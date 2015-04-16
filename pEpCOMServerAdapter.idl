@@ -1,0 +1,145 @@
+// pEpCOMServerAdapter.idl : IDL source for pEpCOMServerAdapter
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (pEpCOMServerAdapter.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+
+[
+    object,
+    uuid(9A9F4422-CF0A-45D7-90CD-1D1B7B2A4540),
+    oleautomation,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IpEpEngine : IUnknown {
+    typedef enum _pEp_STATUS {
+        pEp_STATUS_OK = 0,
+
+        pEp_KEY_NOT_FOUND = 0x0201,
+        pEp_KEY_HAS_AMBIG_NAME = 0x0202,
+        pEp_GET_KEY_FAILED = 0x0203,
+
+        pEp_UNENCRYPTED = 0x0400,
+        pEp_VERIFIED = 0x0401,
+        pEp_DECRYPTED = 0x0402,
+        pEp_DECRYPTED_AND_VERIFIED = 0x0403,
+        pEp_DECRYPT_WRONG_FORMAT = 0x0404,
+        pEp_DECRYPT_NO_KEY = 0x0405,
+        pEp_DECRYPT_SIGNATURE_DOES_NOT_MATCH = 0x0406,
+        pEp_VERIFY_NO_KEY = 0x0407,
+        pEp_VERIFIED_AND_TRUSTED = 0x0408,
+
+        pEp_ILLEGAL_VALUE = -4,
+        pEp_BUFFER_TOO_SMALL = -3,
+        pEp_OUT_OF_MEMORY = -2,
+        pEp_UNKNOWN_ERROR = -1
+    } pEp_STATUS;
+
+    [id(1)] HRESULT log([in] BSTR title, [in] BSTR entity, [in, defaultvalue("")] BSTR description, [in, defaultvalue("")] BSTR comment);
+    [id(2)] HRESULT decrypt([in] BSTR ctext, [out] BSTR * ptext, [out] SAFEARRAY(BSTR) * key_list, [out, retval] pEp_STATUS * decrypt_status);
+    [id(3)] HRESULT decrypt_b([in] BSTR ctext, [out] SAFEARRAY(BYTE) * ptext, [out] SAFEARRAY(BSTR) * key_list, [out, retval] pEp_STATUS * decrypt_status);
+    [id(4)] HRESULT encrypt([in] SAFEARRAY(BSTR) key_list, [in] BSTR ptext, [out] BSTR * ctext, [out, retval] pEp_STATUS * status);
+    [id(5)] HRESULT encrypt_b([in] SAFEARRAY(BSTR) key_list, [in] SAFEARRAY(BYTE) ptext, [out] BSTR * ctext, [out, retval] pEp_STATUS * status);
+    [id(21)] HRESULT verify([in] BSTR text, [in] BSTR signature, [out] SAFEARRAY(BSTR) * key_list, [out, retval] pEp_STATUS * verify_status);
+    [id(6)] HRESULT safeword([in] LONG value, [in, defaultvalue("en")] BSTR lang, [out, retval] BSTR * word);
+    [id(7)] HRESULT safewords([in] BSTR fpr, [in, defaultvalue("en")] BSTR lang, [in, defaultvalue(0)] LONG max_words, [out, retval] BSTR * words);
+
+    typedef enum _pEp_comm_type {
+        pEp_ct_unknown = 0,
+
+        // range 0x01 to 0x09: no encryption, 0x0a to 0x0e: nothing reasonable
+
+        pEp_ct_no_encryption = 0x01,                // generic
+        pEp_ct_no_encrypted_channel = 0x02,
+        pEp_ct_key_not_found = 0x03,
+        pEp_ct_key_expired = 0x04,
+        pEp_ct_key_revoked = 0x05,
+        pEp_ct_key_b0rken = 0x06,
+        pEp_ct_my_key_not_included = 0x09,
+
+        pEp_ct_security_by_obscurity = 0x0a,
+        pEp_ct_b0rken_crypto = 0x0b,
+        pEp_ct_key_too_short = 0x0e,
+
+        pEp_ct_compromized = 0x0f,                  // known compromized connection
+
+        // range 0x10 to 0x3f: unconfirmed encryption
+
+        pEp_ct_unconfirmed_encryption = 0x10,       // generic
+        pEp_ct_OpenPGP_1024_RSA_unconfirmed = 0x11,	// RSA 1024 is weak
+        pEp_ct_OpenPGP_unconfirmed = 0x3f,          // key at least 2048 bit RSA
+        // or 1024 bit DSA
+
+        // range 0x40 to 0x7f: unconfirmed encryption and anonymization
+
+        pEp_ct_unconfirmed_enc_anon = 0x40,         // generic
+        pEp_ct_pEp_unconfirmed = 0x7f,
+
+        pEp_ct_confirmed = 0x80,                    // this bit decides if trust is confirmed
+
+        // range 0x81 to 0x8f: reserved
+        // range 0x90 to 0xbf: confirmed encryption
+
+        pEp_ct_confirmed_encryption = 0x90,         // generic
+        pEp_ct_OpenPGP_1024_RSA = 0x91, // RSA 1024 is weak
+        pEp_ct_OpenPGP = 0xbf, // key at least 2048 bit RSA or 1024 bit DSA
+
+        // range 0xc0 to 0xff: confirmed encryption and anonymization
+
+        pEp_ct_confirmed_enc_anon = 0xc0,           // generic
+        pEp_ct_pEp = 0xff
+    } pEp_comm_type;
+
+    struct pEp_identity_s {
+        BSTR address;
+        BSTR fpr;
+        BSTR user_id;
+        BSTR username;
+        pEp_comm_type comm_type;
+        BSTR lang;
+    };
+
+    [id(8)] HRESULT get_identity([in] BSTR address, [out, retval] struct pEp_identity_s * ident);
+    [id(9)] HRESULT set_identity([in] struct pEp_identity_s * ident);
+    [id(10)] HRESULT generate_keypair([in] struct pEp_identity_s * ident, [out, retval] BSTR * fpr);
+    [id(11)] HRESULT delete_keypair([in] BSTR fpr);
+    [id(12)] HRESULT import_key([in] BSTR key_data);
+    [id(13)] HRESULT import_key_b([in] SAFEARRAY(BYTE) key_data);
+    [id(14)] HRESULT export_key([in] BSTR fpr, [out, retval] BSTR * key_data);
+    [id(15)] HRESULT recv_key([in] BSTR pattern);
+    [id(16)] HRESULT find_keys([in] BSTR pattern, [out, retval] SAFEARRAY(BSTR) * key_list);
+    [id(17)] HRESULT send_key([in] BSTR pattern);
+
+    [id(19)] HRESULT examine_identity([in] struct pEp_identity_s * ident);
+    [id(20)] HRESULT examine_myself([in] struct pEp_identity_s * myself);
+    [id(22)] HRESULT myself([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
+    [id(23)] HRESULT update_identity([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
+};
+[
+    uuid(3EC2E1A4-40E8-48E4-A7B0-1876D34F9462),
+    version(1.0),
+]
+library pEpCOMServerAdapterLib
+{
+    importlib("stdole2.tlb");
+    [
+        uuid(B6BC9B8E-D9E2-4419-A3A4-7B4B58175549)
+    ]
+    dispinterface _IpEpEngineEvents
+    {
+    properties:
+    methods:
+    };
+    [
+        uuid(EF1B073D-5058-4E0E-829E-B4D22CA21EA2)
+    ]
+    coclass pEpEngine {
+        [default] interface IpEpEngine;
+        [default, source] dispinterface _IpEpEngineEvents;
+    };
+};
+

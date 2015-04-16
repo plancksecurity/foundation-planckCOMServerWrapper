@@ -1,0 +1,15 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {EF1B073D-5058-4E0E-829E-B4D22CA21EA2} = s 'pEpEngine Class'
+		{
+			LocalServer32 = s '%MODULE%'
+			{
+				val ServerExecutable = s '%MODULE%'
+			}
+			TypeLib = s '{3EC2E1A4-40E8-48E4-A7B0-1876D34F9462}'
+			Version = s '1.0'
+		}
+	}
+}
