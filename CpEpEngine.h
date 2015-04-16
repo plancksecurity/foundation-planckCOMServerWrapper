@@ -23,7 +23,7 @@ using namespace utility;
 // CpEpEngine
 
 class ATL_NO_VTABLE CpEpEngine :
-	public CComObjectRootEx<CComSingleThreadModel>,
+    public CComObjectRootEx<CComObjectThreadModel>,
 	public CComCoClass<CpEpEngine, &CLSID_pEpEngine>,
 	public ISupportErrorInfo,
 	public IConnectionPointContainerImpl<CpEpEngine>,
