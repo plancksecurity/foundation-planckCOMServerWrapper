@@ -54,9 +54,10 @@ DECLARE_REGISTRY_RESOURCEID(IDR_PEPENGINE)
 DECLARE_NOT_AGGREGATABLE(CpEpEngine)
 
 BEGIN_COM_MAP(CpEpEngine)
-	COM_INTERFACE_ENTRY(IpEpEngine)
-	COM_INTERFACE_ENTRY(ISupportErrorInfo)
-	COM_INTERFACE_ENTRY(IConnectionPointContainer)
+    COM_INTERFACE_ENTRY(IpEpEngine)
+    COM_INTERFACE_ENTRY(ISupportErrorInfo)
+    COM_INTERFACE_ENTRY(IConnectionPointContainer)
+    COM_INTERFACE_ENTRY(IMessageAPI_Outlook)
 END_COM_MAP()
 
 BEGIN_CONNECTION_POINT_MAP(CpEpEngine)
@@ -196,6 +197,7 @@ public:
 
     // IMessageAPI_Outlook
     STDMETHOD(key_compromized)(BSTR fpr);
+    STDMETHOD(get_outlook)(IMessageAPI_Outlook* pVal);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)

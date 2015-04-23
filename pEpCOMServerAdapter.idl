@@ -7,6 +7,8 @@
 import "oaidl.idl";
 import "ocidl.idl";
 
+interface IMessageAPI_Outlook;
+
 [
     object,
     uuid(9A9F4422-CF0A-45D7-90CD-1D1B7B2A4540),

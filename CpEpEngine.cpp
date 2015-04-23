@@ -968,3 +968,11 @@ HRESULT CpEpEngine::error(_bstr_t msg)
     }
     return E_FAIL;
 }
+
+
+STDMETHODIMP CpEpEngine::get_outlook(IMessageAPI_Outlook* pVal)
+{
+    pVal = (IMessageAPI_Outlook *) this;
+
+    return S_OK;
+}
