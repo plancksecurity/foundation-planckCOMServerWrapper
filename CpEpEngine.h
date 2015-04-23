@@ -197,7 +197,6 @@ public:
 
     // IMessageAPI_Outlook
     STDMETHOD(key_compromized)(BSTR fpr);
-    STDMETHOD(get_outlook)(IMessageAPI_Outlook* pVal);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)
