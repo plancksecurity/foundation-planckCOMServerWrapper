@@ -6,7 +6,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Thu Apr 16 16:43:32 2015
+/* at Thu Apr 23 19:17:16 2015
  */
 /* Compiler settings for pEpCOMServerAdapter.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -68,6 +68,9 @@ typedef IID CLSID;
 #endif !_MIDL_USE_GUIDDEF_
 
 MIDL_DEFINE_GUID(IID, IID_IpEpEngine,0x9A9F4422,0xCF0A,0x45D7,0x90,0xCD,0x1D,0x1B,0x7B,0x2A,0x45,0x40);
+
+
+MIDL_DEFINE_GUID(IID, IID_IMessageAPI_Outlook,0xBC9AB54D,0x2CDA,0x47A5,0xAB,0x40,0x64,0x85,0x7B,0x9E,0x95,0x55);
 
 
 MIDL_DEFINE_GUID(IID, LIBID_pEpCOMServerAdapterLib,0x3EC2E1A4,0x40E8,0x48E4,0xA7,0xB0,0x18,0x76,0xD3,0x4F,0x94,0x62);

@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Thu Apr 16 16:43:32 2015
+/* at Thu Apr 23 19:17:16 2015
  */
 /* Compiler settings for pEpCOMServerAdapter.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -50,6 +50,13 @@
 typedef interface IpEpEngine IpEpEngine;
 
 #endif 	/* __IpEpEngine_FWD_DEFINED__ */
+
+
+#ifndef __IMessageAPI_Outlook_FWD_DEFINED__
+#define __IMessageAPI_Outlook_FWD_DEFINED__
+typedef interface IMessageAPI_Outlook IMessageAPI_Outlook;
+
+#endif 	/* __IMessageAPI_Outlook_FWD_DEFINED__ */
 
 
 #ifndef ___IpEpEngineEvents_FWD_DEFINED__
@@ -154,98 +161,98 @@ EXTERN_C const IID IID_IpEpEngine;
     IpEpEngine : public IUnknown
     {
     public:
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE log( 
+        virtual HRESULT STDMETHODCALLTYPE log( 
             /* [in] */ BSTR title,
             /* [in] */ BSTR entity,
             /* [defaultvalue][in] */ BSTR description = L"",
             /* [defaultvalue][in] */ BSTR comment = L"") = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE decrypt( 
+        virtual HRESULT STDMETHODCALLTYPE decrypt( 
             /* [in] */ BSTR ctext,
             /* [out] */ BSTR *ptext,
             /* [out] */ SAFEARRAY * *key_list,
             /* [retval][out] */ pEp_STATUS *decrypt_status) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE decrypt_b( 
+        virtual HRESULT STDMETHODCALLTYPE decrypt_b( 
             /* [in] */ BSTR ctext,
             /* [out] */ SAFEARRAY * *ptext,
             /* [out] */ SAFEARRAY * *key_list,
             /* [retval][out] */ pEp_STATUS *decrypt_status) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE encrypt( 
+        virtual HRESULT STDMETHODCALLTYPE encrypt( 
             /* [in] */ SAFEARRAY * key_list,
             /* [in] */ BSTR ptext,
             /* [out] */ BSTR *ctext,
             /* [retval][out] */ pEp_STATUS *status) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE encrypt_b( 
+        virtual HRESULT STDMETHODCALLTYPE encrypt_b( 
             /* [in] */ SAFEARRAY * key_list,
             /* [in] */ SAFEARRAY * ptext,
             /* [out] */ BSTR *ctext,
             /* [retval][out] */ pEp_STATUS *status) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE verify( 
+        virtual HRESULT STDMETHODCALLTYPE verify( 
             /* [in] */ BSTR text,
             /* [in] */ BSTR signature,
             /* [out] */ SAFEARRAY * *key_list,
             /* [retval][out] */ pEp_STATUS *verify_status) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE safeword( 
+        virtual HRESULT STDMETHODCALLTYPE safeword( 
             /* [in] */ LONG value,
             /* [defaultvalue][in] */ BSTR lang,
             /* [retval][out] */ BSTR *word) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE safewords( 
+        virtual HRESULT STDMETHODCALLTYPE safewords( 
             /* [in] */ BSTR fpr,
             /* [defaultvalue][in] */ BSTR lang,
             /* [defaultvalue][in] */ LONG max_words,
             /* [retval][out] */ BSTR *words) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE get_identity( 
+        virtual HRESULT STDMETHODCALLTYPE get_identity( 
             /* [in] */ BSTR address,
             /* [retval][out] */ struct pEp_identity_s *ident) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE set_identity( 
+        virtual HRESULT STDMETHODCALLTYPE set_identity( 
             /* [in] */ struct pEp_identity_s *ident) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE generate_keypair( 
+        virtual HRESULT STDMETHODCALLTYPE generate_keypair( 
             /* [in] */ struct pEp_identity_s *ident,
             /* [retval][out] */ BSTR *fpr) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE delete_keypair( 
+        virtual HRESULT STDMETHODCALLTYPE delete_keypair( 
             /* [in] */ BSTR fpr) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE import_key( 
+        virtual HRESULT STDMETHODCALLTYPE import_key( 
             /* [in] */ BSTR key_data) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE import_key_b( 
+        virtual HRESULT STDMETHODCALLTYPE import_key_b( 
             /* [in] */ SAFEARRAY * key_data) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE export_key( 
+        virtual HRESULT STDMETHODCALLTYPE export_key( 
             /* [in] */ BSTR fpr,
             /* [retval][out] */ BSTR *key_data) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE recv_key( 
+        virtual HRESULT STDMETHODCALLTYPE recv_key( 
             /* [in] */ BSTR pattern) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE find_keys( 
+        virtual HRESULT STDMETHODCALLTYPE find_keys( 
             /* [in] */ BSTR pattern,
             /* [retval][out] */ SAFEARRAY * *key_list) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE send_key( 
+        virtual HRESULT STDMETHODCALLTYPE send_key( 
             /* [in] */ BSTR pattern) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE examine_identity( 
+        virtual HRESULT STDMETHODCALLTYPE examine_identity( 
             /* [in] */ struct pEp_identity_s *ident) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE examine_myself( 
+        virtual HRESULT STDMETHODCALLTYPE examine_myself( 
             /* [in] */ struct pEp_identity_s *myself) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE myself( 
+        virtual HRESULT STDMETHODCALLTYPE myself( 
             /* [in] */ struct pEp_identity_s *ident,
             /* [retval][out] */ struct pEp_identity_s *result) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE update_identity( 
+        virtual HRESULT STDMETHODCALLTYPE update_identity( 
             /* [in] */ struct pEp_identity_s *ident,
             /* [retval][out] */ struct pEp_identity_s *result) = 0;
         
@@ -270,119 +277,119 @@ EXTERN_C const IID IID_IpEpEngine;
         ULONG ( STDMETHODCALLTYPE *Release )( 
             IpEpEngine * This);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *log )( 
+        HRESULT ( STDMETHODCALLTYPE *log )( 
             IpEpEngine * This,
             /* [in] */ BSTR title,
             /* [in] */ BSTR entity,
             /* [defaultvalue][in] */ BSTR description,
             /* [defaultvalue][in] */ BSTR comment);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *decrypt )( 
+        HRESULT ( STDMETHODCALLTYPE *decrypt )( 
             IpEpEngine * This,
             /* [in] */ BSTR ctext,
             /* [out] */ BSTR *ptext,
             /* [out] */ SAFEARRAY * *key_list,
             /* [retval][out] */ pEp_STATUS *decrypt_status);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *decrypt_b )( 
+        HRESULT ( STDMETHODCALLTYPE *decrypt_b )( 
             IpEpEngine * This,
             /* [in] */ BSTR ctext,
             /* [out] */ SAFEARRAY * *ptext,
             /* [out] */ SAFEARRAY * *key_list,
             /* [retval][out] */ pEp_STATUS *decrypt_status);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *encrypt )( 
+        HRESULT ( STDMETHODCALLTYPE *encrypt )( 
             IpEpEngine * This,
             /* [in] */ SAFEARRAY * key_list,
             /* [in] */ BSTR ptext,
             /* [out] */ BSTR *ctext,
             /* [retval][out] */ pEp_STATUS *status);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *encrypt_b )( 
+        HRESULT ( STDMETHODCALLTYPE *encrypt_b )( 
             IpEpEngine * This,
             /* [in] */ SAFEARRAY * key_list,
             /* [in] */ SAFEARRAY * ptext,
             /* [out] */ BSTR *ctext,
             /* [retval][out] */ pEp_STATUS *status);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *verify )( 
+        HRESULT ( STDMETHODCALLTYPE *verify )( 
             IpEpEngine * This,
             /* [in] */ BSTR text,
             /* [in] */ BSTR signature,
             /* [out] */ SAFEARRAY * *key_list,
             /* [retval][out] */ pEp_STATUS *verify_status);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *safeword )( 
+        HRESULT ( STDMETHODCALLTYPE *safeword )( 
             IpEpEngine * This,
             /* [in] */ LONG value,
             /* [defaultvalue][in] */ BSTR lang,
             /* [retval][out] */ BSTR *word);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *safewords )( 
+        HRESULT ( STDMETHODCALLTYPE *safewords )( 
             IpEpEngine * This,
             /* [in] */ BSTR fpr,
             /* [defaultvalue][in] */ BSTR lang,
             /* [defaultvalue][in] */ LONG max_words,
             /* [retval][out] */ BSTR *words);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *get_identity )( 
+        HRESULT ( STDMETHODCALLTYPE *get_identity )( 
             IpEpEngine * This,
             /* [in] */ BSTR address,
             /* [retval][out] */ struct pEp_identity_s *ident);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *set_identity )( 
+        HRESULT ( STDMETHODCALLTYPE *set_identity )( 
             IpEpEngine * This,
             /* [in] */ struct pEp_identity_s *ident);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *generate_keypair )( 
+        HRESULT ( STDMETHODCALLTYPE *generate_keypair )( 
             IpEpEngine * This,
             /* [in] */ struct pEp_identity_s *ident,
             /* [retval][out] */ BSTR *fpr);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *delete_keypair )( 
+        HRESULT ( STDMETHODCALLTYPE *delete_keypair )( 
             IpEpEngine * This,
             /* [in] */ BSTR fpr);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *import_key )( 
+        HRESULT ( STDMETHODCALLTYPE *import_key )( 
             IpEpEngine * This,
             /* [in] */ BSTR key_data);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *import_key_b )( 
+        HRESULT ( STDMETHODCALLTYPE *import_key_b )( 
             IpEpEngine * This,
             /* [in] */ SAFEARRAY * key_data);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *export_key )( 
+        HRESULT ( STDMETHODCALLTYPE *export_key )( 
             IpEpEngine * This,
             /* [in] */ BSTR fpr,
             /* [retval][out] */ BSTR *key_data);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *recv_key )( 
+        HRESULT ( STDMETHODCALLTYPE *recv_key )( 
             IpEpEngine * This,
             /* [in] */ BSTR pattern);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *find_keys )( 
+        HRESULT ( STDMETHODCALLTYPE *find_keys )( 
             IpEpEngine * This,
             /* [in] */ BSTR pattern,
             /* [retval][out] */ SAFEARRAY * *key_list);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *send_key )( 
+        HRESULT ( STDMETHODCALLTYPE *send_key )( 
             IpEpEngine * This,
             /* [in] */ BSTR pattern);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *examine_identity )( 
+        HRESULT ( STDMETHODCALLTYPE *examine_identity )( 
             IpEpEngine * This,
             /* [in] */ struct pEp_identity_s *ident);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *examine_myself )( 
+        HRESULT ( STDMETHODCALLTYPE *examine_myself )( 
             IpEpEngine * This,
             /* [in] */ struct pEp_identity_s *myself);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *myself )( 
+        HRESULT ( STDMETHODCALLTYPE *myself )( 
             IpEpEngine * This,
             /* [in] */ struct pEp_identity_s *ident,
             /* [retval][out] */ struct pEp_identity_s *result);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *update_identity )( 
+        HRESULT ( STDMETHODCALLTYPE *update_identity )( 
             IpEpEngine * This,
             /* [in] */ struct pEp_identity_s *ident,
             /* [retval][out] */ struct pEp_identity_s *result);
@@ -485,6 +492,119 @@ EXTERN_C const IID IID_IpEpEngine;
 
 
 #endif 	/* __IpEpEngine_INTERFACE_DEFINED__ */
+
+
+#ifndef __IMessageAPI_Outlook_INTERFACE_DEFINED__
+#define __IMessageAPI_Outlook_INTERFACE_DEFINED__
+
+/* interface IMessageAPI_Outlook */
+/* [unique][nonextensible][oleautomation][uuid][object] */ 
+
+typedef 
+enum _pEp_text_format
+    {
+        pEp_text_format_plain	= 0,
+        pEp_text_format_html	= ( pEp_text_format_plain + 1 ) ,
+        pEp_text_format_other	= 0xff
+    } 	pEp_text_format;
+
+typedef 
+enum _pEp_msg_direction
+    {
+        pEp_dir_incoming	= 0,
+        pEp_dir_outgoing	= ( pEp_dir_incoming + 1 ) 
+    } 	pEp_msg_direction;
+
+typedef 
+enum _pEp_MIME_format
+    {
+        pEp_MIME_none	= 0,
+        pEp_MIME_fields_omitted	= ( pEp_MIME_none + 1 ) ,
+        pEp_MIME	= ( pEp_MIME_fields_omitted + 1 ) 
+    } 	pEp_MIME_format;
+
+typedef 
+enum _pEp_enc_format
+    {
+        pEp_enc_none	= 0,
+        pEp_enc_pieces	= ( pEp_enc_none + 1 ) ,
+        pEp_enc_S_MIME	= ( pEp_enc_pieces + 1 ) ,
+        pEp_enc_PGP_MIME	= ( pEp_enc_S_MIME + 1 ) ,
+        pEp_enc_pEp	= ( pEp_enc_PGP_MIME + 1 ) 
+    } 	pEp_enc_format;
+
+
+EXTERN_C const IID IID_IMessageAPI_Outlook;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("BC9AB54D-2CDA-47A5-AB40-64857B9E9555")
+    IMessageAPI_Outlook : public IUnknown
+    {
+    public:
+        virtual HRESULT STDMETHODCALLTYPE key_compromized( 
+            /* [in] */ BSTR fpr) = 0;
+        
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct IMessageAPI_OutlookVtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            IMessageAPI_Outlook * This,
+            /* [in] */ REFIID riid,
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            IMessageAPI_Outlook * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            IMessageAPI_Outlook * This);
+        
+        HRESULT ( STDMETHODCALLTYPE *key_compromized )( 
+            IMessageAPI_Outlook * This,
+            /* [in] */ BSTR fpr);
+        
+        END_INTERFACE
+    } IMessageAPI_OutlookVtbl;
+
+    interface IMessageAPI_Outlook
+    {
+        CONST_VTBL struct IMessageAPI_OutlookVtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define IMessageAPI_Outlook_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define IMessageAPI_Outlook_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define IMessageAPI_Outlook_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define IMessageAPI_Outlook_key_compromized(This,fpr)	\
+    ( (This)->lpVtbl -> key_compromized(This,fpr) ) 
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __IMessageAPI_Outlook_INTERFACE_DEFINED__ */
 
 
 

@@ -7,7 +7,6 @@
 import "oaidl.idl";
 import "ocidl.idl";
 
-
 [
     object,
     uuid(9A9F4422-CF0A-45D7-90CD-1D1B7B2A4540),
@@ -39,14 +38,14 @@ interface IpEpEngine : IUnknown {
         pEp_UNKNOWN_ERROR = -1
     } pEp_STATUS;
 
-    [id(1)] HRESULT log([in] BSTR title, [in] BSTR entity, [in, defaultvalue("")] BSTR description, [in, defaultvalue("")] BSTR comment);
-    [id(2)] HRESULT decrypt([in] BSTR ctext, [out] BSTR * ptext, [out] SAFEARRAY(BSTR) * key_list, [out, retval] pEp_STATUS * decrypt_status);
-    [id(3)] HRESULT decrypt_b([in] BSTR ctext, [out] SAFEARRAY(BYTE) * ptext, [out] SAFEARRAY(BSTR) * key_list, [out, retval] pEp_STATUS * decrypt_status);
-    [id(4)] HRESULT encrypt([in] SAFEARRAY(BSTR) key_list, [in] BSTR ptext, [out] BSTR * ctext, [out, retval] pEp_STATUS * status);
-    [id(5)] HRESULT encrypt_b([in] SAFEARRAY(BSTR) key_list, [in] SAFEARRAY(BYTE) ptext, [out] BSTR * ctext, [out, retval] pEp_STATUS * status);
-    [id(21)] HRESULT verify([in] BSTR text, [in] BSTR signature, [out] SAFEARRAY(BSTR) * key_list, [out, retval] pEp_STATUS * verify_status);
-    [id(6)] HRESULT safeword([in] LONG value, [in, defaultvalue("en")] BSTR lang, [out, retval] BSTR * word);
-    [id(7)] HRESULT safewords([in] BSTR fpr, [in, defaultvalue("en")] BSTR lang, [in, defaultvalue(0)] LONG max_words, [out, retval] BSTR * words);
+    HRESULT log([in] BSTR title, [in] BSTR entity, [in, defaultvalue("")] BSTR description, [in, defaultvalue("")] BSTR comment);
+    HRESULT decrypt([in] BSTR ctext, [out] BSTR * ptext, [out] SAFEARRAY(BSTR) * key_list, [out, retval] pEp_STATUS * decrypt_status);
+    HRESULT decrypt_b([in] BSTR ctext, [out] SAFEARRAY(BYTE) * ptext, [out] SAFEARRAY(BSTR) * key_list, [out, retval] pEp_STATUS * decrypt_status);
+    HRESULT encrypt([in] SAFEARRAY(BSTR) key_list, [in] BSTR ptext, [out] BSTR * ctext, [out, retval] pEp_STATUS * status);
+    HRESULT encrypt_b([in] SAFEARRAY(BSTR) key_list, [in] SAFEARRAY(BYTE) ptext, [out] BSTR * ctext, [out, retval] pEp_STATUS * status);
+    HRESULT verify([in] BSTR text, [in] BSTR signature, [out] SAFEARRAY(BSTR) * key_list, [out, retval] pEp_STATUS * verify_status);
+    HRESULT safeword([in] LONG value, [in, defaultvalue("en")] BSTR lang, [out, retval] BSTR * word);
+    HRESULT safewords([in] BSTR fpr, [in, defaultvalue("en")] BSTR lang, [in, defaultvalue(0)] LONG max_words, [out, retval] BSTR * words);
 
     typedef enum _pEp_comm_type {
         pEp_ct_unknown = 0,
@@ -103,22 +102,59 @@ interface IpEpEngine : IUnknown {
         BSTR lang;
     };
 
-    [id(8)] HRESULT get_identity([in] BSTR address, [out, retval] struct pEp_identity_s * ident);
-    [id(9)] HRESULT set_identity([in] struct pEp_identity_s * ident);
-    [id(10)] HRESULT generate_keypair([in] struct pEp_identity_s * ident, [out, retval] BSTR * fpr);
-    [id(11)] HRESULT delete_keypair([in] BSTR fpr);
-    [id(12)] HRESULT import_key([in] BSTR key_data);
-    [id(13)] HRESULT import_key_b([in] SAFEARRAY(BYTE) key_data);
-    [id(14)] HRESULT export_key([in] BSTR fpr, [out, retval] BSTR * key_data);
-    [id(15)] HRESULT recv_key([in] BSTR pattern);
-    [id(16)] HRESULT find_keys([in] BSTR pattern, [out, retval] SAFEARRAY(BSTR) * key_list);
-    [id(17)] HRESULT send_key([in] BSTR pattern);
+    HRESULT get_identity([in] BSTR address, [out, retval] struct pEp_identity_s * ident);
+    HRESULT set_identity([in] struct pEp_identity_s * ident);
+    HRESULT generate_keypair([in] struct pEp_identity_s * ident, [out, retval] BSTR * fpr);
+    HRESULT delete_keypair([in] BSTR fpr);
+    HRESULT import_key([in] BSTR key_data);
+    HRESULT import_key_b([in] SAFEARRAY(BYTE) key_data);
+    HRESULT export_key([in] BSTR fpr, [out, retval] BSTR * key_data);
+    HRESULT recv_key([in] BSTR pattern);
+    HRESULT find_keys([in] BSTR pattern, [out, retval] SAFEARRAY(BSTR) * key_list);
+    HRESULT send_key([in] BSTR pattern);
 
-    [id(19)] HRESULT examine_identity([in] struct pEp_identity_s * ident);
-    [id(20)] HRESULT examine_myself([in] struct pEp_identity_s * myself);
-    [id(22)] HRESULT myself([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
-    [id(23)] HRESULT update_identity([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
+    HRESULT examine_identity([in] struct pEp_identity_s * ident);
+    HRESULT examine_myself([in] struct pEp_identity_s * myself);
+    HRESULT myself([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
+    HRESULT update_identity([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
 };
+
+[
+    object,
+    uuid(BC9AB54D-2CDA-47A5-AB40-64857B9E9555),
+    oleautomation,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IMessageAPI_Outlook : IUnknown {
+    typedef enum _pEp_text_format {
+        pEp_text_format_plain = 0,
+        pEp_text_format_html,
+        pEp_text_format_other = 0xff
+    } pEp_text_format;
+
+    typedef enum _pEp_msg_direction {
+        pEp_dir_incoming = 0,
+        pEp_dir_outgoing
+    } pEp_msg_direction;
+
+    typedef enum _pEp_MIME_format {
+        pEp_MIME_none = 0,                      // message is not MIME encoded
+        pEp_MIME_fields_omitted,                // message content but no fields
+        pEp_MIME                                // message is fully MIME encoded
+    } pEp_MIME_format;
+
+    typedef enum _pEp_enc_format {
+        pEp_enc_none = 0,                       // message is not encrypted
+        pEp_enc_pieces,                         // inline PGP + PGP extensions
+        pEp_enc_S_MIME,                         // RFC5751
+        pEp_enc_PGP_MIME,                       // RFC3156
+        pEp_enc_pEp                             // pEp encryption format
+    } pEp_enc_format;
+
+    HRESULT key_compromized([in] BSTR fpr);
+};
+
 [
     uuid(3EC2E1A4-40E8-48E4-A7B0-1876D34F9462),
     version(1.0),
@@ -140,6 +176,7 @@ library pEpCOMServerAdapterLib
     coclass pEpEngine {
         [default] interface IpEpEngine;
         [default, source] dispinterface _IpEpEngineEvents;
+        interface IMessageAPI_Outlook;
     };
 };
 

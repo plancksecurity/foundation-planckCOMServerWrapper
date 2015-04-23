@@ -18,11 +18,13 @@
 extern "C"   {
 #endif
 
+EXTERN_PROXY_FILE( MessageAPI )
 EXTERN_PROXY_FILE( pEpCOMServerAdapter )
 
 
 PROXYFILE_LIST_START
 /* Start of list */
+  REFERENCE_PROXY_FILE( MessageAPI ),
   REFERENCE_PROXY_FILE( pEpCOMServerAdapter ),
 /* End of list */
 PROXYFILE_LIST_END

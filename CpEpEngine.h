@@ -28,7 +28,8 @@ class ATL_NO_VTABLE CpEpEngine :
 	public ISupportErrorInfo,
 	public IConnectionPointContainerImpl<CpEpEngine>,
 	public CProxy_IpEpEngineEvents<CpEpEngine>,
-	public IpEpEngine
+	public IpEpEngine,
+    public IMessageAPI_Outlook
 {
 public:
 	CpEpEngine()
@@ -192,6 +193,9 @@ public:
     STDMETHOD(verify)(BSTR text, BSTR signature, LPSAFEARRAY * key_list, pEp_STATUS * verify_status);
     STDMETHOD(myself)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
     STDMETHOD(update_identity)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
+
+    // IMessageAPI_Outlook
+    STDMETHOD(key_compromized)(BSTR fpr);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)
