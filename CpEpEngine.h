@@ -136,13 +136,14 @@ public:
     STDMETHOD(recv_key)(BSTR pattern);
     STDMETHOD(find_keys)(BSTR pattern, LPSAFEARRAY * key_list);
     STDMETHOD(send_key)(BSTR pattern);
+
+    // keymanagement API
+
     STDMETHOD(examine_identity)(pEp_identity_s * ident);
     STDMETHOD(examine_myself)(pEp_identity_s * myself);
     STDMETHOD(verify)(BSTR text, BSTR signature, LPSAFEARRAY * key_list, pEp_STATUS * verify_status);
     STDMETHOD(myself)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
     STDMETHOD(update_identity)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
-
-    // IMessageAPI_Outlook
     STDMETHOD(key_compromized)(BSTR fpr);
 };
 
