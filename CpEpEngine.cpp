@@ -916,7 +916,7 @@ STDMETHODIMP CpEpEngine::key_compromized(BSTR fpr)
         return FAIL(L"key not found");
 
     if (status != ::PEP_STATUS_OK)
-        return FAIL(L"revoke compromized key");
+        return FAIL(L"cannot revoke compromized key");
 
     return S_OK;
 }
@@ -929,7 +929,7 @@ STDMETHODIMP CpEpEngine::key_compromized(BSTR fpr)
     do /* poll queue */ {
         if (iq->size())
             break;
-        ::Sleep(100);
+        ::Sleep(200);
     } while (true);
 
     ::pEp_identity *_ident;
