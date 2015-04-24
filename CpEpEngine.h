@@ -18,7 +18,7 @@
 
 using namespace ATL;
 using namespace utility;
-
+using namespace pEp::utility;
 
 // CpEpEngine
 

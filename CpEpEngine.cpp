@@ -3,6 +3,8 @@
 #include "stdafx.h"
 #include "CpEpEngine.h"
 
+using namespace std;
+using namespace pEp::utility;
 
 // CpEpEngine
 
@@ -22,48 +24,6 @@ STDMETHODIMP CpEpEngine::InterfaceSupportsErrorInfo(REFIID riid)
 }
 
 #define FAIL(msg) error(msg)
-
-using namespace std;
-
-static CComSafeArray<BSTR> string_array(const ::stringlist_t *stringlist)
-{
-    CComSafeArray<BSTR> sa_string_list;
-    int n = 0;
-    for (const ::stringlist_t *k = stringlist; k != NULL; k = k->next) {
-        if (k->value) {
-            HRESULT _result = sa_string_list.Add(utf16_bstr(k->value).Detach(), false);
-            assert(_result == S_OK);
-            if (_result == E_OUTOFMEMORY)
-                throw std::bad_alloc();
-            ++n;
-        }
-    }
-
-    return sa_string_list;
-}
-
-static ::stringlist_t * new_stringlist(const SAFEARRAY * safearray)
-{
-    CComSafeArray<BSTR> sa(safearray);
-    int n_strings = 0;
-    ::stringlist_t *_stringlist = ::new_stringlist((const char *) NULL);
-    assert(_stringlist);
-    if (_stringlist == NULL)
-        throw std::bad_alloc();
-
-    n_strings = sa.GetUpperBound() - sa.GetLowerBound() + 1;
-    ::stringlist_t *k = _stringlist;
-    for (int i = 0, j = sa.GetLowerBound(); i<n_strings; ++i, ++j) {
-        k = ::stringlist_add(k, utf8_string(sa.GetAt(j)).c_str());
-        assert(k);
-        if (k == NULL) {
-            ::free_stringlist(_stringlist);
-            throw std::bad_alloc();
-        }
-    }
-
-    return _stringlist;
-}
 
 // CpEpEngine
 

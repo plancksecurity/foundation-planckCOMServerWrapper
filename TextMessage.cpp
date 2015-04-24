@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "TextMessage.h"
 
+using namespace pEp::utility;
 
 // CTextMessage
 
