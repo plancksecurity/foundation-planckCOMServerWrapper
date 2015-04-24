@@ -142,7 +142,7 @@
     <ClInclude Include="CpEpEngine.h" />
     <ClInclude Include="locked_queue.hh" />
     <ClInclude Include="pEpCOMServerAdapter_i.h" />
-    <ClInclude Include="pEp_identity_cpp.h" />
+    <ClInclude Include="pEp_identity_helper.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />

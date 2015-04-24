@@ -75,7 +75,7 @@
     <ClInclude Include="TextMessage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pEp_identity_cpp.h">
+    <ClInclude Include="pEp_identity_helper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

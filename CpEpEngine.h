@@ -9,7 +9,7 @@
 #include "_IpEpEngineEvents_CP.h"
 #include "locked_queue.hh"
 #include "utf8_helper.h"
-#include "pEp_identity_cpp.h"
+#include "pEp_identity_helper.h"
 
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
