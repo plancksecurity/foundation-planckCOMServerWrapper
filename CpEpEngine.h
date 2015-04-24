@@ -9,7 +9,7 @@
 #include "_IpEpEngineEvents_CP.h"
 #include "locked_queue.hh"
 #include "utf8_helper.h"
-
+#include "pEp_identity_cpp.h"
 
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
@@ -80,57 +80,6 @@ END_CONNECTION_POINT_MAP()
 
 
 protected:
-    struct pEp_identity_cpp {
-        std::string address;
-        std::string fpr;
-        std::string user_id;
-        std::string username;
-        pEp_comm_type comm_type;
-        std::string lang;
-        bool me;
-
-        pEp_identity_cpp(
-            std::string _address = std::string(),
-            std::string _fpr = std::string(),
-            std::string _user_id = std::string(),
-            std::string _username = std::string(),
-            pEp_comm_type _comm_type = pEp_ct_unknown,
-            std::string _lang = std::string()
-            ) : address(_address), fpr(_fpr), user_id(_user_id), username(_username), comm_type(_comm_type), lang(_lang), me(false)
-        { }
-
-        pEp_identity_cpp(const ::pEp_identity *_ident)
-            : me(false)
-        {
-            if (_ident->address)
-                address = _ident->address;
-            if (_ident->fpr)
-                fpr = _ident->fpr;
-            if (_ident->user_id)
-                user_id = _ident->user_id;
-            if (_ident->username)
-                username = _ident->username;
-            comm_type = (pEp_comm_type) _ident->comm_type;
-            lang = _ident->lang;
-        }
-
-        pEp_identity_cpp(const pEp_identity_s *_ident)
-            : me(false)
-        {
-            if (_ident->address)
-                address = utf8_string(_ident->address);
-            if (_ident->fpr)
-                fpr = utf8_string(_ident->fpr);
-            if (_ident->user_id)
-                user_id = utf8_string(_ident->user_id);
-            if (_ident->username)
-                username = utf8_string(_ident->username);
-            comm_type = _ident->comm_type;
-            if (_ident->lang)
-                lang = utf8_string(_ident->lang);
-        }
-    };
-
     class session
     {
     private:
@@ -158,8 +107,6 @@ protected:
     {
         return session(this);
     }
-
-    static ::pEp_identity *new_identity(const pEp_identity_cpp&);
 
     typedef locked_queue<pEp_identity_cpp> identity_queue_t;
     static ::pEp_identity * retrieve_next_identity(void *management);

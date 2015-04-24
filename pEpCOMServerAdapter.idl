@@ -119,6 +119,7 @@ interface IpEpEngine : IUnknown {
     HRESULT examine_myself([in] struct pEp_identity_s * myself);
     HRESULT myself([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
     HRESULT update_identity([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
+    HRESULT key_compromized([in] BSTR fpr);
 };
 
 [
@@ -153,8 +154,19 @@ interface IMessageAPI_Outlook : IUnknown {
         pEp_enc_PGP_MIME,                       // RFC3156
         pEp_enc_pEp                             // pEp encryption format
     } pEp_enc_format;
+};
 
-    HRESULT key_compromized([in] BSTR fpr);
+[
+	object,
+	uuid(161538F9-53C8-4D9C-8BA4-0FB43AEC7106),
+	oleautomation,
+	nonextensible,
+	pointer_default(unique)
+]
+interface ITextMessage : IUnknown {
+
+    [propget] HRESULT from([out, retval] struct pEp_identity_s* pVal);
+    [propput] HRESULT from([in] struct pEp_identity_s *newVal);
 };
 
 [
@@ -180,5 +192,21 @@ library pEpCOMServerAdapterLib
         [default, source] dispinterface _IpEpEngineEvents;
         interface IMessageAPI_Outlook;
     };
+	[
+		uuid(844B5363-4EF4-4A39-A030-16452783A6F7)		
+	]
+	dispinterface _ITextMessageEvents
+	{
+		properties:
+		methods:
+	};
+	[
+		uuid(B6CC444F-FE14-4DFE-8315-81E4EA16C1CC)		
+	]
+	coclass TextMessage
+	{
+		[default] interface ITextMessage;
+		[default, source] dispinterface _ITextMessageEvents;
+	};
 };
 

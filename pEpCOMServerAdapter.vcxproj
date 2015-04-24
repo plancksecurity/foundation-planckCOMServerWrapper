@@ -127,6 +127,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TextMessage.cpp" />
     <ClCompile Include="utf8_helper.cpp" />
     <ClCompile Include="xdlldata.c">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
@@ -141,12 +142,15 @@
     <ClInclude Include="CpEpEngine.h" />
     <ClInclude Include="locked_queue.hh" />
     <ClInclude Include="pEpCOMServerAdapter_i.h" />
+    <ClInclude Include="pEp_identity_cpp.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TextMessage.h" />
     <ClInclude Include="utf8_helper.h" />
     <ClInclude Include="xdlldata.h" />
     <ClInclude Include="_IpEpEngineEvents_CP.h" />
+    <ClInclude Include="_ITextMessageEvents_CP.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="pEpCOMServerAdapter.rc" />
@@ -157,6 +161,7 @@
   <ItemGroup>
     <None Include="pEpCOMServerAdapter.rgs" />
     <None Include="pEpEngine.rgs" />
+    <None Include="TextMessage.rgs" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="pEpCOMServerAdapter.idl" />

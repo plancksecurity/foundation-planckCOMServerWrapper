@@ -1,0 +1,15 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {B6CC444F-FE14-4DFE-8315-81E4EA16C1CC} = s 'TextMessage Class'
+		{
+			LocalServer32 = s '%MODULE%'
+			{
+				val ServerExecutable = s '%MODULE_RAW%'
+			}
+			TypeLib = s '{3EC2E1A4-40E8-48E4-A7B0-1876D34F9462}'
+			Version = s '1.0'
+		}
+	}
+}

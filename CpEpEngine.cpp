@@ -65,100 +65,7 @@ static ::stringlist_t * new_stringlist(const SAFEARRAY * safearray)
     return _stringlist;
 }
 
-static ::pEp_identity *new_identity(const pEp_identity_s * ident)
-{
-    ::pEp_identity *_ident;
-
-    string _address;
-    string _fpr;
-    string _user_id;
-    string _username;
-
-    if (ident->address)
-        _address = utf8_string(ident->address);
-    if (ident->fpr) {
-        _fpr = utf8_string(ident->fpr);
-        for (auto p = _fpr.begin(); p != _fpr.end(); ++p) {
-            if (*p >= 'A' && *p <= 'Z')
-                continue;
-            if (*p >= '0' && *p <= '9')
-                continue;
-            throw invalid_argument("invalid hex digits in fingerprint");
-        }
-    }
-    if (ident->user_id)
-        _user_id = utf8_string(ident->user_id);
-    if (ident->username)
-        _username = utf8_string(ident->username);
-
-    _ident = ::new_identity(_address.c_str(), _fpr.c_str(), _user_id.c_str(), _username.c_str());
-    assert(_ident);
-    if (_ident == NULL)
-        throw bad_alloc();
-
-    _ident->comm_type = (PEP_comm_type) ident->comm_type;
-
-    if (ident->lang) {
-        string _lang = utf8_string(ident->lang);
-        if (_lang.length() != 0) {
-            if (_lang.length() != 2) {
-                ::free_identity(_ident);
-                throw invalid_argument("invalid language code");
-            }
-            if (_lang[0] < 'a' || _lang[0] > 'z') {
-                ::free_identity(_ident);
-                throw invalid_argument("invalid language code");
-            }
-            if (_lang[1] < 'a' || _lang[1] > 'z') {
-                ::free_identity(_ident);
-                throw invalid_argument("invalid language code");
-            }
-            _ident->lang[0] = _lang[0];
-            _ident->lang[1] = _lang[1];
-        }
-    }
-
-    return _ident;
-}
-
-static void copy_identity(pEp_identity_s * ident_s, const pEp_identity * ident)
-{
-    ::memset(ident_s, 0, sizeof(pEp_identity_s));
-
-    if (ident->address)
-        ident_s->address = utf16_bstr(ident->address).Detach();
-    if (ident->fpr)
-        ident_s->fpr = utf16_bstr(ident->fpr).Detach();
-    if (ident->user_id)
-        ident_s->user_id = utf16_bstr(ident->user_id).Detach();
-    if (ident->username)
-        ident_s->username = utf16_bstr(ident->username).Detach();
-    ident_s->comm_type = (pEp_comm_type) ident->comm_type;
-    if (ident->lang)
-        ident_s->lang = utf16_bstr(ident->lang).Detach();
-}
-
 // CpEpEngine
-
-::pEp_identity *CpEpEngine::new_identity(const CpEpEngine::pEp_identity_cpp& ident)
-{
-    ::pEp_identity *_ident = ::new_identity(ident.address.c_str(), ident.fpr.c_str(), ident.user_id.c_str(), ident.username.c_str());
-    assert(_ident);
-    if (_ident == NULL)
-        throw bad_alloc();
-
-    _ident->comm_type = (::PEP_comm_type) ident.comm_type;
-    _ident->me = ident.me;
-
-    assert(ident.lang.size() == 0 || ident.lang.size() == 2);
-
-    if (ident.lang.size()) {
-        _ident->lang[0] = ident.lang[0];
-        _ident->lang[1] = ident.lang[1];
-    }
-
-    return _ident;
-}
 
 STDMETHODIMP CpEpEngine::log(BSTR title, BSTR entity, BSTR description, BSTR comment)
 {
@@ -929,7 +836,7 @@ STDMETHODIMP CpEpEngine::key_compromized(BSTR fpr)
     do /* poll queue */ {
         if (iq->size())
             break;
-        ::Sleep(200);
+        ::Sleep(100);
     } while (true);
 
     ::pEp_identity *_ident;
@@ -940,7 +847,7 @@ STDMETHODIMP CpEpEngine::key_compromized(BSTR fpr)
         return NULL;
     }
 
-    _ident = new_identity(ident);
+    _ident = ident.to_pEp_identity();
     iq->pop_front();
 
     return _ident;
