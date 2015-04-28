@@ -89,11 +89,11 @@ END_CONNECTION_POINT_MAP()
 	}
 
 public:
+    STDMETHOD(get_from)(pEp_identity_s * pVal);
+    STDMETHOD(put_from)(pEp_identity_s * newVal);
 
-
-
-    STDMETHOD(get_from)(pEp_identity_s* pVal);
-    STDMETHOD(put_from)(pEp_identity_s* newVal);
+    STDMETHOD(get_to)(LPSAFEARRAY * pVal);
+    STDMETHOD(put_to)(SAFEARRAY * newVal);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(TextMessage), CTextMessage)

@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Tue Apr 28 15:22:51 2015
+/* at Wed Apr 29 00:13:01 2015
  */
 /* Compiler settings for pEpCOMServerAdapter.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -178,7 +178,7 @@ enum _pEp_comm_type
         pEp_ct_pEp	= 0xff
     } 	pEp_comm_type;
 
-struct pEp_identity_s
+/* [uuid] */ struct  DECLSPEC_UUID("CAAC4CFB-4EE6-4C27-81F7-E5B4E0A46816") pEp_identity_s
     {
     BSTR address;
     BSTR fpr;
@@ -560,6 +560,12 @@ EXTERN_C const IID IID_ITextMessage;
         virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_from( 
             /* [in] */ struct pEp_identity_s *newVal) = 0;
         
+        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_to( 
+            /* [retval][out] */ SAFEARRAY * *pVal) = 0;
+        
+        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_to( 
+            /* [in] */ SAFEARRAY * newVal) = 0;
+        
     };
     
     
@@ -589,6 +595,14 @@ EXTERN_C const IID IID_ITextMessage;
             ITextMessage * This,
             /* [in] */ struct pEp_identity_s *newVal);
         
+        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_to )( 
+            ITextMessage * This,
+            /* [retval][out] */ SAFEARRAY * *pVal);
+        
+        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_to )( 
+            ITextMessage * This,
+            /* [in] */ SAFEARRAY * newVal);
+        
         END_INTERFACE
     } ITextMessageVtbl;
 
@@ -617,6 +631,12 @@ EXTERN_C const IID IID_ITextMessage;
 
 #define ITextMessage_put_from(This,newVal)	\
     ( (This)->lpVtbl -> put_from(This,newVal) ) 
+
+#define ITextMessage_get_to(This,pVal)	\
+    ( (This)->lpVtbl -> get_to(This,pVal) ) 
+
+#define ITextMessage_put_to(This,newVal)	\
+    ( (This)->lpVtbl -> put_to(This,newVal) ) 
 
 #endif /* COBJMACROS */
 

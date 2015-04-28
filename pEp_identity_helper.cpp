@@ -158,6 +158,5 @@ namespace pEp {
 
             return _ident;
         }
-
     }
 }

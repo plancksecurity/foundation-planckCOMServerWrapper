@@ -39,5 +39,45 @@ namespace pEp {
         void copy_identity(pEp_identity_s * ident_s, const pEp_identity * ident);
         ::pEp_identity *new_identity(const pEp_identity_s * ident);
 
+        template< class UDType > static IRecordInfo *getRecordInfo()
+        {
+            LPTYPEINFO pTypeInfo = NULL;
+            LPTYPELIB pTypelib = NULL;
+            LPSAFEARRAY psaUDType = NULL;
+            IRecordInfo* pRecInfo = NULL;
+
+            // Fetch the IRecordInfo interface describing the UDT
+            HRESULT hr = LoadRegTypeLib(LIBID_pEpCOMServerAdapterLib, 1, 0, GetUserDefaultLCID(), &pTypelib);
+            assert(SUCCEEDED(hr) && pTypelib);
+
+            hr = pTypelib->GetTypeInfoOfGuid(__uuidof(UDType), &pTypeInfo);
+            assert(SUCCEEDED(hr) && pTypeInfo);
+            hr = GetRecordInfoFromTypeInfo(pTypeInfo, &pRecInfo);
+            assert(SUCCEEDED(hr) && pRecInfo);
+            pTypeInfo->Release();
+            pTypelib->Release();
+
+            return pRecInfo;
+        }
+
+        template< class UDType > LPSAFEARRAY newSafeArray(ULONG cElements)
+        {
+            IRecordInfo *pRecInfo = getRecordInfo< UDType >();
+            SAFEARRAYBOUND rgbounds = { cElements, 0 };
+            LPSAFEARRAY psaUDType = SafeArrayCreateEx(VT_RECORD, 1, &rgbounds, pRecInfo);
+            pRecInfo->Release();
+            assert(psaUDType);
+
+            return psaUDType;
+        }
+
+        template< class UDType > UDType * accessData(LPSAFEARRAY psaUDType)
+        {
+            UDType *pUDTypeStruct = NULL;
+            HRESULT hr = SafeArrayAccessData(psaUDType, reinterpret_cast<PVOID*>(&pUDTypeStruct));
+            assert(SUCCEEDED(hr) && pUDTypeStruct);
+
+            return pUDTypeStruct;
+        }
     }
 }

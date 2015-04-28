@@ -95,7 +95,7 @@ interface IpEpEngine : IUnknown {
         pEp_ct_pEp = 0xff
     } pEp_comm_type;
 
-    struct pEp_identity_s {
+    [uuid(CAAC4CFB-4EE6-4C27-81F7-E5B4E0A46816)] struct pEp_identity_s {
         BSTR address;
         BSTR fpr;
         BSTR user_id;
@@ -132,8 +132,11 @@ interface IpEpEngine : IUnknown {
 ]
 interface ITextMessage : IUnknown {
 
-    [propget] HRESULT from([out, retval] struct pEp_identity_s* pVal);
+    [propget] HRESULT from([out, retval] struct pEp_identity_s *pVal);
     [propput] HRESULT from([in] struct pEp_identity_s *newVal);
+
+    [propget] HRESULT to([out, retval] SAFEARRAY(struct pEp_identity_s) *pVal);
+    [propput] HRESULT to([in] SAFEARRAY(struct pEp_identity_s) newVal);
 };
 
 [
