@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Fri Apr 24 16:11:40 2015
+/* at Tue Apr 28 15:22:51 2015
  */
 /* Compiler settings for pEpCOMServerAdapter.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -52,18 +52,18 @@ typedef interface IpEpEngine IpEpEngine;
 #endif 	/* __IpEpEngine_FWD_DEFINED__ */
 
 
-#ifndef __IMessageAPI_Outlook_FWD_DEFINED__
-#define __IMessageAPI_Outlook_FWD_DEFINED__
-typedef interface IMessageAPI_Outlook IMessageAPI_Outlook;
-
-#endif 	/* __IMessageAPI_Outlook_FWD_DEFINED__ */
-
-
 #ifndef __ITextMessage_FWD_DEFINED__
 #define __ITextMessage_FWD_DEFINED__
 typedef interface ITextMessage ITextMessage;
 
 #endif 	/* __ITextMessage_FWD_DEFINED__ */
+
+
+#ifndef __IMessageAPI_Outlook_FWD_DEFINED__
+#define __IMessageAPI_Outlook_FWD_DEFINED__
+typedef interface IMessageAPI_Outlook IMessageAPI_Outlook;
+
+#endif 	/* __IMessageAPI_Outlook_FWD_DEFINED__ */
 
 
 #ifndef ___IpEpEngineEvents_FWD_DEFINED__
@@ -539,6 +539,96 @@ EXTERN_C const IID IID_IpEpEngine;
 #endif 	/* __IpEpEngine_INTERFACE_DEFINED__ */
 
 
+#ifndef __ITextMessage_INTERFACE_DEFINED__
+#define __ITextMessage_INTERFACE_DEFINED__
+
+/* interface ITextMessage */
+/* [unique][nonextensible][oleautomation][uuid][object] */ 
+
+
+EXTERN_C const IID IID_ITextMessage;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("161538F9-53C8-4D9C-8BA4-0FB43AEC7106")
+    ITextMessage : public IUnknown
+    {
+    public:
+        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_from( 
+            /* [retval][out] */ struct pEp_identity_s *pVal) = 0;
+        
+        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_from( 
+            /* [in] */ struct pEp_identity_s *newVal) = 0;
+        
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct ITextMessageVtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            ITextMessage * This,
+            /* [in] */ REFIID riid,
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            ITextMessage * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            ITextMessage * This);
+        
+        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_from )( 
+            ITextMessage * This,
+            /* [retval][out] */ struct pEp_identity_s *pVal);
+        
+        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_from )( 
+            ITextMessage * This,
+            /* [in] */ struct pEp_identity_s *newVal);
+        
+        END_INTERFACE
+    } ITextMessageVtbl;
+
+    interface ITextMessage
+    {
+        CONST_VTBL struct ITextMessageVtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define ITextMessage_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define ITextMessage_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define ITextMessage_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define ITextMessage_get_from(This,pVal)	\
+    ( (This)->lpVtbl -> get_from(This,pVal) ) 
+
+#define ITextMessage_put_from(This,newVal)	\
+    ( (This)->lpVtbl -> put_from(This,newVal) ) 
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __ITextMessage_INTERFACE_DEFINED__ */
+
+
 #ifndef __IMessageAPI_Outlook_INTERFACE_DEFINED__
 #define __IMessageAPI_Outlook_INTERFACE_DEFINED__
 
@@ -640,96 +730,6 @@ EXTERN_C const IID IID_IMessageAPI_Outlook;
 
 
 #endif 	/* __IMessageAPI_Outlook_INTERFACE_DEFINED__ */
-
-
-#ifndef __ITextMessage_INTERFACE_DEFINED__
-#define __ITextMessage_INTERFACE_DEFINED__
-
-/* interface ITextMessage */
-/* [unique][nonextensible][oleautomation][uuid][object] */ 
-
-
-EXTERN_C const IID IID_ITextMessage;
-
-#if defined(__cplusplus) && !defined(CINTERFACE)
-    
-    MIDL_INTERFACE("161538F9-53C8-4D9C-8BA4-0FB43AEC7106")
-    ITextMessage : public IUnknown
-    {
-    public:
-        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_from( 
-            /* [retval][out] */ struct pEp_identity_s *pVal) = 0;
-        
-        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_from( 
-            /* [in] */ struct pEp_identity_s *newVal) = 0;
-        
-    };
-    
-    
-#else 	/* C style interface */
-
-    typedef struct ITextMessageVtbl
-    {
-        BEGIN_INTERFACE
-        
-        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
-            ITextMessage * This,
-            /* [in] */ REFIID riid,
-            /* [annotation][iid_is][out] */ 
-            _COM_Outptr_  void **ppvObject);
-        
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
-            ITextMessage * This);
-        
-        ULONG ( STDMETHODCALLTYPE *Release )( 
-            ITextMessage * This);
-        
-        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_from )( 
-            ITextMessage * This,
-            /* [retval][out] */ struct pEp_identity_s *pVal);
-        
-        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_from )( 
-            ITextMessage * This,
-            /* [in] */ struct pEp_identity_s *newVal);
-        
-        END_INTERFACE
-    } ITextMessageVtbl;
-
-    interface ITextMessage
-    {
-        CONST_VTBL struct ITextMessageVtbl *lpVtbl;
-    };
-
-    
-
-#ifdef COBJMACROS
-
-
-#define ITextMessage_QueryInterface(This,riid,ppvObject)	\
-    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
-
-#define ITextMessage_AddRef(This)	\
-    ( (This)->lpVtbl -> AddRef(This) ) 
-
-#define ITextMessage_Release(This)	\
-    ( (This)->lpVtbl -> Release(This) ) 
-
-
-#define ITextMessage_get_from(This,pVal)	\
-    ( (This)->lpVtbl -> get_from(This,pVal) ) 
-
-#define ITextMessage_put_from(This,newVal)	\
-    ( (This)->lpVtbl -> put_from(This,newVal) ) 
-
-#endif /* COBJMACROS */
-
-
-#endif 	/* C style interface */
-
-
-
-
-#endif 	/* __ITextMessage_INTERFACE_DEFINED__ */
 
 
 

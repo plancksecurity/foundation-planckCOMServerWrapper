@@ -122,6 +122,20 @@ interface IpEpEngine : IUnknown {
     HRESULT key_compromized([in] BSTR fpr);
 };
 
+
+[
+    object,
+    uuid(161538F9-53C8-4D9C-8BA4-0FB43AEC7106),
+    oleautomation,
+    nonextensible,
+    pointer_default(unique)
+]
+interface ITextMessage : IUnknown {
+
+    [propget] HRESULT from([out, retval] struct pEp_identity_s* pVal);
+    [propput] HRESULT from([in] struct pEp_identity_s *newVal);
+};
+
 [
     object,
     uuid(BC9AB54D-2CDA-47A5-AB40-64857B9E9555),
@@ -154,19 +168,6 @@ interface IMessageAPI_Outlook : IUnknown {
         pEp_enc_PGP_MIME,                       // RFC3156
         pEp_enc_pEp                             // pEp encryption format
     } pEp_enc_format;
-};
-
-[
-	object,
-	uuid(161538F9-53C8-4D9C-8BA4-0FB43AEC7106),
-	oleautomation,
-	nonextensible,
-	pointer_default(unique)
-]
-interface ITextMessage : IUnknown {
-
-    [propget] HRESULT from([out, retval] struct pEp_identity_s* pVal);
-    [propput] HRESULT from([in] struct pEp_identity_s *newVal);
 };
 
 [

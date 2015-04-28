@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "CpEpEngine.h"
+#include "TextMessage.h"
 
 using namespace std;
 using namespace pEp::utility;
