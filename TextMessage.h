@@ -28,9 +28,11 @@ class ATL_NO_VTABLE CTextMessage :
 {
 private:
     ::message *msg;
+    ::bloblist_t *m_next_attachment;
 
 public:
-	CTextMessage()
+    CTextMessage()
+        : m_next_attachment(NULL)
 	{
         msg = (::message *) calloc(1, sizeof(::message));
         assert(msg);
@@ -39,6 +41,7 @@ public:
 	}
 
     CTextMessage(const CTextMessage& second)
+        : m_next_attachment(NULL)
     {
         msg = ::message_dup(second.msg);
         assert(msg);
@@ -47,6 +50,7 @@ public:
     }
 
     CTextMessage(const ::message *second)
+        : m_next_attachment(NULL)
     {
         assert(second);
         msg = ::message_dup(second);
@@ -89,11 +93,57 @@ END_CONNECTION_POINT_MAP()
 	}
 
 public:
+    STDMETHOD(get_dir)(pEp_msg_direction * pVal);
+    STDMETHOD(put_dir)(pEp_msg_direction newVal);
+
+    STDMETHOD(get_id)(BSTR * pVal);
+    STDMETHOD(put_id)(BSTR newVal);
+
+    STDMETHOD(get_shortmsg)(BSTR * pVal);
+    STDMETHOD(put_shortmsg)(BSTR newVal);
+
+    STDMETHOD(get_longmsg)(BSTR * pVal);
+    STDMETHOD(put_longmsg)(BSTR newVal);
+
+    STDMETHOD(get_longmsg_formatted)(BSTR * pVal);
+    STDMETHOD(put_longmsg_formatted)(BSTR newVal);
+
+    STDMETHOD(add_attachment)(SAFEARRAY * data, BSTR mime_type, BSTR filename);
+    STDMETHOD(has_attachments)(boolean *result);
+    STDMETHOD(next_attachment)(SAFEARRAY ** data, BSTR * mime_type, BSTR * filename, boolean *result);
+
+    STDMETHOD(get_sent)(hyper * result);
+    STDMETHOD(put_sent)(hyper val);
+
+    STDMETHOD(get_recv)(hyper * result);
+    STDMETHOD(put_recv)(hyper val);
+
     STDMETHOD(get_from)(pEp_identity_s * pVal);
     STDMETHOD(put_from)(pEp_identity_s * newVal);
 
     STDMETHOD(get_to)(LPSAFEARRAY * pVal);
     STDMETHOD(put_to)(SAFEARRAY * newVal);
+
+    STDMETHOD(get_recv_by)(pEp_identity_s * pVal);
+    STDMETHOD(put_recv_by)(pEp_identity_s * newVal);
+
+    STDMETHOD(get_cc)(LPSAFEARRAY * pVal);
+    STDMETHOD(put_cc)(SAFEARRAY * newVal);
+
+    STDMETHOD(get_bcc)(LPSAFEARRAY * pVal);
+    STDMETHOD(put_bcc)(SAFEARRAY * newVal);
+
+    STDMETHOD(get_reply_to)(LPSAFEARRAY * pVal);
+    STDMETHOD(put_reply_to)(SAFEARRAY * newVal);
+
+    STDMETHOD(get_references)(SAFEARRAY ** pVal);
+    STDMETHOD(put_references)(SAFEARRAY * newVal);
+
+    STDMETHOD(get_keywords)(SAFEARRAY ** pVal);
+    STDMETHOD(put_keywords)(SAFEARRAY * newVal);
+
+    STDMETHOD(get_comments)(BSTR * pVal);
+    STDMETHOD(put_comments)(BSTR newVal);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(TextMessage), CTextMessage)

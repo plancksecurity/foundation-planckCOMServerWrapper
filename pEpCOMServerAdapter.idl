@@ -7,7 +7,92 @@
 import "oaidl.idl";
 import "ocidl.idl";
 
-interface IMessageAPI_Outlook;
+
+[
+    object,
+    uuid(161538F9-53C8-4D9C-8BA4-0FB43AEC7106),
+    oleautomation,
+    nonextensible,
+    pointer_default(unique)
+]
+interface ITextMessage : IUnknown {
+    typedef enum _pEp_text_format {
+        pEp_text_format_plain = 0,
+        pEp_text_format_html,
+        pEp_text_format_other = 0xff
+    } pEp_text_format;
+
+    typedef enum _pEp_msg_direction {
+        pEp_dir_incoming = 0,
+        pEp_dir_outgoing
+    } pEp_msg_direction;
+
+    typedef enum _pEp_MIME_format {
+        pEp_MIME_none = 0,                      // message is not MIME encoded
+        pEp_MIME_fields_omitted,                // message content but no fields
+        pEp_MIME                                // message is fully MIME encoded
+    } pEp_MIME_format;
+
+    typedef enum _pEp_enc_format {
+        pEp_enc_none = 0,                       // message is not encrypted
+        pEp_enc_pieces,                         // inline PGP + PGP extensions
+        pEp_enc_S_MIME,                         // RFC5751
+        pEp_enc_PGP_MIME,                       // RFC3156
+        pEp_enc_pEp                             // pEp encryption format
+    } pEp_enc_format;
+
+    [propget] HRESULT dir([out, retval] pEp_msg_direction *pVal);
+    [propput] HRESULT dir([in] pEp_msg_direction newVal);
+
+    [propget] HRESULT id([out, retval] BSTR *pVal);
+    [propput] HRESULT id([in] BSTR newVal);
+
+    [propget] HRESULT shortmsg([out, retval] BSTR *pVal);
+    [propput] HRESULT shortmsg([in] BSTR newVal);
+
+    [propget] HRESULT longmsg([out, retval] BSTR *pVal);
+    [propput] HRESULT longmsg([in] BSTR newVal);
+
+    [propget] HRESULT longmsg_formatted([out, retval] BSTR *pVal);
+    [propput] HRESULT longmsg_formatted([in] BSTR newVal);
+
+    HRESULT add_attachment([in] SAFEARRAY(BYTE) data, [in, optional] BSTR mime_type, [in, optional] BSTR filename);
+    HRESULT has_attachments([out, retval] boolean *result);
+    HRESULT next_attachment([out] SAFEARRAY(BYTE) * data, [out] BSTR * mime_type, [out] BSTR * filename, [out, retval] boolean *result);
+
+    [propget] HRESULT sent([out, retval] hyper * result);
+    [propput] HRESULT sent([in] hyper val);
+
+    [propget] HRESULT recv([out, retval] hyper * result);
+    [propput] HRESULT recv([in] hyper val);
+
+    [propget] HRESULT from([out, retval] struct pEp_identity_s *pVal);
+    [propput] HRESULT from([in] struct pEp_identity_s *newVal);
+
+    [propget] HRESULT to([out, retval] SAFEARRAY(struct pEp_identity_s) *pVal);
+    [propput] HRESULT to([in] SAFEARRAY(struct pEp_identity_s) newVal);
+
+    [propget] HRESULT recv_by([out, retval] struct pEp_identity_s *pVal);
+    [propput] HRESULT recv_by([in] struct pEp_identity_s *newVal);
+
+    [propget] HRESULT cc([out, retval] SAFEARRAY(struct pEp_identity_s) *pVal);
+    [propput] HRESULT cc([in] SAFEARRAY(struct pEp_identity_s) newVal);
+
+    [propget] HRESULT bcc([out, retval] SAFEARRAY(struct pEp_identity_s) *pVal);
+    [propput] HRESULT bcc([in] SAFEARRAY(struct pEp_identity_s) newVal);
+
+    [propget] HRESULT reply_to([out, retval] SAFEARRAY(struct pEp_identity_s) *pVal);
+    [propput] HRESULT reply_to([in] SAFEARRAY(struct pEp_identity_s) newVal);
+
+    [propget] HRESULT references([out, retval] SAFEARRAY(BSTR) *pVal);
+    [propput] HRESULT references([in] SAFEARRAY(BSTR) newVal);
+
+    [propget] HRESULT keywords([out, retval] SAFEARRAY(BSTR) *pVal);
+    [propput] HRESULT keywords([in] SAFEARRAY(BSTR) newVal);
+
+    [propget] HRESULT comments([out, retval] BSTR *pVal);
+    [propput] HRESULT comments([in] BSTR newVal);
+};
 
 [
     object,
@@ -120,57 +205,28 @@ interface IpEpEngine : IUnknown {
     HRESULT myself([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
     HRESULT update_identity([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
     HRESULT key_compromized([in] BSTR fpr);
-};
 
+    // Message API
 
-[
-    object,
-    uuid(161538F9-53C8-4D9C-8BA4-0FB43AEC7106),
-    oleautomation,
-    nonextensible,
-    pointer_default(unique)
-]
-interface ITextMessage : IUnknown {
+    typedef enum _pEp_color {
+        pEp_undefined = 0,
+        pEp_unencrypted,
+        pEp_unreliable,
+        pEp_reliable,
+        pEp_yellow = pEp_reliable,
+        pEp_trusted,
+        pEp_green = pEp_trusted,
+        pEp_trusted_and_anonymized,
+        pEp_fully_anonymous,
 
-    [propget] HRESULT from([out, retval] struct pEp_identity_s *pVal);
-    [propput] HRESULT from([in] struct pEp_identity_s *newVal);
+        pEp_under_attack = -1,
+        pEp_red = pEp_under_attack,
+        pEp_b0rken = -2
+    } pEp_color;
 
-    [propget] HRESULT to([out, retval] SAFEARRAY(struct pEp_identity_s) *pVal);
-    [propput] HRESULT to([in] SAFEARRAY(struct pEp_identity_s) newVal);
-};
-
-[
-    object,
-    uuid(BC9AB54D-2CDA-47A5-AB40-64857B9E9555),
-    oleautomation,
-    nonextensible,
-    pointer_default(unique)
-]
-interface IMessageAPI_Outlook : IUnknown {
-    typedef enum _pEp_text_format {
-        pEp_text_format_plain = 0,
-        pEp_text_format_html,
-        pEp_text_format_other = 0xff
-    } pEp_text_format;
-
-    typedef enum _pEp_msg_direction {
-        pEp_dir_incoming = 0,
-        pEp_dir_outgoing
-    } pEp_msg_direction;
-
-    typedef enum _pEp_MIME_format {
-        pEp_MIME_none = 0,                      // message is not MIME encoded
-        pEp_MIME_fields_omitted,                // message content but no fields
-        pEp_MIME                                // message is fully MIME encoded
-    } pEp_MIME_format;
-
-    typedef enum _pEp_enc_format {
-        pEp_enc_none = 0,                       // message is not encrypted
-        pEp_enc_pieces,                         // inline PGP + PGP extensions
-        pEp_enc_S_MIME,                         // RFC5751
-        pEp_enc_PGP_MIME,                       // RFC3156
-        pEp_enc_pEp                             // pEp encryption format
-    } pEp_enc_format;
+    HRESULT message_encrypt([in] ITextMessage *src, [out] ITextMessage ** dst, [in, optional] SAFEARRAY(BSTR) extra);
+    HRESULT message_decrypt([in] ITextMessage *src, [out] ITextMessage ** dst);
+    HRESULT message_color([in] ITextMessage *msg, [out, retval] pEp_color * pVal);
 };
 
 [
@@ -194,7 +250,6 @@ library pEpCOMServerAdapterLib
     coclass pEpEngine {
         [default] interface IpEpEngine;
         [default, source] dispinterface _IpEpEngineEvents;
-        interface IMessageAPI_Outlook;
     };
 	[
 		uuid(844B5363-4EF4-4A39-A030-16452783A6F7)		
@@ -213,4 +268,3 @@ library pEpCOMServerAdapterLib
 		[default, source] dispinterface _ITextMessageEvents;
 	};
 };
-

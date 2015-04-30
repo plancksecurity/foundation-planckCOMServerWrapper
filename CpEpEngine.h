@@ -28,8 +28,7 @@ class ATL_NO_VTABLE CpEpEngine :
 	public ISupportErrorInfo,
 	public IConnectionPointContainerImpl<CpEpEngine>,
 	public CProxy_IpEpEngineEvents<CpEpEngine>,
-	public IpEpEngine,
-    public IMessageAPI_Outlook
+	public IpEpEngine
 {
 public:
 	CpEpEngine()
@@ -57,7 +56,6 @@ BEGIN_COM_MAP(CpEpEngine)
     COM_INTERFACE_ENTRY(IpEpEngine)
     COM_INTERFACE_ENTRY(ISupportErrorInfo)
     COM_INTERFACE_ENTRY(IConnectionPointContainer)
-    COM_INTERFACE_ENTRY(IMessageAPI_Outlook)
 END_COM_MAP()
 
 BEGIN_CONNECTION_POINT_MAP(CpEpEngine)
@@ -148,6 +146,9 @@ public:
     
     // Message API
 
+    STDMETHOD(message_encrypt)(ITextMessage * src, ITextMessage ** dst, SAFEARRAY * extra);
+    STDMETHOD(message_decrypt)(ITextMessage * src, ITextMessage ** dst);
+    STDMETHOD(message_color)(ITextMessage *msg, pEp_color * pVal);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)

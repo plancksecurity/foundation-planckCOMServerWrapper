@@ -836,3 +836,27 @@ HRESULT CpEpEngine::error(_bstr_t msg)
     }
     return E_FAIL;
 }
+
+STDMETHODIMP CpEpEngine::message_encrypt(ITextMessage * src, ITextMessage ** dst, SAFEARRAY * extra)
+{
+    assert(src);
+    assert(dst);
+
+    return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::message_decrypt(ITextMessage * src, ITextMessage ** dst)
+{
+    assert(src);
+    assert(dst);
+
+    return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::message_color(ITextMessage *msg, pEp_color * pVal)
+{
+    assert(msg);
+    assert(pVal);
+
+    return S_OK;
+}
