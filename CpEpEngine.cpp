@@ -842,6 +842,49 @@ STDMETHODIMP CpEpEngine::message_encrypt(ITextMessage * src, ITextMessage ** dst
     assert(src);
     assert(dst);
 
+    CTextMessage *_src = dynamic_cast<CTextMessage *>(src);
+    assert(_src);
+
+    if (_src->msg->enc_format != PEP_enc_none)
+        return E_INVALIDARG;
+
+    ::stringlist_t * _extra = NULL;
+    if (extra) {
+        try {
+            _extra = new_stringlist(extra);
+        }
+        catch (bad_alloc& e) {
+            return E_OUTOFMEMORY;
+        }
+        catch (exception& e) {
+            return E_FAIL;
+        }
+    }
+
+    ::message *msg_dst;
+    PEP_STATUS status = ::encrypt_message(get_session(), _src->msg, _extra, &msg_dst, PEP_enc_pieces);
+    if (status != PEP_STATUS_OK)
+        FAIL(L"cannot encrypt message");
+    assert(msg_dst);
+
+    ::free_stringlist(_extra);
+
+    ITextMessage *i_dst;
+    HRESULT hr = CTextMessage::CreateInstance(&i_dst);
+    assert(hr == S_OK);
+    
+    if (hr != S_OK) {
+        free_message(msg_dst);
+        return hr;
+    }
+
+    CTextMessage *_dst = dynamic_cast<CTextMessage *>(i_dst);
+    assert(_dst);
+
+    ::free_message(_dst->msg);
+    _dst->msg = msg_dst;
+
+    *dst = i_dst;
     return S_OK;
 }
 
@@ -850,6 +893,35 @@ STDMETHODIMP CpEpEngine::message_decrypt(ITextMessage * src, ITextMessage ** dst
     assert(src);
     assert(dst);
 
+    CTextMessage *_src = dynamic_cast<CTextMessage *>(src);
+    assert(_src);
+
+    if (_src->msg->enc_format != PEP_enc_none)
+        return E_INVALIDARG;
+
+    ::message *msg_dst;
+    PEP_STATUS status = ::decrypt_message(get_session(), _src->msg, PEP_MIME_none, &msg_dst);
+    if (status != PEP_STATUS_OK)
+        FAIL(L"cannot decrypt message");
+
+    assert(msg_dst);
+
+    ITextMessage *i_dst;
+    HRESULT hr = CTextMessage::CreateInstance(&i_dst);
+    assert(hr == S_OK);
+
+    if (hr != S_OK) {
+        free_message(msg_dst);
+        return hr;
+    }
+
+    CTextMessage *_dst = dynamic_cast<CTextMessage *>(i_dst);
+    assert(_dst);
+
+    ::free_message(_dst->msg);
+    _dst->msg = msg_dst;
+
+    *dst = i_dst;
     return S_OK;
 }
 
@@ -858,5 +930,14 @@ STDMETHODIMP CpEpEngine::message_color(ITextMessage *msg, pEp_color * pVal)
     assert(msg);
     assert(pVal);
 
+    CTextMessage *_msg = dynamic_cast<CTextMessage *>(msg);
+    assert(_msg);
+
+    PEP_color _color;
+    PEP_STATUS status = ::get_message_color(get_session(), _msg->msg, &_color);
+    if (status != PEP_STATUS_OK)
+        FAIL(L"cannot get message color");
+
+    *pVal = (pEp_color) _color;
     return S_OK;
 }

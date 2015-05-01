@@ -27,10 +27,11 @@ class ATL_NO_VTABLE CTextMessage :
 	public ITextMessage
 {
 private:
-    ::message *msg;
     ::bloblist_t *m_next_attachment;
 
 public:
+    ::message *msg;
+
     CTextMessage()
         : m_next_attachment(NULL)
 	{
@@ -40,20 +41,12 @@ public:
             throw bad_alloc();
 	}
 
+    // the violation of the rule of three is intended
+
     CTextMessage(const CTextMessage& second)
         : m_next_attachment(NULL)
     {
-        msg = ::message_dup(second.msg);
-        assert(msg);
-        if (msg == NULL)
-            throw bad_alloc();
-    }
-
-    CTextMessage(const ::message *second)
-        : m_next_attachment(NULL)
-    {
-        assert(second);
-        msg = ::message_dup(second);
+        msg = (::message *) calloc(1, sizeof(::message));
         assert(msg);
         if (msg == NULL)
             throw bad_alloc();
