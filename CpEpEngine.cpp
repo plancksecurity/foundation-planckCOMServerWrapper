@@ -329,7 +329,7 @@ STDMETHODIMP CpEpEngine::encrypt_b(SAFEARRAY * key_list, SAFEARRAY * ptext, BSTR
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::safeword(LONG value, BSTR lang, BSTR * word)
+STDMETHODIMP CpEpEngine::trustword(LONG value, BSTR lang, BSTR * word)
 {
     assert(value >= 0 && value <= 65535);
     assert(word);
@@ -358,14 +358,14 @@ STDMETHODIMP CpEpEngine::safeword(LONG value, BSTR lang, BSTR * word)
     char *_word = NULL;
     size_t _wsize = 0;
 
-    PEP_STATUS status = ::safeword(get_session(), _value, _lang.c_str(), &_word, &_wsize);
+    PEP_STATUS status = ::trustword(get_session(), _value, _lang.c_str(), &_word, &_wsize);
     assert(status != PEP_OUT_OF_MEMORY);
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
 
     if (_word == NULL) {
         *word = NULL;
-        return FAIL(L"safeword");
+        return FAIL(L"trustword");
     }
     else {
         *word = utf16_bstr(_word).Detach();
@@ -374,7 +374,7 @@ STDMETHODIMP CpEpEngine::safeword(LONG value, BSTR lang, BSTR * word)
     }
 }
 
-STDMETHODIMP CpEpEngine::safewords(BSTR fpr, BSTR lang, LONG max_words, BSTR * words)
+STDMETHODIMP CpEpEngine::trustwords(BSTR fpr, BSTR lang, LONG max_words, BSTR * words)
 {
     assert(fpr);
     assert(max_words >= 0);
@@ -413,14 +413,14 @@ STDMETHODIMP CpEpEngine::safewords(BSTR fpr, BSTR lang, LONG max_words, BSTR * w
     char *_words = NULL;
     size_t _wsize = 0;
 
-    PEP_STATUS status = ::safewords(get_session(), _fpr.c_str(), _lang.c_str(), &_words, &_wsize, max_words);
+    PEP_STATUS status = ::trustwords(get_session(), _fpr.c_str(), _lang.c_str(), &_words, &_wsize, max_words);
     assert(status != PEP_OUT_OF_MEMORY);
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
 
     if (_words == NULL) {
         *words = NULL;
-        return FAIL(L"safewords");
+        return FAIL(L"trustwords");
     }
     else {
         *words = utf16_bstr(_words).Detach();

@@ -131,8 +131,8 @@ interface IpEpEngine : IUnknown {
     HRESULT encrypt([in] SAFEARRAY(BSTR) key_list, [in] BSTR ptext, [out] BSTR * ctext, [out, retval] pEp_STATUS * status);
     HRESULT encrypt_b([in] SAFEARRAY(BSTR) key_list, [in] SAFEARRAY(BYTE) ptext, [out] BSTR * ctext, [out, retval] pEp_STATUS * status);
     HRESULT verify([in] BSTR text, [in] BSTR signature, [out] SAFEARRAY(BSTR) * key_list, [out, retval] pEp_STATUS * verify_status);
-    HRESULT safeword([in] LONG value, [in, defaultvalue("en")] BSTR lang, [out, retval] BSTR * word);
-    HRESULT safewords([in] BSTR fpr, [in, defaultvalue("en")] BSTR lang, [in, defaultvalue(0)] LONG max_words, [out, retval] BSTR * words);
+    HRESULT trustword([in] LONG value, [in, defaultvalue("en")] BSTR lang, [out, retval] BSTR * word);
+    HRESULT trustwords([in] BSTR fpr, [in, defaultvalue("en")] BSTR lang, [in, defaultvalue(0)] LONG max_words, [out, retval] BSTR * words);
 
     typedef enum _pEp_comm_type {
         pEp_ct_unknown = 0,
