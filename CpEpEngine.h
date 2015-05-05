@@ -146,9 +146,11 @@ public:
     
     // Message API
 
-    STDMETHOD(message_encrypt)(ITextMessage * src, ITextMessage ** dst, SAFEARRAY * extra);
-    STDMETHOD(message_decrypt)(ITextMessage * src, ITextMessage ** dst);
+    STDMETHOD(encrypt_message)(ITextMessage * src, ITextMessage ** dst, SAFEARRAY * extra);
+    STDMETHOD(decrypt_message)(ITextMessage * src, ITextMessage ** dst, SAFEARRAY ** keylist);
     STDMETHOD(message_color)(ITextMessage *msg, pEp_color * pVal);
+    STDMETHOD(identity_color)(pEp_identity_s * ident, pEp_color * pVal);
+
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)

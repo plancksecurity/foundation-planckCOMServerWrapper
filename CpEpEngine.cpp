@@ -837,7 +837,7 @@ HRESULT CpEpEngine::error(_bstr_t msg)
     return E_FAIL;
 }
 
-STDMETHODIMP CpEpEngine::message_encrypt(ITextMessage * src, ITextMessage ** dst, SAFEARRAY * extra)
+STDMETHODIMP CpEpEngine::encrypt_message(ITextMessage * src, ITextMessage ** dst, SAFEARRAY * extra)
 {
     assert(src);
     assert(dst);
@@ -888,10 +888,11 @@ STDMETHODIMP CpEpEngine::message_encrypt(ITextMessage * src, ITextMessage ** dst
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::message_decrypt(ITextMessage * src, ITextMessage ** dst)
+STDMETHODIMP CpEpEngine::decrypt_message(ITextMessage * src, ITextMessage ** dst, SAFEARRAY ** keylist)
 {
     assert(src);
     assert(dst);
+    assert(keylist);
 
     CTextMessage *_src = dynamic_cast<CTextMessage *>(src);
     assert(_src);
@@ -900,7 +901,8 @@ STDMETHODIMP CpEpEngine::message_decrypt(ITextMessage * src, ITextMessage ** dst
         return E_INVALIDARG;
 
     ::message *msg_dst;
-    PEP_STATUS status = ::decrypt_message(get_session(), _src->msg, PEP_MIME_none, &msg_dst);
+    ::stringlist_t *_keylist;
+    PEP_STATUS status = ::decrypt_message(get_session(), _src->msg, PEP_MIME_none, &msg_dst, &_keylist);
     if (status != PEP_STATUS_OK)
         FAIL(L"cannot decrypt message");
 
@@ -911,7 +913,8 @@ STDMETHODIMP CpEpEngine::message_decrypt(ITextMessage * src, ITextMessage ** dst
     assert(hr == S_OK);
 
     if (hr != S_OK) {
-        free_message(msg_dst);
+        ::free_message(msg_dst);
+        ::free_stringlist(_keylist);
         return hr;
     }
 
@@ -921,7 +924,19 @@ STDMETHODIMP CpEpEngine::message_decrypt(ITextMessage * src, ITextMessage ** dst
     ::free_message(_dst->msg);
     _dst->msg = msg_dst;
 
+    ULONG len = ::stringlist_length(_keylist);
+    CComSafeArray<BSTR> sa;
+    sa.Create(len);
+
+    ::stringlist_t *_kl;
+    ULONG i;
+    for (_kl = _keylist, i = 0; _kl && _kl->value; _kl = _kl->next, i++)
+        sa.SetAt(i, utf16_bstr(_kl->value).Detach(), false);
+    ::free_stringlist(_keylist);
+
     *dst = i_dst;
+    *keylist = sa.Detach();
+
     return S_OK;
 }
 
@@ -934,7 +949,34 @@ STDMETHODIMP CpEpEngine::message_color(ITextMessage *msg, pEp_color * pVal)
     assert(_msg);
 
     PEP_color _color;
-    PEP_STATUS status = ::get_message_color(get_session(), _msg->msg, &_color);
+    PEP_STATUS status = ::message_color(get_session(), _msg->msg, &_color);
+    if (status != PEP_STATUS_OK)
+        FAIL(L"cannot get message color");
+
+    *pVal = (pEp_color) _color;
+    return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::identity_color(struct pEp_identity_s *ident, pEp_color * pVal)
+{
+    ::pEp_identity *_ident;
+
+    assert(ident);
+    assert(pVal);
+
+    try {
+        _ident = new_identity(ident);
+    }
+    catch (bad_alloc& e) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& e) {
+        return E_FAIL;
+    }
+
+    PEP_color _color;
+    PEP_STATUS status = ::identity_color(get_session(), _ident, &_color);
+    free_identity(_ident);
     if (status != PEP_STATUS_OK)
         FAIL(L"cannot get message color");
 
