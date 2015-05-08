@@ -888,11 +888,12 @@ STDMETHODIMP CpEpEngine::encrypt_message(ITextMessage * src, ITextMessage ** dst
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::decrypt_message(ITextMessage * src, ITextMessage ** dst, SAFEARRAY ** keylist)
+STDMETHODIMP CpEpEngine::decrypt_message(ITextMessage * src, ITextMessage ** dst, SAFEARRAY ** keylist, pEp_color *rating)
 {
     assert(src);
     assert(dst);
     assert(keylist);
+    assert(rating);
 
     CTextMessage *_src = dynamic_cast<CTextMessage *>(src);
     assert(_src);
@@ -902,45 +903,58 @@ STDMETHODIMP CpEpEngine::decrypt_message(ITextMessage * src, ITextMessage ** dst
 
     ::message *msg_dst;
     ::stringlist_t *_keylist;
-    PEP_STATUS status = ::decrypt_message(get_session(), _src->msg, PEP_MIME_none, &msg_dst, &_keylist);
-    if (status != PEP_STATUS_OK)
-        FAIL(L"cannot decrypt message");
+    ::PEP_color _rating;
 
-    assert(msg_dst);
+    PEP_STATUS status = ::decrypt_message(get_session(), _src->msg, PEP_MIME_none, &msg_dst, &_keylist, &_rating);
+    if (status != PEP_STATUS_OK && (status < PEP_UNENCRYPTED || status > PEP_CANNOT_DECRYPT_UNKNOWN))
+        return FAIL(L"decrypt message failed");
 
-    ITextMessage *i_dst;
-    HRESULT hr = CTextMessage::CreateInstance(&i_dst);
-    assert(hr == S_OK);
+    if (msg_dst) {
+        ITextMessage *i_dst;
+        HRESULT hr = CTextMessage::CreateInstance(&i_dst);
+        assert(hr == S_OK);
 
-    if (hr != S_OK) {
-        ::free_message(msg_dst);
-        ::free_stringlist(_keylist);
-        return hr;
+        if (hr != S_OK) {
+            ::free_message(msg_dst);
+            ::free_stringlist(_keylist);
+            return hr;
+        }
+
+        CTextMessage *_dst = dynamic_cast<CTextMessage *>(i_dst);
+        assert(_dst);
+
+        ::free_message(_dst->msg);
+        _dst->msg = msg_dst;
+
+        *dst = i_dst;
+    }
+    else {
+        *dst = NULL;
     }
 
-    CTextMessage *_dst = dynamic_cast<CTextMessage *>(i_dst);
-    assert(_dst);
+    if (_keylist) {
+        ULONG len = ::stringlist_length(_keylist);
+        CComSafeArray<BSTR> sa;
+        sa.Create(len);
 
-    ::free_message(_dst->msg);
-    _dst->msg = msg_dst;
+        ::stringlist_t *_kl;
+        ULONG i;
+        for (_kl = _keylist, i = 0; _kl && _kl->value; _kl = _kl->next, i++)
+            sa.SetAt(i, utf16_bstr(_kl->value).Detach(), false);
+        ::free_stringlist(_keylist);
 
-    ULONG len = ::stringlist_length(_keylist);
-    CComSafeArray<BSTR> sa;
-    sa.Create(len);
+        *keylist = sa.Detach();
+    }
+    else {
+        *keylist = NULL;
+    }
 
-    ::stringlist_t *_kl;
-    ULONG i;
-    for (_kl = _keylist, i = 0; _kl && _kl->value; _kl = _kl->next, i++)
-        sa.SetAt(i, utf16_bstr(_kl->value).Detach(), false);
-    ::free_stringlist(_keylist);
-
-    *dst = i_dst;
-    *keylist = sa.Detach();
+    *rating = (pEp_color) _rating;
 
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::message_color(ITextMessage *msg, pEp_color * pVal)
+STDMETHODIMP CpEpEngine::outgoing_message_color(ITextMessage *msg, pEp_color * pVal)
 {
     assert(msg);
     assert(pVal);
@@ -948,10 +962,13 @@ STDMETHODIMP CpEpEngine::message_color(ITextMessage *msg, pEp_color * pVal)
     CTextMessage *_msg = dynamic_cast<CTextMessage *>(msg);
     assert(_msg);
 
+    if (_msg->msg->dir != PEP_dir_outgoing)
+        return E_INVALIDARG;
+
     PEP_color _color;
-    PEP_STATUS status = ::message_color(get_session(), _msg->msg, &_color);
+    PEP_STATUS status = ::outgoing_message_color(get_session(), _msg->msg, &_color);
     if (status != PEP_STATUS_OK)
-        FAIL(L"cannot get message color");
+        return FAIL(L"cannot get message color");
 
     *pVal = (pEp_color) _color;
     return S_OK;
@@ -978,7 +995,7 @@ STDMETHODIMP CpEpEngine::identity_color(struct pEp_identity_s *ident, pEp_color 
     PEP_STATUS status = ::identity_color(get_session(), _ident, &_color);
     free_identity(_ident);
     if (status != PEP_STATUS_OK)
-        FAIL(L"cannot get message color");
+        return FAIL(L"cannot get message color");
 
     *pVal = (pEp_color) _color;
     return S_OK;

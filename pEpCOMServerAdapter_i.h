@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Tue May 05 10:27:03 2015
+/* at Wed May 06 20:19:27 2015
  */
 /* Compiler settings for pEpCOMServerAdapter.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -767,9 +767,10 @@ EXTERN_C const IID IID_IpEpEngine;
         virtual HRESULT STDMETHODCALLTYPE decrypt_message( 
             /* [in] */ ITextMessage *src,
             /* [out] */ ITextMessage **dst,
-            /* [out] */ SAFEARRAY * *keylist) = 0;
+            /* [out] */ SAFEARRAY * *keylist,
+            /* [out] */ pEp_color *rating) = 0;
         
-        virtual HRESULT STDMETHODCALLTYPE message_color( 
+        virtual HRESULT STDMETHODCALLTYPE outgoing_message_color( 
             /* [in] */ ITextMessage *msg,
             /* [retval][out] */ pEp_color *pVal) = 0;
         
@@ -929,9 +930,10 @@ EXTERN_C const IID IID_IpEpEngine;
             IpEpEngine * This,
             /* [in] */ ITextMessage *src,
             /* [out] */ ITextMessage **dst,
-            /* [out] */ SAFEARRAY * *keylist);
+            /* [out] */ SAFEARRAY * *keylist,
+            /* [out] */ pEp_color *rating);
         
-        HRESULT ( STDMETHODCALLTYPE *message_color )( 
+        HRESULT ( STDMETHODCALLTYPE *outgoing_message_color )( 
             IpEpEngine * This,
             /* [in] */ ITextMessage *msg,
             /* [retval][out] */ pEp_color *pVal);
@@ -1036,11 +1038,11 @@ EXTERN_C const IID IID_IpEpEngine;
 #define IpEpEngine_encrypt_message(This,src,dst,extra)	\
     ( (This)->lpVtbl -> encrypt_message(This,src,dst,extra) ) 
 
-#define IpEpEngine_decrypt_message(This,src,dst,keylist)	\
-    ( (This)->lpVtbl -> decrypt_message(This,src,dst,keylist) ) 
+#define IpEpEngine_decrypt_message(This,src,dst,keylist,rating)	\
+    ( (This)->lpVtbl -> decrypt_message(This,src,dst,keylist,rating) ) 
 
-#define IpEpEngine_message_color(This,msg,pVal)	\
-    ( (This)->lpVtbl -> message_color(This,msg,pVal) ) 
+#define IpEpEngine_outgoing_message_color(This,msg,pVal)	\
+    ( (This)->lpVtbl -> outgoing_message_color(This,msg,pVal) ) 
 
 #define IpEpEngine_identity_color(This,ident,pVal)	\
     ( (This)->lpVtbl -> identity_color(This,ident,pVal) ) 
