@@ -498,9 +498,8 @@ STDMETHODIMP CTextMessage::get_id(BSTR * pVal)
         catch (exception& e) {
             return E_FAIL;
         }
+        *pVal = val.Detach();
     }
-
-    *pVal = val.Detach();
 
     return S_OK;
 }
@@ -547,9 +546,8 @@ STDMETHODIMP CTextMessage::get_shortmsg(BSTR * pVal)
         catch (exception& e) {
             return E_FAIL;
         }
+        *pVal = val.Detach();
     }
-
-    *pVal = val.Detach();
 
     return S_OK;
 }
@@ -596,9 +594,8 @@ STDMETHODIMP CTextMessage::get_longmsg(BSTR * pVal)
         catch (exception& e) {
             return E_FAIL;
         }
+        *pVal = val.Detach();
     }
-
-    *pVal = val.Detach();
 
     return S_OK;
 }
@@ -645,9 +642,8 @@ STDMETHODIMP CTextMessage::get_longmsg_formatted(BSTR * pVal)
         catch (exception& e) {
             return E_FAIL;
         }
+        *pVal = val.Detach();
     }
-
-    *pVal = val.Detach();
 
     return S_OK;
 }
@@ -969,9 +965,8 @@ STDMETHODIMP CTextMessage::get_comments(BSTR * pVal)
         catch (exception& e) {
             return E_FAIL;
         }
+        *pVal = val.Detach();
     }
-
-    *pVal = val.Detach();
 
     return S_OK;
 }
