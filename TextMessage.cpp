@@ -731,6 +731,9 @@ STDMETHODIMP CTextMessage::add_attachment(SAFEARRAY * data, BSTR mime_type, BSTR
         return E_OUTOFMEMORY;
     }
 
+    if (msg->attachments == NULL)
+        msg->attachments = blob;
+
     return S_OK;
 }
 

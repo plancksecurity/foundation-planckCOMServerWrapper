@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Wed May 06 20:19:27 2015
+/* at Tue May 12 13:50:45 2015
  */
 /* Compiler settings for pEpCOMServerAdapter.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -638,9 +638,10 @@ typedef
 enum _pEp_color
     {
         pEp_rating_undefined	= 0,
-        pEp_rating_unencrypted	= ( pEp_rating_undefined + 1 ) ,
-        pEp_rating_cannot_decrypt	= ( pEp_rating_unencrypted + 1 ) ,
-        pEp_rating_unreliable	= ( pEp_rating_cannot_decrypt + 1 ) ,
+        pEp_rating_cannot_decrypt	= ( pEp_rating_undefined + 1 ) ,
+        pEp_rating_have_no_key	= ( pEp_rating_cannot_decrypt + 1 ) ,
+        pEp_rating_unencrypted	= ( pEp_rating_have_no_key + 1 ) ,
+        pEp_rating_unreliable	= ( pEp_rating_unencrypted + 1 ) ,
         pEp_rating_reliable	= ( pEp_rating_unreliable + 1 ) ,
         pEp_rating_yellow	= pEp_rating_reliable,
         pEp_rating_trusted	= ( pEp_rating_yellow + 1 ) ,
@@ -768,7 +769,7 @@ EXTERN_C const IID IID_IpEpEngine;
             /* [in] */ ITextMessage *src,
             /* [out] */ ITextMessage **dst,
             /* [out] */ SAFEARRAY * *keylist,
-            /* [out] */ pEp_color *rating) = 0;
+            /* [retval][out] */ pEp_color *rating) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE outgoing_message_color( 
             /* [in] */ ITextMessage *msg,
@@ -931,7 +932,7 @@ EXTERN_C const IID IID_IpEpEngine;
             /* [in] */ ITextMessage *src,
             /* [out] */ ITextMessage **dst,
             /* [out] */ SAFEARRAY * *keylist,
-            /* [out] */ pEp_color *rating);
+            /* [retval][out] */ pEp_color *rating);
         
         HRESULT ( STDMETHODCALLTYPE *outgoing_message_color )( 
             IpEpEngine * This,

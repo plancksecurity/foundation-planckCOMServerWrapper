@@ -210,8 +210,9 @@ interface IpEpEngine : IUnknown {
 
     typedef enum _pEp_color {
         pEp_rating_undefined = 0,
-        pEp_rating_unencrypted,
         pEp_rating_cannot_decrypt,
+        pEp_rating_have_no_key,
+        pEp_rating_unencrypted,
         pEp_rating_unreliable,
         pEp_rating_reliable,
         pEp_rating_yellow = pEp_rating_reliable,
@@ -226,7 +227,7 @@ interface IpEpEngine : IUnknown {
     } pEp_color;
 
     HRESULT encrypt_message([in] ITextMessage *src, [out] ITextMessage ** dst, [in, optional] SAFEARRAY(BSTR) extra);
-    HRESULT decrypt_message([in] ITextMessage *src, [out] ITextMessage ** dst, [out] SAFEARRAY(BSTR) *keylist, [out] pEp_color *rating);
+    HRESULT decrypt_message([in] ITextMessage *src, [out] ITextMessage ** dst, [out] SAFEARRAY(BSTR) *keylist, [out, retval] pEp_color *rating);
     HRESULT outgoing_message_color([in] ITextMessage *msg, [out, retval] pEp_color * pVal);
     HRESULT identity_color([in] struct pEp_identity_s * ident, [out, retval] pEp_color * pVal);
 };

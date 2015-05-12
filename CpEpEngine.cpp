@@ -905,8 +905,8 @@ STDMETHODIMP CpEpEngine::decrypt_message(ITextMessage * src, ITextMessage ** dst
     ::stringlist_t *_keylist;
     ::PEP_color _rating;
 
-    PEP_STATUS status = ::decrypt_message(get_session(), _src->msg, PEP_MIME_none, &msg_dst, &_keylist, &_rating);
-    if (status != PEP_STATUS_OK && (status < PEP_UNENCRYPTED || status > PEP_CANNOT_DECRYPT_UNKNOWN))
+    PEP_STATUS status = ::decrypt_message(get_session(), _src->msg, &msg_dst, &_keylist, &_rating);
+    if (status != PEP_STATUS_OK)
         return FAIL(L"decrypt message failed");
 
     if (msg_dst) {
