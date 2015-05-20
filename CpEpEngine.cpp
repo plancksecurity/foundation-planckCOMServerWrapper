@@ -853,10 +853,10 @@ STDMETHODIMP CpEpEngine::encrypt_message(ITextMessage * src, ITextMessage ** dst
         try {
             _extra = new_stringlist(extra);
         }
-        catch (bad_alloc& e) {
+        catch (bad_alloc&) {
             return E_OUTOFMEMORY;
         }
-        catch (exception& e) {
+        catch (exception&) {
             return E_FAIL;
         }
     }
@@ -984,10 +984,10 @@ STDMETHODIMP CpEpEngine::identity_color(struct pEp_identity_s *ident, pEp_color 
     try {
         _ident = new_identity(ident);
     }
-    catch (bad_alloc& e) {
+    catch (bad_alloc&) {
         return E_OUTOFMEMORY;
     }
-    catch (exception& e) {
+    catch (exception&) {
         return E_FAIL;
     }
 

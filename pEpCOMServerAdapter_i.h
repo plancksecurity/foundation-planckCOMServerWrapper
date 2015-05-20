@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Tue May 12 13:50:45 2015
+/* at Wed May 20 17:39:57 2015
  */
 /* Compiler settings for pEpCOMServerAdapter.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -145,6 +145,13 @@ enum _pEp_enc_format
         pEp_enc_pEp	= ( pEp_enc_PGP_MIME + 1 ) 
     } 	pEp_enc_format;
 
+/* [uuid] */ struct  DECLSPEC_UUID("1292C31A-6486-427F-B29F-7F03607836DC") _opt_field
+    {
+    BSTR name;
+    BSTR value;
+    } ;
+typedef struct _opt_field opt_field_t;
+
 
 EXTERN_C const IID IID_ITextMessage;
 
@@ -186,8 +193,8 @@ EXTERN_C const IID IID_ITextMessage;
         
         virtual HRESULT STDMETHODCALLTYPE add_attachment( 
             /* [in] */ SAFEARRAY * data,
-            /* [optional][in] */ BSTR mime_type,
-            /* [optional][in] */ BSTR filename) = 0;
+            /* [in] */ BSTR mime_type,
+            /* [in] */ BSTR filename) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE has_attachments( 
             /* [retval][out] */ boolean *result) = 0;
@@ -264,6 +271,12 @@ EXTERN_C const IID IID_ITextMessage;
         virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_comments( 
             /* [in] */ BSTR newVal) = 0;
         
+        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_opt_fields( 
+            /* [retval][out] */ SAFEARRAY * *pVal) = 0;
+        
+        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_opt_fields( 
+            /* [in] */ SAFEARRAY * newVal) = 0;
+        
     };
     
     
@@ -328,8 +341,8 @@ EXTERN_C const IID IID_ITextMessage;
         HRESULT ( STDMETHODCALLTYPE *add_attachment )( 
             ITextMessage * This,
             /* [in] */ SAFEARRAY * data,
-            /* [optional][in] */ BSTR mime_type,
-            /* [optional][in] */ BSTR filename);
+            /* [in] */ BSTR mime_type,
+            /* [in] */ BSTR filename);
         
         HRESULT ( STDMETHODCALLTYPE *has_attachments )( 
             ITextMessage * This,
@@ -429,6 +442,14 @@ EXTERN_C const IID IID_ITextMessage;
         /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_comments )( 
             ITextMessage * This,
             /* [in] */ BSTR newVal);
+        
+        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_opt_fields )( 
+            ITextMessage * This,
+            /* [retval][out] */ SAFEARRAY * *pVal);
+        
+        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_opt_fields )( 
+            ITextMessage * This,
+            /* [in] */ SAFEARRAY * newVal);
         
         END_INTERFACE
     } ITextMessageVtbl;
@@ -558,6 +579,12 @@ EXTERN_C const IID IID_ITextMessage;
 #define ITextMessage_put_comments(This,newVal)	\
     ( (This)->lpVtbl -> put_comments(This,newVal) ) 
 
+#define ITextMessage_get_opt_fields(This,pVal)	\
+    ( (This)->lpVtbl -> get_opt_fields(This,pVal) ) 
+
+#define ITextMessage_put_opt_fields(This,newVal)	\
+    ( (This)->lpVtbl -> put_opt_fields(This,newVal) ) 
+
 #endif /* COBJMACROS */
 
 
@@ -625,7 +652,7 @@ enum _pEp_comm_type
         pEp_ct_pEp	= 0xff
     } 	pEp_comm_type;
 
-/* [uuid] */ struct  DECLSPEC_UUID("CAAC4CFB-4EE6-4C27-81F7-E5B4E0A46816") pEp_identity_s
+/* [uuid] */ struct  DECLSPEC_UUID("0CB90E62-8A6A-4CA0-99D7-481704051FF0") pEp_identity_s
     {
     BSTR address;
     BSTR fpr;
@@ -763,7 +790,7 @@ EXTERN_C const IID IID_IpEpEngine;
         virtual HRESULT STDMETHODCALLTYPE encrypt_message( 
             /* [in] */ ITextMessage *src,
             /* [out] */ ITextMessage **dst,
-            /* [optional][in] */ SAFEARRAY * extra) = 0;
+            /* [in] */ SAFEARRAY * extra) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE decrypt_message( 
             /* [in] */ ITextMessage *src,
@@ -925,7 +952,7 @@ EXTERN_C const IID IID_IpEpEngine;
             IpEpEngine * This,
             /* [in] */ ITextMessage *src,
             /* [out] */ ITextMessage **dst,
-            /* [optional][in] */ SAFEARRAY * extra);
+            /* [in] */ SAFEARRAY * extra);
         
         HRESULT ( STDMETHODCALLTYPE *decrypt_message )( 
             IpEpEngine * This,

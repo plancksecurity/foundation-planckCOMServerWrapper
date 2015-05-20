@@ -41,6 +41,13 @@ interface ITextMessage : IUnknown {
         pEp_enc_pEp                             // pEp encryption format
     } pEp_enc_format;
 
+    [uuid(1292C31A-6486-427F-B29F-7F03607836DC)] struct _opt_field {
+        BSTR name;
+        BSTR value;
+    };
+
+    typedef struct _opt_field opt_field_t;
+
     [propget] HRESULT dir([out, retval] pEp_msg_direction *pVal);
     [propput] HRESULT dir([in] pEp_msg_direction newVal);
 
@@ -56,7 +63,7 @@ interface ITextMessage : IUnknown {
     [propget] HRESULT longmsg_formatted([out, retval] BSTR *pVal);
     [propput] HRESULT longmsg_formatted([in] BSTR newVal);
 
-    HRESULT add_attachment([in] SAFEARRAY(BYTE) data, [in, optional] BSTR mime_type, [in, optional] BSTR filename);
+    HRESULT add_attachment([in] SAFEARRAY(BYTE) data, [in] BSTR mime_type, [in] BSTR filename);
     HRESULT has_attachments([out, retval] boolean *result);
     HRESULT next_attachment([out] SAFEARRAY(BYTE) * data, [out] BSTR * mime_type, [out] BSTR * filename, [out, retval] boolean *result);
 
@@ -92,6 +99,9 @@ interface ITextMessage : IUnknown {
 
     [propget] HRESULT comments([out, retval] BSTR *pVal);
     [propput] HRESULT comments([in] BSTR newVal);
+
+    [propget] HRESULT opt_fields([out, retval] SAFEARRAY(opt_field_t) *pVal);
+    [propput] HRESULT opt_fields([in] SAFEARRAY(opt_field_t) newVal);
 };
 
 [
@@ -180,7 +190,7 @@ interface IpEpEngine : IUnknown {
         pEp_ct_pEp = 0xff
     } pEp_comm_type;
 
-    [uuid(CAAC4CFB-4EE6-4C27-81F7-E5B4E0A46816)] struct pEp_identity_s {
+    [uuid(0CB90E62-8A6A-4CA0-99D7-481704051FF0)] struct pEp_identity_s {
         BSTR address;
         BSTR fpr;
         BSTR user_id;
@@ -226,7 +236,7 @@ interface IpEpEngine : IUnknown {
         pEp_rating_b0rken = -2
     } pEp_color;
 
-    HRESULT encrypt_message([in] ITextMessage *src, [out] ITextMessage ** dst, [in, optional] SAFEARRAY(BSTR) extra);
+    HRESULT encrypt_message([in] ITextMessage *src, [out] ITextMessage ** dst, [in] SAFEARRAY(BSTR) extra);
     HRESULT decrypt_message([in] ITextMessage *src, [out] ITextMessage ** dst, [out] SAFEARRAY(BSTR) *keylist, [out, retval] pEp_color *rating);
     HRESULT outgoing_message_color([in] ITextMessage *msg, [out, retval] pEp_color * pVal);
     HRESULT identity_color([in] struct pEp_identity_s * ident, [out, retval] pEp_color * pVal);

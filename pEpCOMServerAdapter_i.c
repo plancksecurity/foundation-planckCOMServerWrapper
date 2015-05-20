@@ -6,7 +6,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Tue May 12 13:50:45 2015
+/* at Wed May 20 17:39:57 2015
  */
 /* Compiler settings for pEpCOMServerAdapter.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 

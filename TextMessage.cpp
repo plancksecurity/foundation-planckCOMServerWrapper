@@ -30,10 +30,10 @@ STDMETHODIMP CTextMessage::get_from(pEp_identity_s* pVal)
     try {
         copy_identity(pVal, msg->from);
     }
-    catch (bad_alloc& e) {
+    catch (bad_alloc&) {
         return E_OUTOFMEMORY;
     }
-    catch (exception& e) {
+    catch (exception&) {
         return E_FAIL;
     }
 
@@ -50,10 +50,10 @@ STDMETHODIMP CTextMessage::put_from(pEp_identity_s* newVal)
     try {
         _from = new_identity(newVal);
     }
-    catch (bad_alloc& e) {
+    catch (bad_alloc&) {
         return E_OUTOFMEMORY;
     }
-    catch (exception& e)
+    catch (exception&)
     {
         return E_FAIL;
     }
@@ -81,12 +81,12 @@ STDMETHODIMP CTextMessage::get_to(LPSAFEARRAY * pVal)
         try {
             copy_identity(&cs[i], il->ident);
         }
-        catch (bad_alloc& e) {
+        catch (bad_alloc&) {
             SafeArrayUnaccessData(sa);
             SafeArrayDestroy(sa);
             return E_OUTOFMEMORY;
         }
-        catch (exception& e) {
+        catch (exception&) {
             SafeArrayUnaccessData(sa);
             SafeArrayDestroy(sa);
             return E_FAIL;
@@ -119,21 +119,22 @@ STDMETHODIMP CTextMessage::put_to(SAFEARRAY * newVal)
     }
 
     identity_list *_il;
-    LONG i, lbound, ubound;
+    LONG lbound, ubound;
+    ULONG i;
     SafeArrayGetLBound(newVal, 1, &lbound);
     SafeArrayGetUBound(newVal, 1, &ubound);
 
-    for (i = lbound, _il = il; i <= ubound; i++) {
+    for (i = 0, _il = il; i < newVal->cbElements; i++) {
         pEp_identity * ident;
         try {
             ident = new_identity(&cs[i]);
         }
-        catch (bad_alloc& e) {
+        catch (bad_alloc&) {
             SafeArrayUnaccessData(newVal);
             free_identity_list(il);
             return E_OUTOFMEMORY;
         }
-        catch (exception& e) {
+        catch (exception&) {
             SafeArrayUnaccessData(newVal);
             free_identity_list(il);
             return E_FAIL;
@@ -161,10 +162,10 @@ STDMETHODIMP CTextMessage::get_recv_by(pEp_identity_s* pVal)
     try {
         copy_identity(pVal, msg->recv_by);
     }
-    catch (bad_alloc& e) {
+    catch (bad_alloc&) {
         return E_OUTOFMEMORY;
     }
-    catch (exception& e) {
+    catch (exception&) {
         return E_FAIL;
     }
 
@@ -181,10 +182,10 @@ STDMETHODIMP CTextMessage::put_recv_by(pEp_identity_s* newVal)
     try {
         _recv_by = new_identity(newVal);
     }
-    catch (bad_alloc& e) {
+    catch (bad_alloc&) {
         return E_OUTOFMEMORY;
     }
-    catch (exception& e) {
+    catch (exception&) {
         return E_FAIL;
     }
 
@@ -211,12 +212,12 @@ STDMETHODIMP CTextMessage::get_cc(LPSAFEARRAY * pVal)
         try {
             copy_identity(&cs[i], il->ident);
         }
-        catch (bad_alloc& e) {
+        catch (bad_alloc&) {
             SafeArrayUnaccessData(sa);
             SafeArrayDestroy(sa);
             return E_OUTOFMEMORY;
         }
-        catch (exception& e) {
+        catch (exception&) {
             SafeArrayUnaccessData(sa);
             SafeArrayDestroy(sa);
             return E_FAIL;
@@ -249,21 +250,22 @@ STDMETHODIMP CTextMessage::put_cc(SAFEARRAY * newVal)
     }
 
     identity_list *_il;
-    LONG i, lbound, ubound;
+    LONG lbound, ubound;
+    ULONG i;
     SafeArrayGetLBound(newVal, 1, &lbound);
     SafeArrayGetUBound(newVal, 1, &ubound);
 
-    for (i = lbound, _il = il; i <= ubound; i++) {
+    for (i = 0, _il = il; i < newVal->cbElements; i++) {
         pEp_identity * ident;
         try {
             ident = new_identity(&cs[i]);
         }
-        catch (bad_alloc& e) {
+        catch (bad_alloc&) {
             SafeArrayUnaccessData(newVal);
             free_identity_list(il);
             return E_OUTOFMEMORY;
         }
-        catch (exception& e) {
+        catch (exception&) {
             SafeArrayUnaccessData(newVal);
             free_identity_list(il);
             return E_FAIL;
@@ -302,12 +304,12 @@ STDMETHODIMP CTextMessage::get_bcc(LPSAFEARRAY * pVal)
         try {
             copy_identity(&cs[i], il->ident);
         }
-        catch (bad_alloc& e) {
+        catch (bad_alloc&) {
             SafeArrayUnaccessData(sa);
             SafeArrayDestroy(sa);
             return E_OUTOFMEMORY;
         }
-        catch (exception& e) {
+        catch (exception&) {
             SafeArrayUnaccessData(sa);
             SafeArrayDestroy(sa);
             return E_FAIL;
@@ -340,21 +342,22 @@ STDMETHODIMP CTextMessage::put_bcc(SAFEARRAY * newVal)
     }
 
     identity_list *_il;
-    LONG i, lbound, ubound;
+    LONG lbound, ubound;
+    ULONG i;
     SafeArrayGetLBound(newVal, 1, &lbound);
     SafeArrayGetUBound(newVal, 1, &ubound);
 
-    for (i = lbound, _il = il; i <= ubound; i++) {
+    for (i = 0, _il = il; i < newVal->cbElements; i++) {
         pEp_identity * ident;
         try {
             ident = new_identity(&cs[i]);
         }
-        catch (bad_alloc& e) {
+        catch (bad_alloc&) {
             SafeArrayUnaccessData(newVal);
             free_identity_list(il);
             return E_OUTOFMEMORY;
         }
-        catch (exception& e) {
+        catch (exception&) {
             SafeArrayUnaccessData(newVal);
             free_identity_list(il);
             return E_FAIL;
@@ -393,12 +396,12 @@ STDMETHODIMP CTextMessage::get_reply_to(LPSAFEARRAY * pVal)
         try {
             copy_identity(&cs[i], il->ident);
         }
-        catch (bad_alloc& e) {
+        catch (bad_alloc&) {
             SafeArrayUnaccessData(sa);
             SafeArrayDestroy(sa);
             return E_OUTOFMEMORY;
         }
-        catch (exception& e) {
+        catch (exception&) {
             SafeArrayUnaccessData(sa);
             SafeArrayDestroy(sa);
             return E_FAIL;
@@ -431,21 +434,22 @@ STDMETHODIMP CTextMessage::put_reply_to(SAFEARRAY * newVal)
     }
 
     identity_list *_il;
-    LONG i, lbound, ubound;
+    LONG lbound, ubound;
+    ULONG i;
     SafeArrayGetLBound(newVal, 1, &lbound);
     SafeArrayGetUBound(newVal, 1, &ubound);
 
-    for (i = lbound, _il = il; i <= ubound; i++) {
+    for (i = 0, _il = il; i < newVal->cbElements; i++) {
         pEp_identity * ident;
         try {
             ident = new_identity(&cs[i]);
         }
-        catch (bad_alloc& e) {
+        catch (bad_alloc&) {
             SafeArrayUnaccessData(newVal);
             free_identity_list(il);
             return E_OUTOFMEMORY;
         }
-        catch (exception& e) {
+        catch (exception&) {
             SafeArrayUnaccessData(newVal);
             free_identity_list(il);
             return E_FAIL;
@@ -492,10 +496,10 @@ STDMETHODIMP CTextMessage::get_id(BSTR * pVal)
         try {
             val = utf16_bstr(msg->id);
         }
-        catch (bad_alloc& e) {
+        catch (bad_alloc&) {
             return E_OUTOFMEMORY;
         }
-        catch (exception& e) {
+        catch (exception&) {
             return E_FAIL;
         }
         *pVal = val.Detach();
@@ -506,27 +510,29 @@ STDMETHODIMP CTextMessage::get_id(BSTR * pVal)
 
 STDMETHODIMP CTextMessage::put_id(BSTR newVal)
 {
-    assert(newVal);
-
+    char *_val = NULL;
     string val;
 
-    try {
-        val = utf8_string(newVal);
-    }
-    catch (bad_alloc& e) {
-        return E_OUTOFMEMORY;
-    }
-    catch (exception& e) {
-        return E_FAIL;
+    if (newVal) {
+        try {
+            val = utf8_string(newVal);
+        }
+        catch (bad_alloc&) {
+            return E_OUTOFMEMORY;
+        }
+        catch (exception&) {
+            return E_FAIL;
+        }
+
+        _val = _strdup(val.c_str());
+        if (_val == NULL)
+            return E_OUTOFMEMORY;
     }
 
     if (msg->id)
         free(msg->id);
 
-    msg->id = _strdup(val.c_str());
-    if (msg->id == NULL)
-        return E_OUTOFMEMORY;
-
+    msg->id = _val;
     return S_OK;
 }
 
@@ -540,10 +546,10 @@ STDMETHODIMP CTextMessage::get_shortmsg(BSTR * pVal)
         try {
             val = utf16_bstr(msg->shortmsg);
         }
-        catch (bad_alloc& e) {
+        catch (bad_alloc&) {
             return E_OUTOFMEMORY;
         }
-        catch (exception& e) {
+        catch (exception&) {
             return E_FAIL;
         }
         *pVal = val.Detach();
@@ -554,27 +560,30 @@ STDMETHODIMP CTextMessage::get_shortmsg(BSTR * pVal)
 
 STDMETHODIMP CTextMessage::put_shortmsg(BSTR newVal)
 {
-    assert(newVal);
+    char *_val = NULL;
 
-    string val;
+    if (newVal) {
+        string val;
 
-    try {
-        val = utf8_string(newVal);
-    }
-    catch (bad_alloc& e) {
-        return E_OUTOFMEMORY;
-    }
-    catch (exception& e) {
-        return E_FAIL;
+        try {
+            val = utf8_string(newVal);
+        }
+        catch (bad_alloc&) {
+            return E_OUTOFMEMORY;
+        }
+        catch (exception&) {
+            return E_FAIL;
+        }
+
+        _val = _strdup(val.c_str());
+        if (_val == NULL)
+            return E_OUTOFMEMORY;
     }
 
     if (msg->shortmsg)
         free(msg->shortmsg);
 
-    msg->shortmsg = _strdup(val.c_str());
-    if (msg->shortmsg == NULL)
-        return E_OUTOFMEMORY;
-
+    msg->shortmsg = _val;
     return S_OK;
 }
 
@@ -588,10 +597,10 @@ STDMETHODIMP CTextMessage::get_longmsg(BSTR * pVal)
         try {
             val = utf16_bstr(msg->longmsg);
         }
-        catch (bad_alloc& e) {
+        catch (bad_alloc&) {
             return E_OUTOFMEMORY;
         }
-        catch (exception& e) {
+        catch (exception&) {
             return E_FAIL;
         }
         *pVal = val.Detach();
@@ -602,27 +611,30 @@ STDMETHODIMP CTextMessage::get_longmsg(BSTR * pVal)
 
 STDMETHODIMP CTextMessage::put_longmsg(BSTR newVal)
 {
-    assert(newVal);
+    char * _val = NULL;
 
-    string val;
+    if (newVal) {
+        string val;
 
-    try {
-        val = utf8_string(newVal);
-    }
-    catch (bad_alloc& e) {
-        return E_OUTOFMEMORY;
-    }
-    catch (exception& e) {
-        return E_FAIL;
+        try {
+            val = utf8_string(newVal);
+        }
+        catch (bad_alloc&) {
+            return E_OUTOFMEMORY;
+        }
+        catch (exception&) {
+            return E_FAIL;
+        }
+
+        _val = _strdup(val.c_str());
+        if (_val == NULL)
+            return E_OUTOFMEMORY;
     }
 
     if (msg->longmsg)
         free(msg->longmsg);
 
-    msg->longmsg = _strdup(val.c_str());
-    if (msg->longmsg == NULL)
-        return E_OUTOFMEMORY;
-
+    msg->longmsg = _val;
     return S_OK;
 }
 
@@ -636,10 +648,10 @@ STDMETHODIMP CTextMessage::get_longmsg_formatted(BSTR * pVal)
         try {
             val = utf16_bstr(msg->longmsg_formatted);
         }
-        catch (bad_alloc& e) {
+        catch (bad_alloc&) {
             return E_OUTOFMEMORY;
         }
-        catch (exception& e) {
+        catch (exception&) {
             return E_FAIL;
         }
         *pVal = val.Detach();
@@ -650,27 +662,30 @@ STDMETHODIMP CTextMessage::get_longmsg_formatted(BSTR * pVal)
 
 STDMETHODIMP CTextMessage::put_longmsg_formatted(BSTR newVal)
 {
-    assert(newVal);
+    char *_val = NULL;
 
-    string val;
+    if (newVal) {
+        string val;
 
-    try {
-        val = utf8_string(newVal);
-    }
-    catch (bad_alloc& e) {
-        return E_OUTOFMEMORY;
-    }
-    catch (exception& e) {
-        return E_FAIL;
+        try {
+            val = utf8_string(newVal);
+        }
+        catch (bad_alloc&) {
+            return E_OUTOFMEMORY;
+        }
+        catch (exception&) {
+            return E_FAIL;
+        }
+
+        _val = _strdup(val.c_str());
+        if (_val == NULL)
+            return E_OUTOFMEMORY;
     }
 
     if (msg->longmsg_formatted)
         free(msg->longmsg_formatted);
 
-    msg->longmsg_formatted = _strdup(val.c_str());
-    if (msg->longmsg_formatted == NULL)
-        return E_OUTOFMEMORY;
-
+    msg->longmsg_formatted = _val;
     return S_OK;
 }
 
@@ -683,12 +698,13 @@ STDMETHODIMP CTextMessage::add_attachment(SAFEARRAY * data, BSTR mime_type, BSTR
     CComSafeArray<BYTE> sa_data(data);
     size_t len = sa_data.GetCount();
 
-    char *_data = (char *) malloc(sa_data.GetCount());
+    char *_data = (char *) malloc(sa_data.GetCount() + 1);
     assert(_data);
     if (_data == NULL)
         return E_OUTOFMEMORY;
 
     memcpy(_data, sa_data.m_psa->pvData, len);
+    _data[len] = 0;
     sa_data.Detach();
 
     string _mime_type;
@@ -696,11 +712,11 @@ STDMETHODIMP CTextMessage::add_attachment(SAFEARRAY * data, BSTR mime_type, BSTR
         try {
             _mime_type = utf8_string(mime_type);
         }
-        catch (bad_alloc& e) {
+        catch (bad_alloc&) {
             free(_data);
             return E_OUTOFMEMORY;
         }
-        catch (exception& e) {
+        catch (exception&) {
             free(_data);
             return E_FAIL;
         }
@@ -711,11 +727,11 @@ STDMETHODIMP CTextMessage::add_attachment(SAFEARRAY * data, BSTR mime_type, BSTR
         try {
             _filename = utf8_string(filename);
         }
-        catch (bad_alloc& e) {
+        catch (bad_alloc&) {
             free(_data);
             return E_OUTOFMEMORY;
         }
-        catch (exception& e) {
+        catch (exception&) {
             free(_data);
             return E_FAIL;
         }
@@ -763,7 +779,7 @@ STDMETHODIMP CTextMessage::next_attachment(SAFEARRAY ** data, BSTR * mime_type, 
     try {
         sa.Create(m_next_attachment->size);
     }
-    catch (bad_alloc& e) {
+    catch (bad_alloc&) {
         return E_OUTOFMEMORY;
     }
 
@@ -774,10 +790,10 @@ STDMETHODIMP CTextMessage::next_attachment(SAFEARRAY ** data, BSTR * mime_type, 
         try {
             _mime_type = utf16_bstr(m_next_attachment->mime_type);
         }
-        catch (bad_alloc& e) {
+        catch (bad_alloc&) {
             return E_OUTOFMEMORY;
         }
-        catch (exception& e) {
+        catch (exception&) {
             return E_FAIL;
         }
     }
@@ -787,10 +803,10 @@ STDMETHODIMP CTextMessage::next_attachment(SAFEARRAY ** data, BSTR * mime_type, 
         try {
             _filename = utf16_bstr(m_next_attachment->filename);
         }
-        catch (bad_alloc& e) {
+        catch (bad_alloc&) {
             return E_OUTOFMEMORY;
         }
-        catch (exception& e) {
+        catch (exception&) {
             return E_FAIL;
         }
     }
@@ -866,10 +882,10 @@ STDMETHODIMP CTextMessage::get_references(SAFEARRAY ** pVal)
             sa.Create(0UL);
         }
     }
-    catch (bad_alloc& e) {
+    catch (bad_alloc&) {
         return E_OUTOFMEMORY;
     }
-    catch (exception& e) {
+    catch (exception&) {
         return E_FAIL;
     }
     
@@ -886,10 +902,10 @@ STDMETHODIMP CTextMessage::put_references(SAFEARRAY * newVal)
     try {
         sl = new_stringlist(newVal);
     }
-    catch (bad_alloc& e) {
+    catch (bad_alloc&) {
         return E_OUTOFMEMORY;
     }
-    catch (exception& e) {
+    catch (exception&) {
         return E_FAIL;
     }
 
@@ -914,10 +930,10 @@ STDMETHODIMP CTextMessage::get_keywords(SAFEARRAY ** pVal)
             sa.Create(0UL);
         }
     }
-    catch (bad_alloc& e) {
+    catch (bad_alloc&) {
         return E_OUTOFMEMORY;
     }
-    catch (exception& e) {
+    catch (exception&) {
         return E_FAIL;
     }
 
@@ -934,10 +950,10 @@ STDMETHODIMP CTextMessage::put_keywords(SAFEARRAY * newVal)
     try {
         sl = new_stringlist(newVal);
     }
-    catch (bad_alloc& e) {
+    catch (bad_alloc&) {
         return E_OUTOFMEMORY;
     }
-    catch (exception& e) {
+    catch (exception&) {
         return E_FAIL;
     }
 
@@ -959,10 +975,10 @@ STDMETHODIMP CTextMessage::get_comments(BSTR * pVal)
         try {
             val = utf16_bstr(msg->comments);
         }
-        catch (bad_alloc& e) {
+        catch (bad_alloc&) {
             return E_OUTOFMEMORY;
         }
-        catch (exception& e) {
+        catch (exception&) {
             return E_FAIL;
         }
         *pVal = val.Detach();
@@ -973,26 +989,125 @@ STDMETHODIMP CTextMessage::get_comments(BSTR * pVal)
 
 STDMETHODIMP CTextMessage::put_comments(BSTR newVal)
 {
-    assert(newVal);
+    char * _val = NULL;
 
-    string val;
+    if (newVal) {
+        string val;
 
-    try {
-        val = utf8_string(newVal);
-    }
-    catch (bad_alloc& e) {
-        return E_OUTOFMEMORY;
-    }
-    catch (exception& e) {
-        return E_FAIL;
+        try {
+            val = utf8_string(newVal);
+        }
+        catch (bad_alloc&) {
+            return E_OUTOFMEMORY;
+        }
+        catch (exception&) {
+            return E_FAIL;
+        }
+
+        _val = _strdup(val.c_str());
+        if (_val == NULL)
+            return E_OUTOFMEMORY;
     }
 
     if (msg->comments)
         free(msg->comments);
 
-    msg->comments = _strdup(val.c_str());
-    if (msg->comments == NULL)
+    msg->comments = _val;
+    return S_OK;
+}
+
+STDMETHODIMP CTextMessage::get_opt_fields(LPSAFEARRAY * pVal)
+{
+    assert(pVal);
+
+    int len = stringpair_list_length(msg->opt_fields);
+
+    LPSAFEARRAY sa = newSafeArray<opt_field_t>(len);
+    if (sa == NULL)
         return E_OUTOFMEMORY;
+
+    opt_field_t *cs = accessData<opt_field_t>(sa);
+
+    stringpair_list_t *il;
+    ULONG i;
+    for (i = 0, il = msg->opt_fields; il && il->value; il = il->next, i++) {
+        try {
+            _bstr_t key = utf16_bstr(il->value->key);
+            _bstr_t value = utf16_bstr(il->value->value);
+
+            cs[i].name = key.Detach();
+            cs[i].value = value.Detach();
+        }
+        catch (bad_alloc&) {
+            SafeArrayUnaccessData(sa);
+            SafeArrayDestroy(sa);
+            return E_OUTOFMEMORY;
+        }
+        catch (exception&) {
+            SafeArrayUnaccessData(sa);
+            SafeArrayDestroy(sa);
+            return E_FAIL;
+        }
+    }
+
+    SafeArrayUnaccessData(sa);
+
+    *pVal = sa;
+    return S_OK;
+}
+
+STDMETHODIMP CTextMessage::put_opt_fields(SAFEARRAY * newVal)
+{
+    assert(newVal);
+
+    if (newVal == NULL)
+        return E_INVALIDARG;
+
+    stringpair_list_t *il = new_stringpair_list(NULL);
+    if (il == NULL)
+        return E_OUTOFMEMORY;
+
+    opt_field_t *cs;
+    HRESULT hr = SafeArrayAccessData(newVal, (void **) &cs);
+    assert(SUCCEEDED(hr) && cs);
+    if (cs == NULL) {
+        free_stringpair_list(il);
+        return E_FAIL;
+    }
+
+    stringpair_list_t *_il;
+    LONG lbound, ubound;
+    ULONG i;
+    SafeArrayGetLBound(newVal, 1, &lbound);
+    SafeArrayGetUBound(newVal, 1, &ubound);
+
+    for (i = 0, _il = il; i < newVal->cbElements; i++) {
+        stringpair_t * pair;
+        try {
+            pair = new_stringpair(utf8_string(cs[i].name).c_str(), utf8_string(cs[i].value).c_str());
+        }
+        catch (bad_alloc&) {
+            SafeArrayUnaccessData(newVal);
+            free_stringpair_list(il);
+            return E_OUTOFMEMORY;
+        }
+        catch (exception&) {
+            SafeArrayUnaccessData(newVal);
+            free_stringpair_list(il);
+            return E_FAIL;
+        }
+        _il = stringpair_list_add(_il, pair);
+        if (_il == NULL) {
+            SafeArrayUnaccessData(newVal);
+            free_stringpair_list(il);
+            return E_OUTOFMEMORY;
+        }
+    }
+
+    SafeArrayUnaccessData(newVal);
+
+    free_stringpair_list(msg->opt_fields);
+    msg->opt_fields = il;
 
     return S_OK;
 }

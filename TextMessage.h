@@ -137,6 +137,9 @@ public:
 
     STDMETHOD(get_comments)(BSTR * pVal);
     STDMETHOD(put_comments)(BSTR newVal);
+
+    STDMETHOD(get_opt_fields)(LPSAFEARRAY * pVal);
+    STDMETHOD(put_opt_fields)(SAFEARRAY * newVal);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(TextMessage), CTextMessage)
