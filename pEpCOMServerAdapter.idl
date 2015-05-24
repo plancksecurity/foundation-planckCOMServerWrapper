@@ -41,12 +41,10 @@ interface ITextMessage : IUnknown {
         pEp_enc_pEp                             // pEp encryption format
     } pEp_enc_format;
 
-    [uuid(1292C31A-6486-427F-B29F-7F03607836DC)] struct _opt_field {
+    [uuid(1292C31A-6486-427F-B29F-7F03607836DC)] struct opt_field {
         BSTR name;
         BSTR value;
     };
-
-    typedef struct _opt_field opt_field_t;
 
     [propget] HRESULT dir([out, retval] pEp_msg_direction *pVal);
     [propput] HRESULT dir([in] pEp_msg_direction newVal);
@@ -100,8 +98,8 @@ interface ITextMessage : IUnknown {
     [propget] HRESULT comments([out, retval] BSTR *pVal);
     [propput] HRESULT comments([in] BSTR newVal);
 
-    [propget] HRESULT opt_fields([out, retval] SAFEARRAY(opt_field_t) *pVal);
-    [propput] HRESULT opt_fields([in] SAFEARRAY(opt_field_t) newVal);
+    [propget] HRESULT opt_fields([out, retval] SAFEARRAY(struct opt_field) *pVal);
+    [propput] HRESULT opt_fields([in] SAFEARRAY(struct opt_field) newVal);
 };
 
 [

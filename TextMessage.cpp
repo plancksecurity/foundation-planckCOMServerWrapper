@@ -76,7 +76,7 @@ STDMETHODIMP CTextMessage::get_to(LPSAFEARRAY * pVal)
     pEp_identity_s *cs = accessData<pEp_identity_s>(sa);    
 
     identity_list *il = msg->to;
-    ULONG i;
+    LONG i;
     for (i = 0, il = msg->to; il && il->ident; il = il->next, i++) {
         try {
             copy_identity(&cs[i], il->ident);
@@ -120,11 +120,11 @@ STDMETHODIMP CTextMessage::put_to(SAFEARRAY * newVal)
 
     identity_list *_il;
     LONG lbound, ubound;
-    ULONG i;
+    LONG i;
     SafeArrayGetLBound(newVal, 1, &lbound);
     SafeArrayGetUBound(newVal, 1, &ubound);
 
-    for (i = 0, _il = il; i < newVal->cbElements; i++) {
+    for (i = 0, _il = il; i < ubound - lbound + 1; i++) {
         pEp_identity * ident;
         try {
             ident = new_identity(&cs[i]);
@@ -207,7 +207,7 @@ STDMETHODIMP CTextMessage::get_cc(LPSAFEARRAY * pVal)
     pEp_identity_s *cs = accessData<pEp_identity_s>(sa);
 
     identity_list *il = msg->cc;
-    ULONG i;
+    LONG i;
     for (i = 0, il = msg->cc; il && il->ident; il = il->next, i++) {
         try {
             copy_identity(&cs[i], il->ident);
@@ -251,11 +251,11 @@ STDMETHODIMP CTextMessage::put_cc(SAFEARRAY * newVal)
 
     identity_list *_il;
     LONG lbound, ubound;
-    ULONG i;
+    LONG i;
     SafeArrayGetLBound(newVal, 1, &lbound);
     SafeArrayGetUBound(newVal, 1, &ubound);
 
-    for (i = 0, _il = il; i < newVal->cbElements; i++) {
+    for (i = 0, _il = il; i < ubound - lbound + 1; i++) {
         pEp_identity * ident;
         try {
             ident = new_identity(&cs[i]);
@@ -299,7 +299,7 @@ STDMETHODIMP CTextMessage::get_bcc(LPSAFEARRAY * pVal)
     pEp_identity_s *cs = accessData<pEp_identity_s>(sa);
 
     identity_list *il = msg->bcc;
-    ULONG i;
+    LONG i;
     for (i = 0, il = msg->bcc; il && il->ident; il = il->next, i++) {
         try {
             copy_identity(&cs[i], il->ident);
@@ -343,11 +343,11 @@ STDMETHODIMP CTextMessage::put_bcc(SAFEARRAY * newVal)
 
     identity_list *_il;
     LONG lbound, ubound;
-    ULONG i;
+    LONG i;
     SafeArrayGetLBound(newVal, 1, &lbound);
     SafeArrayGetUBound(newVal, 1, &ubound);
 
-    for (i = 0, _il = il; i < newVal->cbElements; i++) {
+    for (i = 0, _il = il; i < ubound - lbound + 1; i++) {
         pEp_identity * ident;
         try {
             ident = new_identity(&cs[i]);
@@ -391,7 +391,7 @@ STDMETHODIMP CTextMessage::get_reply_to(LPSAFEARRAY * pVal)
     pEp_identity_s *cs = accessData<pEp_identity_s>(sa);
 
     identity_list *il = msg->reply_to;
-    ULONG i;
+    LONG i;
     for (i = 0, il = msg->reply_to; il && il->ident; il = il->next, i++) {
         try {
             copy_identity(&cs[i], il->ident);
@@ -435,11 +435,11 @@ STDMETHODIMP CTextMessage::put_reply_to(SAFEARRAY * newVal)
 
     identity_list *_il;
     LONG lbound, ubound;
-    ULONG i;
+    LONG i;
     SafeArrayGetLBound(newVal, 1, &lbound);
     SafeArrayGetUBound(newVal, 1, &ubound);
 
-    for (i = 0, _il = il; i < newVal->cbElements; i++) {
+    for (i = 0, _il = il; i < ubound - lbound + 1; i++) {
         pEp_identity * ident;
         try {
             ident = new_identity(&cs[i]);
@@ -1020,21 +1020,24 @@ STDMETHODIMP CTextMessage::get_opt_fields(LPSAFEARRAY * pVal)
 {
     assert(pVal);
 
+    if (msg->opt_fields == NULL)
+        return S_OK;
+
     int len = stringpair_list_length(msg->opt_fields);
 
-    LPSAFEARRAY sa = newSafeArray<opt_field_t>(len);
+    LPSAFEARRAY sa = newSafeArray<struct opt_field>(len);
     if (sa == NULL)
         return E_OUTOFMEMORY;
 
-    opt_field_t *cs = accessData<opt_field_t>(sa);
+    struct opt_field *cs = accessData<struct opt_field>(sa);
 
     stringpair_list_t *il;
-    ULONG i;
+    LONG i;
     for (i = 0, il = msg->opt_fields; il && il->value; il = il->next, i++) {
         try {
             _bstr_t key = utf16_bstr(il->value->key);
             _bstr_t value = utf16_bstr(il->value->value);
-
+            
             cs[i].name = key.Detach();
             cs[i].value = value.Detach();
         }
@@ -1067,7 +1070,7 @@ STDMETHODIMP CTextMessage::put_opt_fields(SAFEARRAY * newVal)
     if (il == NULL)
         return E_OUTOFMEMORY;
 
-    opt_field_t *cs;
+    struct opt_field *cs;
     HRESULT hr = SafeArrayAccessData(newVal, (void **) &cs);
     assert(SUCCEEDED(hr) && cs);
     if (cs == NULL) {
@@ -1077,11 +1080,11 @@ STDMETHODIMP CTextMessage::put_opt_fields(SAFEARRAY * newVal)
 
     stringpair_list_t *_il;
     LONG lbound, ubound;
-    ULONG i;
+    LONG i;
     SafeArrayGetLBound(newVal, 1, &lbound);
     SafeArrayGetUBound(newVal, 1, &ubound);
 
-    for (i = 0, _il = il; i < newVal->cbElements; i++) {
+    for (i = 0, _il = il; i < ubound - lbound + 1; i++) {
         stringpair_t * pair;
         try {
             pair = new_stringpair(utf8_string(cs[i].name).c_str(), utf8_string(cs[i].value).c_str());

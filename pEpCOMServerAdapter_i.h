@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Wed May 20 17:39:57 2015
+/* at Fri May 22 14:25:56 2015
  */
 /* Compiler settings for pEpCOMServerAdapter.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -145,13 +145,11 @@ enum _pEp_enc_format
         pEp_enc_pEp	= ( pEp_enc_PGP_MIME + 1 ) 
     } 	pEp_enc_format;
 
-/* [uuid] */ struct  DECLSPEC_UUID("1292C31A-6486-427F-B29F-7F03607836DC") _opt_field
+/* [uuid] */ struct  DECLSPEC_UUID("1292C31A-6486-427F-B29F-7F03607836DC") opt_field
     {
     BSTR name;
     BSTR value;
     } ;
-typedef struct _opt_field opt_field_t;
-
 
 EXTERN_C const IID IID_ITextMessage;
 
