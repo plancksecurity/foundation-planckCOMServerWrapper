@@ -208,6 +208,9 @@ interface IpEpEngine : IUnknown {
     HRESULT find_keys([in] BSTR pattern, [out, retval] SAFEARRAY(BSTR) * key_list);
     HRESULT send_key([in] BSTR pattern);
 
+    HRESULT start_keyserver_lookup();
+    HRESULT stop_keyserver_lookup();
+
     HRESULT examine_identity([in] struct pEp_identity_s * ident);
     HRESULT examine_myself([in] struct pEp_identity_s * myself);
     HRESULT myself([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);

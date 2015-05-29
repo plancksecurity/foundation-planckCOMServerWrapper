@@ -664,17 +664,50 @@ STDMETHODIMP CpEpEngine::send_key(BSTR pattern)
         return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::start_keyserver_lookup()
+{
+    if (keymanagement_thread)
+        return S_OK;
+
+    identity_queue = new identity_queue_t();
+
+    keymanagement_thread = new thread(::do_keymanagement, retrieve_next_identity, (void *) identity_queue);
+    keymanagement_thread->detach();
+
+    return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::stop_keyserver_lookup()
+{
+    if (keymanagement_thread == NULL)
+        return S_OK;
+
+    pEp_identity_cpp shutdown;
+    identity_queue->push_front(shutdown);
+
+    keymanagement_thread->join();
+    delete keymanagement_thread;
+    keymanagement_thread = NULL;
+
+    delete identity_queue;
+    identity_queue = NULL;
+
+    return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::examine_identity(pEp_identity_s * ident)
 {
     assert(ident);
     if (ident == NULL)
         return E_INVALIDARG;
 
-    try {
-        identity_queue->push_back(ident);
-    }
-    catch (bad_alloc) {
-        return E_OUTOFMEMORY;
+    if (identity_queue) {
+        try {
+            identity_queue->push_back(ident);
+        }
+        catch (bad_alloc) {
+            return E_OUTOFMEMORY;
+        }
     }
 
     return S_OK;
@@ -689,12 +722,13 @@ STDMETHODIMP CpEpEngine::examine_myself(pEp_identity_s * myself)
     pEp_identity_cpp _ident(myself);
     _ident.me = true;
 
-    ::log_event(get_session(), "examine_myself", "debug", _ident.address.c_str(), NULL);
-    try {
-        identity_queue->push_front(_ident);
-    }
-    catch (bad_alloc) {
-        return E_OUTOFMEMORY;
+    if (identity_queue) {
+        try {
+            identity_queue->push_front(_ident);
+        }
+        catch (bad_alloc) {
+            return E_OUTOFMEMORY;
+        }
     }
 
     return S_OK;
@@ -749,8 +783,10 @@ STDMETHODIMP CpEpEngine::update_identity(struct pEp_identity_s *ident, struct pE
         assert(_ident->fpr);
         copy_identity(result, _ident);
         if (_ident->comm_type == PEP_ct_unknown || _ident->comm_type == PEP_ct_key_expired) {
-            pEp_identity_cpp _ident_cpp(_ident);
-            identity_queue->push_back(_ident_cpp);
+            if (identity_queue) {
+                pEp_identity_cpp _ident_cpp(_ident);
+                identity_queue->push_back(_ident_cpp);
+            }
         }
         ::free_identity(_ident);
         return S_OK;

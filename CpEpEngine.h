@@ -31,19 +31,15 @@ class ATL_NO_VTABLE CpEpEngine :
 	public IpEpEngine
 {
 public:
-	CpEpEngine()
+    CpEpEngine() : keymanagement_thread(NULL), identity_queue(NULL)
 	{
         PEP_STATUS status = ::init(&m_session);
         assert(status == PEP_STATUS_OK);
         ::log_event(m_session, "Startup", "pEp COM Adapter", NULL, NULL);
-        identity_queue = new identity_queue_t();
-        keymanagement_thread = new thread(::do_keymanagement, retrieve_next_identity, (void *) identity_queue);
-        keymanagement_thread->detach();
     }
+
     ~CpEpEngine()
     {
-        pEp_identity_cpp shutdown;
-        identity_queue->push_front(shutdown);
         ::log_event(m_session, "Shutdown", "pEp COM Adapter", NULL, NULL);
         ::release(m_session);
     }
@@ -136,6 +132,9 @@ public:
     STDMETHOD(send_key)(BSTR pattern);
 
     // keymanagement API
+
+    STDMETHOD(start_keyserver_lookup)();
+    STDMETHOD(stop_keyserver_lookup)();
 
     STDMETHOD(examine_identity)(pEp_identity_s * ident);
     STDMETHOD(examine_myself)(pEp_identity_s * myself);

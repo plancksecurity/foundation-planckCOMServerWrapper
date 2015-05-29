@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Fri May 22 14:25:56 2015
+/* at Fri May 29 13:07:51 2015
  */
 /* Compiler settings for pEpCOMServerAdapter.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -768,6 +768,10 @@ EXTERN_C const IID IID_IpEpEngine;
         virtual HRESULT STDMETHODCALLTYPE send_key( 
             /* [in] */ BSTR pattern) = 0;
         
+        virtual HRESULT STDMETHODCALLTYPE start_keyserver_lookup( void) = 0;
+        
+        virtual HRESULT STDMETHODCALLTYPE stop_keyserver_lookup( void) = 0;
+        
         virtual HRESULT STDMETHODCALLTYPE examine_identity( 
             /* [in] */ struct pEp_identity_s *ident) = 0;
         
@@ -924,6 +928,12 @@ EXTERN_C const IID IID_IpEpEngine;
             IpEpEngine * This,
             /* [in] */ BSTR pattern);
         
+        HRESULT ( STDMETHODCALLTYPE *start_keyserver_lookup )( 
+            IpEpEngine * This);
+        
+        HRESULT ( STDMETHODCALLTYPE *stop_keyserver_lookup )( 
+            IpEpEngine * This);
+        
         HRESULT ( STDMETHODCALLTYPE *examine_identity )( 
             IpEpEngine * This,
             /* [in] */ struct pEp_identity_s *ident);
@@ -1045,6 +1055,12 @@ EXTERN_C const IID IID_IpEpEngine;
 
 #define IpEpEngine_send_key(This,pattern)	\
     ( (This)->lpVtbl -> send_key(This,pattern) ) 
+
+#define IpEpEngine_start_keyserver_lookup(This)	\
+    ( (This)->lpVtbl -> start_keyserver_lookup(This) ) 
+
+#define IpEpEngine_stop_keyserver_lookup(This)	\
+    ( (This)->lpVtbl -> stop_keyserver_lookup(This) ) 
 
 #define IpEpEngine_examine_identity(This,ident)	\
     ( (This)->lpVtbl -> examine_identity(This,ident) ) 
