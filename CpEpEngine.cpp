@@ -782,12 +782,6 @@ STDMETHODIMP CpEpEngine::update_identity(struct pEp_identity_s *ident, struct pE
     if (status == PEP_STATUS_OK) {
         assert(_ident->fpr);
         copy_identity(result, _ident);
-        if (_ident->comm_type == PEP_ct_unknown || _ident->comm_type == PEP_ct_key_expired) {
-            if (identity_queue.load()) {
-                pEp_identity_cpp _ident_cpp(_ident);
-                identity_queue.load()->push_back(_ident_cpp);
-            }
-        }
         ::free_identity(_ident);
         return S_OK;
     }
@@ -823,6 +817,28 @@ STDMETHODIMP CpEpEngine::key_compromized(BSTR fpr)
         return FAIL(L"cannot revoke compromized key");
 
     return S_OK;
+}
+
+int CpEpEngine::examine_identity(pEp_identity *ident, void *management)
+{
+    assert(ident);
+    assert(management);
+    if (!(ident && management))
+        return -1;
+
+    CpEpEngine *me = (CpEpEngine *) management;
+
+    if (me->identity_queue.load() == NULL)
+        return 0;
+
+    try {
+        me->identity_queue.load()->push_back(ident);
+    }
+    catch (exception&) {
+        return -1;
+    }
+
+    return 0;
 }
 
 ::pEp_identity * CpEpEngine::retrieve_next_identity(void *management)

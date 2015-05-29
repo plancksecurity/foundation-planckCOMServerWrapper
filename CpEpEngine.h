@@ -28,11 +28,15 @@ class ATL_NO_VTABLE CpEpEngine :
 	public CProxy_IpEpEngineEvents<CpEpEngine>,
 	public IpEpEngine
 {
+protected:
+    static int examine_identity(pEp_identity *ident, void *management);
+
 public:
     CpEpEngine() : keymanagement_thread(NULL), identity_queue(NULL)
 	{
         PEP_STATUS status = ::init(&m_session);
         assert(status == PEP_STATUS_OK);
+        ::register_examine_function(m_session, CpEpEngine::examine_identity, (void *)this);
         ::log_event(m_session, "Startup", "pEp COM Adapter", NULL, NULL);
     }
 
