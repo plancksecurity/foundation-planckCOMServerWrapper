@@ -3,8 +3,6 @@
 #pragma once
 #include "resource.h"       // main symbols
 
-
-
 #include "pEpComServerAdapter_i.h"
 #include "_IpEpEngineEvents_CP.h"
 #include "locked_queue.hh"
@@ -109,7 +107,7 @@ protected:
 private:
     PEP_SESSION m_session;
     mutex session_mutex;
-    identity_queue_t *identity_queue;
+    atomic< identity_queue_t * > identity_queue;
     thread *keymanagement_thread;
 
 public:

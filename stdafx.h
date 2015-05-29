@@ -34,6 +34,7 @@
 #include <list>
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 #include <assert.h>
 

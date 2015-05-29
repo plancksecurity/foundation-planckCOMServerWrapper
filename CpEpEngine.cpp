@@ -671,9 +671,9 @@ STDMETHODIMP CpEpEngine::start_keyserver_lookup()
 
     identity_queue = new identity_queue_t();
 
-    keymanagement_thread = new thread(::do_keymanagement, retrieve_next_identity, (void *) identity_queue);
+    keymanagement_thread = new thread(::do_keymanagement, retrieve_next_identity, (void *) identity_queue.load());
     keymanagement_thread->detach();
-
+    
     return S_OK;
 }
 
@@ -682,15 +682,17 @@ STDMETHODIMP CpEpEngine::stop_keyserver_lookup()
     if (keymanagement_thread == NULL)
         return S_OK;
 
+    identity_queue_t *_iq = identity_queue.load();
+    identity_queue = NULL;
+
     pEp_identity_cpp shutdown;
-    identity_queue->push_front(shutdown);
+    _iq->push_front(shutdown);
 
     keymanagement_thread->join();
     delete keymanagement_thread;
     keymanagement_thread = NULL;
 
-    delete identity_queue;
-    identity_queue = NULL;
+    delete _iq;
 
     return S_OK;
 }
@@ -701,9 +703,9 @@ STDMETHODIMP CpEpEngine::examine_identity(pEp_identity_s * ident)
     if (ident == NULL)
         return E_INVALIDARG;
 
-    if (identity_queue) {
+    if (identity_queue.load() == NULL) {
         try {
-            identity_queue->push_back(ident);
+            identity_queue.load()->push_back(ident);
         }
         catch (bad_alloc) {
             return E_OUTOFMEMORY;
@@ -722,9 +724,9 @@ STDMETHODIMP CpEpEngine::examine_myself(pEp_identity_s * myself)
     pEp_identity_cpp _ident(myself);
     _ident.me = true;
 
-    if (identity_queue) {
+    if (identity_queue.load()) {
         try {
-            identity_queue->push_front(_ident);
+            identity_queue.load()->push_front(_ident);
         }
         catch (bad_alloc) {
             return E_OUTOFMEMORY;
@@ -783,9 +785,9 @@ STDMETHODIMP CpEpEngine::update_identity(struct pEp_identity_s *ident, struct pE
         assert(_ident->fpr);
         copy_identity(result, _ident);
         if (_ident->comm_type == PEP_ct_unknown || _ident->comm_type == PEP_ct_key_expired) {
-            if (identity_queue) {
+            if (identity_queue.load()) {
                 pEp_identity_cpp _ident_cpp(_ident);
-                identity_queue->push_back(_ident_cpp);
+                identity_queue.load()->push_back(_ident_cpp);
             }
         }
         ::free_identity(_ident);
