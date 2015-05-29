@@ -666,24 +666,22 @@ STDMETHODIMP CpEpEngine::send_key(BSTR pattern)
 
 STDMETHODIMP CpEpEngine::start_keyserver_lookup()
 {
-    if (keymanagement_thread)
+    if (identity_queue.load())
         return S_OK;
 
-    identity_queue = new identity_queue_t();
-
+    identity_queue.store(new identity_queue_t());
     keymanagement_thread = new thread(::do_keymanagement, retrieve_next_identity, (void *) identity_queue.load());
-    keymanagement_thread->detach();
     
     return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::stop_keyserver_lookup()
 {
-    if (keymanagement_thread == NULL)
+    if (identity_queue.load() == NULL)
         return S_OK;
 
     identity_queue_t *_iq = identity_queue.load();
-    identity_queue = NULL;
+    identity_queue.store(NULL);
 
     pEp_identity_cpp shutdown;
     _iq->push_front(shutdown);
@@ -841,10 +839,8 @@ STDMETHODIMP CpEpEngine::key_compromized(BSTR fpr)
     ::pEp_identity *_ident;
     pEp_identity_cpp& ident = iq->front();
 
-    if (ident.address.size() == 0) {
-        delete iq;
+    if (ident.address.size() == 0)
         return NULL;
-    }
 
     _ident = ident.to_pEp_identity();
     iq->pop_front();
