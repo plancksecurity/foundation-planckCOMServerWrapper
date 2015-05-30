@@ -28,7 +28,7 @@ STDMETHODIMP CTextMessage::get_from(pEp_identity_s* pVal)
     assert(pVal);
 
     try {
-        copy_identity(pVal, msg->from);
+        copy_identity(pVal, msg()->from);
     }
     catch (bad_alloc&) {
         return E_OUTOFMEMORY;
@@ -58,8 +58,8 @@ STDMETHODIMP CTextMessage::put_from(pEp_identity_s* newVal)
         return E_FAIL;
     }
 
-    ::free_identity(msg->from);
-    msg->from = _from;
+    ::free_identity(msg()->from);
+    msg()->from = _from;
     return S_OK;
 }
 
@@ -164,12 +164,12 @@ static HRESULT il_put(identity_list **target, SAFEARRAY * newVal)
 
 STDMETHODIMP CTextMessage::get_to(LPSAFEARRAY * pVal)
 {
-    return il_get(msg->to, pVal);
+    return il_get(msg()->to, pVal);
 }
 
 STDMETHODIMP CTextMessage::put_to(SAFEARRAY * newVal)
 {
-    return il_put(&msg->to, newVal);
+    return il_put(&msg()->to, newVal);
 }
 
 STDMETHODIMP CTextMessage::get_recv_by(pEp_identity_s* pVal)
@@ -177,7 +177,7 @@ STDMETHODIMP CTextMessage::get_recv_by(pEp_identity_s* pVal)
     assert(pVal);
 
     try {
-        copy_identity(pVal, msg->recv_by);
+        copy_identity(pVal, msg()->recv_by);
     }
     catch (bad_alloc&) {
         return E_OUTOFMEMORY;
@@ -206,53 +206,53 @@ STDMETHODIMP CTextMessage::put_recv_by(pEp_identity_s* newVal)
         return E_FAIL;
     }
 
-    ::free_identity(msg->recv_by);
-    msg->recv_by = _recv_by;
+    ::free_identity(msg()->recv_by);
+    msg()->recv_by = _recv_by;
     return S_OK;
 }
 
 STDMETHODIMP CTextMessage::get_cc(LPSAFEARRAY * pVal)
 {
-    return il_get(msg->cc, pVal);
+    return il_get(msg()->cc, pVal);
 }
 
 STDMETHODIMP CTextMessage::put_cc(SAFEARRAY * newVal)
 {
-    return il_put(&msg->cc, newVal);
+    return il_put(&msg()->cc, newVal);
 }
 
 STDMETHODIMP CTextMessage::get_bcc(LPSAFEARRAY * pVal)
 {
-    return il_get(msg->bcc, pVal);
+    return il_get(msg()->bcc, pVal);
 }
 
 STDMETHODIMP CTextMessage::put_bcc(SAFEARRAY * newVal)
 {
-    return il_put(&msg->bcc, newVal);
+    return il_put(&msg()->bcc, newVal);
 }
 
 STDMETHODIMP CTextMessage::get_reply_to(LPSAFEARRAY * pVal)
 {
-    return il_get(msg->reply_to, pVal);
+    return il_get(msg()->reply_to, pVal);
 }
 
 STDMETHODIMP CTextMessage::put_reply_to(SAFEARRAY * newVal)
 {
-    return il_put(&msg->reply_to, newVal);
+    return il_put(&msg()->reply_to, newVal);
 }
 
 STDMETHODIMP CTextMessage::get_dir(pEp_msg_direction *pVal)
 {
     assert(pVal);
 
-    *pVal = (pEp_msg_direction) msg->dir;
+    *pVal = (pEp_msg_direction) msg()->dir;
 
     return S_OK;
 }
 
 STDMETHODIMP CTextMessage::put_dir(pEp_msg_direction newVal)
 {
-    msg->dir = (PEP_msg_direction) newVal;
+    msg()->dir = (PEP_msg_direction) newVal;
 
     return S_OK;
 }
@@ -263,9 +263,9 @@ STDMETHODIMP CTextMessage::get_id(BSTR * pVal)
 
     _bstr_t val;
 
-    if (msg->id) {
+    if (msg()->id) {
         try {
-            val = utf16_bstr(msg->id);
+            val = utf16_bstr(msg()->id);
         }
         catch (bad_alloc&) {
             return E_OUTOFMEMORY;
@@ -300,10 +300,10 @@ STDMETHODIMP CTextMessage::put_id(BSTR newVal)
             return E_OUTOFMEMORY;
     }
 
-    if (msg->id)
-        free(msg->id);
+    if (msg()->id)
+        free(msg()->id);
 
-    msg->id = _val;
+    msg()->id = _val;
     return S_OK;
 }
 
@@ -313,9 +313,9 @@ STDMETHODIMP CTextMessage::get_shortmsg(BSTR * pVal)
 
     _bstr_t val;
 
-    if (msg->shortmsg) {
+    if (msg()->shortmsg) {
         try {
-            val = utf16_bstr(msg->shortmsg);
+            val = utf16_bstr(msg()->shortmsg);
         }
         catch (bad_alloc&) {
             return E_OUTOFMEMORY;
@@ -351,10 +351,10 @@ STDMETHODIMP CTextMessage::put_shortmsg(BSTR newVal)
             return E_OUTOFMEMORY;
     }
 
-    if (msg->shortmsg)
-        free(msg->shortmsg);
+    if (msg()->shortmsg)
+        free(msg()->shortmsg);
 
-    msg->shortmsg = _val;
+    msg()->shortmsg = _val;
     return S_OK;
 }
 
@@ -364,9 +364,9 @@ STDMETHODIMP CTextMessage::get_longmsg(BSTR * pVal)
 
     _bstr_t val;
 
-    if (msg->longmsg) {
+    if (msg()->longmsg) {
         try {
-            val = utf16_bstr(msg->longmsg);
+            val = utf16_bstr(msg()->longmsg);
         }
         catch (bad_alloc&) {
             return E_OUTOFMEMORY;
@@ -402,10 +402,10 @@ STDMETHODIMP CTextMessage::put_longmsg(BSTR newVal)
             return E_OUTOFMEMORY;
     }
 
-    if (msg->longmsg)
-        free(msg->longmsg);
+    if (msg()->longmsg)
+        free(msg()->longmsg);
 
-    msg->longmsg = _val;
+    msg()->longmsg = _val;
     return S_OK;
 }
 
@@ -415,9 +415,9 @@ STDMETHODIMP CTextMessage::get_longmsg_formatted(BSTR * pVal)
 
     _bstr_t val;
 
-    if (msg->longmsg_formatted) {
+    if (msg()->longmsg_formatted) {
         try {
-            val = utf16_bstr(msg->longmsg_formatted);
+            val = utf16_bstr(msg()->longmsg_formatted);
         }
         catch (bad_alloc&) {
             return E_OUTOFMEMORY;
@@ -453,10 +453,10 @@ STDMETHODIMP CTextMessage::put_longmsg_formatted(BSTR newVal)
             return E_OUTOFMEMORY;
     }
 
-    if (msg->longmsg_formatted)
-        free(msg->longmsg_formatted);
+    if (msg()->longmsg_formatted)
+        free(msg()->longmsg_formatted);
 
-    msg->longmsg_formatted = _val;
+    msg()->longmsg_formatted = _val;
     return S_OK;
 }
 
@@ -508,14 +508,14 @@ STDMETHODIMP CTextMessage::add_attachment(SAFEARRAY * data, BSTR mime_type, BSTR
         }
     }
 
-    bloblist_t *blob = bloblist_add(msg->attachments, _data, len, _mime_type.c_str(), _filename.c_str());
+    bloblist_t *blob = bloblist_add(msg()->attachments, _data, len, _mime_type.c_str(), _filename.c_str());
     if (blob == NULL) {
         free(_data);
         return E_OUTOFMEMORY;
     }
 
-    if (msg->attachments == NULL)
-        msg->attachments = blob;
+    if (msg()->attachments == NULL)
+        msg()->attachments = blob;
 
     return S_OK;
 }
@@ -524,13 +524,13 @@ STDMETHODIMP CTextMessage::has_attachments(boolean *result)
 {
     assert(result);
 
-    if (msg->attachments == NULL || msg->attachments->data == NULL) {
+    if (msg()->attachments == NULL || msg()->attachments->data == NULL) {
         m_next_attachment = NULL;
         *result = false;
         return S_OK;
     }
 
-    m_next_attachment = msg->attachments;
+    m_next_attachment = msg()->attachments;
     *result = true;
 
     return S_OK;
@@ -596,10 +596,10 @@ STDMETHODIMP CTextMessage::get_sent(hyper * result)
 {
     assert(result);
 
-    if (msg->sent == NULL)
+    if (msg()->sent == NULL)
         return E_NOT_SET;
 
-    *result = mktime(msg->sent);
+    *result = mktime(msg()->sent);
     return S_OK;
 }
 
@@ -609,9 +609,9 @@ STDMETHODIMP CTextMessage::put_sent(hyper val)
     if (ts == NULL)
         return E_OUTOFMEMORY;
 
-    if (msg->sent)
-        free_timestamp(msg->sent);
-    msg->sent = ts;
+    if (msg()->sent)
+        free_timestamp(msg()->sent);
+    msg()->sent = ts;
 
     return S_OK;
 }
@@ -620,10 +620,10 @@ STDMETHODIMP CTextMessage::get_recv(hyper * result)
 {
     assert(result);
 
-    if (msg->recv == NULL)
+    if (msg()->recv == NULL)
         return E_NOT_SET;
 
-    *result = mktime(msg->recv);
+    *result = mktime(msg()->recv);
     return S_OK;
 }
 
@@ -633,9 +633,9 @@ STDMETHODIMP CTextMessage::put_recv(hyper val)
     if (ts == NULL)
         return E_OUTOFMEMORY;
 
-    if (msg->recv)
-        free_timestamp(msg->recv);
-    msg->recv = ts;
+    if (msg()->recv)
+        free_timestamp(msg()->recv);
+    msg()->recv = ts;
 
     return S_OK;
 }
@@ -646,8 +646,8 @@ STDMETHODIMP CTextMessage::get_references(SAFEARRAY ** pVal)
 
     CComSafeArray<BSTR> sa;
     try {
-        if (msg->references) {
-            sa = string_array(msg->references);
+        if (msg()->references) {
+            sa = string_array(msg()->references);
         }
         else {
             sa.Create(0UL);
@@ -680,10 +680,10 @@ STDMETHODIMP CTextMessage::put_references(SAFEARRAY * newVal)
         return E_FAIL;
     }
 
-    if (msg->references)
-        free_stringlist(msg->references);
+    if (msg()->references)
+        free_stringlist(msg()->references);
 
-    msg->references = sl;
+    msg()->references = sl;
 
     return S_OK;
 }
@@ -694,8 +694,8 @@ STDMETHODIMP CTextMessage::get_keywords(SAFEARRAY ** pVal)
 
     CComSafeArray<BSTR> sa;
     try {
-        if (msg->keywords) {
-            sa = string_array(msg->keywords);
+        if (msg()->keywords) {
+            sa = string_array(msg()->keywords);
         }
         else {
             sa.Create(0UL);
@@ -728,10 +728,10 @@ STDMETHODIMP CTextMessage::put_keywords(SAFEARRAY * newVal)
         return E_FAIL;
     }
 
-    if (msg->keywords)
-        free_stringlist(msg->keywords);
+    if (msg()->keywords)
+        free_stringlist(msg()->keywords);
 
-    msg->keywords = sl;
+    msg()->keywords = sl;
 
     return S_OK;
 }
@@ -742,9 +742,9 @@ STDMETHODIMP CTextMessage::get_comments(BSTR * pVal)
 
     _bstr_t val;
 
-    if (msg->comments) {
+    if (msg()->comments) {
         try {
-            val = utf16_bstr(msg->comments);
+            val = utf16_bstr(msg()->comments);
         }
         catch (bad_alloc&) {
             return E_OUTOFMEMORY;
@@ -780,10 +780,10 @@ STDMETHODIMP CTextMessage::put_comments(BSTR newVal)
             return E_OUTOFMEMORY;
     }
 
-    if (msg->comments)
-        free(msg->comments);
+    if (msg()->comments)
+        free(msg()->comments);
 
-    msg->comments = _val;
+    msg()->comments = _val;
     return S_OK;
 }
 
@@ -791,10 +791,10 @@ STDMETHODIMP CTextMessage::get_opt_fields(LPSAFEARRAY * pVal)
 {
     assert(pVal);
 
-    if (msg->opt_fields == NULL)
+    if (msg()->opt_fields == NULL)
         return S_OK;
 
-    int len = stringpair_list_length(msg->opt_fields);
+    int len = stringpair_list_length(msg()->opt_fields);
 
     LPSAFEARRAY sa = newSafeArray<struct opt_field>(len);
     if (sa == NULL)
@@ -802,7 +802,7 @@ STDMETHODIMP CTextMessage::get_opt_fields(LPSAFEARRAY * pVal)
 
     stringpair_list_t *il;
     LONG i;
-    for (i = 0, il = msg->opt_fields; il && il->value; il = il->next, i++) {
+    for (i = 0, il = msg()->opt_fields; il && il->value; il = il->next, i++) {
         opt_field fld;
         memset(&fld, 0, sizeof(opt_field));
 
@@ -875,8 +875,8 @@ STDMETHODIMP CTextMessage::put_opt_fields(SAFEARRAY * newVal)
         }
     }
 
-    free_stringpair_list(msg->opt_fields);
-    msg->opt_fields = il;
+    free_stringpair_list(msg()->opt_fields);
+    msg()->opt_fields = il;
 
     return S_OK;
 }

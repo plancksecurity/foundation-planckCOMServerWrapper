@@ -236,8 +236,8 @@ interface IpEpEngine : IUnknown {
         pEp_rating_b0rken = -2
     } pEp_color;
 
-    HRESULT encrypt_message([in] ITextMessage *src, [out] ITextMessage ** dst, [in] SAFEARRAY(BSTR) extra);
-    HRESULT decrypt_message([in] ITextMessage *src, [out] ITextMessage ** dst, [out] SAFEARRAY(BSTR) *keylist, [out, retval] pEp_color *rating);
+    HRESULT encrypt_message([in,ref] ITextMessage *src, [in,ref] ITextMessage * dst, [in] SAFEARRAY(BSTR) extra);
+    HRESULT decrypt_message([in,ref] ITextMessage *src, [in,ref] ITextMessage * dst, [out] SAFEARRAY(BSTR) *keylist, [out, retval] pEp_color *rating);
     HRESULT outgoing_message_color([in] ITextMessage *msg, [out, retval] pEp_color * pVal);
     HRESULT identity_color([in] struct pEp_identity_s * ident, [out, retval] pEp_color * pVal);
 };

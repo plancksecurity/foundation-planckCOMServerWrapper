@@ -28,16 +28,57 @@ class ATL_NO_VTABLE CTextMessage :
 {
 private:
     ::bloblist_t *m_next_attachment;
+    mutex message_mutex;
+    ::message *_msg;
+
+protected:
+    class Msg {
+    private:
+        CTextMessage *me;
+
+    public:
+        Msg(CTextMessage *myself)
+        {
+            me = myself;
+            me->message_mutex.lock();
+        }
+
+        ~Msg()
+        {
+            me->message_mutex.unlock();
+        }
+
+        ::message * operator->()
+        {
+            return me->_msg;
+        }
+
+        operator ::message *()
+        {
+            return me->_msg;
+        }
+    };
 
 public:
-    ::message *msg;
+    Msg msg()
+    {
+        return Msg(this);
+    }
+
+    void msg(::message *new_msg)
+    {
+        lock_guard<mutex> lg(message_mutex);
+
+        ::free_message(_msg);
+        _msg = new_msg;
+    }
 
     CTextMessage()
         : m_next_attachment(NULL)
 	{
-        msg = (::message *) calloc(1, sizeof(::message));
-        assert(msg);
-        if (msg == NULL)
+        _msg = (::message *) calloc(1, sizeof(::message));
+        assert(_msg);
+        if (_msg == NULL)
             throw bad_alloc();
 	}
 
@@ -46,15 +87,15 @@ public:
     CTextMessage(const CTextMessage& second)
         : m_next_attachment(NULL)
     {
-        msg = (::message *) calloc(1, sizeof(::message));
-        assert(msg);
-        if (msg == NULL)
+        _msg = (::message *) calloc(1, sizeof(::message));
+        assert(_msg);
+        if (_msg == NULL)
             throw bad_alloc();
     }
 
     virtual ~CTextMessage()
     {
-        ::free_message(msg);
+        ::free_message(_msg);
     }
 
 DECLARE_REGISTRY_RESOURCEID(IDR_TEXTMESSAGE)

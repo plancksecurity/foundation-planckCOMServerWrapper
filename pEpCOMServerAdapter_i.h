@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Sat May 30 12:51:56 2015
+/* at Sat May 30 18:16:12 2015
  */
 /* Compiler settings for pEpCOMServerAdapter.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -787,13 +787,13 @@ EXTERN_C const IID IID_IpEpEngine;
             /* [in] */ BSTR fpr) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE encrypt_message( 
-            /* [in] */ ITextMessage *src,
-            /* [out] */ ITextMessage **dst,
+            /* [ref][in] */ ITextMessage *src,
+            /* [ref][in] */ ITextMessage *dst,
             /* [in] */ SAFEARRAY * extra) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE decrypt_message( 
-            /* [in] */ ITextMessage *src,
-            /* [out] */ ITextMessage **dst,
+            /* [ref][in] */ ITextMessage *src,
+            /* [ref][in] */ ITextMessage *dst,
             /* [out] */ SAFEARRAY * *keylist,
             /* [retval][out] */ pEp_color *rating) = 0;
         
@@ -951,14 +951,14 @@ EXTERN_C const IID IID_IpEpEngine;
         
         HRESULT ( STDMETHODCALLTYPE *encrypt_message )( 
             IpEpEngine * This,
-            /* [in] */ ITextMessage *src,
-            /* [out] */ ITextMessage **dst,
+            /* [ref][in] */ ITextMessage *src,
+            /* [ref][in] */ ITextMessage *dst,
             /* [in] */ SAFEARRAY * extra);
         
         HRESULT ( STDMETHODCALLTYPE *decrypt_message )( 
             IpEpEngine * This,
-            /* [in] */ ITextMessage *src,
-            /* [out] */ ITextMessage **dst,
+            /* [ref][in] */ ITextMessage *src,
+            /* [ref][in] */ ITextMessage *dst,
             /* [out] */ SAFEARRAY * *keylist,
             /* [retval][out] */ pEp_color *rating);
         

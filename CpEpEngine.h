@@ -147,8 +147,8 @@ public:
     
     // Message API
 
-    STDMETHOD(encrypt_message)(ITextMessage * src, ITextMessage ** dst, SAFEARRAY * extra);
-    STDMETHOD(decrypt_message)(ITextMessage * src, ITextMessage ** dst, SAFEARRAY ** keylist, pEp_color *rating);
+    STDMETHOD(encrypt_message)(ITextMessage * src, ITextMessage * dst, SAFEARRAY * extra);
+    STDMETHOD(decrypt_message)(ITextMessage * src, ITextMessage * dst, SAFEARRAY ** keylist, pEp_color *rating);
     STDMETHOD(outgoing_message_color)(ITextMessage *msg, pEp_color * pVal);
     STDMETHOD(identity_color)(pEp_identity_s * ident, pEp_color * pVal);
 

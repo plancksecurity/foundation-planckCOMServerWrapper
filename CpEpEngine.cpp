@@ -866,15 +866,17 @@ HRESULT CpEpEngine::error(_bstr_t msg)
     return E_FAIL;
 }
 
-STDMETHODIMP CpEpEngine::encrypt_message(ITextMessage * src, ITextMessage ** dst, SAFEARRAY * extra)
+STDMETHODIMP CpEpEngine::encrypt_message(ITextMessage * src, ITextMessage * dst, SAFEARRAY * extra)
 {
     assert(src);
     assert(dst);
 
     CTextMessage *_src = dynamic_cast<CTextMessage *>(src);
     assert(_src);
+    CTextMessage *_dst = dynamic_cast<CTextMessage *>(dst);
+    assert(_dst);
 
-    if (_src->msg->enc_format != PEP_enc_none)
+    if (_src->msg()->enc_format != PEP_enc_none)
         return E_INVALIDARG;
 
     ::stringlist_t * _extra = NULL;
@@ -891,35 +893,20 @@ STDMETHODIMP CpEpEngine::encrypt_message(ITextMessage * src, ITextMessage ** dst
     }
 
     ::message *msg_dst;
-    PEP_STATUS status = ::encrypt_message(get_session(), _src->msg, _extra, &msg_dst, PEP_enc_pieces);
+    PEP_STATUS status = ::encrypt_message(get_session(), _src->msg(), _extra, &msg_dst, PEP_enc_pieces);
     if (status != PEP_STATUS_OK)
         FAIL(L"cannot encrypt message");
 
     ::free_stringlist(_extra);
 
     if (msg_dst) {
-        ITextMessage *i_dst;
-        HRESULT hr = CTextMessage::CreateInstance(&i_dst);
-        assert(hr == S_OK);
-
-        if (hr != S_OK) {
-            free_message(msg_dst);
-            return hr;
-        }
-
-        CTextMessage *_dst = dynamic_cast<CTextMessage *>(i_dst);
-        assert(_dst);
-
-        ::free_message(_dst->msg);
-        _dst->msg = msg_dst;
-
-        *dst = i_dst;
+        _dst->msg(msg_dst);
     }
 
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::decrypt_message(ITextMessage * src, ITextMessage ** dst, SAFEARRAY ** keylist, pEp_color *rating)
+STDMETHODIMP CpEpEngine::decrypt_message(ITextMessage * src, ITextMessage * dst, SAFEARRAY ** keylist, pEp_color *rating)
 {
     assert(src);
     assert(dst);
@@ -928,39 +915,22 @@ STDMETHODIMP CpEpEngine::decrypt_message(ITextMessage * src, ITextMessage ** dst
 
     CTextMessage *_src = dynamic_cast<CTextMessage *>(src);
     assert(_src);
+    CTextMessage *_dst = dynamic_cast<CTextMessage *>(dst);
+    assert(_dst);
 
-    if (_src->msg->enc_format != PEP_enc_none)
+    if (_src->msg()->enc_format != PEP_enc_none)
         return E_INVALIDARG;
 
     ::message *msg_dst;
     ::stringlist_t *_keylist;
     ::PEP_color _rating;
 
-    PEP_STATUS status = ::decrypt_message(get_session(), _src->msg, &msg_dst, &_keylist, &_rating);
+    PEP_STATUS status = ::decrypt_message(get_session(), _src->msg(), &msg_dst, &_keylist, &_rating);
     if (status != PEP_STATUS_OK)
         return FAIL(L"decrypt message failed");
 
     if (msg_dst) {
-        ITextMessage *i_dst;
-        HRESULT hr = CTextMessage::CreateInstance(&i_dst);
-        assert(hr == S_OK);
-
-        if (hr != S_OK) {
-            ::free_message(msg_dst);
-            ::free_stringlist(_keylist);
-            return hr;
-        }
-
-        CTextMessage *_dst = dynamic_cast<CTextMessage *>(i_dst);
-        assert(_dst);
-
-        ::free_message(_dst->msg);
-        _dst->msg = msg_dst;
-
-        *dst = i_dst;
-    }
-    else {
-        *dst = NULL;
+        _dst->msg(msg_dst);
     }
 
     if (_keylist) {
@@ -993,11 +963,11 @@ STDMETHODIMP CpEpEngine::outgoing_message_color(ITextMessage *msg, pEp_color * p
     CTextMessage *_msg = dynamic_cast<CTextMessage *>(msg);
     assert(_msg);
 
-    if (_msg->msg->dir != PEP_dir_outgoing)
+    if (_msg->msg()->dir != PEP_dir_outgoing)
         return E_INVALIDARG;
 
     PEP_color _color;
-    PEP_STATUS status = ::outgoing_message_color(get_session(), _msg->msg, &_color);
+    PEP_STATUS status = ::outgoing_message_color(get_session(), _msg->msg(), &_color);
     if (status != PEP_STATUS_OK)
         return FAIL(L"cannot get message color");
 
