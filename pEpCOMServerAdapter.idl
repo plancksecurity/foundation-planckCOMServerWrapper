@@ -212,7 +212,6 @@ interface IpEpEngine : IUnknown {
     HRESULT stop_keyserver_lookup();
 
     HRESULT examine_identity([in] struct pEp_identity_s * ident);
-    HRESULT examine_myself([in] struct pEp_identity_s * myself);
     HRESULT myself([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
     HRESULT update_identity([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
     HRESULT key_compromized([in] BSTR fpr);

@@ -713,27 +713,6 @@ STDMETHODIMP CpEpEngine::examine_identity(pEp_identity_s * ident)
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::examine_myself(pEp_identity_s * myself)
-{
-    assert(myself);
-    if (myself == NULL)
-        return E_INVALIDARG;
-
-    pEp_identity_cpp _ident(myself);
-    _ident.me = true;
-
-    if (identity_queue.load()) {
-        try {
-            identity_queue.load()->push_front(_ident);
-        }
-        catch (bad_alloc) {
-            return E_OUTOFMEMORY;
-        }
-    }
-
-    return S_OK;
-}
-
 STDMETHODIMP CpEpEngine::myself(struct pEp_identity_s *ident, struct pEp_identity_s *result)
 {
     assert(ident);
@@ -915,26 +894,28 @@ STDMETHODIMP CpEpEngine::encrypt_message(ITextMessage * src, ITextMessage ** dst
     PEP_STATUS status = ::encrypt_message(get_session(), _src->msg, _extra, &msg_dst, PEP_enc_pieces);
     if (status != PEP_STATUS_OK)
         FAIL(L"cannot encrypt message");
-    assert(msg_dst);
 
     ::free_stringlist(_extra);
 
-    ITextMessage *i_dst;
-    HRESULT hr = CTextMessage::CreateInstance(&i_dst);
-    assert(hr == S_OK);
-    
-    if (hr != S_OK) {
-        free_message(msg_dst);
-        return hr;
+    if (msg_dst) {
+        ITextMessage *i_dst;
+        HRESULT hr = CTextMessage::CreateInstance(&i_dst);
+        assert(hr == S_OK);
+
+        if (hr != S_OK) {
+            free_message(msg_dst);
+            return hr;
+        }
+
+        CTextMessage *_dst = dynamic_cast<CTextMessage *>(i_dst);
+        assert(_dst);
+
+        ::free_message(_dst->msg);
+        _dst->msg = msg_dst;
+
+        *dst = i_dst;
     }
 
-    CTextMessage *_dst = dynamic_cast<CTextMessage *>(i_dst);
-    assert(_dst);
-
-    ::free_message(_dst->msg);
-    _dst->msg = msg_dst;
-
-    *dst = i_dst;
     return S_OK;
 }
 

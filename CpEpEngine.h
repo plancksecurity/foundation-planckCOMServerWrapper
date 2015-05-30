@@ -140,7 +140,6 @@ public:
     STDMETHOD(stop_keyserver_lookup)();
 
     STDMETHOD(examine_identity)(pEp_identity_s * ident);
-    STDMETHOD(examine_myself)(pEp_identity_s * myself);
     STDMETHOD(verify)(BSTR text, BSTR signature, LPSAFEARRAY * key_list, pEp_STATUS * verify_status);
     STDMETHOD(myself)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
     STDMETHOD(update_identity)(struct pEp_identity_s *ident, struct pEp_identity_s *result);

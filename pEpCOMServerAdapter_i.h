@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Sat May 30 01:09:44 2015
+/* at Sat May 30 01:53:09 2015
  */
 /* Compiler settings for pEpCOMServerAdapter.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -775,9 +775,6 @@ EXTERN_C const IID IID_IpEpEngine;
         virtual HRESULT STDMETHODCALLTYPE examine_identity( 
             /* [in] */ struct pEp_identity_s *ident) = 0;
         
-        virtual HRESULT STDMETHODCALLTYPE examine_myself( 
-            /* [in] */ struct pEp_identity_s *myself) = 0;
-        
         virtual HRESULT STDMETHODCALLTYPE myself( 
             /* [in] */ struct pEp_identity_s *ident,
             /* [retval][out] */ struct pEp_identity_s *result) = 0;
@@ -938,10 +935,6 @@ EXTERN_C const IID IID_IpEpEngine;
             IpEpEngine * This,
             /* [in] */ struct pEp_identity_s *ident);
         
-        HRESULT ( STDMETHODCALLTYPE *examine_myself )( 
-            IpEpEngine * This,
-            /* [in] */ struct pEp_identity_s *myself);
-        
         HRESULT ( STDMETHODCALLTYPE *myself )( 
             IpEpEngine * This,
             /* [in] */ struct pEp_identity_s *ident,
@@ -1064,9 +1057,6 @@ EXTERN_C const IID IID_IpEpEngine;
 
 #define IpEpEngine_examine_identity(This,ident)	\
     ( (This)->lpVtbl -> examine_identity(This,ident) ) 
-
-#define IpEpEngine_examine_myself(This,myself)	\
-    ( (This)->lpVtbl -> examine_myself(This,myself) ) 
 
 #define IpEpEngine_myself(This,ident,result)	\
     ( (This)->lpVtbl -> myself(This,ident,result) ) 
