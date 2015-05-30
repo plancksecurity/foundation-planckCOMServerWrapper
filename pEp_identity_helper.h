@@ -35,7 +35,6 @@ namespace pEp {
             pEp_identity_s * to_pEp_identity_s();
         };
 
-        void free_pEp_identity_s(pEp_identity_s *ident);
         void copy_identity(pEp_identity_s * ident_s, const pEp_identity * ident);
         ::pEp_identity *new_identity(const pEp_identity_s * ident);
 

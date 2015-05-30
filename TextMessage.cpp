@@ -63,46 +63,49 @@ STDMETHODIMP CTextMessage::put_from(pEp_identity_s* newVal)
     return S_OK;
 }
 
-STDMETHODIMP CTextMessage::get_to(LPSAFEARRAY * pVal)
+static HRESULT il_get(const identity_list *il, LPSAFEARRAY * sa)
 {
-    assert(pVal);
+    assert(sa);
+    int len = identity_list_length(il);
 
-    int len = identity_list_length(msg->to);
-
-    LPSAFEARRAY sa = newSafeArray<pEp_identity_s>(len);
-    if (sa == NULL)
+    LPSAFEARRAY _sa = newSafeArray<pEp_identity_s>(len);
+    if (_sa == NULL)
         return E_OUTOFMEMORY;
 
-    pEp_identity_s *cs = accessData<pEp_identity_s>(sa);    
-
-    identity_list *il = msg->to;
+    const identity_list *_il;
     LONG i;
-    for (i = 0, il = msg->to; il && il->ident; il = il->next, i++) {
+    for (i = 0, _il = il; _il && _il->ident; _il = _il->next, i++) {
+        pEp_identity_s cs;
+        
         try {
-            copy_identity(&cs[i], il->ident);
+            copy_identity(&cs, _il->ident);
+
+            ::SafeArrayPutElement(_sa, &i, &cs);
+
+            IRecordInfo *ir = getRecordInfo<pEp_identity_s>();
+            ir->RecordClear(&cs);
         }
         catch (bad_alloc&) {
-            SafeArrayUnaccessData(sa);
-            SafeArrayDestroy(sa);
+            IRecordInfo *ir = getRecordInfo<pEp_identity_s>();
+            ir->RecordClear(&cs);
+            SafeArrayDestroy(_sa);
             return E_OUTOFMEMORY;
         }
         catch (exception&) {
-            SafeArrayUnaccessData(sa);
-            SafeArrayDestroy(sa);
+            IRecordInfo *ir = getRecordInfo<pEp_identity_s>();
+            ir->RecordClear(&cs);
+            SafeArrayDestroy(_sa);
             return E_FAIL;
         }
     }
 
-    SafeArrayUnaccessData(sa);
-
-    *pVal = sa;
+    *sa = _sa;
     return S_OK;
 }
 
-STDMETHODIMP CTextMessage::put_to(SAFEARRAY * newVal)
+static HRESULT il_put(identity_list **target, SAFEARRAY * newVal)
 {
     assert(newVal);
-
     if (newVal == NULL)
         return E_INVALIDARG;
 
@@ -110,49 +113,63 @@ STDMETHODIMP CTextMessage::put_to(SAFEARRAY * newVal)
     if (il == NULL)
         return E_OUTOFMEMORY;
 
-    pEp_identity_s *cs;
-    HRESULT hr = SafeArrayAccessData(newVal, (void **) &cs);
-    assert(SUCCEEDED(hr) && cs);
-    if (cs == NULL) {
-        free_identity_list(il);
-        return E_FAIL;
-    }
-
     identity_list *_il;
     LONG lbound, ubound;
     LONG i;
     SafeArrayGetLBound(newVal, 1, &lbound);
     SafeArrayGetUBound(newVal, 1, &ubound);
 
-    for (i = 0, _il = il; i < ubound - lbound + 1; i++) {
+    for (i = lbound, _il = il; i <= ubound; i++) {
         pEp_identity * ident;
+        pEp_identity_s cs;
+        memset(&cs, 0, sizeof(pEp_identity_s));
+
         try {
-            ident = new_identity(&cs[i]);
+            HRESULT hr = ::SafeArrayGetElement(newVal, &i, &cs);
+            if (hr != S_OK) {
+                IRecordInfo *ri = getRecordInfo<pEp_identity_s>();
+                ri->RecordClear(&cs);
+                free_identity_list(il);
+                return hr;
+            }
+            ident = new_identity(&cs);
+
+            IRecordInfo *ri = getRecordInfo<pEp_identity_s>();
+            ri->RecordClear(&cs);
         }
         catch (bad_alloc&) {
-            SafeArrayUnaccessData(newVal);
+            IRecordInfo *ri = getRecordInfo<pEp_identity_s>();
+            ri->RecordClear(&cs);
             free_identity_list(il);
             return E_OUTOFMEMORY;
         }
         catch (exception&) {
-            SafeArrayUnaccessData(newVal);
+            IRecordInfo *ri = getRecordInfo<pEp_identity_s>();
+            ri->RecordClear(&cs);
             free_identity_list(il);
             return E_FAIL;
         }
         _il = identity_list_add(_il, ident);
         if (_il == NULL) {
-            SafeArrayUnaccessData(newVal);
             free_identity_list(il);
             return E_OUTOFMEMORY;
         }
     }
 
-    SafeArrayUnaccessData(newVal);
-    
-    free_identity_list(msg->to);
-    msg->to = il;
+    free_identity_list(*target);
+    *target = il;
 
     return S_OK;
+}
+
+STDMETHODIMP CTextMessage::get_to(LPSAFEARRAY * pVal)
+{
+    return il_get(msg->to, pVal);
+}
+
+STDMETHODIMP CTextMessage::put_to(SAFEARRAY * newVal)
+{
+    return il_put(&msg->to, newVal);
 }
 
 STDMETHODIMP CTextMessage::get_recv_by(pEp_identity_s* pVal)
@@ -196,278 +213,32 @@ STDMETHODIMP CTextMessage::put_recv_by(pEp_identity_s* newVal)
 
 STDMETHODIMP CTextMessage::get_cc(LPSAFEARRAY * pVal)
 {
-    assert(pVal);
-
-    int len = identity_list_length(msg->cc);
-
-    LPSAFEARRAY sa = newSafeArray<pEp_identity_s>(len);
-    if (sa == NULL)
-        return E_OUTOFMEMORY;
-
-    pEp_identity_s *cs = accessData<pEp_identity_s>(sa);
-
-    identity_list *il = msg->cc;
-    LONG i;
-    for (i = 0, il = msg->cc; il && il->ident; il = il->next, i++) {
-        try {
-            copy_identity(&cs[i], il->ident);
-        }
-        catch (bad_alloc&) {
-            SafeArrayUnaccessData(sa);
-            SafeArrayDestroy(sa);
-            return E_OUTOFMEMORY;
-        }
-        catch (exception&) {
-            SafeArrayUnaccessData(sa);
-            SafeArrayDestroy(sa);
-            return E_FAIL;
-        }
-    }
-
-    SafeArrayUnaccessData(sa);
-
-    *pVal = sa;
-    return S_OK;
+    return il_get(msg->cc, pVal);
 }
 
 STDMETHODIMP CTextMessage::put_cc(SAFEARRAY * newVal)
 {
-    assert(newVal);
-
-    if (newVal == NULL)
-        return E_INVALIDARG;
-
-    identity_list *il = new_identity_list(NULL);
-    if (il == NULL)
-        return E_OUTOFMEMORY;
-
-    pEp_identity_s *cs;
-    HRESULT hr = SafeArrayAccessData(newVal, (void **) &cs);
-    assert(SUCCEEDED(hr) && cs);
-    if (cs == NULL) {
-        free_identity_list(il);
-        return E_FAIL;
-    }
-
-    identity_list *_il;
-    LONG lbound, ubound;
-    LONG i;
-    SafeArrayGetLBound(newVal, 1, &lbound);
-    SafeArrayGetUBound(newVal, 1, &ubound);
-
-    for (i = 0, _il = il; i < ubound - lbound + 1; i++) {
-        pEp_identity * ident;
-        try {
-            ident = new_identity(&cs[i]);
-        }
-        catch (bad_alloc&) {
-            SafeArrayUnaccessData(newVal);
-            free_identity_list(il);
-            return E_OUTOFMEMORY;
-        }
-        catch (exception&) {
-            SafeArrayUnaccessData(newVal);
-            free_identity_list(il);
-            return E_FAIL;
-        }
-        _il = identity_list_add(_il, ident);
-        if (_il == NULL) {
-            SafeArrayUnaccessData(newVal);
-            free_identity_list(il);
-            return E_OUTOFMEMORY;
-        }
-    }
-
-    SafeArrayUnaccessData(newVal);
-
-    free_identity_list(msg->cc);
-    msg->cc = il;
-
-    return S_OK;
+    return il_put(&msg->cc, newVal);
 }
 
 STDMETHODIMP CTextMessage::get_bcc(LPSAFEARRAY * pVal)
 {
-    assert(pVal);
-
-    int len = identity_list_length(msg->bcc);
-
-    LPSAFEARRAY sa = newSafeArray<pEp_identity_s>(len);
-    if (sa == NULL)
-        return E_OUTOFMEMORY;
-
-    pEp_identity_s *cs = accessData<pEp_identity_s>(sa);
-
-    identity_list *il = msg->bcc;
-    LONG i;
-    for (i = 0, il = msg->bcc; il && il->ident; il = il->next, i++) {
-        try {
-            copy_identity(&cs[i], il->ident);
-        }
-        catch (bad_alloc&) {
-            SafeArrayUnaccessData(sa);
-            SafeArrayDestroy(sa);
-            return E_OUTOFMEMORY;
-        }
-        catch (exception&) {
-            SafeArrayUnaccessData(sa);
-            SafeArrayDestroy(sa);
-            return E_FAIL;
-        }
-    }
-
-    SafeArrayUnaccessData(sa);
-
-    *pVal = sa;
-    return S_OK;
+    return il_get(msg->bcc, pVal);
 }
 
 STDMETHODIMP CTextMessage::put_bcc(SAFEARRAY * newVal)
 {
-    assert(newVal);
-
-    if (newVal == NULL)
-        return E_INVALIDARG;
-
-    identity_list *il = new_identity_list(NULL);
-    if (il == NULL)
-        return E_OUTOFMEMORY;
-
-    pEp_identity_s *cs;
-    HRESULT hr = SafeArrayAccessData(newVal, (void **) &cs);
-    assert(SUCCEEDED(hr) && cs);
-    if (cs == NULL) {
-        free_identity_list(il);
-        return E_FAIL;
-    }
-
-    identity_list *_il;
-    LONG lbound, ubound;
-    LONG i;
-    SafeArrayGetLBound(newVal, 1, &lbound);
-    SafeArrayGetUBound(newVal, 1, &ubound);
-
-    for (i = 0, _il = il; i < ubound - lbound + 1; i++) {
-        pEp_identity * ident;
-        try {
-            ident = new_identity(&cs[i]);
-        }
-        catch (bad_alloc&) {
-            SafeArrayUnaccessData(newVal);
-            free_identity_list(il);
-            return E_OUTOFMEMORY;
-        }
-        catch (exception&) {
-            SafeArrayUnaccessData(newVal);
-            free_identity_list(il);
-            return E_FAIL;
-        }
-        _il = identity_list_add(_il, ident);
-        if (_il == NULL) {
-            SafeArrayUnaccessData(newVal);
-            free_identity_list(il);
-            return E_OUTOFMEMORY;
-        }
-    }
-
-    SafeArrayUnaccessData(newVal);
-
-    free_identity_list(msg->bcc);
-    msg->bcc = il;
-
-    return S_OK;
+    return il_put(&msg->bcc, newVal);
 }
 
 STDMETHODIMP CTextMessage::get_reply_to(LPSAFEARRAY * pVal)
 {
-    assert(pVal);
-
-    int len = identity_list_length(msg->reply_to);
-
-    LPSAFEARRAY sa = newSafeArray<pEp_identity_s>(len);
-    if (sa == NULL)
-        return E_OUTOFMEMORY;
-
-    pEp_identity_s *cs = accessData<pEp_identity_s>(sa);
-
-    identity_list *il = msg->reply_to;
-    LONG i;
-    for (i = 0, il = msg->reply_to; il && il->ident; il = il->next, i++) {
-        try {
-            copy_identity(&cs[i], il->ident);
-        }
-        catch (bad_alloc&) {
-            SafeArrayUnaccessData(sa);
-            SafeArrayDestroy(sa);
-            return E_OUTOFMEMORY;
-        }
-        catch (exception&) {
-            SafeArrayUnaccessData(sa);
-            SafeArrayDestroy(sa);
-            return E_FAIL;
-        }
-    }
-
-    SafeArrayUnaccessData(sa);
-
-    *pVal = sa;
-    return S_OK;
+    return il_get(msg->reply_to, pVal);
 }
 
 STDMETHODIMP CTextMessage::put_reply_to(SAFEARRAY * newVal)
 {
-    assert(newVal);
-
-    if (newVal == NULL)
-        return E_INVALIDARG;
-
-    identity_list *il = new_identity_list(NULL);
-    if (il == NULL)
-        return E_OUTOFMEMORY;
-
-    pEp_identity_s *cs;
-    HRESULT hr = SafeArrayAccessData(newVal, (void **) &cs);
-    assert(SUCCEEDED(hr) && cs);
-    if (cs == NULL) {
-        free_identity_list(il);
-        return E_FAIL;
-    }
-
-    identity_list *_il;
-    LONG lbound, ubound;
-    LONG i;
-    SafeArrayGetLBound(newVal, 1, &lbound);
-    SafeArrayGetUBound(newVal, 1, &ubound);
-
-    for (i = 0, _il = il; i < ubound - lbound + 1; i++) {
-        pEp_identity * ident;
-        try {
-            ident = new_identity(&cs[i]);
-        }
-        catch (bad_alloc&) {
-            SafeArrayUnaccessData(newVal);
-            free_identity_list(il);
-            return E_OUTOFMEMORY;
-        }
-        catch (exception&) {
-            SafeArrayUnaccessData(newVal);
-            free_identity_list(il);
-            return E_FAIL;
-        }
-        _il = identity_list_add(_il, ident);
-        if (_il == NULL) {
-            SafeArrayUnaccessData(newVal);
-            free_identity_list(il);
-            return E_OUTOFMEMORY;
-        }
-    }
-
-    SafeArrayUnaccessData(newVal);
-
-    free_identity_list(msg->reply_to);
-    msg->reply_to = il;
-
-    return S_OK;
+    return il_put(&msg->reply_to, newVal);
 }
 
 STDMETHODIMP CTextMessage::get_dir(pEp_msg_direction *pVal)
@@ -1029,31 +800,34 @@ STDMETHODIMP CTextMessage::get_opt_fields(LPSAFEARRAY * pVal)
     if (sa == NULL)
         return E_OUTOFMEMORY;
 
-    struct opt_field *cs = accessData<struct opt_field>(sa);
-
     stringpair_list_t *il;
     LONG i;
     for (i = 0, il = msg->opt_fields; il && il->value; il = il->next, i++) {
+        opt_field fld;
+        memset(&fld, 0, sizeof(opt_field));
+
         try {
-            _bstr_t key = utf16_bstr(il->value->key);
-            _bstr_t value = utf16_bstr(il->value->value);
-            
-            cs[i].name = key.Detach();
-            cs[i].value = value.Detach();
+            fld.name = utf16_bstr(il->value->key).Detach();
+            fld.value = utf16_bstr(il->value->value).Detach();
+
+            ::SafeArrayPutElement(sa, &i, &fld);
+
+            IRecordInfo *ir = getRecordInfo<opt_field>();
+            ir->RecordClear(&fld);
         }
         catch (bad_alloc&) {
-            SafeArrayUnaccessData(sa);
+            IRecordInfo *ir = getRecordInfo<opt_field>();
+            ir->RecordClear(&fld);
             SafeArrayDestroy(sa);
             return E_OUTOFMEMORY;
         }
         catch (exception&) {
-            SafeArrayUnaccessData(sa);
+            IRecordInfo *ir = getRecordInfo<opt_field>();
+            ir->RecordClear(&fld);
             SafeArrayDestroy(sa);
             return E_FAIL;
         }
     }
-
-    SafeArrayUnaccessData(sa);
 
     *pVal = sa;
     return S_OK;
@@ -1070,44 +844,36 @@ STDMETHODIMP CTextMessage::put_opt_fields(SAFEARRAY * newVal)
     if (il == NULL)
         return E_OUTOFMEMORY;
 
-    struct opt_field *cs;
-    HRESULT hr = SafeArrayAccessData(newVal, (void **) &cs);
-    assert(SUCCEEDED(hr) && cs);
-    if (cs == NULL) {
-        free_stringpair_list(il);
-        return E_FAIL;
-    }
-
     stringpair_list_t *_il;
     LONG lbound, ubound;
     LONG i;
     SafeArrayGetLBound(newVal, 1, &lbound);
     SafeArrayGetUBound(newVal, 1, &ubound);
 
-    for (i = 0, _il = il; i < ubound - lbound + 1; i++) {
+    for (i = lbound, _il = il; i <= ubound; i++) {
         stringpair_t * pair;
         try {
-            pair = new_stringpair(utf8_string(cs[i].name).c_str(), utf8_string(cs[i].value).c_str());
+            struct opt_field cs;
+            memset(&cs, 0, sizeof(opt_field));
+            HRESULT hr = ::SafeArrayGetElement(newVal, &i, &cs);
+            pair = new_stringpair(utf8_string(cs.name).c_str(), utf8_string(cs.value).c_str());
+            IRecordInfo *ri = getRecordInfo<opt_field>();
+            ri->RecordClear(&cs);
         }
         catch (bad_alloc&) {
-            SafeArrayUnaccessData(newVal);
             free_stringpair_list(il);
             return E_OUTOFMEMORY;
         }
         catch (exception&) {
-            SafeArrayUnaccessData(newVal);
             free_stringpair_list(il);
             return E_FAIL;
         }
         _il = stringpair_list_add(_il, pair);
         if (_il == NULL) {
-            SafeArrayUnaccessData(newVal);
             free_stringpair_list(il);
             return E_OUTOFMEMORY;
         }
     }
-
-    SafeArrayUnaccessData(newVal);
 
     free_stringpair_list(msg->opt_fields);
     msg->opt_fields = il;

@@ -71,18 +71,6 @@ namespace pEp {
             return _ident;
         }
 
-        void free_pEp_identity_s(pEp_identity_s *ident)
-        {
-            if (ident) {
-                SysFreeString(ident->address);
-                SysFreeString(ident->fpr);
-                SysFreeString(ident->lang);
-                SysFreeString(ident->username);
-                SysFreeString(ident->user_id);
-                free(ident);
-            }
-        }
-
         void copy_identity(pEp_identity_s * ident_s, const pEp_identity * ident)
         {
             assert(ident_s);
