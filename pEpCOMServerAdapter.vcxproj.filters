@@ -37,10 +37,7 @@
     <ClCompile Include="utf8_helper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TextMessage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pEp_identity_helper.cpp">
+    <ClCompile Include="pEp_utitlity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -72,13 +69,7 @@
     <ClInclude Include="_IpEpEngineEvents_CP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="_ITextMessageEvents_CP.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TextMessage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pEp_identity_helper.h">
+    <ClInclude Include="pEp_utility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -95,9 +86,6 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="pEpEngine.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="TextMessage.rgs">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

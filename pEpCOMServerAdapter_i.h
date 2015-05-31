@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Sat May 30 18:16:12 2015
+/* at Sun May 31 10:51:32 2015
  */
 /* Compiler settings for pEpCOMServerAdapter.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
@@ -45,13 +45,6 @@
 
 /* Forward Declarations */ 
 
-#ifndef __ITextMessage_FWD_DEFINED__
-#define __ITextMessage_FWD_DEFINED__
-typedef interface ITextMessage ITextMessage;
-
-#endif 	/* __ITextMessage_FWD_DEFINED__ */
-
-
 #ifndef __IpEpEngine_FWD_DEFINED__
 #define __IpEpEngine_FWD_DEFINED__
 typedef interface IpEpEngine IpEpEngine;
@@ -78,25 +71,6 @@ typedef struct pEpEngine pEpEngine;
 #endif 	/* __pEpEngine_FWD_DEFINED__ */
 
 
-#ifndef ___ITextMessageEvents_FWD_DEFINED__
-#define ___ITextMessageEvents_FWD_DEFINED__
-typedef interface _ITextMessageEvents _ITextMessageEvents;
-
-#endif 	/* ___ITextMessageEvents_FWD_DEFINED__ */
-
-
-#ifndef __TextMessage_FWD_DEFINED__
-#define __TextMessage_FWD_DEFINED__
-
-#ifdef __cplusplus
-typedef class TextMessage TextMessage;
-#else
-typedef struct TextMessage TextMessage;
-#endif /* __cplusplus */
-
-#endif 	/* __TextMessage_FWD_DEFINED__ */
-
-
 /* header files for imported files */
 #include "oaidl.h"
 #include "ocidl.h"
@@ -104,494 +78,6 @@ typedef struct TextMessage TextMessage;
 #ifdef __cplusplus
 extern "C"{
 #endif 
-
-
-#ifndef __ITextMessage_INTERFACE_DEFINED__
-#define __ITextMessage_INTERFACE_DEFINED__
-
-/* interface ITextMessage */
-/* [unique][nonextensible][oleautomation][uuid][object] */ 
-
-typedef 
-enum _pEp_text_format
-    {
-        pEp_text_format_plain	= 0,
-        pEp_text_format_html	= ( pEp_text_format_plain + 1 ) ,
-        pEp_text_format_other	= 0xff
-    } 	pEp_text_format;
-
-typedef 
-enum _pEp_msg_direction
-    {
-        pEp_dir_incoming	= 0,
-        pEp_dir_outgoing	= ( pEp_dir_incoming + 1 ) 
-    } 	pEp_msg_direction;
-
-typedef 
-enum _pEp_MIME_format
-    {
-        pEp_MIME_none	= 0,
-        pEp_MIME_fields_omitted	= ( pEp_MIME_none + 1 ) ,
-        pEp_MIME	= ( pEp_MIME_fields_omitted + 1 ) 
-    } 	pEp_MIME_format;
-
-typedef 
-enum _pEp_enc_format
-    {
-        pEp_enc_none	= 0,
-        pEp_enc_pieces	= ( pEp_enc_none + 1 ) ,
-        pEp_enc_S_MIME	= ( pEp_enc_pieces + 1 ) ,
-        pEp_enc_PGP_MIME	= ( pEp_enc_S_MIME + 1 ) ,
-        pEp_enc_pEp	= ( pEp_enc_PGP_MIME + 1 ) 
-    } 	pEp_enc_format;
-
-/* [uuid] */ struct  DECLSPEC_UUID("1292C31A-6486-427F-B29F-7F03607836DC") opt_field
-    {
-    BSTR name;
-    BSTR value;
-    } ;
-
-EXTERN_C const IID IID_ITextMessage;
-
-#if defined(__cplusplus) && !defined(CINTERFACE)
-    
-    MIDL_INTERFACE("161538F9-53C8-4D9C-8BA4-0FB43AEC7106")
-    ITextMessage : public IUnknown
-    {
-    public:
-        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_dir( 
-            /* [retval][out] */ pEp_msg_direction *pVal) = 0;
-        
-        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_dir( 
-            /* [in] */ pEp_msg_direction newVal) = 0;
-        
-        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_id( 
-            /* [retval][out] */ BSTR *pVal) = 0;
-        
-        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_id( 
-            /* [in] */ BSTR newVal) = 0;
-        
-        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_shortmsg( 
-            /* [retval][out] */ BSTR *pVal) = 0;
-        
-        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_shortmsg( 
-            /* [in] */ BSTR newVal) = 0;
-        
-        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_longmsg( 
-            /* [retval][out] */ BSTR *pVal) = 0;
-        
-        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_longmsg( 
-            /* [in] */ BSTR newVal) = 0;
-        
-        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_longmsg_formatted( 
-            /* [retval][out] */ BSTR *pVal) = 0;
-        
-        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_longmsg_formatted( 
-            /* [in] */ BSTR newVal) = 0;
-        
-        virtual HRESULT STDMETHODCALLTYPE add_attachment( 
-            /* [in] */ SAFEARRAY * data,
-            /* [in] */ BSTR mime_type,
-            /* [in] */ BSTR filename) = 0;
-        
-        virtual HRESULT STDMETHODCALLTYPE has_attachments( 
-            /* [retval][out] */ boolean *result) = 0;
-        
-        virtual HRESULT STDMETHODCALLTYPE next_attachment( 
-            /* [out] */ SAFEARRAY * *data,
-            /* [out] */ BSTR *mime_type,
-            /* [out] */ BSTR *filename,
-            /* [retval][out] */ boolean *result) = 0;
-        
-        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_sent( 
-            /* [retval][out] */ hyper *result) = 0;
-        
-        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_sent( 
-            /* [in] */ hyper val) = 0;
-        
-        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_recv( 
-            /* [retval][out] */ hyper *result) = 0;
-        
-        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_recv( 
-            /* [in] */ hyper val) = 0;
-        
-        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_from( 
-            /* [retval][out] */ struct pEp_identity_s *pVal) = 0;
-        
-        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_from( 
-            /* [in] */ struct pEp_identity_s *newVal) = 0;
-        
-        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_to( 
-            /* [retval][out] */ SAFEARRAY * *pVal) = 0;
-        
-        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_to( 
-            /* [in] */ SAFEARRAY * newVal) = 0;
-        
-        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_recv_by( 
-            /* [retval][out] */ struct pEp_identity_s *pVal) = 0;
-        
-        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_recv_by( 
-            /* [in] */ struct pEp_identity_s *newVal) = 0;
-        
-        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_cc( 
-            /* [retval][out] */ SAFEARRAY * *pVal) = 0;
-        
-        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_cc( 
-            /* [in] */ SAFEARRAY * newVal) = 0;
-        
-        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_bcc( 
-            /* [retval][out] */ SAFEARRAY * *pVal) = 0;
-        
-        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_bcc( 
-            /* [in] */ SAFEARRAY * newVal) = 0;
-        
-        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_reply_to( 
-            /* [retval][out] */ SAFEARRAY * *pVal) = 0;
-        
-        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_reply_to( 
-            /* [in] */ SAFEARRAY * newVal) = 0;
-        
-        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_references( 
-            /* [retval][out] */ SAFEARRAY * *pVal) = 0;
-        
-        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_references( 
-            /* [in] */ SAFEARRAY * newVal) = 0;
-        
-        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_keywords( 
-            /* [retval][out] */ SAFEARRAY * *pVal) = 0;
-        
-        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_keywords( 
-            /* [in] */ SAFEARRAY * newVal) = 0;
-        
-        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_comments( 
-            /* [retval][out] */ BSTR *pVal) = 0;
-        
-        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_comments( 
-            /* [in] */ BSTR newVal) = 0;
-        
-        virtual /* [propget] */ HRESULT STDMETHODCALLTYPE get_opt_fields( 
-            /* [retval][out] */ SAFEARRAY * *pVal) = 0;
-        
-        virtual /* [propput] */ HRESULT STDMETHODCALLTYPE put_opt_fields( 
-            /* [in] */ SAFEARRAY * newVal) = 0;
-        
-    };
-    
-    
-#else 	/* C style interface */
-
-    typedef struct ITextMessageVtbl
-    {
-        BEGIN_INTERFACE
-        
-        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
-            ITextMessage * This,
-            /* [in] */ REFIID riid,
-            /* [annotation][iid_is][out] */ 
-            _COM_Outptr_  void **ppvObject);
-        
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
-            ITextMessage * This);
-        
-        ULONG ( STDMETHODCALLTYPE *Release )( 
-            ITextMessage * This);
-        
-        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_dir )( 
-            ITextMessage * This,
-            /* [retval][out] */ pEp_msg_direction *pVal);
-        
-        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_dir )( 
-            ITextMessage * This,
-            /* [in] */ pEp_msg_direction newVal);
-        
-        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_id )( 
-            ITextMessage * This,
-            /* [retval][out] */ BSTR *pVal);
-        
-        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_id )( 
-            ITextMessage * This,
-            /* [in] */ BSTR newVal);
-        
-        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_shortmsg )( 
-            ITextMessage * This,
-            /* [retval][out] */ BSTR *pVal);
-        
-        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_shortmsg )( 
-            ITextMessage * This,
-            /* [in] */ BSTR newVal);
-        
-        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_longmsg )( 
-            ITextMessage * This,
-            /* [retval][out] */ BSTR *pVal);
-        
-        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_longmsg )( 
-            ITextMessage * This,
-            /* [in] */ BSTR newVal);
-        
-        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_longmsg_formatted )( 
-            ITextMessage * This,
-            /* [retval][out] */ BSTR *pVal);
-        
-        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_longmsg_formatted )( 
-            ITextMessage * This,
-            /* [in] */ BSTR newVal);
-        
-        HRESULT ( STDMETHODCALLTYPE *add_attachment )( 
-            ITextMessage * This,
-            /* [in] */ SAFEARRAY * data,
-            /* [in] */ BSTR mime_type,
-            /* [in] */ BSTR filename);
-        
-        HRESULT ( STDMETHODCALLTYPE *has_attachments )( 
-            ITextMessage * This,
-            /* [retval][out] */ boolean *result);
-        
-        HRESULT ( STDMETHODCALLTYPE *next_attachment )( 
-            ITextMessage * This,
-            /* [out] */ SAFEARRAY * *data,
-            /* [out] */ BSTR *mime_type,
-            /* [out] */ BSTR *filename,
-            /* [retval][out] */ boolean *result);
-        
-        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_sent )( 
-            ITextMessage * This,
-            /* [retval][out] */ hyper *result);
-        
-        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_sent )( 
-            ITextMessage * This,
-            /* [in] */ hyper val);
-        
-        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_recv )( 
-            ITextMessage * This,
-            /* [retval][out] */ hyper *result);
-        
-        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_recv )( 
-            ITextMessage * This,
-            /* [in] */ hyper val);
-        
-        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_from )( 
-            ITextMessage * This,
-            /* [retval][out] */ struct pEp_identity_s *pVal);
-        
-        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_from )( 
-            ITextMessage * This,
-            /* [in] */ struct pEp_identity_s *newVal);
-        
-        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_to )( 
-            ITextMessage * This,
-            /* [retval][out] */ SAFEARRAY * *pVal);
-        
-        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_to )( 
-            ITextMessage * This,
-            /* [in] */ SAFEARRAY * newVal);
-        
-        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_recv_by )( 
-            ITextMessage * This,
-            /* [retval][out] */ struct pEp_identity_s *pVal);
-        
-        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_recv_by )( 
-            ITextMessage * This,
-            /* [in] */ struct pEp_identity_s *newVal);
-        
-        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_cc )( 
-            ITextMessage * This,
-            /* [retval][out] */ SAFEARRAY * *pVal);
-        
-        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_cc )( 
-            ITextMessage * This,
-            /* [in] */ SAFEARRAY * newVal);
-        
-        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_bcc )( 
-            ITextMessage * This,
-            /* [retval][out] */ SAFEARRAY * *pVal);
-        
-        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_bcc )( 
-            ITextMessage * This,
-            /* [in] */ SAFEARRAY * newVal);
-        
-        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_reply_to )( 
-            ITextMessage * This,
-            /* [retval][out] */ SAFEARRAY * *pVal);
-        
-        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_reply_to )( 
-            ITextMessage * This,
-            /* [in] */ SAFEARRAY * newVal);
-        
-        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_references )( 
-            ITextMessage * This,
-            /* [retval][out] */ SAFEARRAY * *pVal);
-        
-        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_references )( 
-            ITextMessage * This,
-            /* [in] */ SAFEARRAY * newVal);
-        
-        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_keywords )( 
-            ITextMessage * This,
-            /* [retval][out] */ SAFEARRAY * *pVal);
-        
-        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_keywords )( 
-            ITextMessage * This,
-            /* [in] */ SAFEARRAY * newVal);
-        
-        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_comments )( 
-            ITextMessage * This,
-            /* [retval][out] */ BSTR *pVal);
-        
-        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_comments )( 
-            ITextMessage * This,
-            /* [in] */ BSTR newVal);
-        
-        /* [propget] */ HRESULT ( STDMETHODCALLTYPE *get_opt_fields )( 
-            ITextMessage * This,
-            /* [retval][out] */ SAFEARRAY * *pVal);
-        
-        /* [propput] */ HRESULT ( STDMETHODCALLTYPE *put_opt_fields )( 
-            ITextMessage * This,
-            /* [in] */ SAFEARRAY * newVal);
-        
-        END_INTERFACE
-    } ITextMessageVtbl;
-
-    interface ITextMessage
-    {
-        CONST_VTBL struct ITextMessageVtbl *lpVtbl;
-    };
-
-    
-
-#ifdef COBJMACROS
-
-
-#define ITextMessage_QueryInterface(This,riid,ppvObject)	\
-    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
-
-#define ITextMessage_AddRef(This)	\
-    ( (This)->lpVtbl -> AddRef(This) ) 
-
-#define ITextMessage_Release(This)	\
-    ( (This)->lpVtbl -> Release(This) ) 
-
-
-#define ITextMessage_get_dir(This,pVal)	\
-    ( (This)->lpVtbl -> get_dir(This,pVal) ) 
-
-#define ITextMessage_put_dir(This,newVal)	\
-    ( (This)->lpVtbl -> put_dir(This,newVal) ) 
-
-#define ITextMessage_get_id(This,pVal)	\
-    ( (This)->lpVtbl -> get_id(This,pVal) ) 
-
-#define ITextMessage_put_id(This,newVal)	\
-    ( (This)->lpVtbl -> put_id(This,newVal) ) 
-
-#define ITextMessage_get_shortmsg(This,pVal)	\
-    ( (This)->lpVtbl -> get_shortmsg(This,pVal) ) 
-
-#define ITextMessage_put_shortmsg(This,newVal)	\
-    ( (This)->lpVtbl -> put_shortmsg(This,newVal) ) 
-
-#define ITextMessage_get_longmsg(This,pVal)	\
-    ( (This)->lpVtbl -> get_longmsg(This,pVal) ) 
-
-#define ITextMessage_put_longmsg(This,newVal)	\
-    ( (This)->lpVtbl -> put_longmsg(This,newVal) ) 
-
-#define ITextMessage_get_longmsg_formatted(This,pVal)	\
-    ( (This)->lpVtbl -> get_longmsg_formatted(This,pVal) ) 
-
-#define ITextMessage_put_longmsg_formatted(This,newVal)	\
-    ( (This)->lpVtbl -> put_longmsg_formatted(This,newVal) ) 
-
-#define ITextMessage_add_attachment(This,data,mime_type,filename)	\
-    ( (This)->lpVtbl -> add_attachment(This,data,mime_type,filename) ) 
-
-#define ITextMessage_has_attachments(This,result)	\
-    ( (This)->lpVtbl -> has_attachments(This,result) ) 
-
-#define ITextMessage_next_attachment(This,data,mime_type,filename,result)	\
-    ( (This)->lpVtbl -> next_attachment(This,data,mime_type,filename,result) ) 
-
-#define ITextMessage_get_sent(This,result)	\
-    ( (This)->lpVtbl -> get_sent(This,result) ) 
-
-#define ITextMessage_put_sent(This,val)	\
-    ( (This)->lpVtbl -> put_sent(This,val) ) 
-
-#define ITextMessage_get_recv(This,result)	\
-    ( (This)->lpVtbl -> get_recv(This,result) ) 
-
-#define ITextMessage_put_recv(This,val)	\
-    ( (This)->lpVtbl -> put_recv(This,val) ) 
-
-#define ITextMessage_get_from(This,pVal)	\
-    ( (This)->lpVtbl -> get_from(This,pVal) ) 
-
-#define ITextMessage_put_from(This,newVal)	\
-    ( (This)->lpVtbl -> put_from(This,newVal) ) 
-
-#define ITextMessage_get_to(This,pVal)	\
-    ( (This)->lpVtbl -> get_to(This,pVal) ) 
-
-#define ITextMessage_put_to(This,newVal)	\
-    ( (This)->lpVtbl -> put_to(This,newVal) ) 
-
-#define ITextMessage_get_recv_by(This,pVal)	\
-    ( (This)->lpVtbl -> get_recv_by(This,pVal) ) 
-
-#define ITextMessage_put_recv_by(This,newVal)	\
-    ( (This)->lpVtbl -> put_recv_by(This,newVal) ) 
-
-#define ITextMessage_get_cc(This,pVal)	\
-    ( (This)->lpVtbl -> get_cc(This,pVal) ) 
-
-#define ITextMessage_put_cc(This,newVal)	\
-    ( (This)->lpVtbl -> put_cc(This,newVal) ) 
-
-#define ITextMessage_get_bcc(This,pVal)	\
-    ( (This)->lpVtbl -> get_bcc(This,pVal) ) 
-
-#define ITextMessage_put_bcc(This,newVal)	\
-    ( (This)->lpVtbl -> put_bcc(This,newVal) ) 
-
-#define ITextMessage_get_reply_to(This,pVal)	\
-    ( (This)->lpVtbl -> get_reply_to(This,pVal) ) 
-
-#define ITextMessage_put_reply_to(This,newVal)	\
-    ( (This)->lpVtbl -> put_reply_to(This,newVal) ) 
-
-#define ITextMessage_get_references(This,pVal)	\
-    ( (This)->lpVtbl -> get_references(This,pVal) ) 
-
-#define ITextMessage_put_references(This,newVal)	\
-    ( (This)->lpVtbl -> put_references(This,newVal) ) 
-
-#define ITextMessage_get_keywords(This,pVal)	\
-    ( (This)->lpVtbl -> get_keywords(This,pVal) ) 
-
-#define ITextMessage_put_keywords(This,newVal)	\
-    ( (This)->lpVtbl -> put_keywords(This,newVal) ) 
-
-#define ITextMessage_get_comments(This,pVal)	\
-    ( (This)->lpVtbl -> get_comments(This,pVal) ) 
-
-#define ITextMessage_put_comments(This,newVal)	\
-    ( (This)->lpVtbl -> put_comments(This,newVal) ) 
-
-#define ITextMessage_get_opt_fields(This,pVal)	\
-    ( (This)->lpVtbl -> get_opt_fields(This,pVal) ) 
-
-#define ITextMessage_put_opt_fields(This,newVal)	\
-    ( (This)->lpVtbl -> put_opt_fields(This,newVal) ) 
-
-#endif /* COBJMACROS */
-
-
-#endif 	/* C style interface */
-
-
-
-
-#endif 	/* __ITextMessage_INTERFACE_DEFINED__ */
 
 
 #ifndef __IpEpEngine_INTERFACE_DEFINED__
@@ -678,6 +164,71 @@ enum _pEp_color
         pEp_rating_b0rken	= -2
     } 	pEp_color;
 
+typedef 
+enum _pEp_text_format
+    {
+        pEp_text_format_plain	= 0,
+        pEp_text_format_html	= ( pEp_text_format_plain + 1 ) ,
+        pEp_text_format_other	= 0xff
+    } 	pEp_text_format;
+
+typedef 
+enum _pEp_msg_direction
+    {
+        pEp_dir_incoming	= 0,
+        pEp_dir_outgoing	= ( pEp_dir_incoming + 1 ) 
+    } 	pEp_msg_direction;
+
+typedef 
+enum _pEp_MIME_format
+    {
+        pEp_MIME_none	= 0,
+        pEp_MIME_fields_omitted	= ( pEp_MIME_none + 1 ) ,
+        pEp_MIME	= ( pEp_MIME_fields_omitted + 1 ) 
+    } 	pEp_MIME_format;
+
+typedef 
+enum _pEp_enc_format
+    {
+        pEp_enc_none	= 0,
+        pEp_enc_pieces	= ( pEp_enc_none + 1 ) ,
+        pEp_enc_S_MIME	= ( pEp_enc_pieces + 1 ) ,
+        pEp_enc_PGP_MIME	= ( pEp_enc_S_MIME + 1 ) ,
+        pEp_enc_pEp	= ( pEp_enc_PGP_MIME + 1 ) 
+    } 	pEp_enc_format;
+
+/* [uuid] */ struct  DECLSPEC_UUID("3A8A4F13-3402-4C4C-94AB-598D87869380") opt_field
+    {
+    BSTR name;
+    BSTR value;
+    } ;
+/* [uuid] */ struct  DECLSPEC_UUID("61DA7AD4-192E-4616-8678-B19AEFB45B45") blob
+    {
+    SAFEARRAY * value;
+    BSTR mime_type;
+    BSTR filename;
+    } ;
+/* [uuid] */ struct  DECLSPEC_UUID("D763A8F3-BA23-4229-A037-1BB7BDC3E0C8") text_message
+    {
+    pEp_msg_direction dir;
+    BSTR id;
+    BSTR shortmsg;
+    BSTR longmsg;
+    BSTR longmsg_formatted;
+    SAFEARRAY * attachments;
+    hyper sent;
+    hyper recv;
+    struct pEp_identity_s from;
+    SAFEARRAY * to;
+    struct pEp_identity_s recv_by;
+    SAFEARRAY * cc;
+    SAFEARRAY * bcc;
+    SAFEARRAY * reply_to;
+    SAFEARRAY * references;
+    SAFEARRAY * keywords;
+    BSTR comments;
+    SAFEARRAY * opt_fields;
+    } ;
 
 EXTERN_C const IID IID_IpEpEngine;
 
@@ -787,18 +338,18 @@ EXTERN_C const IID IID_IpEpEngine;
             /* [in] */ BSTR fpr) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE encrypt_message( 
-            /* [ref][in] */ ITextMessage *src,
-            /* [ref][in] */ ITextMessage *dst,
+            /* [in] */ struct text_message *src,
+            /* [out] */ struct text_message **dst,
             /* [in] */ SAFEARRAY * extra) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE decrypt_message( 
-            /* [ref][in] */ ITextMessage *src,
-            /* [ref][in] */ ITextMessage *dst,
+            /* [in] */ struct text_message *src,
+            /* [out] */ struct text_message **dst,
             /* [out] */ SAFEARRAY * *keylist,
             /* [retval][out] */ pEp_color *rating) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE outgoing_message_color( 
-            /* [in] */ ITextMessage *msg,
+            /* [in] */ struct text_message *msg,
             /* [retval][out] */ pEp_color *pVal) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE identity_color( 
@@ -951,20 +502,20 @@ EXTERN_C const IID IID_IpEpEngine;
         
         HRESULT ( STDMETHODCALLTYPE *encrypt_message )( 
             IpEpEngine * This,
-            /* [ref][in] */ ITextMessage *src,
-            /* [ref][in] */ ITextMessage *dst,
+            /* [in] */ struct text_message *src,
+            /* [out] */ struct text_message **dst,
             /* [in] */ SAFEARRAY * extra);
         
         HRESULT ( STDMETHODCALLTYPE *decrypt_message )( 
             IpEpEngine * This,
-            /* [ref][in] */ ITextMessage *src,
-            /* [ref][in] */ ITextMessage *dst,
+            /* [in] */ struct text_message *src,
+            /* [out] */ struct text_message **dst,
             /* [out] */ SAFEARRAY * *keylist,
             /* [retval][out] */ pEp_color *rating);
         
         HRESULT ( STDMETHODCALLTYPE *outgoing_message_color )( 
             IpEpEngine * This,
-            /* [in] */ ITextMessage *msg,
+            /* [in] */ struct text_message *msg,
             /* [retval][out] */ pEp_color *pVal);
         
         HRESULT ( STDMETHODCALLTYPE *identity_color )( 
@@ -1221,129 +772,6 @@ EXTERN_C const CLSID CLSID_pEpEngine;
 
 class DECLSPEC_UUID("EF1B073D-5058-4E0E-829E-B4D22CA21EA2")
 pEpEngine;
-#endif
-
-#ifndef ___ITextMessageEvents_DISPINTERFACE_DEFINED__
-#define ___ITextMessageEvents_DISPINTERFACE_DEFINED__
-
-/* dispinterface _ITextMessageEvents */
-/* [uuid] */ 
-
-
-EXTERN_C const IID DIID__ITextMessageEvents;
-
-#if defined(__cplusplus) && !defined(CINTERFACE)
-
-    MIDL_INTERFACE("844B5363-4EF4-4A39-A030-16452783A6F7")
-    _ITextMessageEvents : public IDispatch
-    {
-    };
-    
-#else 	/* C style interface */
-
-    typedef struct _ITextMessageEventsVtbl
-    {
-        BEGIN_INTERFACE
-        
-        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
-            _ITextMessageEvents * This,
-            /* [in] */ REFIID riid,
-            /* [annotation][iid_is][out] */ 
-            _COM_Outptr_  void **ppvObject);
-        
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
-            _ITextMessageEvents * This);
-        
-        ULONG ( STDMETHODCALLTYPE *Release )( 
-            _ITextMessageEvents * This);
-        
-        HRESULT ( STDMETHODCALLTYPE *GetTypeInfoCount )( 
-            _ITextMessageEvents * This,
-            /* [out] */ UINT *pctinfo);
-        
-        HRESULT ( STDMETHODCALLTYPE *GetTypeInfo )( 
-            _ITextMessageEvents * This,
-            /* [in] */ UINT iTInfo,
-            /* [in] */ LCID lcid,
-            /* [out] */ ITypeInfo **ppTInfo);
-        
-        HRESULT ( STDMETHODCALLTYPE *GetIDsOfNames )( 
-            _ITextMessageEvents * This,
-            /* [in] */ REFIID riid,
-            /* [size_is][in] */ LPOLESTR *rgszNames,
-            /* [range][in] */ UINT cNames,
-            /* [in] */ LCID lcid,
-            /* [size_is][out] */ DISPID *rgDispId);
-        
-        /* [local] */ HRESULT ( STDMETHODCALLTYPE *Invoke )( 
-            _ITextMessageEvents * This,
-            /* [annotation][in] */ 
-            _In_  DISPID dispIdMember,
-            /* [annotation][in] */ 
-            _In_  REFIID riid,
-            /* [annotation][in] */ 
-            _In_  LCID lcid,
-            /* [annotation][in] */ 
-            _In_  WORD wFlags,
-            /* [annotation][out][in] */ 
-            _In_  DISPPARAMS *pDispParams,
-            /* [annotation][out] */ 
-            _Out_opt_  VARIANT *pVarResult,
-            /* [annotation][out] */ 
-            _Out_opt_  EXCEPINFO *pExcepInfo,
-            /* [annotation][out] */ 
-            _Out_opt_  UINT *puArgErr);
-        
-        END_INTERFACE
-    } _ITextMessageEventsVtbl;
-
-    interface _ITextMessageEvents
-    {
-        CONST_VTBL struct _ITextMessageEventsVtbl *lpVtbl;
-    };
-
-    
-
-#ifdef COBJMACROS
-
-
-#define _ITextMessageEvents_QueryInterface(This,riid,ppvObject)	\
-    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
-
-#define _ITextMessageEvents_AddRef(This)	\
-    ( (This)->lpVtbl -> AddRef(This) ) 
-
-#define _ITextMessageEvents_Release(This)	\
-    ( (This)->lpVtbl -> Release(This) ) 
-
-
-#define _ITextMessageEvents_GetTypeInfoCount(This,pctinfo)	\
-    ( (This)->lpVtbl -> GetTypeInfoCount(This,pctinfo) ) 
-
-#define _ITextMessageEvents_GetTypeInfo(This,iTInfo,lcid,ppTInfo)	\
-    ( (This)->lpVtbl -> GetTypeInfo(This,iTInfo,lcid,ppTInfo) ) 
-
-#define _ITextMessageEvents_GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId)	\
-    ( (This)->lpVtbl -> GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId) ) 
-
-#define _ITextMessageEvents_Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)	\
-    ( (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr) ) 
-
-#endif /* COBJMACROS */
-
-
-#endif 	/* C style interface */
-
-
-#endif 	/* ___ITextMessageEvents_DISPINTERFACE_DEFINED__ */
-
-
-EXTERN_C const CLSID CLSID_TextMessage;
-
-#ifdef __cplusplus
-
-class DECLSPEC_UUID("B6CC444F-FE14-4DFE-8315-81E4EA16C1CC")
-TextMessage;
 #endif
 #endif /* __pEpCOMServerAdapterLib_LIBRARY_DEFINED__ */
 

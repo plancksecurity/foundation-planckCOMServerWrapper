@@ -2,7 +2,6 @@
 
 #include "stdafx.h"
 #include "CpEpEngine.h"
-#include "TextMessage.h"
 
 using namespace std;
 using namespace pEp::utility;
@@ -866,88 +865,53 @@ HRESULT CpEpEngine::error(_bstr_t msg)
     return E_FAIL;
 }
 
-STDMETHODIMP CpEpEngine::encrypt_message(ITextMessage * src, ITextMessage * dst, SAFEARRAY * extra)
+STDMETHODIMP CpEpEngine::encrypt_message(text_message * src, text_message ** dst, SAFEARRAY * extra)
 {
     assert(src);
     assert(dst);
 
-    CTextMessage *_src = dynamic_cast<CTextMessage *>(src);
-    assert(_src);
-    CTextMessage *_dst = dynamic_cast<CTextMessage *>(dst);
-    assert(_dst);
-
-    if (_src->msg()->enc_format != PEP_enc_none)
-        return E_INVALIDARG;
-
-    ::stringlist_t * _extra = NULL;
-    if (extra) {
-        try {
-            _extra = new_stringlist(extra);
-        }
-        catch (bad_alloc&) {
-            return E_OUTOFMEMORY;
-        }
-        catch (exception&) {
-            return E_FAIL;
-        }
-    }
-
+    ::message *_src = text_message_to_C(src);
     ::message *msg_dst;
-    PEP_STATUS status = ::encrypt_message(get_session(), _src->msg(), _extra, &msg_dst, PEP_enc_pieces);
+    ::stringlist_t *_extra = new_stringlist(extra);
+
+    PEP_STATUS status = ::encrypt_message(get_session(), _src, _extra, &msg_dst, PEP_enc_pieces);
+    free_message(_src);
+    free_stringlist(_extra);
     if (status != PEP_STATUS_OK)
         FAIL(L"cannot encrypt message");
 
-    ::free_stringlist(_extra);
-
     if (msg_dst) {
-        _dst->msg(msg_dst);
+        *dst = text_message_from_C(msg_dst);
+        free_message(msg_dst);
     }
 
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::decrypt_message(ITextMessage * src, ITextMessage * dst, SAFEARRAY ** keylist, pEp_color *rating)
+STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message ** dst, SAFEARRAY ** keylist, pEp_color *rating)
 {
     assert(src);
     assert(dst);
     assert(keylist);
     assert(rating);
 
-    CTextMessage *_src = dynamic_cast<CTextMessage *>(src);
-    assert(_src);
-    CTextMessage *_dst = dynamic_cast<CTextMessage *>(dst);
-    assert(_dst);
-
-    if (_src->msg()->enc_format != PEP_enc_none)
-        return E_INVALIDARG;
-
+    ::message *_src = text_message_to_C(src);
     ::message *msg_dst;
     ::stringlist_t *_keylist;
     ::PEP_color _rating;
 
-    PEP_STATUS status = ::decrypt_message(get_session(), _src->msg(), &msg_dst, &_keylist, &_rating);
+    PEP_STATUS status = ::decrypt_message(get_session(), _src, &msg_dst, &_keylist, &_rating);
+    free_message(_src);
     if (status != PEP_STATUS_OK)
         return FAIL(L"decrypt message failed");
 
     if (msg_dst) {
-        _dst->msg(msg_dst);
+        *dst = text_message_from_C(msg_dst);
     }
 
     if (_keylist) {
-        ULONG len = ::stringlist_length(_keylist);
-        CComSafeArray<BSTR> sa;
-        sa.Create(len);
-
-        ::stringlist_t *_kl;
-        ULONG i;
-        for (_kl = _keylist, i = 0; _kl && _kl->value; _kl = _kl->next, i++)
-            sa.SetAt(i, utf16_bstr(_kl->value).Detach(), false);
-        ::free_stringlist(_keylist);
-
-        *keylist = sa.Detach();
-    }
-    else {
-        *keylist = NULL;
+        *keylist = string_array(_keylist).Detach();
+        free_stringlist(_keylist);
     }
 
     *rating = (pEp_color) _rating;
@@ -955,19 +919,15 @@ STDMETHODIMP CpEpEngine::decrypt_message(ITextMessage * src, ITextMessage * dst,
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::outgoing_message_color(ITextMessage *msg, pEp_color * pVal)
+STDMETHODIMP CpEpEngine::outgoing_message_color(text_message *msg, pEp_color * pVal)
 {
     assert(msg);
     assert(pVal);
 
-    CTextMessage *_msg = dynamic_cast<CTextMessage *>(msg);
-    assert(_msg);
-
-    if (_msg->msg()->dir != PEP_dir_outgoing)
-        return E_INVALIDARG;
+    ::message *_msg = text_message_to_C(msg);
 
     PEP_color _color;
-    PEP_STATUS status = ::outgoing_message_color(get_session(), _msg->msg(), &_color);
+    PEP_STATUS status = ::outgoing_message_color(get_session(), _msg, &_color);
     if (status != PEP_STATUS_OK)
         return FAIL(L"cannot get message color");
 

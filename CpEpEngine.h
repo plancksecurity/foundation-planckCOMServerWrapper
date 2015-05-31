@@ -7,7 +7,7 @@
 #include "_IpEpEngineEvents_CP.h"
 #include "locked_queue.hh"
 #include "utf8_helper.h"
-#include "pEp_identity_helper.h"
+#include "pEp_utility.h"
 
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
@@ -147,9 +147,9 @@ public:
     
     // Message API
 
-    STDMETHOD(encrypt_message)(ITextMessage * src, ITextMessage * dst, SAFEARRAY * extra);
-    STDMETHOD(decrypt_message)(ITextMessage * src, ITextMessage * dst, SAFEARRAY ** keylist, pEp_color *rating);
-    STDMETHOD(outgoing_message_color)(ITextMessage *msg, pEp_color * pVal);
+    STDMETHOD(encrypt_message)(text_message * src, text_message ** dst, SAFEARRAY * extra);
+    STDMETHOD(decrypt_message)(text_message * src, text_message ** dst, SAFEARRAY ** keylist, pEp_color *rating);
+    STDMETHOD(outgoing_message_color)(text_message *msg, pEp_color * pVal);
     STDMETHOD(identity_color)(pEp_identity_s * ident, pEp_color * pVal);
 
 };

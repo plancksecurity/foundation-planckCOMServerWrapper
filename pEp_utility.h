@@ -70,13 +70,7 @@ namespace pEp {
             return psaUDType;
         }
 
-        template< class UDType > UDType * accessData(LPSAFEARRAY psaUDType)
-        {
-            UDType *pUDTypeStruct = NULL;
-            HRESULT hr = SafeArrayAccessData(psaUDType, reinterpret_cast<PVOID*>(&pUDTypeStruct));
-            assert(SUCCEEDED(hr) && pUDTypeStruct);
-
-            return pUDTypeStruct;
-        }
+        text_message *text_message_from_C(::message *msg);
+        ::message * text_message_to_C(text_message *msg);
     }
 }

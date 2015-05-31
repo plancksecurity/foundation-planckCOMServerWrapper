@@ -7,101 +7,6 @@
 import "oaidl.idl";
 import "ocidl.idl";
 
-
-[
-    object,
-    uuid(161538F9-53C8-4D9C-8BA4-0FB43AEC7106),
-    oleautomation,
-    nonextensible,
-    pointer_default(unique)
-]
-interface ITextMessage : IUnknown {
-    typedef enum _pEp_text_format {
-        pEp_text_format_plain = 0,
-        pEp_text_format_html,
-        pEp_text_format_other = 0xff
-    } pEp_text_format;
-
-    typedef enum _pEp_msg_direction {
-        pEp_dir_incoming = 0,
-        pEp_dir_outgoing
-    } pEp_msg_direction;
-
-    typedef enum _pEp_MIME_format {
-        pEp_MIME_none = 0,                      // message is not MIME encoded
-        pEp_MIME_fields_omitted,                // message content but no fields
-        pEp_MIME                                // message is fully MIME encoded
-    } pEp_MIME_format;
-
-    typedef enum _pEp_enc_format {
-        pEp_enc_none = 0,                       // message is not encrypted
-        pEp_enc_pieces,                         // inline PGP + PGP extensions
-        pEp_enc_S_MIME,                         // RFC5751
-        pEp_enc_PGP_MIME,                       // RFC3156
-        pEp_enc_pEp                             // pEp encryption format
-    } pEp_enc_format;
-
-    [uuid(1292C31A-6486-427F-B29F-7F03607836DC)] struct opt_field {
-        BSTR name;
-        BSTR value;
-    };
-
-    [propget] HRESULT dir([out, retval] pEp_msg_direction *pVal);
-    [propput] HRESULT dir([in] pEp_msg_direction newVal);
-
-    [propget] HRESULT id([out, retval] BSTR *pVal);
-    [propput] HRESULT id([in] BSTR newVal);
-
-    [propget] HRESULT shortmsg([out, retval] BSTR *pVal);
-    [propput] HRESULT shortmsg([in] BSTR newVal);
-
-    [propget] HRESULT longmsg([out, retval] BSTR *pVal);
-    [propput] HRESULT longmsg([in] BSTR newVal);
-
-    [propget] HRESULT longmsg_formatted([out, retval] BSTR *pVal);
-    [propput] HRESULT longmsg_formatted([in] BSTR newVal);
-
-    HRESULT add_attachment([in] SAFEARRAY(BYTE) data, [in] BSTR mime_type, [in] BSTR filename);
-    HRESULT has_attachments([out, retval] boolean *result);
-    HRESULT next_attachment([out] SAFEARRAY(BYTE) * data, [out] BSTR * mime_type, [out] BSTR * filename, [out, retval] boolean *result);
-
-    [propget] HRESULT sent([out, retval] hyper * result);
-    [propput] HRESULT sent([in] hyper val);
-
-    [propget] HRESULT recv([out, retval] hyper * result);
-    [propput] HRESULT recv([in] hyper val);
-
-    [propget] HRESULT from([out, retval] struct pEp_identity_s *pVal);
-    [propput] HRESULT from([in] struct pEp_identity_s *newVal);
-
-    [propget] HRESULT to([out, retval] SAFEARRAY(struct pEp_identity_s) *pVal);
-    [propput] HRESULT to([in] SAFEARRAY(struct pEp_identity_s) newVal);
-
-    [propget] HRESULT recv_by([out, retval] struct pEp_identity_s *pVal);
-    [propput] HRESULT recv_by([in] struct pEp_identity_s *newVal);
-
-    [propget] HRESULT cc([out, retval] SAFEARRAY(struct pEp_identity_s) *pVal);
-    [propput] HRESULT cc([in] SAFEARRAY(struct pEp_identity_s) newVal);
-
-    [propget] HRESULT bcc([out, retval] SAFEARRAY(struct pEp_identity_s) *pVal);
-    [propput] HRESULT bcc([in] SAFEARRAY(struct pEp_identity_s) newVal);
-
-    [propget] HRESULT reply_to([out, retval] SAFEARRAY(struct pEp_identity_s) *pVal);
-    [propput] HRESULT reply_to([in] SAFEARRAY(struct pEp_identity_s) newVal);
-
-    [propget] HRESULT references([out, retval] SAFEARRAY(BSTR) *pVal);
-    [propput] HRESULT references([in] SAFEARRAY(BSTR) newVal);
-
-    [propget] HRESULT keywords([out, retval] SAFEARRAY(BSTR) *pVal);
-    [propput] HRESULT keywords([in] SAFEARRAY(BSTR) newVal);
-
-    [propget] HRESULT comments([out, retval] BSTR *pVal);
-    [propput] HRESULT comments([in] BSTR newVal);
-
-    [propget] HRESULT opt_fields([out, retval] SAFEARRAY(struct opt_field) *pVal);
-    [propput] HRESULT opt_fields([in] SAFEARRAY(struct opt_field) newVal);
-};
-
 [
     object,
     uuid(9A9F4422-CF0A-45D7-90CD-1D1B7B2A4540),
@@ -236,9 +141,66 @@ interface IpEpEngine : IUnknown {
         pEp_rating_b0rken = -2
     } pEp_color;
 
-    HRESULT encrypt_message([in,ref] ITextMessage *src, [in,ref] ITextMessage * dst, [in] SAFEARRAY(BSTR) extra);
-    HRESULT decrypt_message([in,ref] ITextMessage *src, [in,ref] ITextMessage * dst, [out] SAFEARRAY(BSTR) *keylist, [out, retval] pEp_color *rating);
-    HRESULT outgoing_message_color([in] ITextMessage *msg, [out, retval] pEp_color * pVal);
+    typedef enum _pEp_text_format {
+        pEp_text_format_plain = 0,
+        pEp_text_format_html,
+        pEp_text_format_other = 0xff
+    } pEp_text_format;
+
+    typedef enum _pEp_msg_direction {
+        pEp_dir_incoming = 0,
+        pEp_dir_outgoing
+    } pEp_msg_direction;
+
+    typedef enum _pEp_MIME_format {
+        pEp_MIME_none = 0,                      // message is not MIME encoded
+        pEp_MIME_fields_omitted,                // message content but no fields
+        pEp_MIME                                // message is fully MIME encoded
+    } pEp_MIME_format;
+
+    typedef enum _pEp_enc_format {
+        pEp_enc_none = 0,                       // message is not encrypted
+        pEp_enc_pieces,                         // inline PGP + PGP extensions
+        pEp_enc_S_MIME,                         // RFC5751
+        pEp_enc_PGP_MIME,                       // RFC3156
+        pEp_enc_pEp                             // pEp encryption format
+    } pEp_enc_format;
+
+    [uuid(3A8A4F13-3402-4C4C-94AB-598D87869380)] struct opt_field {
+        BSTR name;
+        BSTR value;
+    };
+
+    [uuid(61DA7AD4-192E-4616-8678-B19AEFB45B45)] struct blob {
+        SAFEARRAY(BYTE) value;
+        BSTR mime_type;
+        BSTR filename;
+    };
+
+    [uuid(D763A8F3-BA23-4229-A037-1BB7BDC3E0C8)] struct text_message {
+        pEp_msg_direction dir;
+        BSTR id;
+        BSTR shortmsg;
+        BSTR longmsg;
+        BSTR longmsg_formatted;
+        SAFEARRAY(struct blob) attachments;
+        hyper sent;
+        hyper recv;
+        struct pEp_identity_s from;
+        SAFEARRAY(struct pEp_identity_s) to;
+        struct pEp_identity_s recv_by;
+        SAFEARRAY(struct pEp_identity_s) cc;
+        SAFEARRAY(struct pEp_identity_s) bcc;
+        SAFEARRAY(struct pEp_identity_s) reply_to;
+        SAFEARRAY(BSTR) references;
+        SAFEARRAY(BSTR) keywords;
+        BSTR comments;
+        SAFEARRAY(struct opt_field) opt_fields;
+    };
+
+    HRESULT encrypt_message([in] struct text_message *src, [out] struct text_message ** dst, [in] SAFEARRAY(BSTR) extra);
+    HRESULT decrypt_message([in] struct text_message *src, [out] struct text_message ** dst, [out] SAFEARRAY(BSTR) *keylist, [out, retval] pEp_color *rating);
+    HRESULT outgoing_message_color([in] struct text_message *msg, [out, retval] pEp_color * pVal);
     HRESULT identity_color([in] struct pEp_identity_s * ident, [out, retval] pEp_color * pVal);
 };
 
@@ -264,20 +226,4 @@ library pEpCOMServerAdapterLib
         [default] interface IpEpEngine;
         [default, source] dispinterface _IpEpEngineEvents;
     };
-	[
-		uuid(844B5363-4EF4-4A39-A030-16452783A6F7)		
-	]
-	dispinterface _ITextMessageEvents
-	{
-		properties:
-		methods:
-	};
-	[
-		uuid(B6CC444F-FE14-4DFE-8315-81E4EA16C1CC)		
-	]
-	coclass TextMessage
-	{
-		[default] interface ITextMessage;
-		[default, source] dispinterface _ITextMessageEvents;
-	};
 };
