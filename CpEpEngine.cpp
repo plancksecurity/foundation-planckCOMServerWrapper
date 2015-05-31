@@ -865,7 +865,7 @@ HRESULT CpEpEngine::error(_bstr_t msg)
     return E_FAIL;
 }
 
-STDMETHODIMP CpEpEngine::encrypt_message(text_message * src, text_message ** dst, SAFEARRAY * extra)
+STDMETHODIMP CpEpEngine::encrypt_message(text_message * src, text_message * dst, SAFEARRAY * extra)
 {
     assert(src);
     assert(dst);
@@ -881,14 +881,14 @@ STDMETHODIMP CpEpEngine::encrypt_message(text_message * src, text_message ** dst
         FAIL(L"cannot encrypt message");
 
     if (msg_dst) {
-        *dst = text_message_from_C(msg_dst);
+        text_message_from_C(dst, msg_dst);
         free_message(msg_dst);
     }
 
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message ** dst, SAFEARRAY ** keylist, pEp_color *rating)
+STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst, SAFEARRAY ** keylist, pEp_color *rating)
 {
     assert(src);
     assert(dst);
@@ -906,7 +906,7 @@ STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message ** dst
         return FAIL(L"decrypt message failed");
 
     if (msg_dst) {
-        *dst = text_message_from_C(msg_dst);
+        text_message_from_C(dst, msg_dst);
     }
 
     if (_keylist) {

@@ -46,6 +46,9 @@ namespace pEp {
 
         string utf8_string(BSTR bstr, NORM_FORM norm)
         {
+            if (bstr == NULL)
+                return "";
+
             return utf8_string((wstring) (wchar_t *) _bstr_t(bstr, true), norm);
         }
 
@@ -77,6 +80,9 @@ namespace pEp {
 
         CComSafeArray<BSTR> string_array(const ::stringlist_t *stringlist)
         {
+            if (stringlist == NULL)
+                return CComSafeArray<BSTR>((ULONG)0);
+
             CComSafeArray<BSTR> sa_string_list;
             int n = 0;
             for (const ::stringlist_t *k = stringlist; k != NULL; k = k->next) {
@@ -94,6 +100,9 @@ namespace pEp {
 
         ::stringlist_t * new_stringlist(const SAFEARRAY * safearray)
         {
+            if (safearray == NULL)
+                return NULL;
+
             CComSafeArray<BSTR> sa(safearray);
             int n_strings = 0;
             ::stringlist_t *_stringlist = ::new_stringlist((const char *) NULL);

@@ -95,6 +95,9 @@ namespace pEp {
 
         ::pEp_identity *new_identity(const pEp_identity_s * ident)
         {
+            if (ident == NULL)
+                return NULL;
+
             ::pEp_identity *_ident;
 
             string _address;
@@ -242,11 +245,10 @@ namespace pEp {
             return stringpair_list_length(tl);
         }
 
-        text_message *text_message_from_C(::message *msg)
+        void text_message_from_C(text_message *msg2, ::message *msg)
         {
+            assert(msg2);
             assert(msg);
-
-            text_message *msg2 = new text_message();
 
             msg2->dir = (pEp_msg_direction) msg->dir;
             msg2->id = bstr(msg->id);
@@ -266,21 +268,23 @@ namespace pEp {
             msg2->keywords = string_array(msg->keywords).Detach();
             msg2->comments = bstr(msg->comments);
             msg2->opt_fields = array_from_C<opt_field, stringpair_list_t>(msg->opt_fields);
-
-            return msg2;
         }
 
-        char * str(_bstr_t s)
+        char * str(BSTR s)
         {
-            char *_s = _strdup(utf8_string(s).c_str());
+            string str = utf8_string(s);
+            char *_s = _strdup(str.c_str());
             if (_s == NULL)
                 throw bad_alloc();
 
-            return s;
+            return _s;
         }
 
         bloblist_t *bloblist(SAFEARRAY *sa)
         {
+            if (sa == NULL)
+                return NULL;
+
             LONG lbound, ubound;
             SafeArrayGetLBound(sa, 1, &lbound);
             SafeArrayGetUBound(sa, 1, &ubound);
@@ -327,6 +331,9 @@ namespace pEp {
 
         identity_list *identities(SAFEARRAY * sa)
         {
+            if (sa == NULL)
+                return NULL;
+
             LONG lbound, ubound;
             SafeArrayGetLBound(sa, 1, &lbound);
             SafeArrayGetUBound(sa, 1, &ubound);
@@ -340,6 +347,7 @@ namespace pEp {
             identity_list *_il = il;
             for (LONG i = lbound; i <= ubound; i++) {
                 pEp_identity_s s;
+                memset(&s, 0, sizeof(s));
                 SafeArrayGetElement(sa, &i, &s);
 
                 pEp_identity *ident;
@@ -377,6 +385,9 @@ namespace pEp {
 
         stringpair_list_t *stringpair_list(SAFEARRAY * sa)
         {
+            if (sa == NULL)
+                return NULL;
+
             LONG lbound, ubound;
             SafeArrayGetLBound(sa, 1, &lbound);
             SafeArrayGetUBound(sa, 1, &ubound);
@@ -390,6 +401,7 @@ namespace pEp {
             stringpair_list_t *_il = il;
             for (LONG i = lbound; i <= ubound; i++) {
                 opt_field s;
+                memset(&s, 0, sizeof(opt_field));
                 SafeArrayGetElement(sa, &i, &s);
 
                 stringpair_t *pair;
@@ -421,6 +433,8 @@ namespace pEp {
             assert(msg);
 
             ::message * msg2 = new_message((PEP_msg_direction) msg->dir, NULL, NULL, NULL);
+            if (msg2 == NULL)
+                throw bad_alloc();
 
             msg2->id = str(msg->id);
             msg2->shortmsg = str(msg->shortmsg);

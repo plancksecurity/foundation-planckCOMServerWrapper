@@ -70,7 +70,7 @@ namespace pEp {
             return psaUDType;
         }
 
-        text_message *text_message_from_C(::message *msg);
         ::message * text_message_to_C(text_message *msg);
+        void text_message_from_C(text_message *msg2, ::message *msg);
     }
 }
