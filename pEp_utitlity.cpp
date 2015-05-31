@@ -164,12 +164,13 @@ namespace pEp {
 
         template<> blob *from_C< blob *, bloblist_t >(bloblist_t *tl)
         {
-            assert(tl && tl->value);
-
             CComSafeArray<BYTE> sa;
             sa.Create(tl->size);
 
-            memcpy(sa.m_psa->pvData, tl->value, tl->size);
+            char *data;
+            SafeArrayAccessData(sa, (void **) &data);
+            memcpy(data, tl->value, tl->size);
+            SafeArrayUnaccessData(sa);
 
             blob *_blob = new blob();
 
