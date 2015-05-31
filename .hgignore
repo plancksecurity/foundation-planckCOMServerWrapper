@@ -1,0 +1,10 @@
+syntax: glob
+
+*.tmp
+Debug
+Release
+*.aps
+*.user
+pEpCOMServerAdapter_p.*
+*~
+
