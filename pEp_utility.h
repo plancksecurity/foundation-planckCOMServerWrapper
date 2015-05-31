@@ -38,18 +38,21 @@ namespace pEp {
         void copy_identity(pEp_identity_s * ident_s, const pEp_identity * ident);
         ::pEp_identity *new_identity(const pEp_identity_s * ident);
 
+        static LPTYPELIB pTypelib = NULL;
+
         template< class UDType > static IRecordInfo *getRecordInfo()
         {
             LPTYPEINFO pTypeInfo = NULL;
-            LPTYPELIB pTypelib = NULL;
             LPSAFEARRAY psaUDType = NULL;
             IRecordInfo* pRecInfo = NULL;
 
             // Fetch the IRecordInfo interface describing the UDT
-            HRESULT hr = LoadRegTypeLib(LIBID_pEpCOMServerAdapterLib, 1, 0, GetUserDefaultLCID(), &pTypelib);
-            assert(SUCCEEDED(hr) && pTypelib);
+            if (pTypelib == NULL)
+                LoadRegTypeLib(LIBID_pEpCOMServerAdapterLib, 1, 0, GetUserDefaultLCID(), &pTypelib);
 
-            hr = pTypelib->GetTypeInfoOfGuid(__uuidof(UDType), &pTypeInfo);
+            assert(pTypelib);
+
+            HRESULT hr = pTypelib->GetTypeInfoOfGuid(__uuidof(UDType), &pTypeInfo);
             assert(SUCCEEDED(hr) && pTypeInfo);
             hr = GetRecordInfoFromTypeInfo(pTypeInfo, &pRecInfo);
             assert(SUCCEEDED(hr) && pRecInfo);

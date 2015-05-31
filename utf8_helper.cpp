@@ -75,7 +75,8 @@ namespace pEp {
 
         _bstr_t utf16_bstr(string str)
         {
-            return _bstr_t(utf16_string(str).c_str());
+            wstring wstr = utf16_string(str);
+            return _bstr_t(wstr.c_str());
         }
 
         CComSafeArray<BSTR> string_array(const ::stringlist_t *stringlist)

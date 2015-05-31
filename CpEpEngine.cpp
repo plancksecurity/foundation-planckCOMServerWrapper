@@ -899,17 +899,16 @@ STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst,
     assert(rating);
 
     ::message *_src = text_message_to_C(src);
-    ::message *msg_dst;
+    ::message *msg_dst = NULL;
     ::stringlist_t *_keylist;
     ::PEP_color _rating;
 
     PEP_STATUS status = ::decrypt_message(get_session(), _src, &msg_dst, &_keylist, &_rating);
-    free_message(_src);
-    if (status != PEP_STATUS_OK)
-        return FAIL(L"decrypt message failed");
+    ::free_message(_src);
 
     if (msg_dst) {
         text_message_from_C(dst, msg_dst);
+        ::free_message(msg_dst);
     }
 
     if (_keylist) {

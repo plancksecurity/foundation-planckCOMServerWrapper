@@ -189,6 +189,9 @@ namespace pEp {
 
         template< class T2, class T > SAFEARRAY * array_from_C(T *tl)
         {
+            if (tl == NULL)
+                return newSafeArray<T2>(0);
+
             int len = length<T>(tl);
 
             LPSAFEARRAY sa = newSafeArray<T2>(len);
@@ -206,7 +209,8 @@ namespace pEp {
         template<> pEp_identity_s from_C< pEp_identity_s, pEp_identity >(pEp_identity *tl)
         {
             pEp_identity_s _ident;
-            copy_identity(&_ident, tl);
+            if (tl)
+                copy_identity(&_ident, tl);
             return _ident;
         }
 
@@ -218,15 +222,18 @@ namespace pEp {
         template<> pEp_identity_s *from_C< pEp_identity_s *, identity_list >(identity_list *il)
         {
             pEp_identity_s *ident = new pEp_identity_s();
-            copy_identity(ident, il->ident);
+            if (il)
+                copy_identity(ident, il->ident);
             return ident;
         }
 
         template<> opt_field *from_C< opt_field *, stringpair_list_t >(stringpair_list_t * sp)
         {
             opt_field *fld = new opt_field();
-            fld->name = bstr(sp->value->key);
-            fld->value = bstr(sp->value->value);
+            if (sp) {
+                fld->name = bstr(sp->value->key);
+                fld->value = bstr(sp->value->value);
+            }
             return fld;
         }
 
@@ -256,8 +263,10 @@ namespace pEp {
             msg2->longmsg = bstr(msg->longmsg);
             msg2->longmsg_formatted = bstr(msg->longmsg_formatted);
             msg2->attachments = array_from_C<blob, bloblist_t>(msg->attachments);
-            msg2->sent = mktime(msg->sent);
-            msg2->recv = mktime(msg->recv);
+            if (msg->sent)
+                msg2->sent = mktime(msg->sent);
+            if (msg->recv)
+                msg2->recv = mktime(msg->recv);
             msg2->from = identity_s(msg->from);
             msg2->to = array_from_C<pEp_identity_s, identity_list>(msg->to);
             msg2->recv_by = identity_s(msg->recv_by);
@@ -438,7 +447,7 @@ namespace pEp {
         {
             assert(msg);
 
-            ::message * msg2 = new_message((PEP_msg_direction) msg->dir, NULL, NULL, NULL);
+            ::message * msg2 = new_message((PEP_msg_direction) msg->dir);
             if (msg2 == NULL)
                 throw bad_alloc();
 
