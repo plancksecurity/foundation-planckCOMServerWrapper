@@ -49,7 +49,11 @@ namespace pEp {
             if (bstr == NULL)
                 return "";
 
-            return utf8_string((wstring) (wchar_t *) _bstr_t(bstr, true), norm);
+            _bstr_t _bstr(bstr);
+            wstring wstr = (wchar_t *) _bstr;
+            _bstr.Detach();
+
+            return utf8_string(wstr, norm);
         }
 
         wstring utf16_string(string str)
@@ -83,7 +87,7 @@ namespace pEp {
         {
             int len = ::stringlist_length(stringlist);
 
-            if (len = 0)
+            if (len == 0)
                 return NULL;
 
             CComSafeArray<BSTR> sa_string_list((LONG) len);

@@ -907,15 +907,14 @@ STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst,
     ::PEP_color _rating;
 
     PEP_STATUS status = ::decrypt_message(get_session(), _src, &msg_dst, &_keylist, &_rating);
-    ::free_message(_src);
 
-    if (msg_dst) {
+    if (msg_dst)
         text_message_from_C(dst, msg_dst);
-        ::free_message(msg_dst);
-    }
-    else {
+    else
         text_message_from_C(dst, _src);
-    }
+
+    ::free_message(_src);
+    ::free_message(msg_dst);
 
     if (_keylist) {
         *keylist = string_array(_keylist);

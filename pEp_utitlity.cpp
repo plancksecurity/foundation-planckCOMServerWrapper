@@ -156,10 +156,10 @@ namespace pEp {
 
         BSTR bstr(char *s)
         {
-            if (s)
-                return utf16_bstr(s);
-            else
+            if (s == NULL)
                 return _bstr_t(L"").Detach();
+
+            return utf16_bstr(s);
         }
 
         template<> blob *from_C< blob *, bloblist_t >(bloblist_t *tl)
@@ -367,10 +367,10 @@ namespace pEp {
                 SafeArrayAccessData(b.value, (void **) &data);
                 memcpy(buffer, data, size);
                 SafeArrayUnaccessData(sa);
-                free(buffer);
 
                 _bl = bloblist_add(_bl, buffer, size, str(b.mime_type), str(b.filename));
                 if (_bl == NULL) {
+                    free(buffer);
                     clear_blob(b);
                     free_bloblist(bl);
                     throw bad_alloc();
