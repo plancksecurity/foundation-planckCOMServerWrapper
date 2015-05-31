@@ -117,11 +117,11 @@ STDMETHODIMP CpEpEngine::decrypt(BSTR ctext, BSTR * ptext, LPSAFEARRAY * key_lis
             return FAIL(L"cannot decrypt");
     }
 
-    *ptext = utf16_bstr(_ptext).Detach();
+    *ptext = utf16_bstr(_ptext);
     pEp_free(_ptext);
 
     if (_keylist && _keylist->value)
-        *key_list = string_array(_keylist).Detach();
+        *key_list = string_array(_keylist);
     else
         *key_list = NULL;
     ::free_stringlist(_keylist);
@@ -196,7 +196,7 @@ STDMETHODIMP CpEpEngine::decrypt_b(BSTR ctext, LPSAFEARRAY * ptext, LPSAFEARRAY 
     ::pEp_free(_ptext);
 
     if (_keylist && _keylist->value)
-        *key_list = string_array(_keylist).Detach();
+        *key_list = string_array(_keylist);
     else
         *key_list = NULL;
     ::free_stringlist(_keylist);
@@ -228,7 +228,7 @@ STDMETHODIMP CpEpEngine::verify(BSTR text, BSTR signature, LPSAFEARRAY * key_lis
     *verify_status = (pEp_STATUS) _status;
 
     if (_keylist && _keylist->value)
-        *key_list = string_array(_keylist).Detach();
+        *key_list = string_array(_keylist);
     else
         *key_list = NULL;
     ::free_stringlist(_keylist);
@@ -271,7 +271,7 @@ STDMETHODIMP CpEpEngine::encrypt(SAFEARRAY * key_list, BSTR ptext, BSTR * ctext,
     if (_ctext == NULL)
         return FAIL(L"encrypt_and_sign");
 
-    *ctext = utf16_bstr(_ctext).Detach();
+    *ctext = utf16_bstr(_ctext);
     pEp_free(_ctext);
 
     return S_OK;
@@ -367,7 +367,7 @@ STDMETHODIMP CpEpEngine::trustword(LONG value, BSTR lang, BSTR * word)
         return FAIL(L"trustword");
     }
     else {
-        *word = utf16_bstr(_word).Detach();
+        *word = utf16_bstr(_word);
         pEp_free(_word);
         return S_OK;
     }
@@ -422,7 +422,7 @@ STDMETHODIMP CpEpEngine::trustwords(BSTR fpr, BSTR lang, LONG max_words, BSTR * 
         return FAIL(L"trustwords");
     }
     else {
-        *words = utf16_bstr(_words).Detach();
+        *words = utf16_bstr(_words);
         pEp_free(_words);
         return S_OK;
     }
@@ -500,7 +500,7 @@ STDMETHODIMP CpEpEngine::generate_keypair(pEp_identity_s * ident, BSTR * fpr)
     }
 
     if (_ident->fpr)
-        *fpr = utf16_bstr(_ident->fpr).Detach();
+        *fpr = utf16_bstr(_ident->fpr);
 
     ::free_identity(_ident);
 
@@ -635,7 +635,7 @@ STDMETHODIMP CpEpEngine::find_keys(BSTR pattern, LPSAFEARRAY * key_list)
         return FAIL(L"find_keys");
 
     if (_keylist && _keylist->value) {
-        *key_list = string_array(_keylist).Detach();
+        *key_list = string_array(_keylist);
     }
     else {
         ::free_stringlist(_keylist);
@@ -898,6 +898,8 @@ STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst,
     assert(keylist);
     assert(rating);
 
+    *keylist = NULL;
+
     ::message *_src = text_message_to_C(src);
     ::message *msg_dst = NULL;
     ::stringlist_t *_keylist;
@@ -912,7 +914,7 @@ STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst,
     }
 
     if (_keylist) {
-        *keylist = string_array(_keylist).Detach();
+        *keylist = string_array(_keylist);
         free_stringlist(_keylist);
     }
 

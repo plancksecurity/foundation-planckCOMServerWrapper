@@ -63,12 +63,12 @@ namespace pEp {
             if (_ident == NULL)
                 throw bad_alloc();
 
-            _ident->address = utf16_bstr(this->address).Detach();
+            _ident->address = utf16_bstr(this->address);
             _ident->comm_type = this->comm_type;
-            _ident->fpr = utf16_bstr(this->fpr).Detach();
-            _ident->lang = utf16_bstr(this->lang).Detach();
-            _ident->username = utf16_bstr(this->username).Detach();
-            _ident->user_id = utf16_bstr(this->user_id).Detach();
+            _ident->fpr = utf16_bstr(this->fpr);
+            _ident->lang = utf16_bstr(this->lang);
+            _ident->username = utf16_bstr(this->username);
+            _ident->user_id = utf16_bstr(this->user_id);
 
             return _ident;
         }
@@ -80,16 +80,16 @@ namespace pEp {
             ::memset(ident_s, 0, sizeof(pEp_identity_s));
             if (ident) {
                 if (ident->address)
-                    ident_s->address = utf16_bstr(ident->address).Detach();
+                    ident_s->address = utf16_bstr(ident->address);
                 if (ident->fpr)
-                    ident_s->fpr = utf16_bstr(ident->fpr).Detach();
+                    ident_s->fpr = utf16_bstr(ident->fpr);
                 if (ident->user_id)
-                    ident_s->user_id = utf16_bstr(ident->user_id).Detach();
+                    ident_s->user_id = utf16_bstr(ident->user_id);
                 if (ident->username)
-                    ident_s->username = utf16_bstr(ident->username).Detach();
+                    ident_s->username = utf16_bstr(ident->username);
                 ident_s->comm_type = (pEp_comm_type) ident->comm_type;
                 if (ident->lang)
-                    ident_s->lang = utf16_bstr(ident->lang).Detach();
+                    ident_s->lang = utf16_bstr(ident->lang);
             }
         }
 
@@ -157,7 +157,7 @@ namespace pEp {
         template<> BSTR from_C< BSTR, char >(char *s)
         {
             if (s)
-                return utf16_bstr(s).Detach();
+                return utf16_bstr(s);
             else
                 return _bstr_t(L"").Detach();
         }
@@ -273,8 +273,8 @@ namespace pEp {
             msg2->cc = array_from_C<pEp_identity_s, identity_list>(msg->cc);
             msg2->bcc = array_from_C<pEp_identity_s, identity_list>(msg->bcc);
             msg2->reply_to = array_from_C<pEp_identity_s, identity_list>(msg->reply_to);
-            msg2->references = string_array(msg->references).Detach();
-            msg2->keywords = string_array(msg->keywords).Detach();
+            msg2->references = string_array(msg->references);
+            msg2->keywords = string_array(msg->keywords);
             msg2->comments = bstr(msg->comments);
             msg2->opt_fields = array_from_C<opt_field, stringpair_list_t>(msg->opt_fields);
         }

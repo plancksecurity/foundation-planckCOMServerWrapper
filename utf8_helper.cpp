@@ -73,24 +73,24 @@ namespace pEp {
             return result;
         }
 
-        _bstr_t utf16_bstr(string str)
+        BSTR utf16_bstr(string str)
         {
             wstring wstr = utf16_string(str);
-            return _bstr_t(wstr.c_str());
+            return _bstr_t(wstr.c_str()).Detach();
         }
 
-        CComSafeArray<BSTR> string_array(const ::stringlist_t *stringlist)
+        LPSAFEARRAY string_array(const ::stringlist_t *stringlist)
         {
             int len = ::stringlist_length(stringlist);
 
             if (len = 0)
-                return CComSafeArray<BSTR>((ULONG)0);
+                return NULL;
 
             CComSafeArray<BSTR> sa_string_list((LONG) len);
             LONG n = 0;
             for (const ::stringlist_t *k = stringlist; k && k->value; k = k->next) {
                 if (k->value) {
-                    HRESULT _result = sa_string_list.SetAt(n, utf16_bstr(k->value).Detach(), false);
+                    HRESULT _result = sa_string_list.SetAt(n, utf16_bstr(k->value), false);
                     assert(_result == S_OK);
                     if (_result == E_OUTOFMEMORY)
                         throw std::bad_alloc();
@@ -98,7 +98,7 @@ namespace pEp {
                 }
             }
 
-            return sa_string_list;
+            return sa_string_list.Detach();
         }
 
         ::stringlist_t * new_stringlist(const SAFEARRAY * safearray)
