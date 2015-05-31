@@ -80,14 +80,16 @@ namespace pEp {
 
         CComSafeArray<BSTR> string_array(const ::stringlist_t *stringlist)
         {
-            if (stringlist == NULL)
+            int len = ::stringlist_length(stringlist);
+
+            if (len = 0)
                 return CComSafeArray<BSTR>((ULONG)0);
 
-            CComSafeArray<BSTR> sa_string_list;
-            int n = 0;
-            for (const ::stringlist_t *k = stringlist; k != NULL; k = k->next) {
+            CComSafeArray<BSTR> sa_string_list((LONG) len);
+            LONG n = 0;
+            for (const ::stringlist_t *k = stringlist; k && k->value; k = k->next) {
                 if (k->value) {
-                    HRESULT _result = sa_string_list.Add(utf16_bstr(k->value).Detach(), false);
+                    HRESULT _result = sa_string_list.SetAt(n, utf16_bstr(k->value).Detach(), false);
                     assert(_result == S_OK);
                     if (_result == E_OUTOFMEMORY)
                         throw std::bad_alloc();

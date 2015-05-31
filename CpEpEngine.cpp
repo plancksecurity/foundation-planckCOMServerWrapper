@@ -875,15 +875,18 @@ STDMETHODIMP CpEpEngine::encrypt_message(text_message * src, text_message * dst,
     ::stringlist_t *_extra = new_stringlist(extra);
 
     PEP_STATUS status = ::encrypt_message(get_session(), _src, _extra, &msg_dst, PEP_enc_pieces);
-    free_message(_src);
-    free_stringlist(_extra);
-    if (status != PEP_STATUS_OK)
+    ::free_stringlist(_extra);
+    if (status != PEP_STATUS_OK && status != PEP_UNENCRYPTED) {
         FAIL(L"cannot encrypt message");
-
-    if (msg_dst) {
-        text_message_from_C(dst, msg_dst);
-        free_message(msg_dst);
     }
+
+    if (status == PEP_UNENCRYPTED)
+        text_message_from_C(dst, _src);
+    else
+        text_message_from_C(dst, msg_dst);
+
+    ::free_message(msg_dst);
+    ::free_message(_src);
 
     return S_OK;
 }

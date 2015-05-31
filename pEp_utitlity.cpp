@@ -197,7 +197,7 @@ namespace pEp {
             SafeArrayGetUBound(sa, 1, &ubound);
 
             T *_tl = tl;
-            for (LONG i = lbound; i <= ubound; _tl = tl->next, i++)
+            for (LONG i = lbound; i <= ubound; _tl = _tl->next, i++)
                 SafeArrayPutElement(sa, &i, from_C<T2 *, T>(_tl));
 
             return sa;
@@ -300,7 +300,13 @@ namespace pEp {
             bloblist_t *_bl = bl;
             for (LONG i = lbound; i <= ubound; i++) {
                 blob b;
+                memset(&b, 0, sizeof(blob));
                 SafeArrayGetElement(sa, &i, &b);
+
+                LONG _lbound, _ubound;
+                SafeArrayGetLBound(b.value, 1, &_lbound);
+                SafeArrayGetUBound(b.value, 1, &_ubound);
+                size_t size = _ubound - _lbound + 1;
 
                 char *buffer = (char *) malloc(size);
                 if (buffer == NULL)
@@ -312,7 +318,7 @@ namespace pEp {
                 memcpy(buffer, data, size);
                 SafeArrayUnaccessData(sa);
 
-                _bl = bloblist_add(_bl, buffer, ubound - lbound + 1, str(b.mime_type), str(b.filename));
+                _bl = bloblist_add(_bl, buffer, size, str(b.mime_type), str(b.filename));
                 if (_bl == NULL) {
                     IRecordInfo *ri = getRecordInfo<blob>();
                     ri->RecordClear(&b);
