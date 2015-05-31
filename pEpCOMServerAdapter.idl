@@ -15,7 +15,7 @@ import "ocidl.idl";
     pointer_default(unique)
 ]
 interface IpEpEngine : IUnknown {
-    typedef enum _pEp_STATUS {
+    typedef   enum _pEp_STATUS {
         pEp_STATUS_OK = 0,
 
         pEp_KEY_NOT_FOUND = 0x0201,
@@ -147,18 +147,18 @@ interface IpEpEngine : IUnknown {
         pEp_text_format_other = 0xff
     } pEp_text_format;
 
-    typedef enum _pEp_msg_direction {
+    typedef  enum _pEp_msg_direction {
         pEp_dir_incoming = 0,
         pEp_dir_outgoing
     } pEp_msg_direction;
 
-    typedef enum _pEp_MIME_format {
+    typedef  enum _pEp_MIME_format {
         pEp_MIME_none = 0,                      // message is not MIME encoded
         pEp_MIME_fields_omitted,                // message content but no fields
         pEp_MIME                                // message is fully MIME encoded
     } pEp_MIME_format;
 
-    typedef enum _pEp_enc_format {
+    typedef  enum _pEp_enc_format {
         pEp_enc_none = 0,                       // message is not encrypted
         pEp_enc_pieces,                         // inline PGP + PGP extensions
         pEp_enc_S_MIME,                         // RFC5751

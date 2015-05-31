@@ -154,17 +154,12 @@ namespace pEp {
 
         template< class T2, class T > T2 from_C(T *tl);
 
-        template<> BSTR from_C< BSTR, char >(char *s)
+        BSTR bstr(char *s)
         {
             if (s)
                 return utf16_bstr(s);
             else
                 return _bstr_t(L"").Detach();
-        }
-
-        inline BSTR bstr(char *s)
-        {
-            return from_C< BSTR, char >(s);
         }
 
         template<> blob *from_C< blob *, bloblist_t >(bloblist_t *tl)
@@ -206,9 +201,22 @@ namespace pEp {
             return sa;
         }
 
+        void clear_identity_s(pEp_identity_s& ident)
+        {
+            SysFreeString(ident.address);
+            SysFreeString(ident.fpr);
+            SysFreeString(ident.lang);
+            SysFreeString(ident.username);
+            SysFreeString(ident.user_id);
+
+            memset(&ident, 0, sizeof(pEp_identity_s));
+        }
+
         template<> pEp_identity_s from_C< pEp_identity_s, pEp_identity >(pEp_identity *tl)
         {
             pEp_identity_s _ident;
+            memset(&_ident, 0, sizeof(_ident));
+
             if (tl)
                 copy_identity(&_ident, tl);
             return _ident;
@@ -222,6 +230,8 @@ namespace pEp {
         template<> pEp_identity_s *from_C< pEp_identity_s *, identity_list >(identity_list *il)
         {
             pEp_identity_s *ident = new pEp_identity_s();
+            memset(ident, 0, sizeof(pEp_identity_s));
+
             if (il)
                 copy_identity(ident, il->ident);
             return ident;
@@ -252,10 +262,33 @@ namespace pEp {
             return stringpair_list_length(tl);
         }
 
+        void clear_text_message(text_message *msg)
+        {
+            SysFreeString(msg->id);
+            SysFreeString(msg->shortmsg);
+            SysFreeString(msg->longmsg);
+            SysFreeString(msg->longmsg_formatted);
+            SafeArrayDestroy(msg->attachments);
+            clear_identity_s(msg->from);
+            SafeArrayDestroy(msg->to);
+            clear_identity_s(msg->recv_by);
+            SafeArrayDestroy(msg->cc);
+            SafeArrayDestroy(msg->bcc);
+            SafeArrayDestroy(msg->reply_to);
+            SafeArrayDestroy(msg->references);
+            SafeArrayDestroy(msg->keywords);
+            SysFreeString(msg->comments);
+            SafeArrayDestroy(msg->opt_fields);
+
+            memset(msg, 0, sizeof(text_message));
+        }
+
         void text_message_from_C(text_message *msg2, ::message *msg)
         {
             assert(msg2);
             assert(msg);
+
+            clear_text_message(msg2);
 
             msg2->dir = (pEp_msg_direction) msg->dir;
             msg2->id = bstr(msg->id);
@@ -287,6 +320,14 @@ namespace pEp {
                 throw bad_alloc();
 
             return _s;
+        }
+
+        void clear_blob(blob& b)
+        {
+            SysFreeString(b.filename);
+            SysFreeString(b.mime_type);
+            SafeArrayDestroy(b.value);
+            memset(&b, 0, sizeof(blob));
         }
 
         bloblist_t *bloblist(SAFEARRAY *sa)
@@ -326,19 +367,16 @@ namespace pEp {
                 SafeArrayAccessData(b.value, (void **) &data);
                 memcpy(buffer, data, size);
                 SafeArrayUnaccessData(sa);
+                free(buffer);
 
                 _bl = bloblist_add(_bl, buffer, size, str(b.mime_type), str(b.filename));
                 if (_bl == NULL) {
-                    IRecordInfo *ri = getRecordInfo<blob>();
-                    ri->RecordClear(&b);
-
+                    clear_blob(b);
                     free_bloblist(bl);
-                    free(buffer);
                     throw bad_alloc();
                 }
 
-                IRecordInfo *ri = getRecordInfo<blob>();
-                ri->RecordClear(&b);
+                clear_blob(b);
             }
 
             return bl;
@@ -362,7 +400,7 @@ namespace pEp {
             identity_list *_il = il;
             for (LONG i = lbound; i <= ubound; i++) {
                 pEp_identity_s s;
-                memset(&s, 0, sizeof(s));
+                memset(&s, 0, sizeof(pEp_identity_s));
                 SafeArrayGetElement(sa, &i, &s);
 
                 pEp_identity *ident;
@@ -370,14 +408,11 @@ namespace pEp {
                     ident = new_identity(&s);
                 }
                 catch (bad_alloc&) {
-                    IRecordInfo *ri = getRecordInfo<pEp_identity_s>();
-                    ri->RecordClear(&s);
-
+                    clear_identity_s(s);
                     throw bad_alloc();
                 }
 
-                IRecordInfo *ri = getRecordInfo<pEp_identity_s>();
-                ri->RecordClear(&s);
+                clear_identity_s(s);
 
                 _il = identity_list_add(_il, ident);
                 if (_il == NULL) {
@@ -396,6 +431,13 @@ namespace pEp {
                 throw bad_alloc();
 
             return pair;
+        }
+
+        void clear_opt_field(opt_field& f)
+        {
+            SysFreeString(f.name);
+            SysFreeString(f.value);
+            memset(&f, 0, sizeof(opt_field));
         }
 
         stringpair_list_t *stringpair_list(SAFEARRAY * sa)
@@ -424,14 +466,11 @@ namespace pEp {
                     pair = new_stringpair(&s);
                 }
                 catch (bad_alloc&) {
-                    IRecordInfo *ri = getRecordInfo<opt_field>();
-                    ri->RecordClear(&s);
-
+                    clear_opt_field(s);
                     throw bad_alloc();
                 }
 
-                IRecordInfo *ri = getRecordInfo<opt_field>();
-                ri->RecordClear(&s);
+                clear_opt_field(s);
 
                 _il = stringpair_list_add(_il, pair);
                 if (_il == NULL) {

@@ -899,6 +899,7 @@ STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst,
     assert(rating);
 
     *keylist = NULL;
+    *rating = pEp_rating_undefined;
 
     ::message *_src = text_message_to_C(src);
     ::message *msg_dst = NULL;
@@ -911,6 +912,9 @@ STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst,
     if (msg_dst) {
         text_message_from_C(dst, msg_dst);
         ::free_message(msg_dst);
+    }
+    else {
+        text_message_from_C(dst, _src);
     }
 
     if (_keylist) {

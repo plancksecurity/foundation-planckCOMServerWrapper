@@ -52,12 +52,12 @@ namespace pEp {
 
             assert(pTypelib);
 
-            HRESULT hr = pTypelib->GetTypeInfoOfGuid(__uuidof(UDType), &pTypeInfo);
+            GUID guid = __uuidof(UDType);
+            HRESULT hr = pTypelib->GetTypeInfoOfGuid(guid, &pTypeInfo);
             assert(SUCCEEDED(hr) && pTypeInfo);
             hr = GetRecordInfoFromTypeInfo(pTypeInfo, &pRecInfo);
             assert(SUCCEEDED(hr) && pRecInfo);
             pTypeInfo->Release();
-            pTypelib->Release();
 
             return pRecInfo;
         }
