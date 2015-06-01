@@ -910,8 +910,6 @@ STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst,
 
     if (msg_dst)
         text_message_from_C(dst, msg_dst);
-    else
-        text_message_from_C(dst, _src);
 
     ::free_message(_src);
     ::free_message(msg_dst);
