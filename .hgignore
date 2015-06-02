@@ -7,4 +7,5 @@ Release
 *.user
 pEpCOMServerAdapter_p.*
 *~
+pEpCOMServerAdapter_i.*
 
