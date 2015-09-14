@@ -48,7 +48,7 @@ namespace pEp {
         {
             if (bstr == NULL)
                 return "";
-
+            
             _bstr_t _bstr(bstr);
             wstring wstr = (wchar_t *) _bstr;
             _bstr.Detach();
