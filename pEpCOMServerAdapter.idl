@@ -119,7 +119,7 @@ interface IpEpEngine : IUnknown {
     HRESULT examine_identity([in] struct pEp_identity_s * ident);
     HRESULT myself([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
     HRESULT update_identity([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
-    HRESULT key_compromized([in] BSTR fpr);
+    HRESULT key_compromized([in] struct pEp_identity_s *ident);
     HRESULT trust_personal_key([in] struct pEp_identity_s *ident);
 
     // Message API

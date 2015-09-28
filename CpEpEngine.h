@@ -143,7 +143,7 @@ public:
     STDMETHOD(verify)(BSTR text, BSTR signature, LPSAFEARRAY * key_list, pEp_STATUS * verify_status);
     STDMETHOD(myself)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
     STDMETHOD(update_identity)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
-    STDMETHOD(key_compromized)(BSTR fpr);
+    STDMETHOD(key_compromized)(struct pEp_identity_s *ident);
     STDMETHOD(trust_personal_key)(struct pEp_identity_s *ident);
 
     // Message API

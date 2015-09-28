@@ -772,19 +772,25 @@ STDMETHODIMP CpEpEngine::update_identity(struct pEp_identity_s *ident, struct pE
     }
 }
 
-STDMETHODIMP CpEpEngine::key_compromized(BSTR fpr)
+STDMETHODIMP CpEpEngine::key_compromized(struct pEp_identity_s *ident)
 {
-    assert(fpr);
+    ::pEp_identity *_ident;
 
-    if (fpr == NULL)
-        return E_INVALIDARG;
+    assert(ident);
 
-    string _fpr = utf8_string(fpr);
-    if (_fpr.length() == 0)
-        return E_INVALIDARG;
+    try {
+        _ident = new_identity(ident);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception&) {
+        return E_FAIL;
+    }
 
-    PEP_STATUS status = ::key_compromized(get_session(), _fpr.c_str());
-    assert(status != PEP_OUT_OF_MEMORY);
+    PEP_STATUS status = ::key_compromized(get_session(), _ident);
+    free_identity(_ident);
+
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
 
