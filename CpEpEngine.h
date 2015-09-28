@@ -144,7 +144,8 @@ public:
     STDMETHOD(myself)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
     STDMETHOD(update_identity)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
     STDMETHOD(key_compromized)(BSTR fpr);
-    
+    STDMETHOD(trust_personal_key)(struct pEp_identity_s *ident);
+
     // Message API
 
     STDMETHOD(encrypt_message)(text_message * src, text_message * dst, SAFEARRAY * extra);

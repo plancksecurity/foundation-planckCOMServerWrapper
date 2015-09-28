@@ -966,3 +966,29 @@ STDMETHODIMP CpEpEngine::identity_color(struct pEp_identity_s *ident, pEp_color 
     *pVal = (pEp_color) _color;
     return S_OK;
 }
+
+STDMETHODIMP CpEpEngine::trust_personal_key(struct pEp_identity_s *ident)
+{
+    ::pEp_identity *_ident;
+
+    assert(ident);
+
+    try {
+        _ident = new_identity(ident);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception&) {
+        return E_FAIL;
+    }
+
+    PEP_STATUS status = ::trust_personal_key(get_session(), _ident);
+    free_identity(_ident);
+    if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+    else if (status != PEP_STATUS_OK)
+        return FAIL(L"failure while executing trust_personal_key()");
+
+    return S_OK;
+}
