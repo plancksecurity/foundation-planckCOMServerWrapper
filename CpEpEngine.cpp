@@ -973,11 +973,12 @@ STDMETHODIMP CpEpEngine::identity_color(struct pEp_identity_s *ident, pEp_color 
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::trust_personal_key(struct pEp_identity_s *ident)
+STDMETHODIMP CpEpEngine::trust_personal_key(struct pEp_identity_s *ident, struct pEp_identity_s *result)
 {
     ::pEp_identity *_ident;
 
     assert(ident);
+    assert(result);
 
     try {
         _ident = new_identity(ident);
@@ -990,6 +991,9 @@ STDMETHODIMP CpEpEngine::trust_personal_key(struct pEp_identity_s *ident)
     }
 
     PEP_STATUS status = ::trust_personal_key(get_session(), _ident);
+    if (status == PEP_STATUS_OK)
+        copy_identity(result, _ident);
+
     free_identity(_ident);
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
