@@ -3,6 +3,8 @@
 #include "stdafx.h"
 #include "CpEpEngine.h"
 
+#define VERBOSE(TEXT) if (verbose_mode) verbose(TEXT)
+
 using namespace std;
 using namespace pEp::utility;
 
@@ -25,7 +27,11 @@ STDMETHODIMP CpEpEngine::InterfaceSupportsErrorInfo(REFIID riid)
 
 #define FAIL(msg) error(msg)
 
-// CpEpEngine
+STDMETHODIMP CpEpEngine::verbose_logging(BOOL enable)
+{
+    verbose_mode = enable != 0;
+    return S_OK;
+}
 
 STDMETHODIMP CpEpEngine::log(BSTR title, BSTR entity, BSTR description, BSTR comment)
 {

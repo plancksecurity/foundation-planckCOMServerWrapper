@@ -32,7 +32,7 @@ protected:
     static int examine_identity(pEp_identity *ident, void *management);
 
 public:
-    CpEpEngine() : keymanagement_thread(NULL), identity_queue(NULL)
+    CpEpEngine() : keymanagement_thread(NULL), identity_queue(NULL), verbose_mode(false)
 	{
         PEP_STATUS status = ::init(&m_session);
         assert(status == PEP_STATUS_OK);
@@ -109,13 +109,25 @@ protected:
     static ::pEp_identity * retrieve_next_identity(void *management);
     HRESULT error(_bstr_t msg);
 
+    void verbose(string text)
+    {
+        if (verbose_mode) {
+            stringstream ss;
+            ss << __FILE__ << ":" << __LINE__ << " " << text;
+            ::log_event(get_session(), "verbose", "pEp COM Server Adapter", ss.str().c_str(), NULL);
+        }
+    }
+
 private:
     PEP_SESSION m_session;
     mutex session_mutex;
     atomic< identity_queue_t * > identity_queue;
     thread *keymanagement_thread;
+    bool verbose_mode;
 
 public:
+    STDMETHOD(verbose_logging)(BOOL enable);
+
     STDMETHOD(log)(BSTR title, BSTR entity, BSTR description, BSTR comment);
     STDMETHOD(decrypt)(BSTR ctext, BSTR * ptext, LPSAFEARRAY * key_list, pEp_STATUS * decrypt_status);
     STDMETHOD(decrypt_b)(BSTR ctext, LPSAFEARRAY * ptext, LPSAFEARRAY * key_list, pEp_STATUS * decrypt_status);
