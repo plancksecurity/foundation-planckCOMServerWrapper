@@ -3,8 +3,6 @@
 #include "stdafx.h"
 #include "CpEpEngine.h"
 
-#define VERBOSE(TEXT) if (verbose_mode) verbose(TEXT)
-
 using namespace std;
 using namespace pEp::utility;
 
@@ -996,7 +994,28 @@ STDMETHODIMP CpEpEngine::trust_personal_key(struct pEp_identity_s *ident, struct
         return E_FAIL;
     }
 
+    if (verbose_mode) {
+        stringstream ss;
+        ss << "trust_personal_key called with ";
+        ss << utf8_string(ident->address);
+        ss << L": ";
+        ss << ident->comm_type;
+        verbose(ss.str());
+    }
+
     PEP_STATUS status = ::trust_personal_key(get_session(), _ident);
+
+    if (verbose_mode) {
+        stringstream ss;
+        ss << "result ";
+        ss << status;
+        ss << " for ";
+        ss << _ident->address;
+        ss << L": ";
+        ss << _ident->comm_type;
+        verbose(ss.str());
+    }
+
     if (status == PEP_STATUS_OK)
         copy_identity(result, _ident);
 
