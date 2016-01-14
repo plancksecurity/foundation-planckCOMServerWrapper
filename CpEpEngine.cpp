@@ -823,7 +823,7 @@ STDMETHODIMP CpEpEngine::reset_trust(struct pEp_identity_s *ident)
         return E_FAIL;
     }
 
-    PEP_STATUS status = ::reset_trust(get_session(), _ident);
+    PEP_STATUS status = ::reset_trust(get_session(), _ident->fpr);
     free_identity(_ident);
 
     if (status == PEP_OUT_OF_MEMORY)
