@@ -156,7 +156,7 @@ public:
     STDMETHOD(myself)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
     STDMETHOD(update_identity)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
     STDMETHOD(key_compromized)(struct pEp_identity_s *ident);
-    STDMETHOD(reset_trust)(struct pEp_identity_s *ident);
+    STDMETHOD(key_reset_trust)(struct pEp_identity_s *ident);
     STDMETHOD(trust_personal_key)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
 
     // Message API
