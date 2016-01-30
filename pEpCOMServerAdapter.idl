@@ -140,9 +140,10 @@ interface IpEpEngine : IUnknown {
         pEp_rating_trusted_and_anonymized,
         pEp_rating_fully_anonymous,
 
-        pEp_rating_under_attack = -1,
-        pEp_rating_red = pEp_rating_under_attack,
-        pEp_rating_b0rken = -2
+        pEp_rating_mistrust = -1,
+        pEp_rating_red = pEp_rating_mistrust,
+        pEp_rating_b0rken = -2,
+        pEp_rating_under_attack = -3
     } pEp_color;
 
     typedef enum _pEp_text_format {
