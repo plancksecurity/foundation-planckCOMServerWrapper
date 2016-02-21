@@ -432,6 +432,27 @@ STDMETHODIMP CpEpEngine::trustwords(BSTR fpr, BSTR lang, LONG max_words, BSTR * 
     }
 }
 
+STDMETHODIMP CpEpEngine::get_crashdump_log(LONG maxlines, BSTR * log)
+{
+    assert(maxlines >= 0);
+    assert(log);
+
+    if (!(maxlines >= 0 && log))
+        return E_INVALIDARG;
+
+    char *_log;
+    PEP_STATUS status = ::get_crashdump_log(get_session(), (int) maxlines, &_log);
+    assert(status == PEP_STATUS_OK);
+    if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+    if (status != PEP_STATUS_OK || _log == NULL)
+        return FAIL(L"get_crashdump_log");
+
+    *log = utf16_bstr(_log);
+    pEp_free(_log);
+    return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::get_identity(BSTR address, pEp_identity_s * ident)
 {
     assert(address);

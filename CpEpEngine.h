@@ -145,6 +145,7 @@ public:
     STDMETHOD(recv_key)(BSTR pattern);
     STDMETHOD(find_keys)(BSTR pattern, LPSAFEARRAY * key_list);
     STDMETHOD(send_key)(BSTR pattern);
+    STDMETHOD(get_crashdump_log)(LONG maxlines, BSTR * log);
 
     // keymanagement API
 
