@@ -453,6 +453,51 @@ STDMETHODIMP CpEpEngine::get_crashdump_log(LONG maxlines, BSTR * log)
     return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::get_languagelist(BSTR * languages)
+{
+    assert(languages);
+
+    if (!languages)
+        return E_INVALIDARG;
+
+    char *_languages;
+    PEP_STATUS status = ::get_languagelist(get_session(), &_languages);
+    assert(status == PEP_STATUS_OK);
+    if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+    if (status != PEP_STATUS_OK || _languages == NULL)
+        return FAIL(L"get_languagelist");
+
+    *languages = utf16_bstr(_languages);
+    pEp_free(_languages);
+    return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::get_phrase(BSTR lang, LONG phrase_id, BSTR * phrase)
+{
+    assert(lang && phrase_id >= 0 && phrase);
+
+    if (!(lang && phrase_id >= 0 && phrase))
+        return E_INVALIDARG;
+
+    string _lang = utf8_string(lang);
+    assert(_lang.length() == 2);
+    if (_lang.length() != 2)
+        return E_INVALIDARG;
+
+    char *_phrase;
+    PEP_STATUS status = ::get_phrase(get_session(), _lang.c_str(), (int) phrase_id, &_phrase);
+    assert(status == PEP_STATUS_OK);
+    if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+    if (status != PEP_STATUS_OK || _phrase == NULL)
+        return FAIL(L"get_phrase");
+
+    *phrase = utf16_bstr(_phrase);
+    pEp_free(_phrase);
+    return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::get_identity(BSTR address, pEp_identity_s * ident)
 {
     assert(address);

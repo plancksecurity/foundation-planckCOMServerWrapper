@@ -49,6 +49,8 @@ interface IpEpEngine : IUnknown {
     HRESULT trustword([in] LONG value, [in, defaultvalue("en")] BSTR lang, [out, retval] BSTR * word);
     HRESULT trustwords([in] BSTR fpr, [in, defaultvalue("en")] BSTR lang, [in, defaultvalue(0)] LONG max_words, [out, retval] BSTR * words);
     HRESULT get_crashdump_log([in, defaultvalue(0)] LONG maxlines, [out, retval] BSTR * log);
+    HRESULT get_languagelist([out, retval] BSTR * languages);
+    HRESULT get_phrase([in] BSTR lang, [in] LONG phrase_id, [out, retval] BSTR * phrase);
 
     typedef enum _pEp_comm_type {
         pEp_ct_unknown = 0,
