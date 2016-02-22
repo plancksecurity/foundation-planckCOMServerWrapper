@@ -25,21 +25,21 @@ STDMETHODIMP CpEpEngine::InterfaceSupportsErrorInfo(REFIID riid)
 
 #define FAIL(msg) error(msg)
 
-STDMETHODIMP CpEpEngine::verbose_logging(BOOL enable)
+STDMETHODIMP CpEpEngine::verbose_logging(VARIANT_BOOL enable)
 {
-    verbose_mode = enable != FALSE;
+    verbose_mode = enable != VARIANT_FALSE;
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::passive_mode(BOOL enable)
+STDMETHODIMP CpEpEngine::passive_mode(VARIANT_BOOL enable)
 {
-    ::config_passive_mode(get_session(), enable != FALSE);
+    ::config_passive_mode(get_session(), enable != VARIANT_FALSE);
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::unencrypted_subject(BOOL enable)
+STDMETHODIMP CpEpEngine::unencrypted_subject(VARIANT_BOOL enable)
 {
-    ::config_unencrypted_subject(get_session(), enable != FALSE);
+    ::config_unencrypted_subject(get_session(), enable != VARIANT_FALSE);
     return S_OK;
 }
 

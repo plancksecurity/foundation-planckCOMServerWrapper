@@ -128,12 +128,12 @@ private:
 public:
     // runtime config of the adapter
 
-    STDMETHOD(verbose_logging)(BOOL enable);
+    STDMETHOD(verbose_logging)(VARIANT_BOOL enable);
     
     // runtime config of the engine
 
-    STDMETHOD(passive_mode)(BOOL enable);
-    STDMETHOD(unencrypted_subject)(BOOL enable);
+    STDMETHOD(passive_mode)(VARIANT_BOOL enable);
+    STDMETHOD(unencrypted_subject)(VARIANT_BOOL enable);
 
     // basic API
 

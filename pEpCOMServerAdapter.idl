@@ -17,12 +17,12 @@ import "ocidl.idl";
 interface IpEpEngine : IUnknown {
     // runtime config of the adapter
 
-    HRESULT verbose_logging([in] BOOL enable);
+    HRESULT verbose_logging([in] VARIANT_BOOL enable);
 
     // runtime config of the engine
 
-    HRESULT passive_mode([in] BOOL enable);
-    HRESULT unencrypted_subject([in] BOOL enable);
+    HRESULT passive_mode([in] VARIANT_BOOL enable);
+    HRESULT unencrypted_subject([in] VARIANT_BOOL enable);
 
     // basic API
 
