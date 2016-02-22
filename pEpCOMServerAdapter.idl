@@ -15,9 +15,18 @@ import "ocidl.idl";
     pointer_default(unique)
 ]
 interface IpEpEngine : IUnknown {
+    // runtime config of the adapter
+
     HRESULT verbose_logging([in] BOOL enable);
 
-    typedef   enum _pEp_STATUS {
+    // runtime config of the engine
+
+    HRESULT passive_mode([in] BOOL enable);
+    HRESULT unencrypted_subject([in] BOOL enable);
+
+    // basic API
+
+    typedef enum _pEp_STATUS {
         pEp_STATUS_OK = 0,
 
         pEp_KEY_NOT_FOUND = 0x0201,

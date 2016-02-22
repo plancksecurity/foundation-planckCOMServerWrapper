@@ -27,7 +27,19 @@ STDMETHODIMP CpEpEngine::InterfaceSupportsErrorInfo(REFIID riid)
 
 STDMETHODIMP CpEpEngine::verbose_logging(BOOL enable)
 {
-    verbose_mode = enable != 0;
+    verbose_mode = enable != FALSE;
+    return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::passive_mode(BOOL enable)
+{
+    ::config_passive_mode(get_session(), enable != FALSE);
+    return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::unencrypted_subject(BOOL enable)
+{
+    ::config_unencrypted_subject(get_session(), enable != FALSE);
     return S_OK;
 }
 

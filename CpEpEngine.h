@@ -126,7 +126,16 @@ private:
     bool verbose_mode;
 
 public:
+    // runtime config of the adapter
+
     STDMETHOD(verbose_logging)(BOOL enable);
+    
+    // runtime config of the engine
+
+    STDMETHOD(passive_mode)(BOOL enable);
+    STDMETHOD(unencrypted_subject)(BOOL enable);
+
+    // basic API
 
     STDMETHOD(log)(BSTR title, BSTR entity, BSTR description, BSTR comment);
     STDMETHOD(decrypt)(BSTR ctext, BSTR * ptext, LPSAFEARRAY * key_list, pEp_STATUS * decrypt_status);
