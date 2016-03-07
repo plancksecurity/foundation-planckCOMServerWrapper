@@ -29,9 +29,24 @@ interface IpEpEngine : IUnknown {
     typedef enum _pEp_STATUS {
         pEp_STATUS_OK = 0,
 
+        pEp_INIT_CANNOT_LOAD_GPGME = 0x0110,
+        pEp_INIT_GPGME_INIT_FAILED = 0x0111,
+        pEp_INIT_NO_GPG_HOME = 0x0112,
+        pEp_INIT_NETPGP_INIT_FAILED = 0x0113,
+
+        pEp_INIT_SQLITE3_WITHOUT_MUTEX = 0x0120,
+        pEp_INIT_CANNOT_OPEN_DB = 0x0121,
+        pEp_INIT_CANNOT_OPEN_SYSTEM_DB = 0x0122,
+
         pEp_KEY_NOT_FOUND = 0x0201,
         pEp_KEY_HAS_AMBIG_NAME = 0x0202,
         pEp_GET_KEY_FAILED = 0x0203,
+
+        pEp_CANNOT_FIND_IDENTITY = 0x0301,
+        pEp_CANNOT_SET_PERSON = 0x0381,
+        pEp_CANNOT_SET_PGP_KEYPAIR = 0x0382,
+        pEp_CANNOT_SET_IDENTITY = 0x0383,
+        pEp_CANNOT_SET_TRUST = 0x0384,
 
         pEp_UNENCRYPTED = 0x0400,
         pEp_VERIFIED = 0x0401,
@@ -42,7 +57,18 @@ interface IpEpEngine : IUnknown {
         pEp_DECRYPT_SIGNATURE_DOES_NOT_MATCH = 0x0406,
         pEp_VERIFY_NO_KEY = 0x0407,
         pEp_VERIFIED_AND_TRUSTED = 0x0408,
+        pEp_CANNOT_DECRYPT_UNKNOWN = 0x04ff,
 
+        pEp_TRUSTWORD_NOT_FOUND = 0x0501,
+
+        pEp_CANNOT_CREATE_KEY = 0x0601,
+        pEp_CANNOT_SEND_KEY = 0x0602,
+
+        pEp_PHRASE_NOT_FOUND = 0x0701,
+
+        pEp_COMMIT_FAILED = 0xff01,
+
+        pEp_CANNOT_CREATE_TEMP_FILE = -5,
         pEp_ILLEGAL_VALUE = -4,
         pEp_BUFFER_TOO_SMALL = -3,
         pEp_OUT_OF_MEMORY = -2,
@@ -76,16 +102,23 @@ interface IpEpEngine : IUnknown {
 
         pEp_ct_security_by_obscurity = 0x0a,
         pEp_ct_b0rken_crypto = 0x0b,
-        pEp_ct_key_too_short = 0x0e,
+        pEp_ct_key_too_short = 0x0c,
 
-        pEp_ct_compromized = 0x0f,                  // known compromized connection
+        pEp_ct_compromized = 0x0e,                  // known compromized connection
+        pEp_ct_mistrusted = 0x0f,                   // known mistrusted key
 
         // range 0x10 to 0x3f: unconfirmed encryption
 
         pEp_ct_unconfirmed_encryption = 0x10,       // generic
-        pEp_ct_OpenPGP_1024_RSA_unconfirmed = 0x11,	// RSA 1024 is weak
-        pEp_ct_OpenPGP_unconfirmed = 0x3f,          // key at least 2048 bit RSA
-        // or 1024 bit DSA
+        pEp_ct_OpenPGP_weak_unconfirmed = 0x11,     // RSA 1024 is weak
+
+        pEp_ct_to_be_checked = 0x20,                // generic
+        pEp_ct_SMIME_unconfirmed = 0x21,
+        pEp_ct_CMS_unconfirmed = 0x22,
+
+        pEp_ct_strong_but_unconfirmed = 0x30,       // generic
+        pEp_ct_OpenPGP_unconfirmed = 0x38,          // key at least 2048 bit RSA or EC
+        pEp_ct_OTR_unconfirmed = 0x3a,
 
         // range 0x40 to 0x7f: unconfirmed encryption and anonymization
 
@@ -98,8 +131,15 @@ interface IpEpEngine : IUnknown {
         // range 0x90 to 0xbf: confirmed encryption
 
         pEp_ct_confirmed_encryption = 0x90,         // generic
-        pEp_ct_OpenPGP_1024_RSA = 0x91, // RSA 1024 is weak
-        pEp_ct_OpenPGP = 0xbf, // key at least 2048 bit RSA or 1024 bit DSA
+        pEp_ct_OpenPGP_weak = 0x91,                 // RSA 1024 is weak
+
+        pEp_ct_to_be_checked_confirmed = 0xa0,      //generic
+        pEp_ct_SMIME = 0xa1,
+        pEp_ct_CMS = 0xa2,
+
+        pEp_ct_strong_encryption = 0xb0,            // generic
+        pEp_ct_OpenPGP = 0xb8,                      // key at least 2048 bit RSA or EC
+        pEp_ct_OTR = 0xba,
 
         // range 0xc0 to 0xff: confirmed encryption and anonymization
 
@@ -144,6 +184,7 @@ interface IpEpEngine : IUnknown {
         pEp_rating_cannot_decrypt,
         pEp_rating_have_no_key,
         pEp_rating_unencrypted,
+        pEp_rating_unencrypted_for_some,
         pEp_rating_unreliable,
         pEp_rating_reliable,
         pEp_rating_yellow = pEp_rating_reliable,
@@ -168,12 +209,6 @@ interface IpEpEngine : IUnknown {
         pEp_dir_incoming = 0,
         pEp_dir_outgoing
     } pEp_msg_direction;
-
-    typedef  enum _pEp_MIME_format {
-        pEp_MIME_none = 0,                      // message is not MIME encoded
-        pEp_MIME_fields_omitted,                // message content but no fields
-        pEp_MIME                                // message is fully MIME encoded
-    } pEp_MIME_format;
 
     typedef  enum _pEp_enc_format {
         pEp_enc_none = 0,                       // message is not encrypted
