@@ -177,6 +177,13 @@ interface IpEpEngine : IUnknown {
     HRESULT key_reset_trust([in] struct pEp_identity_s *ident);
     HRESULT trust_personal_key([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
 
+    // Blacklist API
+
+    HRESULT blacklist_add([in] BSTR fpr);
+    HRESULT blacklist_delete([in] BSTR fpr);
+    HRESULT blacklist_is_listed([in] BSTR fpr, [out, retval] VARIANT_BOOL *listed);
+    HRESULT blacklist_retrieve([out, retval] SAFEARRAY(BSTR) *blacklist);
+
     // Message API
 
     typedef enum _pEp_color {

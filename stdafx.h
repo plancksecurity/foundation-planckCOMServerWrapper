@@ -42,3 +42,4 @@
 #include "../../pEpEngine/src/keymanagement.h"
 #include "../../pEpEngine/src/message_api.h"
 #include "../../pEpEngine/src/stringpair.h"
+#include "../../pEpEngine/src/blacklist.h"

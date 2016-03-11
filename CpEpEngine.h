@@ -171,6 +171,13 @@ public:
     STDMETHOD(key_reset_trust)(struct pEp_identity_s *ident);
     STDMETHOD(trust_personal_key)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
 
+    // Blacklist API
+
+    STDMETHOD(blacklist_add)(BSTR fpr);
+    STDMETHOD(blacklist_delete)(BSTR fpr);
+    STDMETHOD(blacklist_is_listed)(BSTR fpr, VARIANT_BOOL *listed);
+    STDMETHOD(blacklist_retrieve)(SAFEARRAY **blacklist);
+
     // Message API
 
     STDMETHOD(encrypt_message)(text_message * src, text_message * dst, SAFEARRAY * extra);

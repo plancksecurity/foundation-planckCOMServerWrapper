@@ -961,6 +961,63 @@ int CpEpEngine::examine_identity(pEp_identity *ident, void *management)
     return _ident;
 }
 
+STDMETHODIMP CpEpEngine::blacklist_add(BSTR fpr)
+{
+    assert(fpr);
+
+    string _fpr = utf8_string(fpr);
+    PEP_STATUS status = ::blacklist_add(get_session(), _fpr.c_str());
+    assert(status == PEP_STATUS_OK);
+    if (status != PEP_STATUS_OK)
+        return FAIL(L"blacklist_add failed in pEp engine");
+
+    return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::blacklist_delete(BSTR fpr)
+{
+    assert(fpr);
+
+    string _fpr = utf8_string(fpr);
+    PEP_STATUS status = ::blacklist_delete(get_session(), _fpr.c_str());
+    assert(status == PEP_STATUS_OK);
+    if (status != PEP_STATUS_OK)
+        return FAIL(L"blacklist_delete failed in pEp engine");
+
+    return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::blacklist_is_listed(BSTR fpr, VARIANT_BOOL *listed)
+{
+    assert(fpr);
+    assert(listed);
+
+    string _fpr = utf8_string(fpr);
+    bool result;
+    PEP_STATUS status = ::blacklist_is_listed(get_session(), _fpr.c_str(), &result);
+    assert(status == PEP_STATUS_OK);
+    if (status != PEP_STATUS_OK)
+        return FAIL(L"blacklist_is_listed failed in pEp engine");
+
+    *listed = result ? VARIANT_TRUE : VARIANT_FALSE;
+    return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::blacklist_retrieve(SAFEARRAY **blacklist)
+{
+    assert(blacklist);
+
+    ::stringlist_t *_blacklist = NULL;
+    PEP_STATUS status = ::blacklist_retrieve(get_session(), &_blacklist);
+    assert(status == PEP_STATUS_OK);
+    if (status != PEP_STATUS_OK)
+        return FAIL(L"blacklist_retrieve failed in pEp engine");
+    assert(_blacklist);
+
+    *blacklist = string_array(_blacklist);
+    return S_OK;
+}
+
 HRESULT CpEpEngine::error(_bstr_t msg)
 {
     _bstr_t helpFile = L"";
