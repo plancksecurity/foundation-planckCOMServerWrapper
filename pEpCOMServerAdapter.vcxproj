@@ -45,6 +45,17 @@
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'">
+    <PostBuildEvent>
+      <Command>echo "registering server $(TargetPath)"
+"$(TargetPath)" /Regserver
+
+echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
+"$(SDK40ToolsPath)x64\TlbImp.exe" "$(TargetPath)" /out:"$(TargetDir)pEpCOMServerAdapter.Interop.dll" /namespace:pEpCOMServerAdapterLib /primary /keyfile:"$(SolutionDir)pEp\pEp_test.snk" /machine:Agnostic
+
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -77,15 +88,6 @@
       <AdditionalDependencies>comsuppwd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <PerUserRedirection>true</PerUserRedirection>
     </Link>
-    <PostBuildEvent>
-      <Command>echo "registering server $(TargetPath)"
-"$(TargetPath)" /Regserver
-
-echo "generating interop assembly $(TargetDir)\pEpCOMServerAdapter.Interop.dll"
-"$(SDK40ToolsPath)x64\TlbImp.exe" $(TargetPath) /out:$(TargetDir)\pEpCOMServerAdapter.Interop.dll /namespace:pEpCOMServerAdapterLib /primary /keyfile:"$(SolutionDir)\pep\pEp_test.snk" /machine:Agnostic
-
-</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
