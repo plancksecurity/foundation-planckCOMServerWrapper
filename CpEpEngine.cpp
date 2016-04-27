@@ -1041,6 +1041,37 @@ HRESULT CpEpEngine::error(_bstr_t msg)
     return E_FAIL;
 }
 
+STDMETHODIMP CpEpEngine::attach_own_key(text_message * src, text_message * dst)
+{
+    assert(src);
+    assert(dst);
+
+    ::message *_src = text_message_to_C(src);
+    ::message *msg_dst;
+
+    PEP_STATUS status = ::encrypt_message(get_session(), _src, NULL, &msg_dst, PEP_enc_none);
+
+    if (status == PEP_UNENCRYPTED)
+        text_message_from_C(dst, _src);
+
+    ::free_message(msg_dst);
+    ::free_message(_src);
+
+    if (status == PEP_OUT_OF_MEMORY) {
+        return E_OUTOFMEMORY;
+    }
+
+    if (status == PEP_UNENCRYPTED)
+    {
+        return S_OK;
+    }
+    else
+    {
+        return FAIL(L"cannot attach own key");
+    }
+}
+
+
 STDMETHODIMP CpEpEngine::encrypt_message(text_message * src, text_message * dst, SAFEARRAY * extra)
 {
     assert(src);

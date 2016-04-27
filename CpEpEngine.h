@@ -180,6 +180,7 @@ public:
 
     // Message API
 
+    STDMETHOD(attach_own_key)(text_message * src, text_message * dst);
     STDMETHOD(encrypt_message)(text_message * src, text_message * dst, SAFEARRAY * extra);
     STDMETHOD(decrypt_message)(text_message * src, text_message * dst, SAFEARRAY ** keylist, pEp_color *rating);
     STDMETHOD(outgoing_message_color)(text_message *msg, pEp_color * pVal);
