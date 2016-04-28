@@ -257,7 +257,6 @@ interface IpEpEngine : IUnknown {
         SAFEARRAY(struct opt_field) opt_fields;
     };
 
-    HRESULT attach_own_key([in] struct text_message *src, [out] struct text_message * dst);
     HRESULT encrypt_message([in] struct text_message *src, [out] struct text_message * dst, [in] SAFEARRAY(BSTR) extra);
     HRESULT decrypt_message([in] struct text_message *src, [out] struct text_message * dst, [out] SAFEARRAY(BSTR) *keylist, [out, retval] pEp_color *rating);
     HRESULT outgoing_message_color([in] struct text_message *msg, [out, retval] pEp_color * pVal);
