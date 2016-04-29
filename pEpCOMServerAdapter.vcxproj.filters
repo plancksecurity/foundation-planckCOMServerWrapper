@@ -37,7 +37,7 @@
     <ClCompile Include="utf8_helper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="pEp_utitlity.cpp">
+    <ClCompile Include="pEp_utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
