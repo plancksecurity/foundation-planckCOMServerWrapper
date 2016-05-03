@@ -144,7 +144,7 @@ public:
     STDMETHOD(encrypt_b)(SAFEARRAY * key_list, SAFEARRAY * ptext, BSTR * ctext, pEp_STATUS * status);
     STDMETHOD(trustword)(LONG value, BSTR lang, BSTR * word);
     STDMETHOD(trustwords)(BSTR fpr, BSTR lang, LONG max_words, BSTR * words);
-    STDMETHOD(get_identity)(BSTR address, pEp_identity_s * ident);
+    STDMETHOD(get_identity)(BSTR address, BSTR user_id, pEp_identity_s * ident);
     STDMETHOD(set_identity)(pEp_identity_s * ident);
     STDMETHOD(generate_keypair)(pEp_identity_s * ident, BSTR * fpr);
     STDMETHOD(delete_keypair)(BSTR fpr);

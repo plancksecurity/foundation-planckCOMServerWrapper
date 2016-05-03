@@ -156,7 +156,7 @@ interface IpEpEngine : IUnknown {
         BSTR lang;
     };
 
-    HRESULT get_identity([in] BSTR address, [out, retval] struct pEp_identity_s * ident);
+    HRESULT get_identity([in] BSTR address, [in] BSTR user_id, [out, retval] struct pEp_identity_s * ident);
     HRESULT set_identity([in] struct pEp_identity_s * ident);
     HRESULT generate_keypair([in] struct pEp_identity_s * ident, [out, retval] BSTR * fpr);
     HRESULT delete_keypair([in] BSTR fpr);

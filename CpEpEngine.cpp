@@ -510,20 +510,24 @@ STDMETHODIMP CpEpEngine::get_phrase(BSTR lang, LONG phrase_id, BSTR * phrase)
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::get_identity(BSTR address, pEp_identity_s * ident)
+STDMETHODIMP CpEpEngine::get_identity(BSTR address, BSTR user_id, pEp_identity_s * ident)
 {
     assert(address);
+    assert(user_id);
     assert(ident);
 
     if (address == NULL)
         return E_INVALIDARG;
-
+    if (user_id == NULL)
+        return E_INVALIDARG;
     if (ident == NULL)
         return E_INVALIDARG;
 
     string _address = utf8_string(address);
+    string _user_id = utf8_string(user_id);
+
     ::pEp_identity *_ident = NULL;
-    PEP_STATUS status = ::get_identity(get_session(), _address.c_str(), &_ident);
+    PEP_STATUS status = ::get_identity(get_session(), _address.c_str(), _user_id.c_str(), &_ident);
     assert(status != PEP_OUT_OF_MEMORY);
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
