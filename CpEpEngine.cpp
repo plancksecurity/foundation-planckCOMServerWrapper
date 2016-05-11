@@ -985,26 +985,31 @@ PEP_STATUS CpEpEngine::messageToSend(void * obj, const message *msg)
     return PEP_STATUS_OK;
 }
 
-sync_handshake_result CpEpEngine::showHandshake(void * obj, const pEp_identity *self, const pEp_identity *partner)
+PEP_STATUS CpEpEngine::showHandshake(void * obj, const pEp_identity *self, const pEp_identity *partner, sync_handshake_result *result)
 {
     assert(self && partner);
     if (!(self && partner))
-        return SYNC_HANDSHAKE_CANCEL;
+        return PEP_ILLEGAL_VALUE;
+
+    *result = SYNC_HANDSHAKE_CANCEL;
 
     pEp_identity_s _self;
     copy_identity(&_self, self);
     pEp_identity_s _partner;
     copy_identity(&_partner, partner);
     CpEpEngine *me = (CpEpEngine *) obj;
-    sync_handshake_result_s result;
-    HRESULT r = me->Fire_ShowHandshake(&_self, &_partner, &result);
+    sync_handshake_result_s _result;
+    HRESULT r = me->Fire_ShowHandshake(&_self, &_partner, &_result);
     assert(r == S_OK);
     clear_identity_s(_self);
     clear_identity_s(_partner);
+    if (r == E_OUTOFMEMORY)
+        return PEP_OUT_OF_MEMORY;
     if (r != S_OK)
-        return SYNC_HANDSHAKE_CANCEL;
+        return PEP_UNKNOWN_ERROR;
 
-    return (sync_handshake_result) (int) result;
+    *result = (sync_handshake_result) (int) _result;
+    return PEP_STATUS_OK;
 }
 
 STDMETHODIMP CpEpEngine::blacklist_add(BSTR fpr)

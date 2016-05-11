@@ -110,7 +110,7 @@ protected:
     typedef locked_queue<pEp_identity_cpp> identity_queue_t;
     static ::pEp_identity * retrieve_next_identity(void *management);
     static PEP_STATUS messageToSend(void *obj, const message *msg);
-    static sync_handshake_result showHandshake(void * obj, const pEp_identity *self, const pEp_identity *partner);
+    static PEP_STATUS showHandshake(void * obj, const pEp_identity *self, const pEp_identity *partner, sync_handshake_result *result);
 
     HRESULT error(_bstr_t msg);
 
