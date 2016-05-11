@@ -36,6 +36,9 @@ namespace pEp {
         };
 
         void copy_identity(pEp_identity_s * ident_s, const pEp_identity * ident);
+        void free_identity_strings(pEp_identity_s * ident_s);
+        void clear_identity_s(pEp_identity_s& ident);
+        void clear_text_message(text_message *msg);
         ::pEp_identity *new_identity(const pEp_identity_s * ident);
 
         static LPTYPELIB pTypelib = NULL;

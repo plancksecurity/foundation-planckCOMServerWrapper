@@ -978,6 +978,7 @@ PEP_STATUS CpEpEngine::messageToSend(void * obj, const message *msg)
     assert(r == S_OK);
     if (r == E_OUTOFMEMORY)
         return PEP_OUT_OF_MEMORY;
+    clear_text_message(&_msg);
     if (r != S_OK)
         return PEP_UNKNOWN_ERROR;
 
@@ -998,6 +999,8 @@ sync_handshake_result CpEpEngine::showHandshake(void * obj, const pEp_identity *
     sync_handshake_result_s result;
     HRESULT r = me->Fire_ShowHandshake(&_self, &_partner, &result);
     assert(r == S_OK);
+    clear_identity_s(_self);
+    clear_identity_s(_partner);
     if (r != S_OK)
         return SYNC_HANDSHAKE_CANCEL;
 
