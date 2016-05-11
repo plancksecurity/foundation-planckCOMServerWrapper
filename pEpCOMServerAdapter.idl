@@ -262,11 +262,11 @@ interface IpEpEngine : IUnknown {
     HRESULT outgoing_message_color([in] struct text_message *msg, [out, retval] pEp_color * pVal);
     HRESULT identity_color([in] struct pEp_identity_s * ident, [out, retval] pEp_color * pVal);
 
-    typedef enum _sync_handshake_result {
-        SYNC_HANDSHAKE_CANCEL = -1,
-        SYNC_HANDSHAKE_ACCEPTED = 0,
-        SYNC_HANDSHAKE_REJECTED = 1
-    } sync_handshake_result;
+    typedef enum _sync_handshake_result_s {
+        SYNC_HANDSHAKE_CANCEL_S = -1,
+        SYNC_HANDSHAKE_ACCEPTED_S = 0,
+        SYNC_HANDSHAKE_REJECTED_S = 1
+    } sync_handshake_result_s;
 };
 
 [
@@ -283,8 +283,8 @@ library pEpCOMServerAdapterLib
     {
     properties:
     methods:
-        [id(1)] HRESULT messageToSend([in] struct text_message * msg);
-        [id(2)] HRESULT showHandshake([in] struct pEp_identity_s * self, [in] struct pEp_identity_s * partner, [out, retval] sync_handshake_result *result);
+        [id(1)] HRESULT MessageToSend([in] struct text_message * msg);
+        [id(2)] HRESULT ShowHandshake([in] struct pEp_identity_s * self, [in] struct pEp_identity_s * partner, [out, retval] sync_handshake_result_s * result);
     };
     [
         uuid(EF1B073D-5058-4E0E-829E-B4D22CA21EA2)
