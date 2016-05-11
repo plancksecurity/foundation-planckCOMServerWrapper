@@ -976,9 +976,9 @@ PEP_STATUS CpEpEngine::messageToSend(void * obj, const message *msg)
     CpEpEngine *me = (CpEpEngine *) obj;
     HRESULT r = me->Fire_MessageToSend(&_msg);
     assert(r == S_OK);
+    clear_text_message(&_msg);
     if (r == E_OUTOFMEMORY)
         return PEP_OUT_OF_MEMORY;
-    clear_text_message(&_msg);
     if (r != S_OK)
         return PEP_UNKNOWN_ERROR;
 
