@@ -44,6 +44,7 @@ public:
     ~CpEpEngine()
     {
         stop_keyserver_lookup();
+        ::unregister_sync_callbacks(m_session);
         ::log_event(m_session, "Shutdown", "pEp COM Adapter", NULL, NULL);
         ::release(m_session);
     }
