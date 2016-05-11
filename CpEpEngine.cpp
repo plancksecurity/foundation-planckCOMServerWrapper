@@ -972,6 +972,8 @@ PEP_STATUS CpEpEngine::messageToSend(void * obj, const message *msg)
         return PEP_ILLEGAL_VALUE;
 
     text_message _msg;
+    memset(&_msg, 0, sizeof(text_message));
+
     text_message_from_C(&_msg, msg);
     CpEpEngine *me = (CpEpEngine *) obj;
     HRESULT r = me->Fire_MessageToSend(&_msg);
