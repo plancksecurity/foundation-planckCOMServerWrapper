@@ -37,6 +37,7 @@ public:
         PEP_STATUS status = ::init(&m_session);
         assert(status == PEP_STATUS_OK);
         ::register_examine_function(m_session, CpEpEngine::examine_identity, (void *)this);
+        ::register_sync_callbacks(m_session, (void*)this, messageToSend, showHandshake);
         ::log_event(m_session, "Startup", "pEp COM Adapter", NULL, NULL);
     }
 
@@ -108,7 +109,7 @@ protected:
     typedef locked_queue<pEp_identity_cpp> identity_queue_t;
     static ::pEp_identity * retrieve_next_identity(void *management);
     static PEP_STATUS messageToSend(void *obj, const message *msg);
-    static sync_handshake_result_s showHandshake(void * obj, const pEp_identity *self, const pEp_identity *partner);
+    static sync_handshake_result showHandshake(void * obj, const pEp_identity *self, const pEp_identity *partner);
 
     HRESULT error(_bstr_t msg);
 

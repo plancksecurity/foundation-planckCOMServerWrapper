@@ -984,11 +984,11 @@ PEP_STATUS CpEpEngine::messageToSend(void * obj, const message *msg)
     return PEP_STATUS_OK;
 }
 
-sync_handshake_result_s CpEpEngine::showHandshake(void * obj, const pEp_identity *self, const pEp_identity *partner)
+sync_handshake_result CpEpEngine::showHandshake(void * obj, const pEp_identity *self, const pEp_identity *partner)
 {
     assert(self && partner);
     if (!(self && partner))
-        return SYNC_HANDSHAKE_CANCEL_S;
+        return SYNC_HANDSHAKE_CANCEL;
 
     pEp_identity_s _self;
     copy_identity(&_self, self);
@@ -999,9 +999,9 @@ sync_handshake_result_s CpEpEngine::showHandshake(void * obj, const pEp_identity
     HRESULT r = me->Fire_ShowHandshake(&_self, &_partner, &result);
     assert(r == S_OK);
     if (r != S_OK)
-        return SYNC_HANDSHAKE_CANCEL_S;
+        return SYNC_HANDSHAKE_CANCEL;
 
-    return result;
+    return (sync_handshake_result) (int) result;
 }
 
 STDMETHODIMP CpEpEngine::blacklist_add(BSTR fpr)
