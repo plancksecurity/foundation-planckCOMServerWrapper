@@ -74,6 +74,6 @@ namespace pEp {
         }
 
         ::message * text_message_to_C(text_message *msg);
-        void text_message_from_C(text_message *msg2, ::message *msg);
+        void text_message_from_C(text_message *msg2, const ::message *msg);
     }
 }

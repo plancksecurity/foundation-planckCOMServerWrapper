@@ -284,7 +284,7 @@ library pEpCOMServerAdapterLib
     properties:
     methods:
         [id(1)] HRESULT MessageToSend([in] struct text_message * msg);
-        [id(2)] HRESULT ShowHandshake([in] struct pEp_identity_s * self, [in] struct pEp_identity_s * partner, [out, retval] sync_handshake_result_s * result);
+        [id(2)] HRESULT ShowHandshake([in] struct pEp_identity_s * self, [in] struct pEp_identity_s * partner, [in,out] sync_handshake_result_s * result);
     };
     [
         uuid(EF1B073D-5058-4E0E-829E-B4D22CA21EA2)

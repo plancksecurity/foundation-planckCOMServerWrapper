@@ -965,6 +965,27 @@ int CpEpEngine::examine_identity(pEp_identity *ident, void *management)
     return _ident;
 }
 
+PEP_STATUS CpEpEngine::messageToSend(void * obj, const message *msg)
+{
+    text_message _msg;
+    text_message_from_C(&_msg, msg);
+    CpEpEngine *me = (CpEpEngine *) obj;
+    me->Fire_MessageToSend(&_msg);
+    return PEP_STATUS_OK;
+}
+
+sync_handshake_result_s CpEpEngine::showHandshake(void * obj, const pEp_identity *self, const pEp_identity *partner)
+{
+    pEp_identity_s _self;
+    copy_identity(&_self, self);
+    pEp_identity_s _partner;
+    copy_identity(&_partner, partner);
+    CpEpEngine *me = (CpEpEngine *) obj;
+    sync_handshake_result_s result;
+    me->Fire_ShowHandshake(&_self, &_partner, &result);
+    return result;
+}
+
 STDMETHODIMP CpEpEngine::blacklist_add(BSTR fpr)
 {
     assert(fpr);

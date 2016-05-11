@@ -107,6 +107,9 @@ protected:
 
     typedef locked_queue<pEp_identity_cpp> identity_queue_t;
     static ::pEp_identity * retrieve_next_identity(void *management);
+    static PEP_STATUS messageToSend(void *obj, const message *msg);
+    static sync_handshake_result_s showHandshake(void * obj, const pEp_identity *self, const pEp_identity *partner);
+
     HRESULT error(_bstr_t msg);
 
     void verbose(string text)

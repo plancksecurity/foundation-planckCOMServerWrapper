@@ -159,7 +159,7 @@ echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
     <ClInclude Include="targetver.h" />
     <ClInclude Include="utf8_helper.h" />
     <ClInclude Include="xdlldata.h" />
-    <ClInclude Include="_IpEpEngineEvents_CP.h" />
+    <ClInclude Include="_IpEpEngineEvents_CP.H" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="pEpCOMServerAdapter.rc" />

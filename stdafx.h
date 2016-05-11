@@ -43,3 +43,4 @@
 #include "../../pEpEngine/src/message_api.h"
 #include "../../pEpEngine/src/stringpair.h"
 #include "../../pEpEngine/src/blacklist.h"
+#include "../../pEpEngine/src/sync.h"

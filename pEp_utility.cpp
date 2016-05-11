@@ -284,7 +284,7 @@ namespace pEp {
             memset(msg, 0, sizeof(text_message));
         }
 
-        void text_message_from_C(text_message *msg2, ::message *msg)
+        void text_message_from_C(text_message *msg2, const ::message *msg)
         {
             assert(msg2);
             assert(msg);
