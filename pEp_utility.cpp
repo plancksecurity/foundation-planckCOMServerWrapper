@@ -289,7 +289,7 @@ namespace pEp {
             assert(msg2);
             assert(msg);
 
-            clear_text_message(msg2);
+            memset(msg2, 0, sizeof(text_message));
 
             msg2->dir = (pEp_msg_direction) msg->dir;
             msg2->id = bstr(msg->id);
