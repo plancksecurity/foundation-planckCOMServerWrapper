@@ -967,22 +967,40 @@ int CpEpEngine::examine_identity(pEp_identity *ident, void *management)
 
 PEP_STATUS CpEpEngine::messageToSend(void * obj, const message *msg)
 {
+    assert(msg);
+    if (msg == NULL)
+        return PEP_ILLEGAL_VALUE;
+
     text_message _msg;
     text_message_from_C(&_msg, msg);
     CpEpEngine *me = (CpEpEngine *) obj;
-    me->Fire_MessageToSend(&_msg);
+    HRESULT r = me->Fire_MessageToSend(&_msg);
+    assert(r == S_OK);
+    if (r == E_OUTOFMEMORY)
+        return PEP_OUT_OF_MEMORY;
+    if (r != S_OK)
+        return PEP_UNKNOWN_ERROR;
+
     return PEP_STATUS_OK;
 }
 
 sync_handshake_result_s CpEpEngine::showHandshake(void * obj, const pEp_identity *self, const pEp_identity *partner)
 {
+    assert(self && partner);
+    if (!(self && partner))
+        return SYNC_HANDSHAKE_CANCEL_S;
+
     pEp_identity_s _self;
     copy_identity(&_self, self);
     pEp_identity_s _partner;
     copy_identity(&_partner, partner);
     CpEpEngine *me = (CpEpEngine *) obj;
     sync_handshake_result_s result;
-    me->Fire_ShowHandshake(&_self, &_partner, &result);
+    HRESULT r = me->Fire_ShowHandshake(&_self, &_partner, &result);
+    assert(r == S_OK);
+    if (r != S_OK)
+        return SYNC_HANDSHAKE_CANCEL_S;
+
     return result;
 }
 
