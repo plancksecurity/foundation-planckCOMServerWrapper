@@ -987,13 +987,11 @@ PEP_STATUS CpEpEngine::messageToSend(void * obj, const message *msg)
     return PEP_STATUS_OK;
 }
 
-PEP_STATUS CpEpEngine::showHandshake(void * obj, const pEp_identity *self, const pEp_identity *partner, sync_handshake_result *result)
+PEP_STATUS CpEpEngine::showHandshake(void * obj, const pEp_identity *self, const pEp_identity *partner)
 {
     assert(self && partner);
     if (!(self && partner))
         return PEP_ILLEGAL_VALUE;
-
-    *result = SYNC_HANDSHAKE_CANCEL;
 
     pEp_identity_s _self;
     copy_identity(&_self, self);
@@ -1010,8 +1008,8 @@ PEP_STATUS CpEpEngine::showHandshake(void * obj, const pEp_identity *self, const
     if (r != S_OK)
         return PEP_UNKNOWN_ERROR;
 
-    *result = (sync_handshake_result) (int) _result;
-    return PEP_STATUS_OK;
+    PEP_STATUS status = deliverHandshakeResult(me->get_session(), (sync_handshake_result) (int) _result);
+    return status;
 }
 
 STDMETHODIMP CpEpEngine::blacklist_add(BSTR fpr)
