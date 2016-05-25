@@ -107,6 +107,34 @@ protected:
         return session(this);
     }
 
+	class callbacks
+	{
+	private:
+		CpEpEngine *me;
+
+	public:
+		callbacks(CpEpEngine *myself)
+		{
+			me = myself;
+			me->callback_mutex.lock();
+		}
+
+		~callbacks()
+		{
+			me->callback_mutex.unlock();
+		}
+
+		operator vector<IpEpEngineCallbacks *>& ()
+		{
+			return me->callback_vector;
+		}
+	};
+
+	callbacks get_callbacks()
+	{
+		return callbacks(this);
+	}
+
     typedef locked_queue<pEp_identity_cpp> identity_queue_t;
     static ::pEp_identity * retrieve_next_identity(void *management);
     static PEP_STATUS messageToSend(void *obj, const message *msg);
@@ -129,6 +157,9 @@ private:
     atomic< identity_queue_t * > identity_queue;
     thread *keymanagement_thread;
     bool verbose_mode;
+
+	mutex callback_mutex;
+	vector<IpEpEngineCallbacks*> callback_vector;
 
 public:
     // runtime config of the adapter
@@ -190,6 +221,19 @@ public:
     STDMETHOD(outgoing_message_color)(text_message *msg, pEp_color * pVal);
     STDMETHOD(identity_color)(pEp_identity_s * ident, pEp_color * pVal);
 
+	// Event callbacks
+
+	STDMETHOD(register_callbacks)(IpEpEngineCallbacks *new_callback);
+	STDMETHOD(unregister_callbacks)(IpEpEngineCallbacks *obsolete_callback);
+
+protected:
+	HRESULT Fire_MessageToSend(
+		/* [in] */ struct text_message *msg);
+
+	HRESULT Fire_ShowHandshake(
+		/* [in] */ struct pEp_identity_s *self,
+		/* [in] */ struct pEp_identity_s *partner,
+		/* [retval][out] */ sync_handshake_result_s *result);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)
