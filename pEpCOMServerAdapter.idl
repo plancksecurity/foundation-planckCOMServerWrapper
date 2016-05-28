@@ -302,7 +302,9 @@ library pEpCOMServerAdapterLib
     {
     properties:
     methods:
-    };
+		// test code - remove before shipping
+		// [id(1)] HRESULT TestEvent([in] LONG test,[in] BSTR testtest);
+	};
     [
         uuid(EF1B073D-5058-4E0E-829E-B4D22CA21EA2)
     ]

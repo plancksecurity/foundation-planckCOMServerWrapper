@@ -812,9 +812,11 @@ STDMETHODIMP CpEpEngine::myself(struct pEp_identity_s *ident, struct pEp_identit
         return E_OUTOFMEMORY;
 
 	// DEBUG CODE - REMOVE BEFORE RELEASE!
-	//sync_handshake_result_s handshakeResult;
+	// sync_handshake_result_s handshakeResult;
 	//
-	//HRESULT res = Fire_ShowHandshake(ident, result, &handshakeResult);
+	// HRESULT res = Fire_ShowHandshake(ident, result, &handshakeResult);
+	// 
+	// HRESULT res2 = Fire_TestEvent(15, _bstr_t( "hallo"));
 
     PEP_STATUS status = ::myself(get_session(), _ident);
 
