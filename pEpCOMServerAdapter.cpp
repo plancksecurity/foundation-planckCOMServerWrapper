@@ -35,7 +35,13 @@ public:
 
     GateKeeper(CpEpCOMServerAdapterModule * const self) : _self(self), now(time(NULL)), next(now + time_diff())
     {
+        LONG lResult = RegOpenCurrentUser(KEY_READ, &cu);
+        assert(lResult == ERROR_SUCCESS);
+    }
 
+    ~GateKeeper()
+    {
+        RegCloseKey(cu);
     }
 
     void keep();
@@ -43,20 +49,26 @@ public:
     void keep_plugin();
     void keep_updated();
 
+protected:
+    static const LPCTSTR plugin_reg_path;
+    static const LPCTSTR plugin_reg_value_name;
+
 private:
     time_t now;
     time_t next;
+    HKEY cu;
 
     CpEpCOMServerAdapterModule * const _self;
 };
+
+const LPCTSTR GateKeeper::plugin_reg_path = _T("Software\\Microsoft\\Office\\Outlook\\Addins\\pEp");
+const LPCTSTR GateKeeper::plugin_reg_value_name = _T("LoadBehavior");
 
 void GateKeeper::keep()
 {
     while (1) {
         keep_plugin();
 
-        Sleep(10000);
-        
         now = time(NULL);
         assert(now != -1);
         
@@ -64,12 +76,25 @@ void GateKeeper::keep()
             next = now + GateKeeper::cycle;
             keep_updated();
         }
+
+        Sleep(10000);
     }
 }
 
 void GateKeeper::keep_plugin()
 {
+    DWORD value;
+    DWORD size;
+    LONG lResult = RegGetValue(cu, plugin_reg_path, plugin_reg_value_name, RRF_RT_REG_DWORD, NULL, &value, &size);
 
+    assert(lResult == ERROR_SUCCESS);
+    if (lResult != ERROR_SUCCESS)
+        return;
+
+    if (value != 3) {
+        lResult = RegSetValue(cu, plugin_reg_path, RRF_RT_REG_DWORD, plugin_reg_value_name, 3);
+        assert(lResult == ERROR_SUCCESS);
+    }
 }
 
 void GateKeeper::keep_updated()
