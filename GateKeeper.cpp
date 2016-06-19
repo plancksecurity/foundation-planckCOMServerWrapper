@@ -45,8 +45,6 @@ void GateKeeper::keep()
 
 void GateKeeper::keep_plugin()
 {
-    MessageBox(NULL, _T("test"), _T("keep_plugin"), MB_ICONINFORMATION | MB_TOPMOST);
-
     DWORD value;
     DWORD size;
 
