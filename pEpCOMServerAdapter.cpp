@@ -16,8 +16,13 @@ class CpEpCOMServerAdapterModule : public ATL::CAtlExeModuleT< CpEpCOMServerAdap
 public:
     CpEpCOMServerAdapterModule() : ATL::CAtlExeModuleT< CpEpCOMServerAdapterModule >(), gatekeeper_thread(NULL)
     {
-        gatekeeper_thread = new thread(gatekeeper, this);
-        gatekeeper_thread->detach();
+        try {
+            gatekeeper_thread = new thread(gatekeeper, this);
+            gatekeeper_thread->detach();
+        }
+        catch (system_error&) {
+
+        }
     }
 
 	DECLARE_LIBID(LIBID_pEpCOMServerAdapterLib)
