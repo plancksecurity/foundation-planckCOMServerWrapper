@@ -35,6 +35,7 @@ namespace pEp {
 
         void keep_plugin();
 
+        string handshake(HINTERNET hUrl);
         void update_product(product p, DWORD context);
         product_list& registered_products();
         void keep_updated();

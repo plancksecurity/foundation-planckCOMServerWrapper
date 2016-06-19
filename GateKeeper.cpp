@@ -114,6 +114,15 @@ namespace pEp {
         return products;
     }
 
+    string GateKeeper::handshake(HINTERNET hUrl)
+    {
+        string key;
+
+        // handshake key
+        
+        return key;
+    }
+
     void GateKeeper::update_product(product p, DWORD context)
     {
         HINTERNET hUrl = InternetOpenUrl(internet, p.second.c_str(), NULL, 0,
