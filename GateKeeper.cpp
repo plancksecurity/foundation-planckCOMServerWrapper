@@ -14,7 +14,7 @@ namespace pEp {
     const DWORD GateKeeper::waiting = 10000; // 10000 ms is 10 sec
 
     GateKeeper::GateKeeper(CpEpCOMServerAdapterModule * const self)
-        : _self(self), now(time(NULL)), next(now + time_diff()), hkUpdater(NULL)
+        : _self(self), now(time(NULL)), next(now + time_diff()), hkUpdater(NULL), internet(NULL)
     {
         LONG lResult = RegOpenCurrentUser(KEY_READ, &cu);
         assert(lResult == ERROR_SUCCESS);
@@ -114,17 +114,30 @@ namespace pEp {
         return products;
     }
 
-    void GateKeeper::update_product(product p)
+    void GateKeeper::update_product(product p, DWORD context)
     {
+        HINTERNET hUrl = InternetOpenUrl(internet, p.second.c_str(), NULL, 0,
+                INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_UI | INTERNET_FLAG_SECURE, context);
+        if (hUrl == NULL)
+            return;
 
+        // update
+
+        InternetCloseHandle(hUrl);
     }
 
     void GateKeeper::keep_updated()
     {
+        internet = InternetOpen(_T("pEp"), INTERNET_OPEN_TYPE_PROXY, NULL, NULL, 0);
+
         product_list& products = registered_products();
+        DWORD context = 0;
         for (auto i = products.begin(); i != products.end(); i++) {
-            update_product(*i);
+            update_product(*i, context++);
         }
+
+        InternetCloseHandle(internet);
+        internet = NULL;
     }
 
 } // namespace pEp

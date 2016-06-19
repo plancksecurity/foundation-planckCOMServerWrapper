@@ -35,7 +35,7 @@ namespace pEp {
 
         void keep_plugin();
 
-        void update_product(product p);
+        void update_product(product p, DWORD context);
         product_list& registered_products();
         void keep_updated();
 
@@ -45,6 +45,7 @@ namespace pEp {
         bool cu_open;
         HKEY cu;
         HKEY hkUpdater;
+        HINTERNET internet;
 
         CpEpCOMServerAdapterModule * const _self;
     };
