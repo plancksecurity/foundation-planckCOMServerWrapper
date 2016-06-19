@@ -27,6 +27,8 @@
 
 #include <comutil.h>
 
+#include <Wininet.h>
+
 #include <vector>
 #include <sstream>
 #include <string>
