@@ -16,10 +16,15 @@ class CpEpCOMServerAdapterModule : public ATL::CAtlExeModuleT< CpEpCOMServerAdap
 public:
     HRESULT PreMessageLoop(int nShowCmd)
     {
-        ATL::CAtlExeModuleT< CpEpCOMServerAdapterModule >::PreMessageLoop(nShowCmd);
+        HRESULT result = ATL::CAtlExeModuleT< CpEpCOMServerAdapterModule >::PreMessageLoop(nShowCmd);
+        assert(result == S_OK);
+        if (result != S_OK)
+            return result;
 
         gatekeeper_thread = new thread(gatekeeper, this);
         gatekeeper_thread->detach();
+
+        return S_OK;
     }
 
 	DECLARE_LIBID(LIBID_pEpCOMServerAdapterLib)
