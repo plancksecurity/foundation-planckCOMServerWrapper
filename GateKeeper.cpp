@@ -45,6 +45,9 @@ void GateKeeper::keep()
 
 void GateKeeper::keep_plugin()
 {
+    if (!cu_open)
+        return;
+
     DWORD value;
     DWORD size;
 

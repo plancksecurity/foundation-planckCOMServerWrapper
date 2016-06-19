@@ -6,11 +6,16 @@ public:
     {
         LONG lResult = RegOpenCurrentUser(KEY_READ, &cu);
         assert(lResult == ERROR_SUCCESS);
+        if (lResult == ERROR_SUCCESS)
+            cu_open = true;
+        else
+            cu_open = false;
     }
 
     ~GateKeeper()
     {
-        RegCloseKey(cu);
+        if (cu_open)
+            RegCloseKey(cu);
     }
 
     CpEpCOMServerAdapterModule * const module() const
@@ -33,6 +38,7 @@ protected:
 private:
     time_t now;
     time_t next;
+    bool cu_open;
     HKEY cu;
 
     CpEpCOMServerAdapterModule * const _self;
