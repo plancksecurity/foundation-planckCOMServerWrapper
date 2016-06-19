@@ -1,45 +1,51 @@
 class CpEpCOMServerAdapterModule;
 
-class GateKeeper {
-public:
-    GateKeeper(CpEpCOMServerAdapterModule * const self) : _self(self), now(time(NULL)), next(now + time_diff())
-    {
-        LONG lResult = RegOpenCurrentUser(KEY_READ, &cu);
-        assert(lResult == ERROR_SUCCESS);
-        if (lResult == ERROR_SUCCESS)
-            cu_open = true;
-        else
-            cu_open = false;
-    }
+namespace pEp {
 
-    ~GateKeeper()
-    {
-        if (cu_open)
-            RegCloseKey(cu);
-    }
+#ifdef UNICODE
+    typedef std::wstring tstring;
+#else
+    typedef std::string tstring;
+#endif
 
-    CpEpCOMServerAdapterModule * const module() const
-    {
-        return _self;
-    }
+    class GateKeeper {
+    public:
+        typedef std::pair<tstring, tstring> product;
+        typedef std::vector< product > product_list;
 
-    void keep();
+        GateKeeper(CpEpCOMServerAdapterModule * const self);
+        ~GateKeeper();
 
-protected:
-    static const LPCTSTR plugin_reg_path;
-    static const LPCTSTR plugin_reg_value_name;
-    static const time_t cycle;
-    static const DWORD waiting;
+        CpEpCOMServerAdapterModule * const module() const
+        {
+            return _self;
+        }
 
-    static time_t time_diff();
-    void keep_plugin();
-    void keep_updated();
+        void keep();
 
-private:
-    time_t now;
-    time_t next;
-    bool cu_open;
-    HKEY cu;
+    protected:
+        static const LPCTSTR plugin_reg_path;
+        static const LPCTSTR plugin_reg_value_name;
+        static const LPCTSTR updater_reg_path;
 
-    CpEpCOMServerAdapterModule * const _self;
-};
+        static const time_t cycle;
+        static const DWORD waiting;
+
+        static time_t time_diff();
+
+        void keep_plugin();
+
+        void update_product(product p);
+        product_list& registered_products();
+        void keep_updated();
+
+    private:
+        time_t now;
+        time_t next;
+        bool cu_open;
+        HKEY cu;
+        HKEY hkUpdater;
+
+        CpEpCOMServerAdapterModule * const _self;
+    };
+}

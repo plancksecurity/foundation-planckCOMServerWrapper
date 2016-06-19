@@ -37,7 +37,7 @@ private:
 
 void CpEpCOMServerAdapterModule::gatekeeper(CpEpCOMServerAdapterModule * const self)
 {
-    GateKeeper keeper(self);
+    pEp::GateKeeper keeper(self);
     keeper.keep();
 }
 

@@ -4,64 +4,127 @@
 
 using namespace std;
 
-const LPCTSTR GateKeeper::plugin_reg_path = _T("Software\\Microsoft\\Office\\Outlook\\Addins\\pEp");
-const LPCTSTR GateKeeper::plugin_reg_value_name = _T("LoadBehavior");
+namespace pEp {
 
-const time_t GateKeeper::cycle = 7200;   // 7200 sec is 2 h
-const DWORD GateKeeper::waiting = 10000; // 10000 ms is 10 sec
+    const LPCTSTR GateKeeper::plugin_reg_path = _T("Software\\Microsoft\\Office\\Outlook\\Addins\\pEp");
+    const LPCTSTR GateKeeper::plugin_reg_value_name = _T("LoadBehavior");
+    const LPCTSTR GateKeeper::updater_reg_path = _T("Software\\pEp\\Updater";)
 
-time_t GateKeeper::time_diff()
-{
-    try {
-        static random_device rd;
-        static mt19937 gen(rd());
+    const time_t GateKeeper::cycle = 7200;   // 7200 sec is 2 h
+    const DWORD GateKeeper::waiting = 10000; // 10000 ms is 10 sec
 
-        uniform_int_distribution<time_t> dist(0, cycle);
+    GateKeeper::GateKeeper(CpEpCOMServerAdapterModule * const self)
+        : _self(self), now(time(NULL)), next(now + time_diff()), hkUpdater(NULL)
+    {
+        LONG lResult = RegOpenCurrentUser(KEY_READ, &cu);
+        assert(lResult == ERROR_SUCCESS);
+        if (lResult == ERROR_SUCCESS)
+            cu_open = true;
+        else
+            cu_open = false;
 
-        return dist(gen);
+        if (cu_open) {
+            LONG lResult = RegOpenKeyEx(cu, updater_reg_path, 0, KEY_READ, &hkUpdater);
+            assert(lResult == ERROR_SUCCESS);
+            if (lResult != ERROR_SUCCESS)
+                return;
+        }
     }
-    catch (exception&) {
-        assert(0);
-        return 0;
+    
+    GateKeeper::~GateKeeper()
+    {
+        if (cu_open) {
+            if (hkUpdater)
+                RegCloseKey(hkUpdater);
+            RegCloseKey(cu);
+        }
     }
-}
 
-void GateKeeper::keep()
-{
-    while (1) {
-        keep_plugin();
+    time_t GateKeeper::time_diff()
+    {
+        try {
+            static random_device rd;
+            static mt19937 gen(rd());
 
-        now = time(NULL);
-        assert(now != -1);
+            uniform_int_distribution<time_t> dist(0, cycle);
 
-        if (now > next) {
-            next = now + GateKeeper::cycle;
-            keep_updated();
+            return dist(gen);
+        }
+        catch (exception&) {
+            assert(0);
+            return 0;
+        }
+    }
+
+    void GateKeeper::keep()
+    {
+        if (!cu_open)
+            return;
+
+        while (1) {
+            keep_plugin();
+
+            now = time(NULL);
+            assert(now != -1);
+
+            if (now > next) {
+                next = now + GateKeeper::cycle;
+                keep_updated();
+            }
+
+            Sleep(waiting);
+        }
+    }
+
+    void GateKeeper::keep_plugin()
+    {
+        DWORD value;
+        DWORD size;
+
+        LONG lResult = RegGetValue(cu, plugin_reg_path, plugin_reg_value_name, RRF_RT_REG_DWORD, NULL, &value, &size);
+        if (lResult != ERROR_SUCCESS)
+            return;
+
+        if (value != 3) {
+            lResult = RegSetValue(cu, plugin_reg_path, RRF_RT_REG_DWORD, plugin_reg_value_name, 3);
+            assert(lResult == ERROR_SUCCESS);
+        }
+    }
+
+    GateKeeper::product_list& GateKeeper::registered_products()
+    {
+        static product_list products;
+
+        // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724872(v=vs.85).aspx
+        static TCHAR value_name[16384];
+        DWORD value_name_size;
+        static TCHAR value[L_MAX_URL_LENGTH + 1];
+        DWORD value_size;
+
+        products.empty();
+
+        LONG lResult = ERROR_SUCCESS;
+        for (DWORD i = 0; lResult == ERROR_SUCCESS; i++) {
+            value_size = L_MAX_URL_LENGTH + 1;
+            lResult = RegEnumValue(hkUpdater, 0, value_name, &value_name_size, NULL, NULL, (LPBYTE) value, &value_size);
+            if (lResult == ERROR_SUCCESS)
+                products.push_back({ value_name, value });
         }
 
-        Sleep(waiting);
+        return products;
     }
-}
 
-void GateKeeper::keep_plugin()
-{
-    if (!cu_open)
-        return;
+    void GateKeeper::update_product(product p)
+    {
 
-    DWORD value;
-    DWORD size;
-
-    LONG lResult = RegGetValue(cu, plugin_reg_path, plugin_reg_value_name, RRF_RT_REG_DWORD, NULL, &value, &size);
-    if (lResult != ERROR_SUCCESS)
-        return;
-
-    if (value != 3) {
-        lResult = RegSetValue(cu, plugin_reg_path, RRF_RT_REG_DWORD, plugin_reg_value_name, 3);
-        assert(lResult == ERROR_SUCCESS);
     }
-}
 
-void GateKeeper::keep_updated()
-{
+    void GateKeeper::keep_updated()
+    {
+        product_list& products = registered_products();
+        for (auto i = products.begin(); i != products.end(); i++) {
+            update_product(*i);
+        }
+    }
 
-}
+} // namespace pEp
