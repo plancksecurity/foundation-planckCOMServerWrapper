@@ -27,6 +27,8 @@
 
 #include <comutil.h>
 
+#include <Wininet.h>
+
 #include <vector>
 #include <sstream>
 #include <string>
@@ -35,6 +37,7 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
+#include <random>
 
 #include <assert.h>
 

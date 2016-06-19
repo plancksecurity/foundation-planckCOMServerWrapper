@@ -85,7 +85,7 @@ echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>comsuppwd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comsuppwd.lib;%(AdditionalDependencies);Wininet.lib</AdditionalDependencies>
       <PerUserRedirection>true</PerUserRedirection>
     </Link>
   </ItemDefinitionGroup>
@@ -120,11 +120,12 @@ echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <RegisterOutput>true</RegisterOutput>
-      <AdditionalDependencies>comsuppw.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comsuppw.lib;%(AdditionalDependencies);Wininet.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CpEpEngine.cpp" />
+    <ClCompile Include="GateKeeper.cpp" />
     <ClCompile Include="pEpCOMServerAdapter.cpp" />
     <ClCompile Include="pEpCOMServerAdapter_i.c">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
@@ -151,6 +152,7 @@ echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CpEpEngine.h" />
+    <ClInclude Include="GateKeeper.h" />
     <ClInclude Include="locked_queue.hh" />
     <ClInclude Include="pEpCOMServerAdapter_i.h" />
     <ClInclude Include="pEp_utility.h" />

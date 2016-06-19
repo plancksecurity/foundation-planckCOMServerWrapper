@@ -40,6 +40,9 @@
     <ClCompile Include="pEp_utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GateKeeper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -71,6 +74,9 @@
     </ClInclude>
     <ClInclude Include="_IpEpEngineEvents_CP.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GateKeeper.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
