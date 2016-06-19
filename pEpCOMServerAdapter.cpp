@@ -14,8 +14,10 @@ using namespace std;
 class CpEpCOMServerAdapterModule : public ATL::CAtlExeModuleT< CpEpCOMServerAdapterModule >
 {
 public:
-    CpEpCOMServerAdapterModule() : ATL::CAtlExeModuleT< CpEpCOMServerAdapterModule >(), gatekeeper_thread(NULL)
+    HRESULT PreMessageLoop(int nShowCmd)
     {
+        ATL::CAtlExeModuleT< CpEpCOMServerAdapterModule >::PreMessageLoop(nShowCmd);
+
         gatekeeper_thread = new thread(gatekeeper, this);
         gatekeeper_thread->detach();
     }

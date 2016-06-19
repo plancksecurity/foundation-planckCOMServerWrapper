@@ -13,6 +13,11 @@ public:
         RegCloseKey(cu);
     }
 
+    CpEpCOMServerAdapterModule * const module() const
+    {
+        return _self;
+    }
+
     void keep();
 
 protected:
