@@ -625,7 +625,7 @@ STDMETHODIMP CpEpEngine::import_key(BSTR key_data)
 
     string _key_data = utf8_string(key_data);
 
-    PEP_STATUS status = ::import_key(get_session(), _key_data.c_str(), _key_data.length());
+    PEP_STATUS status = ::import_key(get_session(), _key_data.c_str(), _key_data.length(), NULL);
     assert(status != PEP_OUT_OF_MEMORY);
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
@@ -643,7 +643,7 @@ STDMETHODIMP CpEpEngine::import_key_b(SAFEARRAY * key_data)
     if (key_data == NULL)
         return E_INVALIDARG;
 
-    ::PEP_STATUS status = ::import_key(get_session(), (const char *) key_data->pvData, key_data->rgsabound[0].cElements);
+    ::PEP_STATUS status = ::import_key(get_session(), (const char *) key_data->pvData, key_data->rgsabound[0].cElements, NULL);
     assert(status != ::PEP_OUT_OF_MEMORY);
     if (status == ::PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
@@ -1133,7 +1133,9 @@ STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst,
     ::stringlist_t *_keylist;
     ::PEP_color _rating;
 
-    PEP_STATUS status = ::decrypt_message(get_session(), _src, &msg_dst, &_keylist, &_rating);
+    PEP_decrypt_flags_t flags = 0; 
+    PEP_STATUS status = ::decrypt_message(get_session(), _src, &msg_dst, &_keylist, &_rating, &flags);
+    // TODO : output decrypt flags.
 
     if (msg_dst)
         text_message_from_C(dst, msg_dst);
