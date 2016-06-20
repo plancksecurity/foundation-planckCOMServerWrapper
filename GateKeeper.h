@@ -1,17 +1,19 @@
 class CpEpCOMServerAdapterModule;
 
+using namespace std;
+
 namespace pEp {
 
 #ifdef UNICODE
-    typedef std::wstring tstring;
+    typedef wstring tstring;
 #else
-    typedef std::string tstring;
+    typedef string tstring;
 #endif
 
     class GateKeeper {
     public:
-        typedef std::pair<tstring, tstring> product;
-        typedef std::vector< product > product_list;
+        typedef pair<tstring, tstring> product;
+        typedef vector< product > product_list;
 
         GateKeeper(CpEpCOMServerAdapterModule * const self);
         ~GateKeeper();

@@ -131,12 +131,17 @@ namespace pEp {
             return;
 
         // update
+        PCTSTR rgpszAcceptTypes[] = { _T("text/plain"), NULL };
+        HINTERNET hRequest = HttpOpenRequest(hUrl, NULL, _T("challenge"), NULL, NULL, rgpszAcceptTypes, INTERNET_FLAG_NO_UI | INTERNET_FLAG_SECURE, context);
+
 
         InternetCloseHandle(hUrl);
     }
 
     void GateKeeper::keep_updated()
     {
+        return; // disabled for now
+
         internet = InternetOpen(_T("pEp"), INTERNET_OPEN_TYPE_PROXY, NULL, NULL, 0);
 
         product_list& products = registered_products();
