@@ -7,6 +7,26 @@
 import "oaidl.idl";
 import "ocidl.idl";
 
+
+typedef enum _sync_handshake_result_s {
+	SYNC_HANDSHAKE_CANCEL_S = -1,
+	SYNC_HANDSHAKE_ACCEPTED_S = 0,
+	SYNC_HANDSHAKE_REJECTED_S = 1
+} sync_handshake_result_s;
+
+[
+	object,
+	uuid(3BA1B15B-27EF-433C-B780-0D08F46B0FF3),
+	oleautomation,
+	nonextensible,
+	pointer_default(unique)
+]
+interface IpEpEngineCallbacks : IUnknown {
+	[id(1)] HRESULT MessageToSend([in] struct text_message * msg);
+	[id(2)] HRESULT ShowHandshake([in] struct pEp_identity_s * self, [in] struct pEp_identity_s * partner, [out, retval] sync_handshake_result_s * result);
+};
+
+
 [
     object,
     uuid(9A9F4422-CF0A-45D7-90CD-1D1B7B2A4540),
@@ -262,11 +282,10 @@ interface IpEpEngine : IUnknown {
     HRESULT outgoing_message_color([in] struct text_message *msg, [out, retval] pEp_color * pVal);
     HRESULT identity_color([in] struct pEp_identity_s * ident, [out, retval] pEp_color * pVal);
 
-    typedef enum _sync_handshake_result_s {
-        SYNC_HANDSHAKE_CANCEL_S = -1,
-        SYNC_HANDSHAKE_ACCEPTED_S = 0,
-        SYNC_HANDSHAKE_REJECTED_S = 1
-    } sync_handshake_result_s;
+
+	HRESULT register_callbacks([in] IpEpEngineCallbacks* new_callback);
+
+	HRESULT unregister_callbacks([in] IpEpEngineCallbacks* obsolete_callback);
 };
 
 [
@@ -283,9 +302,9 @@ library pEpCOMServerAdapterLib
     {
     properties:
     methods:
-        [id(1)] HRESULT MessageToSend([in] struct text_message * msg);
-        [id(2)] HRESULT ShowHandshake([in] struct pEp_identity_s * self, [in] struct pEp_identity_s * partner, [in,out] sync_handshake_result_s * result);
-    };
+		// test code - remove before shipping
+		// [id(1)] HRESULT TestEvent([in] LONG test,[in] BSTR testtest);
+	};
     [
         uuid(EF1B073D-5058-4E0E-829E-B4D22CA21EA2)
     ]

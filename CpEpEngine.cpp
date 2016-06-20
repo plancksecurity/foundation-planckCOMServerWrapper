@@ -811,6 +811,13 @@ STDMETHODIMP CpEpEngine::myself(struct pEp_identity_s *ident, struct pEp_identit
     if (_ident == NULL)
         return E_OUTOFMEMORY;
 
+	// DEBUG CODE - REMOVE BEFORE RELEASE!
+	// sync_handshake_result_s handshakeResult;
+	//
+	// HRESULT res = Fire_ShowHandshake(ident, result, &handshakeResult);
+	// 
+	// HRESULT res2 = Fire_TestEvent(15, _bstr_t( "hallo"));
+
     PEP_STATUS status = ::myself(get_session(), _ident);
 
     if (status == PEP_STATUS_OK) {
@@ -1245,4 +1252,67 @@ STDMETHODIMP CpEpEngine::trust_personal_key(struct pEp_identity_s *ident, struct
         return FAIL(L"failure while executing trust_personal_key()");
 
     return S_OK;
+}
+
+
+// Event callbacks
+
+STDMETHODIMP CpEpEngine::register_callbacks(IpEpEngineCallbacks* new_callbacks) 
+{
+	callbacks cbs = get_callbacks();
+	vector<IpEpEngineCallbacks*>& vec = cbs;
+
+	vec.push_back(new_callbacks);
+	new_callbacks->AddRef();
+
+	return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::unregister_callbacks(IpEpEngineCallbacks* obsolete_callbacks) 
+{
+	callbacks cbs = get_callbacks();
+	vector<IpEpEngineCallbacks*>& vec = cbs;
+
+	auto position = std::find(vec.begin(), vec.end(), obsolete_callbacks);
+	if (position != vec.end()) {
+		vec.erase(position);
+		obsolete_callbacks->Release();
+		return S_OK;
+	}
+
+	return S_FALSE;
+}
+
+HRESULT CpEpEngine::Fire_MessageToSend(text_message * msg)
+{
+	callbacks cbs = get_callbacks();
+	vector<IpEpEngineCallbacks*>& vec = cbs;
+
+	assert(msg);
+
+	for (auto it = vec.begin(); it != vec.end(); ++it) 
+	{
+		auto res = (*it)->MessageToSend(msg);
+		if (res != S_OK)
+			return res;
+	}
+	return S_OK;
+}
+
+HRESULT CpEpEngine::Fire_ShowHandshake(pEp_identity_s * self, pEp_identity_s * partner, sync_handshake_result_s * result)
+{
+	callbacks cbs = get_callbacks();
+	vector<IpEpEngineCallbacks*>& vec = cbs;
+
+	assert(self);
+	assert(partner);
+	assert(result);
+
+	for (auto it = vec.begin(); it != vec.end(); ++it)
+	{
+		auto res = (*it)->ShowHandshake(self, partner, result);
+		if (res != S_OK)
+			return res;
+	}
+	return S_OK;
 }
