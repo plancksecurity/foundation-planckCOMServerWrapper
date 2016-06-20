@@ -1140,8 +1140,9 @@ STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst,
     ::stringlist_t *_keylist;
     ::PEP_color _rating;
 
+    PEP_decrypt_flags_t flags = 0; 
+    PEP_STATUS status = ::decrypt_message(get_session(), _src, &msg_dst, &_keylist, &_rating, &flags);
     // TODO : output decrypt flags.
-    PEP_STATUS status = ::decrypt_message(get_session(), _src, &msg_dst, &_keylist, &_rating, NULL);
 
     if (msg_dst)
         text_message_from_C(dst, msg_dst);
