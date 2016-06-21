@@ -82,7 +82,7 @@ namespace pEp {
         while (!_self->m_bComInitialized)
             Sleep(1);
 
-        MessageBox(NULL, _T("test"), _T("keep_plugin"), MB_ICONINFORMATION | MB_TOPMOST);
+        // MessageBox(NULL, _T("test"), _T("keep_plugin"), MB_ICONINFORMATION | MB_TOPMOST);
 
         DWORD value;
         DWORD size;
@@ -128,8 +128,19 @@ namespace pEp {
 
         uniform_int_distribution<time_t> dist(0, UINT64_MAX);
 
-        key.ll_key[0] = dist(gen);
-        key.ll_key[1] = dist(gen);
+        key.qw_key[0] = dist(gen);
+        key.qw_key[1] = dist(gen);
+
+        return key;
+    }
+
+    string GateKeeper::wrapped_delivery_key(aeskey_t key)
+    {
+        string result;
+
+        // ...
+
+        return result;
     }
 
     GateKeeper::product_list& GateKeeper::registered_products()

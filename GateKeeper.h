@@ -18,7 +18,7 @@ namespace pEp {
             uint8_t c_key[16];
             uint16_t w_key[8];
             uint32_t dw_key[4];
-            uint64_t ll_key[2];
+            uint64_t qw_key[2];
         };
 
         GateKeeper(CpEpCOMServerAdapterModule * const self);
@@ -45,6 +45,7 @@ namespace pEp {
 
         string update_key();
         aeskey_t delivery_key();
+        string wrapped_delivery_key(aeskey_t key);
 
         void update_product(product p, DWORD context);
         product_list& registered_products();

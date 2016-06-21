@@ -28,6 +28,7 @@
 #include <comutil.h>
 
 #include <Wininet.h>
+#include <bcrypt.h>
 
 #include <vector>
 #include <sstream>
