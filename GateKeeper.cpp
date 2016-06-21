@@ -97,7 +97,7 @@ namespace pEp {
         }
     }
 
-    string GateKeeper::updateKey()
+    string GateKeeper::update_key()
     {
         static string key;
 
