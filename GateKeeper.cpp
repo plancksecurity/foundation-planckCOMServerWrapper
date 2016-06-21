@@ -119,6 +119,19 @@ namespace pEp {
         return key;
     }
 
+    GateKeeper::aeskey_t GateKeeper::delivery_key()
+    {
+        aeskey_t key;
+
+        static random_device rd;
+        static mt19937 gen(rd());
+
+        uniform_int_distribution<time_t> dist(0, UINT64_MAX);
+
+        key.ll_key[0] = dist(gen);
+        key.ll_key[1] = dist(gen);
+    }
+
     GateKeeper::product_list& GateKeeper::registered_products()
     {
         static product_list products;
@@ -140,15 +153,6 @@ namespace pEp {
         }
 
         return products;
-    }
-
-    string GateKeeper::handshake(HINTERNET hUrl)
-    {
-        string key;
-
-        // handshake key
-        
-        return key;
     }
 
     void GateKeeper::update_product(product p, DWORD context)

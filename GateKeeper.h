@@ -14,6 +14,12 @@ namespace pEp {
     public:
         typedef pair<tstring, tstring> product;
         typedef vector< product > product_list;
+        union aeskey_t {
+            uint8_t c_key[16];
+            uint16_t w_key[8];
+            uint32_t dw_key[4];
+            uint64_t ll_key[2];
+        };
 
         GateKeeper(CpEpCOMServerAdapterModule * const self);
         ~GateKeeper();
@@ -38,7 +44,8 @@ namespace pEp {
         void keep_plugin();
 
         string update_key();
-        string handshake(HINTERNET hUrl);
+        aeskey_t delivery_key();
+
         void update_product(product p, DWORD context);
         product_list& registered_products();
         void keep_updated();

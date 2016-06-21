@@ -38,6 +38,7 @@
 #include <mutex>
 #include <atomic>
 #include <random>
+#include <bitset>
 
 #include <assert.h>
 
