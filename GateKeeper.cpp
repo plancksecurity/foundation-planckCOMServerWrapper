@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "GateKeeper.h"
+#include "pEpCOMServerAdapter.h"
 
 using namespace std;
 
@@ -78,6 +79,11 @@ namespace pEp {
 
     void GateKeeper::keep_plugin()
     {
+        while (!_self->m_bComInitialized)
+            Sleep(1);
+
+        MessageBox(NULL, _T("test"), _T("keep_plugin"), MB_ICONINFORMATION | MB_TOPMOST);
+
         DWORD value;
         DWORD size;
 
@@ -89,6 +95,28 @@ namespace pEp {
             lResult = RegSetValue(cu, plugin_reg_path, RRF_RT_REG_DWORD, plugin_reg_value_name, 3);
             assert(lResult == ERROR_SUCCESS);
         }
+    }
+
+    string GateKeeper::updateKey()
+    {
+        static string key;
+
+        if (key.length() == 0) {
+            HRSRC res = FindResource(_self->hModule(), MAKEINTRESOURCE(IRD_UPDATEKEY), RT_RCDATA);
+            assert(res);
+            if (!res)
+                throw runtime_error("FindResource: IRD_UPDATEKEY");
+
+            HGLOBAL hRes = LoadResource(_self->hModule(), res);
+            assert(hRes);
+            if (!hRes)
+                throw runtime_error("LoadResource: IRD_UPDATEKEY");
+
+            key = string((char *)LockResource(hRes), SizeofResource(_self->hModule(), res));
+            UnlockResource(hRes);
+        }
+
+        return key;
     }
 
     GateKeeper::product_list& GateKeeper::registered_products()
