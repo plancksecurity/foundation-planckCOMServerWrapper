@@ -14,7 +14,7 @@ namespace pEp {
     const time_t GateKeeper::cycle = 7200;   // 7200 sec is 2 h
     const DWORD GateKeeper::waiting = 10000; // 10000 ms is 10 sec
 
-    GateKeeper::GateKeeper(CpEpCOMServerAdapterModule * const self)
+    GateKeeper::GateKeeper(CpEpCOMServerAdapterModule * self)
         : _self(self), now(time(NULL)), next(now + time_diff()), hkUpdater(NULL), internet(NULL), hAES(NULL), hRSA(NULL)
     {
         LONG lResult = RegOpenCurrentUser(KEY_READ, &cu);
@@ -145,7 +145,43 @@ namespace pEp {
         string result;
 
         BCRYPT_KEY_HANDLE hUpdateKey;
+        string _update_key = update_key();
 
+        NTSTATUS status = BCryptImportKeyPair(hRSA, NULL, BCRYPT_RSAPUBLIC_BLOB, &hUpdateKey,
+                (PUCHAR) _update_key.data(), _update_key.size(), 0);
+        if (status)
+            throw runtime_error("BCryptImportKeyPair: update_key");
+
+        static random_device rd;
+        static mt19937 gen(rd());
+        uniform_int_distribution<time_t> dist(0, UINT64_MAX);
+        uint64_t r[32];
+        for (int i = 0; i < 32; i++)
+            r[i] = dist(gen);
+
+        BCRYPT_OAEP_PADDING_INFO pi;
+        pi.pszAlgId = BCRYPT_SHA256_ALGORITHM;
+        pi.pbLabel = (PUCHAR) r;
+        pi.cbLabel = sizeof(r);
+
+        ULONG result_size;
+        PUCHAR _result;
+        status = BCryptEncrypt(hUpdateKey, (PUCHAR) _update_key.data(), _update_key.size(), &pi, NULL, 0, NULL, 0, &result_size, BCRYPT_PAD_OAEP);
+        if (status)
+            throw runtime_error("BCryptEncrypt: calculating result size");
+
+        _result = new UCHAR[result_size];
+        ULONG copied;
+        status = BCryptEncrypt(hUpdateKey, (PUCHAR) _update_key.data(), _update_key.size(), &pi, NULL, 0, _result, result_size, &copied, BCRYPT_PAD_OAEP);
+        if (status)
+            throw runtime_error("BCryptEncrypt: calculating result size");
+
+        stringstream s;
+        s << hex << _result;
+        delete[] _result;
+        s >> result;
+
+        BCryptDestroyKey(hUpdateKey);
         return result;
     }
 

@@ -11,7 +11,7 @@
 using namespace ATL;
 using namespace std;
 
-void CpEpCOMServerAdapterModule::gatekeeper(CpEpCOMServerAdapterModule * const self)
+void CpEpCOMServerAdapterModule::gatekeeper(CpEpCOMServerAdapterModule * self)
 {
     pEp::GateKeeper keeper(self);
     keeper.keep();

@@ -21,7 +21,7 @@ namespace pEp {
             uint64_t qw_key[2];
         };
 
-        GateKeeper(CpEpCOMServerAdapterModule * const self);
+        GateKeeper(CpEpCOMServerAdapterModule * self);
         ~GateKeeper();
 
         CpEpCOMServerAdapterModule * const module() const
