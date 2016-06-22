@@ -160,6 +160,7 @@ namespace pEp {
             r[i] = dist(gen);
 
         BCRYPT_OAEP_PADDING_INFO pi;
+        memset(&pi, 0, sizeof(BCRYPT_OAEP_PADDING_INFO));
         pi.pszAlgId = BCRYPT_SHA256_ALGORITHM;
         pi.pbLabel = (PUCHAR) r;
         pi.cbLabel = sizeof(r);
@@ -167,14 +168,19 @@ namespace pEp {
         ULONG result_size;
         PUCHAR _result = NULL;
         status = BCryptEncrypt(hUpdateKey, (PUCHAR) _update_key.data(), _update_key.size(), &pi, NULL, 0, NULL, 0, &result_size, BCRYPT_PAD_OAEP);
-        if (status)
+        if (status) {
+            BCryptDestroyKey(hUpdateKey);
             throw runtime_error("BCryptEncrypt: calculating result size");
+        }
 
         _result = new UCHAR[result_size];
         ULONG copied;
         status = BCryptEncrypt(hUpdateKey, (PUCHAR) _update_key.data(), _update_key.size(), &pi, NULL, 0, _result, result_size, &copied, BCRYPT_PAD_OAEP);
-        if (status)
+        if (status) {
+            BCryptDestroyKey(hUpdateKey);
+            delete[] _result;
             throw runtime_error("BCryptEncrypt: encrypting using update_key");
+        }
 
         stringstream s;
         s << hex << setw(2) << setfill('0');
