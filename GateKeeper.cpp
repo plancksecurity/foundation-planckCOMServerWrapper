@@ -140,7 +140,7 @@ namespace pEp {
         return hKey;
     }
 
-    string GateKeeper::wrapped_delivery_key(BCRYPT_KEY_HANDLE hKey)
+    string GateKeeper::wrapped_delivery_key(BCRYPT_KEY_HANDLE hDeliveryKey)
     {
         string result;
 
@@ -154,7 +154,7 @@ namespace pEp {
 
         aeskey_t _delivery_key;
         ULONG copied;
-        status = BCryptExportKey(delivery_key(), NULL, BCRYPT_KEY_DATA_BLOB, (PUCHAR) &_delivery_key, sizeof(aeskey_t), &copied, 0);
+        status = BCryptExportKey(hDeliveryKey, NULL, BCRYPT_KEY_DATA_BLOB, (PUCHAR) &_delivery_key, sizeof(aeskey_t), &copied, 0);
         if (status)
             throw runtime_error("BCryptExportKey: delivery_key");
 
