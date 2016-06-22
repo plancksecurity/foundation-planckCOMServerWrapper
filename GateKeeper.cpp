@@ -15,7 +15,7 @@ namespace pEp {
     const DWORD GateKeeper::waiting = 10000; // 10000 ms is 10 sec
 
     GateKeeper::GateKeeper(CpEpCOMServerAdapterModule * const self)
-        : _self(self), now(time(NULL)), next(now + time_diff()), hkUpdater(NULL), internet(NULL)
+        : _self(self), now(time(NULL)), next(now + time_diff()), hkUpdater(NULL), internet(NULL), hAES(NULL), hRSA(NULL)
     {
         LONG lResult = RegOpenCurrentUser(KEY_READ, &cu);
         assert(lResult == ERROR_SUCCESS);
@@ -82,7 +82,7 @@ namespace pEp {
         while (!_self->m_bComInitialized)
             Sleep(1);
 
-        // MessageBox(NULL, _T("test"), _T("keep_plugin"), MB_ICONINFORMATION | MB_TOPMOST);
+        MessageBox(NULL, _T("test"), _T("keep_plugin"), MB_ICONINFORMATION | MB_TOPMOST);
 
         DWORD value;
         DWORD size;
@@ -119,7 +119,7 @@ namespace pEp {
         return key;
     }
 
-    GateKeeper::aeskey_t GateKeeper::delivery_key()
+    BCRYPT_KEY_HANDLE GateKeeper::delivery_key()
     {
         aeskey_t key;
 
@@ -131,14 +131,20 @@ namespace pEp {
         key.qw_key[0] = dist(gen);
         key.qw_key[1] = dist(gen);
 
-        return key;
+        BCRYPT_KEY_HANDLE hKey;
+        NTSTATUS status = BCryptGenerateSymmetricKey(hAES, &hKey, NULL, 0, (PUCHAR) &key, (ULONG) sizeof(aeskey_t), 0);
+        assert(status == 0);
+        if (status)
+            throw runtime_error("BCryptGenerateSymmetricKey");
+
+        return hKey;
     }
 
-    string GateKeeper::wrapped_delivery_key(aeskey_t key)
+    string GateKeeper::wrapped_delivery_key(BCRYPT_KEY_HANDLE hKey)
     {
         string result;
 
-        // ...
+        BCRYPT_KEY_HANDLE hUpdateKey;
 
         return result;
     }
@@ -185,7 +191,19 @@ namespace pEp {
     {
         return; // disabled for now
 
+        NTSTATUS status = BCryptOpenAlgorithmProvider(&hAES, BCRYPT_AES_ALGORITHM, MS_PRIMITIVE_PROVIDER, 0);
+        assert(status == 0);
+        if (status)
+            goto closing;
+
+        status = BCryptOpenAlgorithmProvider(&hRSA, BCRYPT_RSA_ALGORITHM, MS_PRIMITIVE_PROVIDER, 0);
+        assert(status == 0);
+        if (status)
+            goto closing;
+
         internet = InternetOpen(_T("pEp"), INTERNET_OPEN_TYPE_PROXY, NULL, NULL, 0);
+        if (!internet)
+            goto closing;
 
         product_list& products = registered_products();
         DWORD context = 0;
@@ -193,8 +211,16 @@ namespace pEp {
             update_product(*i, context++);
         }
 
-        InternetCloseHandle(internet);
+    closing:
+        if (internet)
+            InternetCloseHandle(internet);
+        if (hAES)
+            BCryptCloseAlgorithmProvider(hAES, 0);
+        if (hRSA)
+            BCryptCloseAlgorithmProvider(hRSA, 0);
         internet = NULL;
+        hAES = NULL;
+        hRSA = NULL;
     }
 
 } // namespace pEp

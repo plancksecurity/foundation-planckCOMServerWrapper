@@ -44,8 +44,8 @@ namespace pEp {
         void keep_plugin();
 
         string update_key();
-        aeskey_t delivery_key();
-        string wrapped_delivery_key(aeskey_t key);
+        BCRYPT_KEY_HANDLE delivery_key();
+        string wrapped_delivery_key(BCRYPT_KEY_HANDLE key);
 
         void update_product(product p, DWORD context);
         product_list& registered_products();
@@ -58,6 +58,8 @@ namespace pEp {
         HKEY cu;
         HKEY hkUpdater;
         HINTERNET internet;
+        BCRYPT_ALG_HANDLE hAES;
+        BCRYPT_ALG_HANDLE hRSA;
 
         CpEpCOMServerAdapterModule * _self;
     };
