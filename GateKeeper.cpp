@@ -152,6 +152,12 @@ namespace pEp {
         if (status)
             throw runtime_error("BCryptImportKeyPair: update_key");
 
+        aeskey_t _delivery_key;
+        ULONG copied;
+        status = BCryptExportKey(delivery_key(), NULL, BCRYPT_KEY_DATA_BLOB, (PUCHAR) &_delivery_key, sizeof(aeskey_t), &copied, 0);
+        if (status)
+            throw runtime_error("BCryptExportKey: delivery_key");
+
         static random_device rd;
         static mt19937 gen(rd());
         uniform_int_distribution<time_t> dist(0, UINT64_MAX);
@@ -167,20 +173,21 @@ namespace pEp {
 
         ULONG result_size;
         PUCHAR _result = NULL;
-        status = BCryptEncrypt(hUpdateKey, (PUCHAR) _update_key.data(), _update_key.size(), &pi, NULL, 0, NULL, 0, &result_size, BCRYPT_PAD_OAEP);
+        status = BCryptEncrypt(hUpdateKey, (PUCHAR) &_delivery_key, sizeof(aeskey_t), &pi, NULL, 0, NULL, 0, &result_size, BCRYPT_PAD_OAEP);
         if (status) {
             BCryptDestroyKey(hUpdateKey);
             throw runtime_error("BCryptEncrypt: calculating result size");
         }
 
         _result = new UCHAR[result_size];
-        ULONG copied;
-        status = BCryptEncrypt(hUpdateKey, (PUCHAR) _update_key.data(), _update_key.size(), &pi, NULL, 0, _result, result_size, &copied, BCRYPT_PAD_OAEP);
+        status = BCryptEncrypt(hUpdateKey, (PUCHAR) &_delivery_key, sizeof(aeskey_t), &pi, NULL, 0, _result, result_size, &copied, BCRYPT_PAD_OAEP);
         if (status) {
             BCryptDestroyKey(hUpdateKey);
             delete[] _result;
             throw runtime_error("BCryptEncrypt: encrypting using update_key");
         }
+
+        BCryptDestroyKey(hUpdateKey);
 
         stringstream s;
         s << hex << setw(2) << setfill('0');
@@ -189,7 +196,6 @@ namespace pEp {
         delete[] _result;
         s >> result;
 
-        BCryptDestroyKey(hUpdateKey);
         return result;
     }
 
