@@ -39,7 +39,7 @@
 #include <mutex>
 #include <atomic>
 #include <random>
-#include <bitset>
+#include <iomanip>
 
 #include <assert.h>
 

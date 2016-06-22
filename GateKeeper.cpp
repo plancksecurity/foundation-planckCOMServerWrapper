@@ -165,7 +165,7 @@ namespace pEp {
         pi.cbLabel = sizeof(r);
 
         ULONG result_size;
-        PUCHAR _result;
+        PUCHAR _result = NULL;
         status = BCryptEncrypt(hUpdateKey, (PUCHAR) _update_key.data(), _update_key.size(), &pi, NULL, 0, NULL, 0, &result_size, BCRYPT_PAD_OAEP);
         if (status)
             throw runtime_error("BCryptEncrypt: calculating result size");
@@ -174,10 +174,12 @@ namespace pEp {
         ULONG copied;
         status = BCryptEncrypt(hUpdateKey, (PUCHAR) _update_key.data(), _update_key.size(), &pi, NULL, 0, _result, result_size, &copied, BCRYPT_PAD_OAEP);
         if (status)
-            throw runtime_error("BCryptEncrypt: calculating result size");
+            throw runtime_error("BCryptEncrypt: encrypting using update_key");
 
         stringstream s;
-        s << hex << _result;
+        s << hex << setw(2) << setfill('0');
+        for (ULONG i = 0; i < copied; i++)
+            s << (int) _result[i];
         delete[] _result;
         s >> result;
 
