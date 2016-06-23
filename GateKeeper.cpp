@@ -2,8 +2,111 @@
 
 #include "GateKeeper.h"
 #include "pEpCOMServerAdapter.h"
+#include "utf8_helper.h"
 
 using namespace std;
+
+// https://gist.github.com/mcdurdin/5626617
+
+struct PUBLIC_KEY_VALUES {
+    BLOBHEADER blobheader;
+    RSAPUBKEY rsapubkey;
+    BYTE modulus[4096];
+};
+
+static void ReverseMemCopy(
+    _Out_ BYTE       *pbDest,
+    _In_  BYTE const *pbSource,
+    _In_  DWORD       cb
+    )
+{
+    for (DWORD i = 0; i < cb; i++) {
+        pbDest[cb - 1 - i] = pbSource[i];
+    }
+}
+
+static NTSTATUS ImportRsaPublicKey(
+    _In_ BCRYPT_ALG_HANDLE  hAlg,    // CNG provider
+    _In_ PUBLIC_KEY_VALUES *pKey,    // Pointer to the RSAPUBKEY blob.
+    _In_ BCRYPT_KEY_HANDLE *phKey    // Receives a handle the imported public key.
+    )
+{
+    NTSTATUS hr = 0;
+
+    BYTE *pbPublicKey = NULL;
+    DWORD cbKey = 0;
+
+    // Layout of the RSA public key blob:
+
+    //  +----------------------------------------------------------------+
+    //  |     BCRYPT_RSAKEY_BLOB    | BE( dwExp ) |   BE( Modulus )      |
+    //  +----------------------------------------------------------------+
+    //
+    //  sizeof(BCRYPT_RSAKEY_BLOB)       cbExp           cbModulus 
+    //  <--------------------------><------------><---------------------->
+    //
+    //   BE = Big Endian Format                                                     
+
+    DWORD cbModulus = (pKey->rsapubkey.bitlen + 7) / 8;
+    DWORD dwExp = pKey->rsapubkey.pubexp;
+    DWORD cbExp = (dwExp & 0xFF000000) ? 4 :
+        (dwExp & 0x00FF0000) ? 3 :
+        (dwExp & 0x0000FF00) ? 2 : 1;
+
+    BCRYPT_RSAKEY_BLOB *pRsaBlob;
+    PBYTE pbCurrent;
+
+    if (!SUCCEEDED(hr = DWordAdd(cbModulus, sizeof(BCRYPT_RSAKEY_BLOB), &cbKey))) {
+        goto cleanup;
+    }
+
+    cbKey += cbExp;
+
+    pbPublicKey = (PBYTE) CoTaskMemAlloc(cbKey);
+    if (pbPublicKey == NULL) {
+        hr = E_OUTOFMEMORY;
+        goto cleanup;
+    }
+
+    ZeroMemory(pbPublicKey, cbKey);
+    pRsaBlob = (BCRYPT_RSAKEY_BLOB *) (pbPublicKey);
+
+    //
+    // Make the Public Key Blob Header
+    //
+
+    pRsaBlob->Magic = BCRYPT_RSAPUBLIC_MAGIC;
+    pRsaBlob->BitLength = pKey->rsapubkey.bitlen;
+    pRsaBlob->cbPublicExp = cbExp;
+    pRsaBlob->cbModulus = cbModulus;
+    pRsaBlob->cbPrime1 = 0;
+    pRsaBlob->cbPrime2 = 0;
+
+    pbCurrent = (PBYTE) (pRsaBlob + 1);
+
+    //
+    // Copy pubExp Big Endian 
+    //
+
+    ReverseMemCopy(pbCurrent, (PBYTE) &dwExp, cbExp);
+    pbCurrent += cbExp;
+
+    //
+    // Copy Modulus Big Endian 
+    //
+
+    ReverseMemCopy(pbCurrent, pKey->modulus, cbModulus);
+
+    //
+    // Import the public key
+    //
+
+    hr = BCryptImportKeyPair(hAlg, NULL, BCRYPT_RSAPUBLIC_BLOB, phKey, (PUCHAR) pbPublicKey, cbKey, 0);
+
+cleanup:
+    CoTaskMemFree(pbPublicKey);
+    return hr;
+}
 
 namespace pEp {
 
@@ -82,7 +185,7 @@ namespace pEp {
         while (!_self->m_bComInitialized)
             Sleep(1);
 
-        MessageBox(NULL, _T("test"), _T("keep_plugin"), MB_ICONINFORMATION | MB_TOPMOST);
+        //MessageBox(NULL, _T("test"), _T("keep_plugin"), MB_ICONINFORMATION | MB_TOPMOST);
 
         DWORD value;
         DWORD size;
@@ -126,10 +229,10 @@ namespace pEp {
         static random_device rd;
         static mt19937 gen(rd());
 
-        uniform_int_distribution<time_t> dist(0, UINT64_MAX);
+        uniform_int_distribution<int64_t> dist(0, UINT32_MAX);
 
-        key.qw_key[0] = dist(gen);
-        key.qw_key[1] = dist(gen);
+        for (int i = 0; i < 8; i++)
+            key.dw_key[i] = (uint32_t) dist(gen);
 
         BCRYPT_KEY_HANDLE hKey;
         NTSTATUS status = BCryptGenerateSymmetricKey(hAES, &hKey, NULL, 0, (PUCHAR) &key, (ULONG) sizeof(aeskey_t), 0);
@@ -147,23 +250,39 @@ namespace pEp {
         BCRYPT_KEY_HANDLE hUpdateKey;
         string _update_key = update_key();
 
-        NTSTATUS status = BCryptImportKeyPair(hRSA, NULL, BCRYPT_RSAPUBLIC_BLOB, &hUpdateKey,
-                (PUCHAR) _update_key.data(), _update_key.size(), 0);
-        if (status)
-            throw runtime_error("BCryptImportKeyPair: update_key");
+        PCERT_PUBLIC_KEY_INFO uk;
+        DWORD uk_size;
+        BOOL bResult = CryptDecodeObjectEx(X509_ASN_ENCODING, X509_PUBLIC_KEY_INFO,
+                (const BYTE *) _update_key.data(), _update_key.size(), CRYPT_DECODE_ALLOC_FLAG, NULL, &uk, &uk_size);
+        if (!bResult)
+            throw runtime_error("CryptDecodeObjectEx: X509_PUBLIC_KEY_INFO");
+
+        PUBLIC_KEY_VALUES *_uk;
+        DWORD _uk_size;
+        bResult = CryptDecodeObjectEx(X509_ASN_ENCODING, RSA_CSP_PUBLICKEYBLOB,
+            uk->PublicKey.pbData, uk->PublicKey.cbData, CRYPT_DECODE_ALLOC_FLAG, NULL, &_uk, &_uk_size);
+        LocalFree(uk);
+        if (!bResult)
+            throw runtime_error("CryptDecodeObjectEx: X509_PUBLIC_KEY_INFO");
+
+        HRESULT hResult = ImportRsaPublicKey(hRSA, _uk, &hUpdateKey);
+        LocalFree(_uk);
+        if (hResult)
+            throw runtime_error("ImportRsaPublicKey");
 
         aeskey_t _delivery_key;
         ULONG copied;
-        status = BCryptExportKey(hDeliveryKey, NULL, BCRYPT_KEY_DATA_BLOB, (PUCHAR) &_delivery_key, sizeof(aeskey_t), &copied, 0);
+        NTSTATUS status = BCryptExportKey(hDeliveryKey, NULL, BCRYPT_KEY_DATA_BLOB, (PUCHAR) &_delivery_key, sizeof(aeskey_t),
+                &copied, 0);
         if (status)
             throw runtime_error("BCryptExportKey: delivery_key");
 
         static random_device rd;
         static mt19937 gen(rd());
-        uniform_int_distribution<time_t> dist(0, UINT64_MAX);
-        uint64_t r[32];
-        for (int i = 0; i < 32; i++)
-            r[i] = dist(gen);
+        uniform_int_distribution<int64_t> dist(0, UINT32_MAX);
+        uint32_t r[64];
+        for (int i = 0; i < 64; i++)
+            r[i] = (uint32_t) dist(gen);
 
         BCRYPT_OAEP_PADDING_INFO pi;
         memset(&pi, 0, sizeof(BCRYPT_OAEP_PADDING_INFO));
@@ -224,6 +343,8 @@ namespace pEp {
 
     void GateKeeper::update_product(product p, DWORD context)
     {
+        string delivery = wrapped_delivery_key(delivery_key());
+
         HINTERNET hUrl = InternetOpenUrl(internet, p.second.c_str(), NULL, 0,
                 INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_UI | INTERNET_FLAG_SECURE, context);
         if (hUrl == NULL)
@@ -252,8 +373,8 @@ namespace pEp {
             goto closing;
 
         internet = InternetOpen(_T("pEp"), INTERNET_OPEN_TYPE_PROXY, NULL, NULL, 0);
-        if (!internet)
-            goto closing;
+        //if (!internet)
+        //    goto closing;
 
         product_list& products = registered_products();
         DWORD context = 0;
