@@ -382,6 +382,8 @@ namespace pEp {
         HANDLE hFile = NULL;
         char *unencrypted_buffer = NULL;
 
+        char nonce[12];
+
         ULONG unencrypted_size;
         NTSTATUS status = BCryptDecrypt(dk, (PUCHAR) crypted.data(), crypted.size(),
                 NULL, NULL, 0, NULL, 0, &unencrypted_size, 0);
@@ -435,6 +437,9 @@ namespace pEp {
 
         NTSTATUS status = BCryptOpenAlgorithmProvider(&hAES, BCRYPT_AES_ALGORITHM, MS_PRIMITIVE_PROVIDER, 0);
         assert(status == 0);
+        if (status)
+            goto closing;
+        status = BCryptSetProperty(hAES, BCRYPT_CHAINING_MODE, (PUCHAR) BCRYPT_CHAIN_MODE_CCM, sizeof(BCRYPT_CHAIN_MODE_CCM), 0);
         if (status)
             goto closing;
 
