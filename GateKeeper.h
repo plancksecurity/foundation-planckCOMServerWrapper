@@ -43,6 +43,7 @@ namespace pEp {
 
         void keep_plugin();
 
+        void install_msi(tstring filename);
         string update_key();
         BCRYPT_KEY_HANDLE delivery_key();
         string wrapped_delivery_key(BCRYPT_KEY_HANDLE hDeliveryKey);

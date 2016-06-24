@@ -341,28 +341,64 @@ namespace pEp {
         return products;
     }
 
+    void GateKeeper::install_msi(tstring filename)
+    {
+
+    }
+
     void GateKeeper::update_product(product p, DWORD context)
     {
-        string delivery = wrapped_delivery_key(delivery_key());
+#ifdef UNICODE
+        tstring delivery = utility::utf16_string(wrapped_delivery_key(delivery_key()));
+#else
+        tstring delivery = wrapped_delivery_key(delivery_key());
+#endif
         tstring url = p.second;
         url += _T("&challenge=");
-#ifdef UNICODE
-        url += utility::utf16_string(delivery);
-#else
         url += delivery;
-#endif
         tstring headers;
         HINTERNET hUrl = InternetOpenUrl(internet, url.c_str(), headers.c_str(), headers.length(),
                 INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_UI | INTERNET_FLAG_SECURE, context);
         if (hUrl == NULL)
             return;
 
-        // update
-        PCTSTR rgpszAcceptTypes[] = { _T("text/plain"), NULL };
-        HINTERNET hRequest = HttpOpenRequest(hUrl, NULL, _T("challenge"), NULL, NULL, rgpszAcceptTypes, INTERNET_FLAG_NO_UI | INTERNET_FLAG_SECURE, context);
+        TCHAR temp_path[MAX_PATH + 1];
+        GetTempPath(MAX_PATH, temp_path);
+        tstring filename = temp_path;
+        filename += _T("\\pEp_");
+        filename += delivery.substr(0, 32);
+        filename += _T(".msi");
 
+        HANDLE hFile = CreateFile(filename.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        if (!hFile)
+            goto closing;
 
+        do {
+            static char buffer[32768];
+            DWORD reading;
+            BOOL bResult = InternetReadFile(hUrl, buffer, 32768, &reading);
+            if (!bResult || !reading)
+                break;
+            DWORD writing;
+            WriteFile(hFile, buffer, reading, &writing, NULL);
+        } while (1);
+
+        CloseHandle(hFile);
+        hFile = NULL;
         InternetCloseHandle(hUrl);
+        hUrl = NULL;
+
+        install_msi(filename);
+        DeleteFile(filename.c_str());
+
+        return;
+
+    closing:
+        if (hFile)
+            CloseHandle(hFile);
+        if (hUrl)
+            InternetCloseHandle(hUrl);
+        DeleteFile(filename.c_str());
     }
 
     void GateKeeper::keep_updated()
@@ -386,7 +422,12 @@ namespace pEp {
         product_list& products = registered_products();
         DWORD context = 0;
         for (auto i = products.begin(); i != products.end(); i++) {
-            update_product(*i, context++);
+            try {
+                update_product(*i, context++);
+            }
+            catch (exception&) {
+            
+            }
         }
 
     closing:
