@@ -344,8 +344,15 @@ namespace pEp {
     void GateKeeper::update_product(product p, DWORD context)
     {
         string delivery = wrapped_delivery_key(delivery_key());
-
-        HINTERNET hUrl = InternetOpenUrl(internet, p.second.c_str(), NULL, 0,
+        tstring url = p.second;
+        url += _T("&challenge=");
+#ifdef UNICODE
+        url += utility::utf16_string(delivery);
+#else
+        url += delivery;
+#endif
+        tstring headers;
+        HINTERNET hUrl = InternetOpenUrl(internet, url.c_str(), headers.c_str(), headers.length(),
                 INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_UI | INTERNET_FLAG_SECURE, context);
         if (hUrl == NULL)
             return;
@@ -372,9 +379,9 @@ namespace pEp {
         if (status)
             goto closing;
 
-        internet = InternetOpen(_T("pEp"), INTERNET_OPEN_TYPE_PROXY, NULL, NULL, 0);
-        //if (!internet)
-        //    goto closing;
+        internet = InternetOpen(_T("pEp"), INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+        if (!internet)
+            goto closing;
 
         product_list& products = registered_products();
         DWORD context = 0;
