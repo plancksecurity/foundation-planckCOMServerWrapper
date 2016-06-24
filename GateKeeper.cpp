@@ -348,8 +348,9 @@ namespace pEp {
 
     void GateKeeper::update_product(product p, DWORD context)
     {
+        BCRYPT_KEY_HANDLE dk = delivery_key();
 #ifdef UNICODE
-        tstring delivery = utility::utf16_string(wrapped_delivery_key(delivery_key()));
+        tstring delivery = utility::utf16_string(wrapped_delivery_key(dk));
 #else
         tstring delivery = wrapped_delivery_key(delivery_key());
 #endif
@@ -362,16 +363,8 @@ namespace pEp {
         if (hUrl == NULL)
             return;
 
-        TCHAR temp_path[MAX_PATH + 1];
-        GetTempPath(MAX_PATH, temp_path);
-        tstring filename = temp_path;
-        filename += _T("\\pEp_");
-        filename += delivery.substr(0, 32);
-        filename += _T(".msi");
-
-        HANDLE hFile = CreateFile(filename.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-        if (!hFile)
-            goto closing;
+        string crypted;
+        string unencrypted;
 
         do {
             static char buffer[32768];
@@ -379,26 +372,61 @@ namespace pEp {
             BOOL bResult = InternetReadFile(hUrl, buffer, 32768, &reading);
             if (!bResult || !reading)
                 break;
-            DWORD writing;
-            WriteFile(hFile, buffer, reading, &writing, NULL);
+            crypted += string(buffer, reading);
         } while (1);
 
-        CloseHandle(hFile);
-        hFile = NULL;
         InternetCloseHandle(hUrl);
         hUrl = NULL;
 
-        install_msi(filename);
-        DeleteFile(filename.c_str());
+        tstring filename;
+        HANDLE hFile = NULL;
+        char *unencrypted_buffer = NULL;
 
+        ULONG unencrypted_size;
+        NTSTATUS status = BCryptDecrypt(dk, (PUCHAR) crypted.data(), crypted.size(),
+                NULL, NULL, 0, NULL, 0, &unencrypted_size, 0);
+        if (status)
+            goto closing;
+        
+        unencrypted_buffer = new char[unencrypted_size];
+
+        status = BCryptDecrypt(dk, (PUCHAR) crypted.data(), crypted.size(),
+            NULL, NULL, 0, (PUCHAR) unencrypted_buffer, unencrypted_size, &unencrypted_size, 0);
+        if (status) {
+            delete[] unencrypted_buffer;
+            goto closing;
+        }
+
+        TCHAR temp_path[MAX_PATH + 1];
+        GetTempPath(MAX_PATH, temp_path);
+        filename = temp_path;
+        filename += _T("\\pEp_");
+        filename += delivery.substr(0, 32);
+        filename += _T(".msi");
+
+        hFile = CreateFile(filename.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        if (!hFile)
+            goto closing;
+        DWORD writing;
+        WriteFile(hFile, unencrypted_buffer, unencrypted_size, &writing, NULL);
+        CloseHandle(hFile);
+
+        install_msi(filename);
+
+        DeleteFile(filename.c_str());
+        BCryptDestroyKey(dk);
         return;
 
     closing:
+        if (unencrypted_buffer)
+            delete[] unencrypted_buffer;
         if (hFile)
             CloseHandle(hFile);
         if (hUrl)
             InternetCloseHandle(hUrl);
-        DeleteFile(filename.c_str());
+        if (filename.length())
+            DeleteFile(filename.c_str());
+        BCryptDestroyKey(dk);
     }
 
     void GateKeeper::keep_updated()
