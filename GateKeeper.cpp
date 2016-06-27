@@ -270,12 +270,26 @@ namespace pEp {
         if (hResult)
             throw runtime_error("ImportRsaPublicKey");
 
-        aeskey_t _delivery_key;
-        ULONG copied;
-        NTSTATUS status = BCryptExportKey(hDeliveryKey, NULL, BCRYPT_KEY_DATA_BLOB, (PUCHAR) &_delivery_key, sizeof(aeskey_t),
-                &copied, 0);
+        ULONG psize;
+        NTSTATUS status = BCryptGetProperty(hUpdateKey, BCRYPT_ALGORITHM_NAME, NULL, 0, &psize, 0);
+        char *prop = new char[psize];
+        TCHAR *_prop = (TCHAR *) prop;
+        BCryptGetProperty(hUpdateKey, BCRYPT_ALGORITHM_NAME, (PUCHAR) prop, psize, &psize, 0);
+
+        ULONG export_size;
+        status = BCryptExportKey(hDeliveryKey, NULL, BCRYPT_KEY_DATA_BLOB, NULL, NULL,
+            &export_size, 0);
         if (status)
+            throw runtime_error("BCryptExportKey: measuring export size");
+
+        PUCHAR _delivery_key = new UCHAR[export_size];
+        ULONG copied;
+        status = BCryptExportKey(hDeliveryKey, NULL, BCRYPT_KEY_DATA_BLOB, _delivery_key, export_size,
+                &copied, 0);
+        if (status) {
+            delete[] _delivery_key;
             throw runtime_error("BCryptExportKey: delivery_key");
+        }
 
         static random_device rd;
         static mt19937 gen(rd());
@@ -292,14 +306,18 @@ namespace pEp {
 
         ULONG result_size;
         PUCHAR _result = NULL;
-        status = BCryptEncrypt(hUpdateKey, (PUCHAR) &_delivery_key, sizeof(aeskey_t), &pi, NULL, 0, NULL, 0, &result_size, BCRYPT_PAD_OAEP);
+        ULONG blob_size = export_size - sizeof(BCRYPT_KEY_DATA_BLOB_HEADER);
+        PUCHAR blob = _delivery_key + sizeof(BCRYPT_KEY_DATA_BLOB_HEADER);
+        status = BCryptEncrypt(hUpdateKey, blob, blob_size, &pi, NULL, 0, NULL, 0, &result_size, BCRYPT_PAD_OAEP);
         if (status) {
+            delete[] _delivery_key;
             BCryptDestroyKey(hUpdateKey);
             throw runtime_error("BCryptEncrypt: calculating result size");
         }
 
         _result = new UCHAR[result_size];
-        status = BCryptEncrypt(hUpdateKey, (PUCHAR) &_delivery_key, sizeof(aeskey_t), &pi, NULL, 0, _result, result_size, &copied, BCRYPT_PAD_OAEP);
+        status = BCryptEncrypt(hUpdateKey, blob, blob_size, &pi, NULL, 0, _result, result_size, &copied, BCRYPT_PAD_OAEP);
+        delete[] _delivery_key;
         if (status) {
             BCryptDestroyKey(hUpdateKey);
             delete[] _result;
@@ -309,9 +327,10 @@ namespace pEp {
         BCryptDestroyKey(hUpdateKey);
 
         stringstream s;
-        s << hex << setw(2) << setfill('0');
-        for (ULONG i = 0; i < copied; i++)
+        for (ULONG i = 0; i < copied; i++) {
+            s << hex << setw(2) << setfill('0');
             s << (int) _result[i];
+        }
         delete[] _result;
         s >> result;
 
@@ -394,10 +413,8 @@ namespace pEp {
 
         status = BCryptDecrypt(dk, (PUCHAR) crypted.data(), crypted.size(),
             NULL, NULL, 0, (PUCHAR) unencrypted_buffer, unencrypted_size, &unencrypted_size, 0);
-        if (status) {
-            delete[] unencrypted_buffer;
+        if (status)
             goto closing;
-        }
 
         TCHAR temp_path[MAX_PATH + 1];
         GetTempPath(MAX_PATH, temp_path);

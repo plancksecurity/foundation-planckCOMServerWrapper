@@ -15,7 +15,7 @@ namespace pEp {
         typedef pair<tstring, tstring> product;
         typedef vector< product > product_list;
         union aeskey_t {
-            uint8_t c_key[132];
+            uint8_t c_key[32];
             uint16_t w_key[16];
             uint32_t dw_key[8];
             uint64_t qw_key[4];
