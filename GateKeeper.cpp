@@ -240,6 +240,11 @@ namespace pEp {
         if (status)
             throw runtime_error("BCryptGenerateSymmetricKey");
 
+        DWORD keylength = 0;
+        ULONG copied = 0;
+        status = BCryptGetProperty(hKey, BCRYPT_KEY_LENGTH, (PUCHAR) &keylength, sizeof(DWORD), &copied, 0);
+        assert(keylength == 256);
+
         return hKey;
     }
 
@@ -396,10 +401,11 @@ namespace pEp {
         HANDLE hFile = NULL;
         char *unencrypted_buffer = NULL;
 
-        UCHAR nonce[16];
-        memset(nonce, 0, 16);
+        UCHAR nonce[12];
+        memcpy(nonce, crypted.data(), sizeof(nonce));
         UCHAR iv[16];
-        memset(iv, 0, 16);
+        memset(iv, 0, sizeof(iv));
+        memcpy(iv, crypted.data(), sizeof(nonce));
 
         BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO authInfo;
         BCRYPT_INIT_AUTH_MODE_INFO(authInfo);
@@ -409,13 +415,15 @@ namespace pEp {
 
         ULONG unencrypted_size;
         NTSTATUS status = BCryptDecrypt(dk, (PUCHAR) crypted.data(), crypted.size(),
-                &authInfo, iv, 16, NULL, 0, &unencrypted_size, 0);
+                &authInfo, iv, sizeof(iv), NULL, 0, &unencrypted_size, 0);
         if (status)
             goto closing;
         
         unencrypted_buffer = new char[unencrypted_size];
-
-        status = BCryptDecrypt(dk, (PUCHAR) crypted.data(), crypted.size(),
+        PUCHAR crypted_data = (PUCHAR) crypted.data();
+        ULONG crypted_size = (ULONG) crypted.size();
+        
+        status = BCryptDecrypt(dk, crypted_data, crypted_size,
             &authInfo, iv, 16, (PUCHAR) unencrypted_buffer, unencrypted_size, &unencrypted_size, 0);
         if (status)
             goto closing;
