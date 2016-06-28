@@ -6,7 +6,7 @@
 
 using namespace std;
 
-// https://gist.github.com/mcdurdin/5626617
+// from https://msdn.microsoft.com/en-us/library/windows/desktop/dd388945(v=vs.85).aspx
 
 struct PUBLIC_KEY_VALUES {
     BLOBHEADER blobheader;
@@ -291,18 +291,9 @@ namespace pEp {
             throw runtime_error("BCryptExportKey: delivery_key");
         }
 
-        static random_device rd;
-        static mt19937 gen(rd());
-        uniform_int_distribution<int64_t> dist(0, UINT32_MAX);
-        uint32_t r[64];
-        for (int i = 0; i < 64; i++)
-            r[i] = (uint32_t) dist(gen);
-
         BCRYPT_OAEP_PADDING_INFO pi;
         memset(&pi, 0, sizeof(BCRYPT_OAEP_PADDING_INFO));
         pi.pszAlgId = BCRYPT_SHA256_ALGORITHM;
-        pi.pbLabel = (PUCHAR) r;
-        pi.cbLabel = sizeof(r);
 
         ULONG result_size;
         PUCHAR _result = NULL;
@@ -385,15 +376,19 @@ namespace pEp {
         string crypted;
         string unencrypted;
 
-        do {
-            static char buffer[32768];
-            DWORD reading;
-            BOOL bResult = InternetReadFile(hUrl, buffer, 32768, &reading);
-            if (!bResult || !reading)
-                break;
-            crypted += string(buffer, reading);
-        } while (1);
-
+        try {
+            do {
+                static char buffer[1024*1024];
+                DWORD reading;
+                BOOL bResult = InternetReadFile(hUrl, buffer, 1024*1024, &reading);
+                if (!bResult || !reading)
+                    break;
+                crypted += string(buffer, reading);
+            } while (1);
+        }
+        catch (exception& e) {
+            MessageBox(NULL, utility::utf16_string(e.what()).c_str(), _T("exception"), MB_ICONSTOP);
+        }
         InternetCloseHandle(hUrl);
         hUrl = NULL;
 
@@ -401,18 +396,27 @@ namespace pEp {
         HANDLE hFile = NULL;
         char *unencrypted_buffer = NULL;
 
-        char nonce[12];
+        UCHAR nonce[16];
+        memset(nonce, 0, 16);
+        UCHAR iv[16];
+        memset(iv, 0, 16);
+
+        BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO authInfo;
+        BCRYPT_INIT_AUTH_MODE_INFO(authInfo);
+
+        authInfo.pbNonce = nonce;
+        authInfo.cbNonce = sizeof(nonce);
 
         ULONG unencrypted_size;
         NTSTATUS status = BCryptDecrypt(dk, (PUCHAR) crypted.data(), crypted.size(),
-                NULL, NULL, 0, NULL, 0, &unencrypted_size, 0);
+                &authInfo, iv, 16, NULL, 0, &unencrypted_size, 0);
         if (status)
             goto closing;
         
         unencrypted_buffer = new char[unencrypted_size];
 
         status = BCryptDecrypt(dk, (PUCHAR) crypted.data(), crypted.size(),
-            NULL, NULL, 0, (PUCHAR) unencrypted_buffer, unencrypted_size, &unencrypted_size, 0);
+            &authInfo, iv, 16, (PUCHAR) unencrypted_buffer, unencrypted_size, &unencrypted_size, 0);
         if (status)
             goto closing;
 
@@ -456,7 +460,7 @@ namespace pEp {
         assert(status == 0);
         if (status)
             goto closing;
-        status = BCryptSetProperty(hAES, BCRYPT_CHAINING_MODE, (PUCHAR) BCRYPT_CHAIN_MODE_CCM, sizeof(BCRYPT_CHAIN_MODE_CCM), 0);
+        status = BCryptSetProperty(hAES, BCRYPT_CHAINING_MODE, (PUCHAR) BCRYPT_CHAIN_MODE_GCM, sizeof(BCRYPT_CHAIN_MODE_GCM), 0);
         if (status)
             goto closing;
 
