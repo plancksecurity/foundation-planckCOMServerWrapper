@@ -1,45 +1,67 @@
 class CpEpCOMServerAdapterModule;
 
-class GateKeeper {
-public:
-    GateKeeper(CpEpCOMServerAdapterModule * const self) : _self(self), now(time(NULL)), next(now + time_diff())
-    {
-        LONG lResult = RegOpenCurrentUser(KEY_READ, &cu);
-        assert(lResult == ERROR_SUCCESS);
-        if (lResult == ERROR_SUCCESS)
-            cu_open = true;
-        else
-            cu_open = false;
-    }
+using namespace std;
 
-    ~GateKeeper()
-    {
-        if (cu_open)
-            RegCloseKey(cu);
-    }
+namespace pEp {
 
-    CpEpCOMServerAdapterModule * const module() const
-    {
-        return _self;
-    }
+#ifdef UNICODE
+    typedef wstring tstring;
+#else
+    typedef string tstring;
+#endif
 
-    void keep();
+    class GateKeeper {
+    public:
+        typedef pair<tstring, tstring> product;
+        typedef vector< product > product_list;
+        union aeskey_t {
+            uint8_t c_key[32];
+            uint16_t w_key[16];
+            uint32_t dw_key[8];
+            uint64_t qw_key[4];
+        };
 
-protected:
-    static const LPCTSTR plugin_reg_path;
-    static const LPCTSTR plugin_reg_value_name;
-    static const time_t cycle;
-    static const DWORD waiting;
+        GateKeeper(CpEpCOMServerAdapterModule * self);
+        ~GateKeeper();
 
-    static time_t time_diff();
-    void keep_plugin();
-    void keep_updated();
+        CpEpCOMServerAdapterModule * const module() const
+        {
+            return _self;
+        }
 
-private:
-    time_t now;
-    time_t next;
-    bool cu_open;
-    HKEY cu;
+        void keep();
 
-    CpEpCOMServerAdapterModule * const _self;
-};
+    protected:
+        static const LPCTSTR plugin_reg_path;
+        static const LPCTSTR plugin_reg_value_name;
+        static const LPCTSTR updater_reg_path;
+
+        static const time_t cycle;
+        static const DWORD waiting;
+
+        static time_t time_diff();
+
+        void keep_plugin();
+
+        void install_msi(tstring filename);
+        string update_key();
+        BCRYPT_KEY_HANDLE delivery_key();
+        string wrapped_delivery_key(BCRYPT_KEY_HANDLE hDeliveryKey);
+
+        void update_product(product p, DWORD context);
+        product_list& registered_products();
+        void keep_updated();
+
+    private:
+        time_t now;
+        time_t next;
+        bool cu_open;
+        HKEY cu;
+        HKEY hkUpdater;
+        HINTERNET internet;
+        BCRYPT_ALG_HANDLE hAES;
+        BCRYPT_ALG_HANDLE hRSA;
+
+        CpEpCOMServerAdapterModule * _self;
+    };
+}

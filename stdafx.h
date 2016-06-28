@@ -28,6 +28,8 @@
 #include <comutil.h>
 
 #include <Wininet.h>
+#include <intsafe.h>
+#include <bcrypt.h>
 
 #include <vector>
 #include <sstream>
@@ -38,6 +40,7 @@
 #include <mutex>
 #include <atomic>
 #include <random>
+#include <iomanip>
 
 #include <assert.h>
 

@@ -85,7 +85,7 @@ echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>comsuppwd.lib;%(AdditionalDependencies);Wininet.lib</AdditionalDependencies>
+      <AdditionalDependencies>comsuppwd.lib;%(AdditionalDependencies);Wininet.lib;bcrypt.lib;Crypt32.lib</AdditionalDependencies>
       <PerUserRedirection>true</PerUserRedirection>
     </Link>
   </ItemDefinitionGroup>
@@ -120,7 +120,7 @@ echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <RegisterOutput>true</RegisterOutput>
-      <AdditionalDependencies>comsuppw.lib;%(AdditionalDependencies);Wininet.lib</AdditionalDependencies>
+      <AdditionalDependencies>comsuppw.lib;%(AdditionalDependencies);Wininet.lib;bcrypt.lib;Crypt32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -154,6 +154,7 @@ echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
     <ClInclude Include="CpEpEngine.h" />
     <ClInclude Include="GateKeeper.h" />
     <ClInclude Include="locked_queue.hh" />
+    <ClInclude Include="pEpCOMServerAdapter.h" />
     <ClInclude Include="pEpCOMServerAdapter_i.h" />
     <ClInclude Include="pEp_utility.h" />
     <ClInclude Include="Resource.h" />
@@ -173,6 +174,7 @@ echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
     <None Include="..\..\pep_for_outlook\pep\pep_test.snk" />
     <None Include="pEpCOMServerAdapter.rgs" />
     <None Include="pEpEngine.rgs" />
+    <None Include="updatekey.bin" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="pEpCOMServerAdapter.idl" />
