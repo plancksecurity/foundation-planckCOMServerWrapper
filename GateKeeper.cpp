@@ -112,7 +112,7 @@ namespace pEp {
 
     const LPCTSTR GateKeeper::plugin_reg_path = _T("Software\\Microsoft\\Office\\Outlook\\Addins\\pEp");
     const LPCTSTR GateKeeper::plugin_reg_value_name = _T("LoadBehavior");
-    const LPCTSTR GateKeeper::updater_reg_path = _T("Software\\pEp\\Updater";)
+    const LPCTSTR GateKeeper::updater_reg_path = _T("Software\\pEp\\Updater");
 
     const time_t GateKeeper::cycle = 7200;   // 7200 sec is 2 h
     const DWORD GateKeeper::waiting = 10000; // 10000 ms is 10 sec
@@ -184,8 +184,6 @@ namespace pEp {
     {
         while (!_self->m_bComInitialized)
             Sleep(1);
-
-        //MessageBox(NULL, _T("test"), _T("keep_plugin"), MB_ICONINFORMATION | MB_TOPMOST);
 
         DWORD value;
         DWORD size;
