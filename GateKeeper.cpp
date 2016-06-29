@@ -171,10 +171,10 @@ namespace pEp {
             now = time(NULL);
             assert(now != -1);
 
-            if (now > next) {
+            //if (now > next) {
                 next = now + GateKeeper::cycle;
                 keep_updated();
-            }
+            //}
 
             Sleep(waiting);
         }
@@ -380,11 +380,16 @@ namespace pEp {
 
         string crypted;
         string unencrypted;
+        UCHAR iv[12];
+        UCHAR nonce[sizeof(iv)];
+        UCHAR tag[16];
 
         try {
-            do {
+            DWORD reading;
+            InternetReadFile(hUrl, iv, sizeof(iv), &reading);
+
+            if (reading) do {
                 static char buffer[1024*1024];
-                DWORD reading;
                 BOOL bResult = InternetReadFile(hUrl, buffer, 1024*1024, &reading);
                 if (!bResult || !reading)
                     break;
@@ -394,24 +399,22 @@ namespace pEp {
         catch (exception& e) {
             MessageBox(NULL, utility::utf16_string(e.what()).c_str(), _T("exception"), MB_ICONSTOP);
         }
+
         InternetCloseHandle(hUrl);
         hUrl = NULL;
+
+        memcpy(nonce, iv, sizeof(iv));
 
         tstring filename;
         HANDLE hFile = NULL;
         char *unencrypted_buffer = NULL;
 
-        UCHAR nonce[12];
-        memcpy(nonce, crypted.data(), sizeof(nonce));
-        UCHAR iv[16];
-        memset(iv, 0, sizeof(iv));
-        memcpy(iv, crypted.data(), sizeof(nonce));
-
         BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO authInfo;
         BCRYPT_INIT_AUTH_MODE_INFO(authInfo);
-
         authInfo.pbNonce = nonce;
         authInfo.cbNonce = sizeof(nonce);
+        authInfo.pbTag = tag;
+        authInfo.cbTag = sizeof(tag);
 
         ULONG unencrypted_size;
         NTSTATUS status = BCryptDecrypt(dk, (PUCHAR) crypted.data(), crypted.size(),
@@ -421,10 +424,11 @@ namespace pEp {
         
         unencrypted_buffer = new char[unencrypted_size];
         PUCHAR crypted_data = (PUCHAR) crypted.data();
-        ULONG crypted_size = (ULONG) crypted.size();
-        
+        ULONG crypted_size = (ULONG) crypted.size() - sizeof(tag);
+        memcpy(tag, crypted_data + crypted_size, sizeof(tag));
+
         status = BCryptDecrypt(dk, crypted_data, crypted_size,
-            &authInfo, iv, 16, (PUCHAR) unencrypted_buffer, unencrypted_size, &unencrypted_size, 0);
+            &authInfo, iv, sizeof(iv), (PUCHAR) unencrypted_buffer, unencrypted_size, &unencrypted_size, 0);
         if (status)
             goto closing;
 
@@ -462,7 +466,7 @@ namespace pEp {
 
     void GateKeeper::keep_updated()
     {
-        return; // disabled for now
+        // return; // disabled for now
 
         NTSTATUS status = BCryptOpenAlgorithmProvider(&hAES, BCRYPT_AES_ALGORITHM, MS_PRIMITIVE_PROVIDER, 0);
         assert(status == 0);
