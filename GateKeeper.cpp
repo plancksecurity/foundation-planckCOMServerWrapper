@@ -171,10 +171,10 @@ namespace pEp {
             now = time(NULL);
             assert(now != -1);
 
-            //if (now > next) {
+            if (now > next) {
                 next = now + GateKeeper::cycle;
                 keep_updated();
-            //}
+            }
 
             Sleep(waiting);
         }
@@ -358,7 +358,7 @@ namespace pEp {
 
     void GateKeeper::install_msi(tstring filename)
     {
-
+        ShellExecute(NULL, _T("open"), filename.c_str(), NULL, NULL, SW_SHOW);
     }
 
     void GateKeeper::update_product(product p, DWORD context)
@@ -432,6 +432,8 @@ namespace pEp {
         if (status)
             goto closing;
 
+        BCryptDestroyKey(dk);
+
         TCHAR temp_path[MAX_PATH + 1];
         GetTempPath(MAX_PATH, temp_path);
         filename = temp_path;
@@ -448,8 +450,6 @@ namespace pEp {
 
         install_msi(filename);
 
-        DeleteFile(filename.c_str());
-        BCryptDestroyKey(dk);
         return;
 
     closing:
@@ -459,15 +459,11 @@ namespace pEp {
             CloseHandle(hFile);
         if (hUrl)
             InternetCloseHandle(hUrl);
-        if (filename.length())
-            DeleteFile(filename.c_str());
         BCryptDestroyKey(dk);
     }
 
     void GateKeeper::keep_updated()
     {
-        // return; // disabled for now
-
         NTSTATUS status = BCryptOpenAlgorithmProvider(&hAES, BCRYPT_AES_ALGORITHM, MS_PRIMITIVE_PROVIDER, 0);
         assert(status == 0);
         if (status)
