@@ -37,6 +37,7 @@ namespace pEp {
         static const LPCTSTR updater_reg_path;
 
         static const time_t cycle;
+        static const time_t fraction;
         static const DWORD waiting;
 
         static time_t time_diff();

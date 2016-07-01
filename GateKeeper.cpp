@@ -115,6 +115,7 @@ namespace pEp {
     const LPCTSTR GateKeeper::updater_reg_path = _T("Software\\pEp\\Updater");
 
     const time_t GateKeeper::cycle = 7200;   // 7200 sec is 2 h
+    const time_t GateKeeper::fraction = 10;  // first update is at 10% of cycle
     const DWORD GateKeeper::waiting = 10000; // 10000 ms is 10 sec
 
     GateKeeper::GateKeeper(CpEpCOMServerAdapterModule * self)
@@ -150,7 +151,7 @@ namespace pEp {
             static random_device rd;
             static mt19937 gen(rd());
 
-            uniform_int_distribution<time_t> dist(0, cycle);
+            uniform_int_distribution<time_t> dist(0, cycle/fraction);
 
             return dist(gen);
         }
