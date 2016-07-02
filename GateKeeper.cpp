@@ -337,15 +337,16 @@ namespace pEp {
         static product_list products;
 
         // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724872(v=vs.85).aspx
-        static TCHAR value_name[16384];
+        TCHAR value_name[16384];
         DWORD value_name_size;
-        static TCHAR value[L_MAX_URL_LENGTH + 1];
+        TCHAR value[L_MAX_URL_LENGTH + 1];
         DWORD value_size;
 
         products.empty();
 
         LONG lResult = ERROR_SUCCESS;
         for (DWORD i = 0; lResult == ERROR_SUCCESS; i++) {
+            value_name_size = 16383;
             value_size = L_MAX_URL_LENGTH + 1;
             lResult = RegEnumValue(hkUpdater, 0, value_name, &value_name_size, NULL, NULL, (LPBYTE) value, &value_size);
             if (lResult == ERROR_SUCCESS)
@@ -382,6 +383,9 @@ namespace pEp {
         UCHAR iv[12];
         UCHAR nonce[sizeof(iv)];
         UCHAR tag[16];
+        tstring filename;
+        HANDLE hFile = NULL;
+        char *unencrypted_buffer = NULL;
 
         try {
             DWORD reading;
@@ -395,18 +399,14 @@ namespace pEp {
                 crypted += string(buffer, reading);
             } while (1);
         }
-        catch (exception& e) {
-            MessageBox(NULL, utility::utf16_string(e.what()).c_str(), _T("exception"), MB_ICONSTOP);
+        catch (exception&) {
+            goto closing;
         }
 
         InternetCloseHandle(hUrl);
         hUrl = NULL;
 
         memcpy(nonce, iv, sizeof(iv));
-
-        tstring filename;
-        HANDLE hFile = NULL;
-        char *unencrypted_buffer = NULL;
 
         BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO authInfo;
         BCRYPT_INIT_AUTH_MODE_INFO(authInfo);
@@ -482,6 +482,7 @@ namespace pEp {
 
         product_list& products = registered_products();
         DWORD context = 0;
+
         for (auto i = products.begin(); i != products.end(); i++) {
             try {
                 update_product(*i, context++);
