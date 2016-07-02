@@ -348,9 +348,10 @@ namespace pEp {
         for (DWORD i = 0; lResult == ERROR_SUCCESS; i++) {
             value_name_size = 16383;
             value_size = L_MAX_URL_LENGTH + 1;
-            lResult = RegEnumValue(hkUpdater, 0, value_name, &value_name_size, NULL, NULL, (LPBYTE) value, &value_size);
-            if (lResult == ERROR_SUCCESS)
+            lResult = RegEnumValue(hkUpdater, i, value_name, &value_name_size, NULL, NULL, (LPBYTE) value, &value_size);
+            if (lResult == ERROR_SUCCESS) {
                 products.push_back({ value_name, value });
+            }
         }
 
         return products;
