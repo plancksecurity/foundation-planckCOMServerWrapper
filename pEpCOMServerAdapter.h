@@ -26,6 +26,8 @@ public:
 
     void start_gatekeeper()
     {
+        this->Lock(); // never exit
+
         try {
             gatekeeper_thread = new thread(gatekeeper, this);
             gatekeeper_thread->detach();
