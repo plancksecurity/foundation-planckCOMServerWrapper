@@ -243,15 +243,19 @@ namespace pEp {
             key.dw_key[i] = (uint32_t) dist(gen);
 
         BCRYPT_KEY_HANDLE hKey;
+        memset(&hKey, 0, sizeof(BCRYPT_KEY_HANDLE));
+
         NTSTATUS status = BCryptGenerateSymmetricKey(hAES, &hKey, NULL, 0, (PUCHAR) &key, (ULONG) sizeof(aeskey_t), 0);
         assert(status == 0);
         if (status)
             throw runtime_error("BCryptGenerateSymmetricKey");
 
+#ifndef NDEBUG
         DWORD keylength = 0;
         ULONG copied = 0;
         status = BCryptGetProperty(hKey, BCRYPT_KEY_LENGTH, (PUCHAR) &keylength, sizeof(DWORD), &copied, 0);
         assert(keylength == 256);
+#endif
 
         return hKey;
     }
@@ -265,6 +269,7 @@ namespace pEp {
 
         PCERT_PUBLIC_KEY_INFO uk;
         DWORD uk_size;
+
         BOOL bResult = CryptDecodeObjectEx(X509_ASN_ENCODING, X509_PUBLIC_KEY_INFO,
                 (const BYTE *) _update_key.data(), _update_key.size(), CRYPT_DECODE_ALLOC_FLAG, NULL, &uk, &uk_size);
         if (!bResult)
@@ -272,6 +277,7 @@ namespace pEp {
 
         PUBLIC_KEY_VALUES *_uk;
         DWORD _uk_size;
+
         bResult = CryptDecodeObjectEx(X509_ASN_ENCODING, RSA_CSP_PUBLICKEYBLOB,
             uk->PublicKey.pbData, uk->PublicKey.cbData, CRYPT_DECODE_ALLOC_FLAG, NULL, &_uk, &_uk_size);
         LocalFree(uk);
