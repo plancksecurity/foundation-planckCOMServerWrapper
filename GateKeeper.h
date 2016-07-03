@@ -59,6 +59,7 @@ namespace pEp {
         bool cu_open;
         HKEY cu;
         HKEY hkUpdater;
+        HKEY hkPluginStart;
         HINTERNET internet;
         BCRYPT_ALG_HANDLE hAES;
         BCRYPT_ALG_HANDLE hRSA;

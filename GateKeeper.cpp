@@ -119,7 +119,8 @@ namespace pEp {
     const DWORD GateKeeper::waiting = 10000; // 10000 ms is 10 sec
 
     GateKeeper::GateKeeper(CpEpCOMServerAdapterModule * self)
-        : _self(self), now(time(NULL)), next(now + time_diff()), hkUpdater(NULL), internet(NULL), hAES(NULL), hRSA(NULL)
+        : _self(self), now(time(NULL)), next(now + time_diff()), hkUpdater(NULL), hkPluginStart(NULL),
+            internet(NULL), hAES(NULL), hRSA(NULL)
     {
         LONG lResult = RegOpenCurrentUser(KEY_READ, &cu);
         assert(lResult == ERROR_SUCCESS);
@@ -133,6 +134,12 @@ namespace pEp {
             assert(lResult == ERROR_SUCCESS);
             if (lResult != ERROR_SUCCESS)
                 return;
+
+            lResult = RegOpenKeyEx(cu, plugin_reg_path, 0, KEY_WRITE, &hkPluginStart);
+            assert(lResult == ERROR_SUCCESS);
+            if (lResult != ERROR_SUCCESS)
+                return;
+            RegCloseKey(hkPluginStart);
         }
     }
     
@@ -183,20 +190,22 @@ namespace pEp {
 
     void GateKeeper::keep_plugin()
     {
+        if (!hkPluginStart)
+            return;
+
         while (!_self->m_bComInitialized)
             Sleep(1);
 
-        DWORD value;
-        DWORD size;
-
-        LONG lResult = RegGetValue(cu, plugin_reg_path, plugin_reg_value_name, RRF_RT_REG_DWORD, NULL, &value, &size);
+        LONG lResult = RegOpenKeyEx(cu, plugin_reg_path, 0, KEY_WRITE, &hkPluginStart);
+        assert(lResult == ERROR_SUCCESS);
         if (lResult != ERROR_SUCCESS)
             return;
 
-        if (value != 3) {
-            lResult = RegSetValue(cu, plugin_reg_path, RRF_RT_REG_DWORD, plugin_reg_value_name, 3);
-            assert(lResult == ERROR_SUCCESS);
-        }
+        DWORD v = 3;
+        lResult = RegSetValueEx(hkPluginStart, plugin_reg_value_name, 0, REG_DWORD, (const BYTE *) &v, sizeof(DWORD));
+        assert(lResult == ERROR_SUCCESS);
+
+        RegCloseKey(hkPluginStart);
     }
 
     string GateKeeper::update_key()
