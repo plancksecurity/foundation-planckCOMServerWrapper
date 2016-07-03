@@ -243,7 +243,6 @@ namespace pEp {
             key.dw_key[i] = (uint32_t) dist(gen);
 
         BCRYPT_KEY_HANDLE hKey;
-        memset(&hKey, 0, sizeof(BCRYPT_KEY_HANDLE));
 
         NTSTATUS status = BCryptGenerateSymmetricKey(hAES, &hKey, NULL, 0, (PUCHAR) &key, (ULONG) sizeof(aeskey_t), 0);
         assert(status == 0);
