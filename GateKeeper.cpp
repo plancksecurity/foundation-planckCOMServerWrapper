@@ -193,9 +193,6 @@ namespace pEp {
         if (!hkPluginStart)
             return;
 
-        while (!_self->m_bComInitialized)
-            Sleep(1);
-
         LONG lResult = RegOpenKeyEx(cu, plugin_reg_path, 0, KEY_WRITE, &hkPluginStart);
         assert(lResult == ERROR_SUCCESS);
         if (lResult != ERROR_SUCCESS)
