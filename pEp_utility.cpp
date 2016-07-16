@@ -167,10 +167,12 @@ namespace pEp {
             CComSafeArray<BYTE> sa;
             sa.Create(tl->size);
 
-            char *data;
-            SafeArrayAccessData(sa, (void **) &data);
-            memcpy(data, tl->value, tl->size);
-            SafeArrayUnaccessData(sa);
+            if (tl->size) {
+                char *data;
+                SafeArrayAccessData(sa, (void **) &data);
+                memcpy(data, tl->value, tl->size);
+                SafeArrayUnaccessData(sa);
+            }
 
             blob *_blob = new blob();
 
@@ -359,16 +361,24 @@ namespace pEp {
                 SafeArrayGetUBound(b.value, 1, &_ubound);
                 size_t size = _ubound - _lbound + 1;
 
-                char *buffer = (char *) malloc(size);
-                if (buffer == NULL)
-                    throw bad_alloc();
+                char *buffer;
+                if (size) {
+                    buffer = (char *) malloc(size);
+                    if (buffer == NULL)
+                        throw bad_alloc();
 
-                char *data;
+                    char *data;
 
-                SafeArrayAccessData(b.value, (void **) &data);
-                memcpy(buffer, data, size);
-                SafeArrayUnaccessData(sa);
+                    SafeArrayAccessData(b.value, (void **) &data);
+                    memcpy(buffer, data, size);
+                    SafeArrayUnaccessData(sa);
+                }
+                else {
+                    buffer = _strdup("");
+                    if (buffer == NULL)
+                        throw bad_alloc();
 
+                }
                 _bl = bloblist_add(_bl, buffer, size, str(b.mime_type), str(b.filename));
                 if (_bl == NULL) {
                     free(buffer);

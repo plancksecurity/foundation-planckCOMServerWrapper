@@ -112,13 +112,15 @@ namespace pEp {
 
     const LPCTSTR GateKeeper::plugin_reg_path = _T("Software\\Microsoft\\Office\\Outlook\\Addins\\pEp");
     const LPCTSTR GateKeeper::plugin_reg_value_name = _T("LoadBehavior");
-    const LPCTSTR GateKeeper::updater_reg_path = _T("Software\\pEp\\Updater";)
+    const LPCTSTR GateKeeper::updater_reg_path = _T("Software\\pEp\\Updater");
 
     const time_t GateKeeper::cycle = 7200;   // 7200 sec is 2 h
+    const time_t GateKeeper::fraction = 10;  // first update is at 10% of cycle
     const DWORD GateKeeper::waiting = 10000; // 10000 ms is 10 sec
 
     GateKeeper::GateKeeper(CpEpCOMServerAdapterModule * self)
-        : _self(self), now(time(NULL)), next(now + time_diff()), hkUpdater(NULL), internet(NULL), hAES(NULL), hRSA(NULL)
+        : _self(self), now(time(NULL)), next(now + time_diff()), hkUpdater(NULL), hkPluginStart(NULL),
+            internet(NULL), hAES(NULL), hRSA(NULL)
     {
         LONG lResult = RegOpenCurrentUser(KEY_READ, &cu);
         assert(lResult == ERROR_SUCCESS);
@@ -132,6 +134,12 @@ namespace pEp {
             assert(lResult == ERROR_SUCCESS);
             if (lResult != ERROR_SUCCESS)
                 return;
+
+            lResult = RegOpenKeyEx(cu, plugin_reg_path, 0, KEY_WRITE, &hkPluginStart);
+            assert(lResult == ERROR_SUCCESS);
+            if (lResult != ERROR_SUCCESS)
+                return;
+            RegCloseKey(hkPluginStart);
         }
     }
     
@@ -150,7 +158,7 @@ namespace pEp {
             static random_device rd;
             static mt19937 gen(rd());
 
-            uniform_int_distribution<time_t> dist(0, cycle);
+            uniform_int_distribution<time_t> dist(0, cycle/fraction);
 
             return dist(gen);
         }
@@ -182,22 +190,19 @@ namespace pEp {
 
     void GateKeeper::keep_plugin()
     {
-        while (!_self->m_bComInitialized)
-            Sleep(1);
+        if (!hkPluginStart)
+            return;
 
-        //MessageBox(NULL, _T("test"), _T("keep_plugin"), MB_ICONINFORMATION | MB_TOPMOST);
-
-        DWORD value;
-        DWORD size;
-
-        LONG lResult = RegGetValue(cu, plugin_reg_path, plugin_reg_value_name, RRF_RT_REG_DWORD, NULL, &value, &size);
+        LONG lResult = RegOpenKeyEx(cu, plugin_reg_path, 0, KEY_WRITE, &hkPluginStart);
+        assert(lResult == ERROR_SUCCESS);
         if (lResult != ERROR_SUCCESS)
             return;
 
-        if (value != 3) {
-            lResult = RegSetValue(cu, plugin_reg_path, RRF_RT_REG_DWORD, plugin_reg_value_name, 3);
-            assert(lResult == ERROR_SUCCESS);
-        }
+        DWORD v = 3;
+        lResult = RegSetValueEx(hkPluginStart, plugin_reg_value_name, 0, REG_DWORD, (const BYTE *) &v, sizeof(DWORD));
+        assert(lResult == ERROR_SUCCESS);
+
+        RegCloseKey(hkPluginStart);
     }
 
     string GateKeeper::update_key()
@@ -235,15 +240,18 @@ namespace pEp {
             key.dw_key[i] = (uint32_t) dist(gen);
 
         BCRYPT_KEY_HANDLE hKey;
+
         NTSTATUS status = BCryptGenerateSymmetricKey(hAES, &hKey, NULL, 0, (PUCHAR) &key, (ULONG) sizeof(aeskey_t), 0);
         assert(status == 0);
         if (status)
             throw runtime_error("BCryptGenerateSymmetricKey");
 
+#ifndef NDEBUG
         DWORD keylength = 0;
         ULONG copied = 0;
         status = BCryptGetProperty(hKey, BCRYPT_KEY_LENGTH, (PUCHAR) &keylength, sizeof(DWORD), &copied, 0);
         assert(keylength == 256);
+#endif
 
         return hKey;
     }
@@ -257,6 +265,7 @@ namespace pEp {
 
         PCERT_PUBLIC_KEY_INFO uk;
         DWORD uk_size;
+
         BOOL bResult = CryptDecodeObjectEx(X509_ASN_ENCODING, X509_PUBLIC_KEY_INFO,
                 (const BYTE *) _update_key.data(), _update_key.size(), CRYPT_DECODE_ALLOC_FLAG, NULL, &uk, &uk_size);
         if (!bResult)
@@ -264,6 +273,7 @@ namespace pEp {
 
         PUBLIC_KEY_VALUES *_uk;
         DWORD _uk_size;
+
         bResult = CryptDecodeObjectEx(X509_ASN_ENCODING, RSA_CSP_PUBLICKEYBLOB,
             uk->PublicKey.pbData, uk->PublicKey.cbData, CRYPT_DECODE_ALLOC_FLAG, NULL, &_uk, &_uk_size);
         LocalFree(uk);
@@ -338,19 +348,21 @@ namespace pEp {
         static product_list products;
 
         // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724872(v=vs.85).aspx
-        static TCHAR value_name[16384];
+        TCHAR value_name[16384];
         DWORD value_name_size;
-        static TCHAR value[L_MAX_URL_LENGTH + 1];
+        TCHAR value[L_MAX_URL_LENGTH + 1];
         DWORD value_size;
 
         products.empty();
 
         LONG lResult = ERROR_SUCCESS;
         for (DWORD i = 0; lResult == ERROR_SUCCESS; i++) {
+            value_name_size = 16383;
             value_size = L_MAX_URL_LENGTH + 1;
-            lResult = RegEnumValue(hkUpdater, 0, value_name, &value_name_size, NULL, NULL, (LPBYTE) value, &value_size);
-            if (lResult == ERROR_SUCCESS)
+            lResult = RegEnumValue(hkUpdater, i, value_name, &value_name_size, NULL, NULL, (LPBYTE) value, &value_size);
+            if (lResult == ERROR_SUCCESS) {
                 products.push_back({ value_name, value });
+            }
         }
 
         return products;
@@ -358,7 +370,7 @@ namespace pEp {
 
     void GateKeeper::install_msi(tstring filename)
     {
-
+        ShellExecute(NULL, _T("open"), filename.c_str(), NULL, NULL, SW_SHOW);
     }
 
     void GateKeeper::update_product(product p, DWORD context)
@@ -380,38 +392,40 @@ namespace pEp {
 
         string crypted;
         string unencrypted;
+        UCHAR iv[12];
+        UCHAR nonce[sizeof(iv)];
+        UCHAR tag[16];
+        tstring filename;
+        HANDLE hFile = NULL;
+        char *unencrypted_buffer = NULL;
 
         try {
-            do {
+            DWORD reading;
+            InternetReadFile(hUrl, iv, sizeof(iv), &reading);
+
+            if (reading) do {
                 static char buffer[1024*1024];
-                DWORD reading;
                 BOOL bResult = InternetReadFile(hUrl, buffer, 1024*1024, &reading);
                 if (!bResult || !reading)
                     break;
                 crypted += string(buffer, reading);
             } while (1);
         }
-        catch (exception& e) {
-            MessageBox(NULL, utility::utf16_string(e.what()).c_str(), _T("exception"), MB_ICONSTOP);
+        catch (exception&) {
+            goto closing;
         }
+
         InternetCloseHandle(hUrl);
         hUrl = NULL;
 
-        tstring filename;
-        HANDLE hFile = NULL;
-        char *unencrypted_buffer = NULL;
-
-        UCHAR nonce[12];
-        memcpy(nonce, crypted.data(), sizeof(nonce));
-        UCHAR iv[16];
-        memset(iv, 0, sizeof(iv));
-        memcpy(iv, crypted.data(), sizeof(nonce));
+        memcpy(nonce, iv, sizeof(iv));
 
         BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO authInfo;
         BCRYPT_INIT_AUTH_MODE_INFO(authInfo);
-
         authInfo.pbNonce = nonce;
         authInfo.cbNonce = sizeof(nonce);
+        authInfo.pbTag = tag;
+        authInfo.cbTag = sizeof(tag);
 
         ULONG unencrypted_size;
         NTSTATUS status = BCryptDecrypt(dk, (PUCHAR) crypted.data(), crypted.size(),
@@ -421,12 +435,15 @@ namespace pEp {
         
         unencrypted_buffer = new char[unencrypted_size];
         PUCHAR crypted_data = (PUCHAR) crypted.data();
-        ULONG crypted_size = (ULONG) crypted.size();
-        
+        ULONG crypted_size = (ULONG) crypted.size() - sizeof(tag);
+        memcpy(tag, crypted_data + crypted_size, sizeof(tag));
+
         status = BCryptDecrypt(dk, crypted_data, crypted_size,
-            &authInfo, iv, 16, (PUCHAR) unencrypted_buffer, unencrypted_size, &unencrypted_size, 0);
+            &authInfo, iv, sizeof(iv), (PUCHAR) unencrypted_buffer, unencrypted_size, &unencrypted_size, 0);
         if (status)
             goto closing;
+
+        BCryptDestroyKey(dk);
 
         TCHAR temp_path[MAX_PATH + 1];
         GetTempPath(MAX_PATH, temp_path);
@@ -444,8 +461,6 @@ namespace pEp {
 
         install_msi(filename);
 
-        DeleteFile(filename.c_str());
-        BCryptDestroyKey(dk);
         return;
 
     closing:
@@ -455,15 +470,11 @@ namespace pEp {
             CloseHandle(hFile);
         if (hUrl)
             InternetCloseHandle(hUrl);
-        if (filename.length())
-            DeleteFile(filename.c_str());
         BCryptDestroyKey(dk);
     }
 
     void GateKeeper::keep_updated()
     {
-        return; // disabled for now
-
         NTSTATUS status = BCryptOpenAlgorithmProvider(&hAES, BCRYPT_AES_ALGORITHM, MS_PRIMITIVE_PROVIDER, 0);
         assert(status == 0);
         if (status)
@@ -483,6 +494,7 @@ namespace pEp {
 
         product_list& products = registered_products();
         DWORD context = 0;
+
         for (auto i = products.begin(); i != products.end(); i++) {
             try {
                 update_product(*i, context++);
