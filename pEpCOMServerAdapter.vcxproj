@@ -53,6 +53,12 @@
 echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
 "$(SDK40ToolsPath)x64\TlbImp.exe" "$(TargetPath)" /out:"$(TargetDir)pEpCOMServerAdapter.Interop.dll" /namespace:pEpCOMServerAdapterLib /primary /keyfile:"$(SolutionDir)pEpForOutlook\pEp_test.snk" /machine:Agnostic
 
+echo "copying required .dll to output directory"
+xcopy /y "..\Dependencies\iconv-1.9.2.win32\bin\iconv.dll" "$(OutDir)"
+xcopy /y "..\Dependencies\openssl\out32dll\libeay32.dll" "$(OutDir)"
+xcopy /y "..\Dependencies\cyrus-sasl-2.1.25\lib\libsasl.dll" "$(OutDir)"
+xcopy /y "..\Dependencies\openssl\out32dll\ssleay32.dll" "$(OutDir)"
+xcopy /y "..\Dependencies\zlib-1.2.8\zlib1.dll" "$(OutDir)"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
