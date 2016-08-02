@@ -51,7 +51,7 @@
 "$(TargetPath)" /Regserver
 
 echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
-"$(SDK40ToolsPath)x64\TlbImp.exe" "$(TargetPath)" /out:"$(TargetDir)pEpCOMServerAdapter.Interop.dll" /namespace:pEpCOMServerAdapterLib /primary /keyfile:"$(SolutionDir)pEp\pEp_test.snk" /machine:Agnostic
+"$(SDK40ToolsPath)x64\TlbImp.exe" "$(TargetPath)" /out:"$(TargetDir)pEpCOMServerAdapter.Interop.dll" /namespace:pEpCOMServerAdapterLib /primary /keyfile:"$(SolutionDir)pEpForOutlook\pEp_test.snk" /machine:Agnostic
 
 </Command>
     </PostBuildEvent>
@@ -171,7 +171,7 @@ echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\pep_for_outlook\pep\pep_test.snk" />
+    <None Include="..\pEpForOutlook\pep_test.snk" />
     <None Include="pEpCOMServerAdapter.rgs" />
     <None Include="pEpEngine.rgs" />
     <None Include="updatekey.bin" />
@@ -180,7 +180,7 @@ echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
     <Midl Include="pEpCOMServerAdapter.idl" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\pEpEngine\pEpEngine.vcxproj">
+    <ProjectReference Include="..\pEpEngine\pEpEngine.vcxproj">
       <Project>{146e69f8-e1da-456a-b048-6dd29d9acf6b}</Project>
     </ProjectReference>
   </ItemGroup>
