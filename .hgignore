@@ -3,6 +3,7 @@ syntax: glob
 *.tmp
 Debug
 Release
+*.orig
 *.aps
 *.user
 pEpCOMServerAdapter_p.*
