@@ -97,10 +97,10 @@
     <None Include="pEpEngine.rgs">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\pep_for_outlook\pep\pep_test.snk" />
     <None Include="updatekey.bin">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\pEpForOutlook\pep_test.snk" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="pEpCOMServerAdapter.idl">
