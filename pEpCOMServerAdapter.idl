@@ -286,6 +286,9 @@ interface IpEpEngine : IUnknown {
 	HRESULT register_callbacks([in] IpEpEngineCallbacks* new_callback);
 
 	HRESULT unregister_callbacks([in] IpEpEngineCallbacks* obsolete_callback);
+
+	// new members should be added to the end of this list...
+	HRESULT encrypt_message_ex([in] struct text_message *src, [out] struct text_message * dst, [in] SAFEARRAY(BSTR) extra, [in] pEp_enc_format enc_format);
 };
 
 [
