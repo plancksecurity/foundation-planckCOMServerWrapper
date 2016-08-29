@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -18,13 +18,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -51,8 +51,14 @@
 "$(TargetPath)" /Regserver
 
 echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
-"$(SDK40ToolsPath)x64\TlbImp.exe" "$(TargetPath)" /out:"$(TargetDir)pEpCOMServerAdapter.Interop.dll" /namespace:pEpCOMServerAdapterLib /primary /keyfile:"$(SolutionDir)pEp\pEp_test.snk" /machine:Agnostic
+"$(SDK40ToolsPath)x64\TlbImp.exe" "$(TargetPath)" /out:"$(TargetDir)pEpCOMServerAdapter.Interop.dll" /namespace:pEpCOMServerAdapterLib /primary /keyfile:"$(SolutionDir)pEpForOutlook\pEp_test.snk" /machine:Agnostic
 
+echo "copying required .dll to output directory"
+xcopy /y "..\Dependencies\iconv-1.9.2.win32\bin\iconv.dll" "$(OutDir)"
+xcopy /y "..\Dependencies\openssl\out32dll\libeay32.dll" "$(OutDir)"
+xcopy /y "..\Dependencies\cyrus-sasl-2.1.25\lib\libsasl.dll" "$(OutDir)"
+xcopy /y "..\Dependencies\openssl\out32dll\ssleay32.dll" "$(OutDir)"
+xcopy /y "..\Dependencies\zlib-1.2.8\zlib1.dll" "$(OutDir)"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -171,7 +177,7 @@ echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\pep_for_outlook\pep\pep_test.snk" />
+    <None Include="..\pEpForOutlook\pep_test.snk" />
     <None Include="pEpCOMServerAdapter.rgs" />
     <None Include="pEpEngine.rgs" />
     <None Include="updatekey.bin" />
@@ -180,7 +186,7 @@ echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
     <Midl Include="pEpCOMServerAdapter.idl" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\pEpEngine\pEpEngine.vcxproj">
+    <ProjectReference Include="..\pEpEngine\pEpEngine.vcxproj">
       <Project>{146e69f8-e1da-456a-b048-6dd29d9acf6b}</Project>
     </ProjectReference>
   </ItemGroup>
