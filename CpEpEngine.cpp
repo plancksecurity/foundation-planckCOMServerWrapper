@@ -1300,6 +1300,38 @@ STDMETHODIMP CpEpEngine::unregister_callbacks(IpEpEngineCallbacks* obsolete_call
 	return S_FALSE;
 }
 
+STDMETHODIMP CpEpEngine::OpenPGP_list_keyinfo(BSTR* search_pattern, LPSAFEARRAY* keyinfo_list) {
+    assert(keyinfo_list);
+    
+    if (key_list == NULL)
+        return E_INVALIDARG;
+
+    string _pattern = "";
+    if (search_pattern)
+        _pattern = utf8_string(search_pattern);
+    ::stringpair_list_t* _keyinfo_list = NULL;
+
+    PEP_STATUS status = ::find_keys(get_session(), _pattern.c_str(), &_keyinfo_list);
+    assert(status != PEP_OUT_OF_MEMORY);
+    if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+
+    if (status != ::PEP_STATUS_OK)
+        return FAIL(L"OpenPGP_list_keyinfo");
+
+    if (_keyinfo_list && _keyinfo_list->value) {
+        *keyinfo_list = stringpair_list(_keyinfo_list); // ???
+    }
+    else {
+        ::free_stringlist(_keyinto_list);
+        return FAIL(L"OpenPGP_list_keyinfo: no keys found");
+    }
+
+    ::free_stringpair_list(_keyinfo_list);
+    return S_OK;
+    
+}
+
 HRESULT CpEpEngine::Fire_MessageToSend(text_message * msg)
 {
 	callbacks cbs = get_callbacks();
