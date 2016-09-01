@@ -465,6 +465,23 @@ STDMETHODIMP CpEpEngine::get_crashdump_log(LONG maxlines, BSTR * log)
     return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::get_engine_version(BSTR * engine_version)
+{
+    assert(engine_version);
+
+    if (!engine_version)
+        return E_INVALIDARG;
+
+    const char *_enginge_version = ::get_engine_version();
+
+    if (_enginge_version == NULL)
+        return FAIL(L"get_engine_version");
+
+    *engine_version = utf16_bstr(_enginge_version);
+
+    return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::get_languagelist(BSTR * languages)
 {
     assert(languages);

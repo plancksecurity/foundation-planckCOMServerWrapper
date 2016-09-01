@@ -191,6 +191,7 @@ public:
     STDMETHOD(find_keys)(BSTR pattern, LPSAFEARRAY * key_list);
     STDMETHOD(send_key)(BSTR pattern);
     STDMETHOD(get_crashdump_log)(LONG maxlines, BSTR * log);
+    STDMETHOD(get_engine_version)(BSTR * engine_version);
     STDMETHOD(get_languagelist)(BSTR * languages);
     STDMETHOD(get_phrase)(BSTR lang, LONG phrase_id, BSTR * phrase);
 
