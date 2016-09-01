@@ -218,8 +218,7 @@ public:
     // Message API
 
     STDMETHOD(encrypt_message)(text_message * src, text_message * dst, SAFEARRAY * extra);
-	STDMETHOD(encrypt_message_ex)(text_message * src, text_message * dst, SAFEARRAY * extra, pEp_enc_format enc_format);
-	STDMETHOD(decrypt_message)(text_message * src, text_message * dst, SAFEARRAY ** keylist, pEp_color *rating);
+    STDMETHOD(decrypt_message)(text_message * src, text_message * dst, SAFEARRAY ** keylist, pEp_color *rating);
     STDMETHOD(outgoing_message_color)(text_message *msg, pEp_color * pVal);
     STDMETHOD(identity_color)(pEp_identity_s * ident, pEp_color * pVal);
 

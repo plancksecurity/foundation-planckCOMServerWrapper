@@ -1118,12 +1118,6 @@ HRESULT CpEpEngine::error(_bstr_t msg)
 
 STDMETHODIMP CpEpEngine::encrypt_message(text_message * src, text_message * dst, SAFEARRAY * extra)
 {
-	// this method is just a backwards compatibility wrapper
-	return encrypt_message_ex(src, dst, extra, pEp_enc_pieces);
-}
-
-STDMETHODIMP CpEpEngine::encrypt_message_ex(text_message * src, text_message * dst, SAFEARRAY * extra, pEp_enc_format enc_format)
-{
     assert(src);
     assert(dst);
 
@@ -1131,10 +1125,7 @@ STDMETHODIMP CpEpEngine::encrypt_message_ex(text_message * src, text_message * d
     ::message *msg_dst;
     ::stringlist_t *_extra = new_stringlist(extra);
 
-	// casting this value in a local variable allows for easier debugging.
-	PEP_enc_format engine_enc_format = (PEP_enc_format)enc_format;
-
-    PEP_STATUS status = ::encrypt_message(get_session(), _src, _extra, &msg_dst, engine_enc_format);
+    PEP_STATUS status = ::encrypt_message(get_session(), _src, _extra, &msg_dst, PEP_enc_PGP_MIME);
     ::free_stringlist(_extra);
 
     if (status == PEP_STATUS_OK)
