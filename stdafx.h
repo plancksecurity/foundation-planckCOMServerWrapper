@@ -50,3 +50,4 @@
 #include "../pEpEngine/src/stringpair.h"
 #include "../pEpEngine/src/blacklist.h"
 #include "../pEpEngine/src/sync.h"
+#include "../pEpEngine/src/openpgp_compat.h"

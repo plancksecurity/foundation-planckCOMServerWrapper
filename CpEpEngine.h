@@ -228,7 +228,7 @@ public:
 	STDMETHOD(unregister_callbacks)(IpEpEngineCallbacks *obsolete_callback);
     
     // PGP compatibility functions
-    STDMETHOD(OpenPGP_list_keyinfo)(BSTR* search_pattern, LPSAFEARRAY* keyinfo_list);
+    STDMETHOD(OpenPGP_list_keyinfo)(BSTR search_pattern, LPSAFEARRAY* keyinfo_list);
 
 protected:
 	HRESULT Fire_MessageToSend(

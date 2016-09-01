@@ -1300,10 +1300,10 @@ STDMETHODIMP CpEpEngine::unregister_callbacks(IpEpEngineCallbacks* obsolete_call
 	return S_FALSE;
 }
 
-STDMETHODIMP CpEpEngine::OpenPGP_list_keyinfo(BSTR* search_pattern, LPSAFEARRAY* keyinfo_list) {
+STDMETHODIMP CpEpEngine::OpenPGP_list_keyinfo(BSTR search_pattern, LPSAFEARRAY* keyinfo_list) {
     assert(keyinfo_list);
     
-    if (key_list == NULL)
+    if (keyinfo_list == NULL)
         return E_INVALIDARG;
 
     string _pattern = "";
@@ -1311,7 +1311,7 @@ STDMETHODIMP CpEpEngine::OpenPGP_list_keyinfo(BSTR* search_pattern, LPSAFEARRAY*
         _pattern = utf8_string(search_pattern);
     ::stringpair_list_t* _keyinfo_list = NULL;
 
-    PEP_STATUS status = ::find_keys(get_session(), _pattern.c_str(), &_keyinfo_list);
+    PEP_STATUS status = ::OpenPGP_list_keyinfo(get_session(), _pattern.c_str(), &_keyinfo_list);
     assert(status != PEP_OUT_OF_MEMORY);
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
@@ -1320,10 +1320,10 @@ STDMETHODIMP CpEpEngine::OpenPGP_list_keyinfo(BSTR* search_pattern, LPSAFEARRAY*
         return FAIL(L"OpenPGP_list_keyinfo");
 
     if (_keyinfo_list && _keyinfo_list->value) {
-        *keyinfo_list = stringpair_list(_keyinfo_list); // ???
+        ::opt_field_array_from_C(_keyinfo_list, keyinfo_list);
     }
     else {
-        ::free_stringlist(_keyinto_list);
+        ::free_stringpair_list(_keyinfo_list);
         return FAIL(L"OpenPGP_list_keyinfo: no keys found");
     }
 
