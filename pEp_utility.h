@@ -42,6 +42,7 @@ namespace pEp {
         ::pEp_identity *new_identity(const pEp_identity_s * ident);
 
 		void opt_field_array_from_C(stringpair_list_t* spair_list, LPSAFEARRAY* pair_list_out);
+		void clear_opt_field_array(LPSAFEARRAY* pair_list);
 
         static LPTYPELIB pTypelib = NULL;
 
