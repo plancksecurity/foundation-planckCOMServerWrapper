@@ -205,6 +205,9 @@ interface IpEpEngine : IUnknown {
     HRESULT blacklist_is_listed([in] BSTR fpr, [out, retval] VARIANT_BOOL *listed);
     HRESULT blacklist_retrieve([out, retval] SAFEARRAY(BSTR) *blacklist);
 
+	// PGP compatibility functions
+	HRESULT OpenPGP_list_keyinfo([in] BSTR search_pattern, [out, retval] SAFEARRAY(struct opt_field)* keyinfo_list);
+
     // Message API
 
     typedef enum _pEp_color {

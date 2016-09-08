@@ -521,5 +521,19 @@ namespace pEp {
 
             return msg2;
         }
+		void opt_field_array_from_C(stringpair_list_t* spair_list, LPSAFEARRAY* pair_list_out) {
+			assert(spair_list);
+			assert(pair_list_out);
+			
+			if (!spair_list)
+				return;
+
+			*pair_list_out = array_from_C<opt_field, stringpair_list_t>(spair_list);
+		}
+		void clear_opt_field_array(LPSAFEARRAY* opt_field_array) {
+			SafeArrayDestroy(*opt_field_array);
+			//memset(*opt_field_array, 0, sizeof(SAFEARRAY*));
+			*opt_field_array = NULL;
+		}
     }
 }
