@@ -1125,7 +1125,7 @@ STDMETHODIMP CpEpEngine::encrypt_message(text_message * src, text_message * dst,
     ::message *msg_dst;
     ::stringlist_t *_extra = new_stringlist(extra);
 
-    PEP_STATUS status = ::encrypt_message(get_session(), _src, _extra, &msg_dst, PEP_enc_pieces);
+    PEP_STATUS status = ::encrypt_message(get_session(), _src, _extra, &msg_dst, PEP_enc_PGP_MIME);
     ::free_stringlist(_extra);
 
     if (status == PEP_STATUS_OK)
