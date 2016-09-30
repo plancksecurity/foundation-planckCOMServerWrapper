@@ -8,6 +8,7 @@
 #include "locked_queue.hh"
 #include "utf8_helper.h"
 #include "pEp_utility.h"
+#include <queue>
 
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
@@ -37,7 +38,7 @@ public:
         PEP_STATUS status = ::init(&m_session);
         assert(status == PEP_STATUS_OK);
         ::register_examine_function(m_session, CpEpEngine::examine_identity, (void *)this);
-        ::register_sync_callbacks(m_session, (void*)this, messageToSend, showHandshake, NULL, NULL);
+        ::register_sync_callbacks(m_session, (void*)this, messageToSend, showHandshake, inject_sync_msg, retreive_next_sync_msg);
         ::log_event(m_session, "Startup", "pEp COM Adapter", NULL, NULL);
     }
 
@@ -137,8 +138,11 @@ protected:
 
     typedef locked_queue<pEp_identity_cpp> identity_queue_t;
     static ::pEp_identity * retrieve_next_identity(void *management);
-    static PEP_STATUS messageToSend(void *obj, message *msg);
+    static PEP_STATUS messageToSend(void * obj, message *msg);
     static PEP_STATUS showHandshake(void * obj, pEp_identity *self, pEp_identity *partner);
+
+	static int inject_sync_msg(void *msg, void* management);
+	static void* retreive_next_sync_msg(void* management);
 
     HRESULT error(_bstr_t msg);
 
@@ -160,6 +164,15 @@ private:
 
 	mutex callback_mutex;
 	vector<IpEpEngineCallbacks*> callback_vector;
+
+	// Keysync members
+	static std::mutex keysync_mutex;
+	static std::condition_variable keysync_condition;
+	static std::thread *keysync_thread;
+	static std::queue<void*> keysync_queue;
+	static bool keysync_thread_running;
+	static bool keysync_abort_requested;
+	static PEP_SESSION keysync_session;
 
 public:
     // runtime config of the adapter
@@ -207,6 +220,10 @@ public:
     STDMETHOD(key_mistrusted)(struct pEp_identity_s *ident);
     STDMETHOD(key_reset_trust)(struct pEp_identity_s *ident);
     STDMETHOD(trust_personal_key)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
+
+	// keysync API
+	STDMETHOD(start_keysync)();
+	STDMETHOD(stop_keysync)();
 
     // Blacklist API
 
