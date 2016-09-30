@@ -37,7 +37,7 @@ public:
         PEP_STATUS status = ::init(&m_session);
         assert(status == PEP_STATUS_OK);
         ::register_examine_function(m_session, CpEpEngine::examine_identity, (void *)this);
-        ::register_sync_callbacks(m_session, (void*)this, messageToSend, showHandshake);
+        ::register_sync_callbacks(m_session, (void*)this, messageToSend, showHandshake, NULL, NULL);
         ::log_event(m_session, "Startup", "pEp COM Adapter", NULL, NULL);
     }
 
@@ -137,8 +137,8 @@ protected:
 
     typedef locked_queue<pEp_identity_cpp> identity_queue_t;
     static ::pEp_identity * retrieve_next_identity(void *management);
-    static PEP_STATUS messageToSend(void *obj, const message *msg);
-    static PEP_STATUS showHandshake(void * obj, const pEp_identity *self, const pEp_identity *partner);
+    static PEP_STATUS messageToSend(void *obj, message *msg);
+    static PEP_STATUS showHandshake(void * obj, pEp_identity *self, pEp_identity *partner);
 
     HRESULT error(_bstr_t msg);
 
@@ -204,7 +204,7 @@ public:
     STDMETHOD(verify)(BSTR text, BSTR signature, LPSAFEARRAY * key_list, pEp_STATUS * verify_status);
     STDMETHOD(myself)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
     STDMETHOD(update_identity)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
-    STDMETHOD(key_compromized)(struct pEp_identity_s *ident);
+    STDMETHOD(key_mistrusted)(struct pEp_identity_s *ident);
     STDMETHOD(key_reset_trust)(struct pEp_identity_s *ident);
     STDMETHOD(trust_personal_key)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
 
@@ -218,9 +218,10 @@ public:
     // Message API
 
     STDMETHOD(encrypt_message)(text_message * src, text_message * dst, SAFEARRAY * extra);
-    STDMETHOD(decrypt_message)(text_message * src, text_message * dst, SAFEARRAY ** keylist, pEp_color *rating);
-    STDMETHOD(outgoing_message_color)(text_message *msg, pEp_color * pVal);
-    STDMETHOD(identity_color)(pEp_identity_s * ident, pEp_color * pVal);
+    STDMETHOD(decrypt_message)(text_message * src, text_message * dst, SAFEARRAY ** keylist, pEp_rating *rating);
+    STDMETHOD(outgoing_message_rating)(text_message *msg, pEp_rating * pVal);
+    STDMETHOD(identity_rating)(pEp_identity_s * ident, pEp_rating * pVal);
+	STDMETHOD(color_from_rating)(pEp_rating rating, pEp_color * pVal);
 
 	// Event callbacks
 

@@ -194,7 +194,7 @@ interface IpEpEngine : IUnknown {
     HRESULT examine_identity([in] struct pEp_identity_s * ident);
     HRESULT myself([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
     HRESULT update_identity([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
-    HRESULT key_compromized([in] struct pEp_identity_s *ident);
+    HRESULT key_mistrusted([in] struct pEp_identity_s *ident);
     HRESULT key_reset_trust([in] struct pEp_identity_s *ident);
     HRESULT trust_personal_key([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
 
@@ -210,31 +210,29 @@ interface IpEpEngine : IUnknown {
 
     // Message API
 
-    typedef enum _pEp_color {
-        pEp_rating_undefined = 0,
-        pEp_rating_cannot_decrypt,
-        pEp_rating_have_no_key,
-        pEp_rating_unencrypted,
-        pEp_rating_unencrypted_for_some,
-        pEp_rating_unreliable,
-        pEp_rating_reliable,
-        pEp_rating_yellow = pEp_rating_reliable,
-        pEp_rating_trusted,
-        pEp_rating_green = pEp_rating_trusted,
-        pEp_rating_trusted_and_anonymized,
-        pEp_rating_fully_anonymous,
+	typedef enum _pEp_rating {
+		pEp_rating_undefined = 0,
+		pEp_rating_cannot_decrypt,
+		pEp_rating_have_no_key,
+		pEp_rating_unencrypted,
+		pEp_rating_unencrypted_for_some,
+		pEp_rating_unreliable,
+		pEp_rating_reliable,
+		pEp_rating_trusted,
+		pEp_rating_trusted_and_anonymized,
+		pEp_rating_fully_anonymous,
 
-        pEp_rating_mistrust = -1,
-        pEp_rating_red = pEp_rating_mistrust,
-        pEp_rating_b0rken = -2,
-        pEp_rating_under_attack = -3
-    } pEp_color;
+		pEp_rating_mistrust = -1,
+		pEp_rating_b0rken = -2,
+		pEp_rating_under_attack = -3
+	} pEp_rating;
 
-    typedef enum _pEp_text_format {
-        pEp_text_format_plain = 0,
-        pEp_text_format_html,
-        pEp_text_format_other = 0xff
-    } pEp_text_format;
+	typedef enum _pEp_color {
+		pEp_color_no_color = 0,
+		pEp_color_yellow,
+		pEp_color_green,
+		pEp_color_red = -1,
+	} pEp_color;
 
     typedef  enum _pEp_msg_direction {
         pEp_dir_incoming = 0,
@@ -282,10 +280,10 @@ interface IpEpEngine : IUnknown {
     };
 
     HRESULT encrypt_message([in] struct text_message *src, [out] struct text_message * dst, [in] SAFEARRAY(BSTR) extra);
-    HRESULT decrypt_message([in] struct text_message *src, [out] struct text_message * dst, [out] SAFEARRAY(BSTR) *keylist, [out, retval] pEp_color *rating);
-    HRESULT outgoing_message_color([in] struct text_message *msg, [out, retval] pEp_color * pVal);
-    HRESULT identity_color([in] struct pEp_identity_s * ident, [out, retval] pEp_color * pVal);
-
+    HRESULT decrypt_message([in] struct text_message *src, [out] struct text_message * dst, [out] SAFEARRAY(BSTR) *keylist, [out, retval] pEp_rating *rating);
+    HRESULT outgoing_message_rating([in] struct text_message *msg, [out, retval] pEp_rating * pVal);
+    HRESULT identity_rating([in] struct pEp_identity_s * ident, [out, retval] pEp_rating * pVal);
+	HRESULT color_from_rating([in] pEp_rating rating, [out, retval] pEp_color* pVal);
 
 	HRESULT register_callbacks([in] IpEpEngineCallbacks* new_callback);
 

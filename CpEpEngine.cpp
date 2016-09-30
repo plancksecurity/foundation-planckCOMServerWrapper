@@ -882,7 +882,7 @@ STDMETHODIMP CpEpEngine::update_identity(struct pEp_identity_s *ident, struct pE
     }
 }
 
-STDMETHODIMP CpEpEngine::key_compromized(struct pEp_identity_s *ident)
+STDMETHODIMP CpEpEngine::key_mistrusted(struct pEp_identity_s *ident)
 {
     ::pEp_identity *_ident;
 
@@ -898,7 +898,7 @@ STDMETHODIMP CpEpEngine::key_compromized(struct pEp_identity_s *ident)
         return E_FAIL;
     }
 
-    PEP_STATUS status = ::key_compromized(get_session(), _ident);
+    PEP_STATUS status = ::key_mistrusted(get_session(), _ident);
     free_identity(_ident);
 
     if (status == PEP_OUT_OF_MEMORY)
@@ -989,7 +989,7 @@ int CpEpEngine::examine_identity(pEp_identity *ident, void *management)
     return _ident;
 }
 
-PEP_STATUS CpEpEngine::messageToSend(void * obj, const message *msg)
+PEP_STATUS CpEpEngine::messageToSend(void * obj, message *msg)
 {
     assert(msg);
     if (msg == NULL)
@@ -1011,7 +1011,7 @@ PEP_STATUS CpEpEngine::messageToSend(void * obj, const message *msg)
     return PEP_STATUS_OK;
 }
 
-PEP_STATUS CpEpEngine::showHandshake(void * obj, const pEp_identity *self, const pEp_identity *partner)
+PEP_STATUS CpEpEngine::showHandshake(void * obj, pEp_identity *self, pEp_identity *partner)
 {
     assert(self && partner);
     if (!(self && partner))
@@ -1032,7 +1032,7 @@ PEP_STATUS CpEpEngine::showHandshake(void * obj, const pEp_identity *self, const
     if (r != S_OK)
         return PEP_UNKNOWN_ERROR;
 
-    PEP_STATUS status = deliverHandshakeResult(me->get_session(), (sync_handshake_result) (int) _result);
+    PEP_STATUS status = deliverHandshakeResult(me->get_session(), partner, (sync_handshake_result) (int) _result);
     return status;
 }
 
@@ -1125,7 +1125,10 @@ STDMETHODIMP CpEpEngine::encrypt_message(text_message * src, text_message * dst,
     ::message *msg_dst;
     ::stringlist_t *_extra = new_stringlist(extra);
 
-    PEP_STATUS status = ::encrypt_message(get_session(), _src, _extra, &msg_dst, PEP_enc_PGP_MIME);
+	// TODO: Check whether we should pass any of the encryption flags as last parameter, or expose
+	// it to the client. (_PEP_enc_format is intentionally hidden for now...)
+	PEP_encrypt_flags_t flags = 0;
+    PEP_STATUS status = ::encrypt_message(get_session(), _src, _extra, &msg_dst, PEP_enc_PGP_MIME, flags);
     ::free_stringlist(_extra);
 
     if (status == PEP_STATUS_OK)
@@ -1142,7 +1145,7 @@ STDMETHODIMP CpEpEngine::encrypt_message(text_message * src, text_message * dst,
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst, SAFEARRAY ** keylist, pEp_color *rating)
+STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst, SAFEARRAY ** keylist, pEp_rating *rating)
 {
     assert(src);
     assert(dst);
@@ -1155,7 +1158,7 @@ STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst,
     ::message *_src = text_message_to_C(src);
     ::message *msg_dst = NULL;
     ::stringlist_t *_keylist;
-    ::PEP_color _rating;
+    ::PEP_rating _rating;
 
     PEP_decrypt_flags_t flags = 0; 
     PEP_STATUS status = ::decrypt_message(get_session(), _src, &msg_dst, &_keylist, &_rating, &flags);
@@ -1172,28 +1175,28 @@ STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst,
         free_stringlist(_keylist);
     }
 
-    *rating = (pEp_color) _rating;
+    *rating = (pEp_rating) _rating;
 
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::outgoing_message_color(text_message *msg, pEp_color * pVal)
+STDMETHODIMP CpEpEngine::outgoing_message_rating(text_message *msg, pEp_rating * pVal)
 {
     assert(msg);
     assert(pVal);
 
     ::message *_msg = text_message_to_C(msg);
 
-    PEP_color _color;
-    PEP_STATUS status = ::outgoing_message_color(get_session(), _msg, &_color);
+    PEP_rating _rating;
+    PEP_STATUS status = ::outgoing_message_rating(get_session(), _msg, &_rating);
     if (status != PEP_STATUS_OK)
-        return FAIL(L"cannot get message color");
+        return FAIL(L"cannot get message rating");
 
-    *pVal = (pEp_color) _color;
+    *pVal = (pEp_rating) _rating;
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::identity_color(struct pEp_identity_s *ident, pEp_color * pVal)
+STDMETHODIMP CpEpEngine::identity_rating(struct pEp_identity_s *ident, pEp_rating * pVal)
 {
     ::pEp_identity *_ident;
 
@@ -1210,14 +1213,26 @@ STDMETHODIMP CpEpEngine::identity_color(struct pEp_identity_s *ident, pEp_color 
         return E_FAIL;
     }
 
-    PEP_color _color;
-    PEP_STATUS status = ::identity_color(get_session(), _ident, &_color);
+    PEP_rating _rating;
+    PEP_STATUS status = ::identity_rating(get_session(), _ident, &_rating);
     free_identity(_ident);
     if (status != PEP_STATUS_OK)
         return FAIL(L"cannot get message color");
 
-    *pVal = (pEp_color) _color;
+    *pVal = (pEp_rating) _rating;
     return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::color_from_rating(pEp_rating rating, pEp_color * pVal) 
+{
+	assert(pVal);
+
+	PEP_rating engineRating = (PEP_rating)rating;
+	PEP_color _color = ::color_from_rating(engineRating);
+
+	*pVal = (pEp_color)_color;
+
+	return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::trust_personal_key(struct pEp_identity_s *ident, struct pEp_identity_s *result)
