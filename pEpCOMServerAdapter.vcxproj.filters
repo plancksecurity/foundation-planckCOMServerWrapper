@@ -72,9 +72,6 @@
     <ClInclude Include="pEp_utility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="_IpEpEngineEvents_CP.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="GateKeeper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
