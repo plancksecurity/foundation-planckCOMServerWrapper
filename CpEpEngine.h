@@ -234,8 +234,8 @@ public:
 
     // Message API
 
-    STDMETHOD(encrypt_message)(text_message * src, text_message * dst, SAFEARRAY * extra);
-    STDMETHOD(decrypt_message)(text_message * src, text_message * dst, SAFEARRAY ** keylist, pEp_rating *rating);
+    STDMETHOD(encrypt_message)(text_message * src, text_message * dst, SAFEARRAY * extra, pEpEncryptFlags flags);
+    STDMETHOD(decrypt_message)(text_message * src, text_message * dst, SAFEARRAY ** keylist, pEpDecryptFlags* flags, pEp_rating *rating);
     STDMETHOD(outgoing_message_rating)(text_message *msg, pEp_rating * pVal);
     STDMETHOD(identity_rating)(pEp_identity_s * ident, pEp_rating * pVal);
 	STDMETHOD(color_from_rating)(pEp_rating rating, pEp_color * pVal);

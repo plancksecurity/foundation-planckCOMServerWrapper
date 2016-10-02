@@ -236,6 +236,16 @@ interface IpEpEngine : IUnknown {
 		pEp_color_red = -1,
 	} pEp_color;
 
+	typedef [v1_enum] enum pEpEncryptFlags {
+		pEpEncryptFlagsNone = 0,
+		pEpEncryptFlagForceEncryption = 0x1,
+	} pEpEncryptFlags;
+
+	typedef [v1_enum] enum pEpDecryptFlags {
+		pEpDecryptFlagsNone = 0,
+		pEpDecryptFlagOwnPrivateKey = 0x1
+	} pEpDecryptFlags;
+
     typedef  enum _pEp_msg_direction {
         pEp_dir_incoming = 0,
         pEp_dir_outgoing
@@ -281,8 +291,8 @@ interface IpEpEngine : IUnknown {
         SAFEARRAY(struct opt_field) opt_fields;
     };
 
-    HRESULT encrypt_message([in] struct text_message *src, [out] struct text_message * dst, [in] SAFEARRAY(BSTR) extra);
-    HRESULT decrypt_message([in] struct text_message *src, [out] struct text_message * dst, [out] SAFEARRAY(BSTR) *keylist, [out, retval] pEp_rating *rating);
+    HRESULT encrypt_message([in] struct text_message *src, [out] struct text_message * dst, [in] SAFEARRAY(BSTR) extra, [in, optional, defaultvalue(pEpEncryptFlagsNone)] pEpEncryptFlags flags);
+    HRESULT decrypt_message([in] struct text_message *src, [out] struct text_message * dst, [out] SAFEARRAY(BSTR) *keylist, [out] pEpDecryptFlags* flags, [out, retval] pEp_rating *rating);
     HRESULT outgoing_message_rating([in] struct text_message *msg, [out, retval] pEp_rating * pVal);
     HRESULT identity_rating([in] struct pEp_identity_s * ident, [out, retval] pEp_rating * pVal);
 	HRESULT color_from_rating([in] pEp_rating rating, [out, retval] pEp_color* pVal);

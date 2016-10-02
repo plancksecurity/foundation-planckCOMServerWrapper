@@ -1116,7 +1116,7 @@ HRESULT CpEpEngine::error(_bstr_t msg)
 	return E_FAIL;
 }
 
-STDMETHODIMP CpEpEngine::encrypt_message(text_message * src, text_message * dst, SAFEARRAY * extra)
+STDMETHODIMP CpEpEngine::encrypt_message(text_message * src, text_message * dst, SAFEARRAY * extra, pEpEncryptFlags flags)
 {
 	assert(src);
 	assert(dst);
@@ -1125,10 +1125,10 @@ STDMETHODIMP CpEpEngine::encrypt_message(text_message * src, text_message * dst,
 	::message *msg_dst;
 	::stringlist_t *_extra = new_stringlist(extra);
 
-	// TODO: Check whether we should pass any of the encryption flags as last parameter, or expose
-	// it to the client. (_PEP_enc_format is intentionally hidden for now...)
-	PEP_encrypt_flags_t flags = 0;
-	PEP_STATUS status = ::encrypt_message(get_session(), _src, _extra, &msg_dst, PEP_enc_PGP_MIME, flags);
+	// _PEP_enc_format is intentionally hardcoded to PEP_enc_PEP:
+	// 2016-10-02 14:10 < fdik> schabi: actually, all adapters now must use PEP_enc_PEP
+	PEP_encrypt_flags_t engineFlags = (PEP_encrypt_flags_t) flags;
+	PEP_STATUS status = ::encrypt_message(get_session(), _src, _extra, &msg_dst, PEP_enc_PEP, engineFlags);
 	::free_stringlist(_extra);
 
 	if (status == PEP_STATUS_OK)
@@ -1145,7 +1145,7 @@ STDMETHODIMP CpEpEngine::encrypt_message(text_message * src, text_message * dst,
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst, SAFEARRAY ** keylist, pEp_rating *rating)
+STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst, SAFEARRAY ** keylist, pEpDecryptFlags *flags, pEp_rating *rating)
 {
 	assert(src);
 	assert(dst);
@@ -1160,9 +1160,10 @@ STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst,
 	::stringlist_t *_keylist;
 	::PEP_rating _rating;
 
-	PEP_decrypt_flags_t flags = 0;
-	PEP_STATUS status = ::decrypt_message(get_session(), _src, &msg_dst, &_keylist, &_rating, &flags);
-	// TODO : output decrypt flags.
+	PEP_decrypt_flags_t engineflags = 0;
+	PEP_STATUS status = ::decrypt_message(get_session(), _src, &msg_dst, &_keylist, &_rating, &engineflags);
+
+	*flags = (pEpDecryptFlags)engineflags;
 
 	if (msg_dst)
 		text_message_from_C(dst, msg_dst);
@@ -1403,7 +1404,7 @@ void * CpEpEngine::retreive_next_sync_msg(void * management)
 	}
 
 	// we acknowledge that we're quitting...
-	keysync_thread_running == false;
+	keysync_thread_running = false;
 
 	// We signal the main thread that we got his signal
 	// so it can gain the mutex again and call join() on us.
