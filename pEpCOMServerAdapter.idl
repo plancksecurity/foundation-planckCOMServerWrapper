@@ -206,7 +206,7 @@ interface IpEpEngine : IUnknown {
     HRESULT blacklist_retrieve([out, retval] SAFEARRAY(BSTR) *blacklist);
 
 	// PGP compatibility functions
-	HRESULT OpenPGP_list_keyinfo([in] BSTR search_pattern, [out, retval] SAFEARRAY(struct opt_field)* keyinfo_list);
+	HRESULT OpenPGP_list_keyinfo([in] BSTR search_pattern, [out, retval] SAFEARRAY(struct StringPair)* keyinfo_list);
 
     // Message API
 
@@ -257,7 +257,7 @@ interface IpEpEngine : IUnknown {
         pEp_enc_pEp                             // pEp encryption format
     } pEp_enc_format;
 
-    [uuid(3A8A4F13-3402-4C4C-94AB-598D87869380)] struct opt_field {
+    [uuid(3A8A4F13-3402-4C4C-94AB-598D87869380)] struct StringPair {
         BSTR name;
         BSTR value;
     };
@@ -286,10 +286,10 @@ interface IpEpEngine : IUnknown {
         SAFEARRAY(BSTR) references;
         SAFEARRAY(BSTR) keywords;
         BSTR comments;
-        SAFEARRAY(struct opt_field) opt_fields;
+        SAFEARRAY(struct StringPair) opt_fields;
     };
 
-    HRESULT encrypt_message([in] struct text_message *src, [out] struct text_message * dst, [in] SAFEARRAY(BSTR) extra, [in, optional, defaultvalue(pEpEncryptFlagsNone)] pEpEncryptFlags flags);
+    HRESULT encrypt_message([in] struct text_message *src, [out] struct text_message * dst, [in] SAFEARRAY(BSTR) extra, [in, defaultvalue(pEpEncryptFlagsNone)] pEpEncryptFlags flags);
     HRESULT decrypt_message([in] struct text_message *src, [out] struct text_message * dst, [out] SAFEARRAY(BSTR) *keylist, [out] pEpDecryptFlags* flags, [out, retval] pEp_rating *rating);
     HRESULT outgoing_message_rating([in] struct text_message *msg, [out, retval] pEp_rating * pVal);
     HRESULT identity_rating([in] struct pEp_identity_s * ident, [out, retval] pEp_rating * pVal);

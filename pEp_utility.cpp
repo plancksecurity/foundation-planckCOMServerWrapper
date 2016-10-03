@@ -240,9 +240,9 @@ namespace pEp {
             return ident;
         }
 
-        template<> opt_field *from_C< opt_field *, stringpair_list_t >(stringpair_list_t * sp)
+        template<> StringPair *from_C< StringPair *, stringpair_list_t >(stringpair_list_t * sp)
         {
-            opt_field *fld = new opt_field();
+            StringPair *fld = new StringPair();
             if (sp) {
                 fld->name = bstr(sp->value->key);
                 fld->value = bstr(sp->value->value);
@@ -312,7 +312,7 @@ namespace pEp {
             msg2->references = string_array(msg->references);
             msg2->keywords = string_array(msg->keywords);
             msg2->comments = bstr(msg->comments);
-            msg2->opt_fields = array_from_C<opt_field, stringpair_list_t>(msg->opt_fields);
+            msg2->opt_fields = array_from_C<StringPair, stringpair_list_t>(msg->opt_fields);
         }
 
         char * str(BSTR s)
@@ -435,7 +435,7 @@ namespace pEp {
             return il;
         }
 
-        stringpair_t *new_stringpair(opt_field *fld)
+        stringpair_t *new_stringpair(StringPair *fld)
         {
             stringpair_t *pair = ::new_stringpair(str(fld->name), str(fld->value));
             if (pair == NULL)
@@ -444,11 +444,11 @@ namespace pEp {
             return pair;
         }
 
-        void clear_opt_field(opt_field& f)
+        void clear_opt_field(StringPair& f)
         {
             SysFreeString(f.name);
             SysFreeString(f.value);
-            memset(&f, 0, sizeof(opt_field));
+            memset(&f, 0, sizeof(StringPair));
         }
 
         stringpair_list_t *stringpair_list(SAFEARRAY * sa)
@@ -468,8 +468,8 @@ namespace pEp {
 
             stringpair_list_t *_il = il;
             for (LONG i = lbound; i <= ubound; i++) {
-                opt_field s;
-                memset(&s, 0, sizeof(opt_field));
+                StringPair s;
+                memset(&s, 0, sizeof(StringPair));
                 SafeArrayGetElement(sa, &i, &s);
 
                 stringpair_t *pair;
@@ -528,7 +528,7 @@ namespace pEp {
 			if (!spair_list)
 				return;
 
-			*pair_list_out = array_from_C<opt_field, stringpair_list_t>(spair_list);
+			*pair_list_out = array_from_C<StringPair, stringpair_list_t>(spair_list);
 		}
 		void clear_opt_field_array(LPSAFEARRAY* opt_field_array) {
 			SafeArrayDestroy(*opt_field_array);
