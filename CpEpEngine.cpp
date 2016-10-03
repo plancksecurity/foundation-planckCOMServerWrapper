@@ -1378,6 +1378,8 @@ int CpEpEngine::inject_sync_msg(void * msg, void * management)
 
 	// notify the receivers
 	me->keysync_condition.notify_all();
+
+    return S_OK;
 }
 
 void * CpEpEngine::retreive_next_sync_msg(void * management)
