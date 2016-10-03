@@ -1289,47 +1289,48 @@ STDMETHODIMP CpEpEngine::trust_personal_key(struct pEp_identity_s *ident, struct
 
 // keysync api
 
-std::mutex CpEpEngine::keysync_mutex;
-std::condition_variable CpEpEngine::keysync_condition;
-std::thread *CpEpEngine::keysync_thread = NULL;
-std::queue<void*> CpEpEngine::keysync_queue;
-bool CpEpEngine::keysync_thread_running = FALSE;
-bool CpEpEngine::keysync_abort_requested = FALSE;
-PEP_SESSION CpEpEngine::keysync_session;
-
-STDMETHODIMP CpEpEngine::start_keysync()
+void CpEpEngine::start_keysync()
 {
 	// acquire the lock
 	std::unique_lock<std::mutex> lock(keysync_mutex);
 
 	// Check if we're already running.
-	if (keysync_thread_running)
-		return S_OK;
+	if (keysync_thread_running) 
+	{
+		// If we have pending aborts, we need to wake up those threads
+		// and cancel the pending abort.
+		if (keysync_abort_requested) 
+		{
+			keysync_abort_requested = false;
+			keysync_condition.notify_all();
+		}
+		return;
+	}
 
-	// Check if a concurrent abort was requested and is in progress
-	if (keysync_abort_requested)
-		return S_FALSE;
+	// Ensure we are not aborting the new thread due to a
+	// left over flag.
+	keysync_abort_requested = false;
 
+	// Init our keysync session
 	PEP_STATUS status = ::init(&keysync_session);
+	::register_sync_callbacks(m_session, (void*)this, messageToSend, showHandshake, inject_sync_msg, retreive_next_sync_msg);
 	assert(status = PEP_STATUS_OK);
 
-	// we pass the address of our mutex as management pointer, to do safety checks.
-	keysync_thread = new thread(::do_sync_protocol, keysync_session, &keysync_mutex);
+	// Star the keysync thread
+	keysync_thread = new thread(::do_sync_protocol, keysync_session, this);
 
 	// flag to signal we're running
 	keysync_thread_running = true;
-
-	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::stop_keysync()
+void CpEpEngine::stop_keysync()
 {
 	// acquire the lock
 	std::unique_lock<std::mutex> lock(keysync_mutex);
 
-	// check whether we're actually running, or there's a concurrent abort
+	// check whether we're not running, or there's a concurrent abort
 	if (keysync_abort_requested || !keysync_thread_running)
-		return S_OK;
+		return;
 
 	// signal that we're gonna abort
 	keysync_abort_requested = true;
@@ -1338,8 +1339,11 @@ STDMETHODIMP CpEpEngine::stop_keysync()
 	keysync_condition.notify_all();
 
 	// Wait for the other thread to finish and clean up
-	while (keysync_thread_running)
+	while (keysync_thread_running && keysync_abort_requested)
 		keysync_condition.wait(lock);
+
+	if (!keysync_abort_requested)
+		return; // someone called start_keysync() while we were trying to stop it...
 
 	// wait for the thread to end
 	keysync_thread->join();
@@ -1347,6 +1351,7 @@ STDMETHODIMP CpEpEngine::stop_keysync()
 	// clean up
 	delete keysync_thread;
 	keysync_thread = NULL;
+	::unregister_sync_callbacks(keysync_session);
 	release(keysync_session);
 	keysync_abort_requested = false;
 }
@@ -1356,59 +1361,61 @@ int CpEpEngine::inject_sync_msg(void * msg, void * management)
 	// check argument
 	if (!msg)
 		return E_INVALIDARG;
-
-	// sanity check
-	if (management != &keysync_mutex)
+	if (!management)
 		return ERROR_INVALID_HANDLE;
 
+	CpEpEngine* me = (CpEpEngine*)management;
+
 	// acquire the lock
-	std::unique_lock<std::mutex> lock(keysync_mutex);
+	std::unique_lock<std::mutex> lock(me->keysync_mutex);
 
 	// check whether we're running:
-	if (keysync_abort_requested || !keysync_thread_running)
+	if (me->keysync_abort_requested || !me->keysync_thread_running)
 		return E_ASYNC_OPERATION_NOT_STARTED;
 
 	// queue the message
-	keysync_queue.push(msg);
+	me->keysync_queue.push(msg);
 
 	// notify the receivers
-	keysync_condition.notify_all();
+	me->keysync_condition.notify_all();
 }
 
 void * CpEpEngine::retreive_next_sync_msg(void * management)
 {
 	// sanity check
-	assert(management == &keysync_mutex);
+	assert(management);
+
+	CpEpEngine* me = (CpEpEngine*)management;
 
 	// acquire the lock
-	std::unique_lock<std::mutex> lock(keysync_mutex);
+	std::unique_lock<std::mutex> lock(me->keysync_mutex);
 
 	// as long as we're supposed to be active 
 	// (we won't wait for the queue to empty currently...)
-	while (!keysync_abort_requested)
+	while (!me->keysync_abort_requested)
 	{
 		// If the queue is empty, wait for a signal, and try again.
-		if (keysync_queue.empty())
+		if (me->keysync_queue.empty())
 		{
-			keysync_condition.wait(lock);
+			me->keysync_condition.wait(lock);
 			continue;
 		}
 
 		// Pop the message and return it.
-		void* msg = keysync_queue.front();
+		void* msg = me->keysync_queue.front();
 		assert(msg);
 
-		keysync_queue.pop();
-		
+		me->keysync_queue.pop();
+
 		return msg;
 	}
 
 	// we acknowledge that we're quitting...
-	keysync_thread_running = false;
+	me->keysync_thread_running = false;
 
 	// We signal the main thread that we got his signal
 	// so it can gain the mutex again and call join() on us.
-	keysync_condition.notify_all();
+	me->keysync_condition.notify_all();
 
 	// and tell the pep engine we're done.
 	return NULL;
@@ -1424,6 +1431,7 @@ STDMETHODIMP CpEpEngine::register_callbacks(IpEpEngineCallbacks* new_callbacks)
 
 	vec.push_back(new_callbacks);
 	new_callbacks->AddRef();
+	start_keysync();
 
 	return S_OK;
 }
@@ -1437,6 +1445,9 @@ STDMETHODIMP CpEpEngine::unregister_callbacks(IpEpEngineCallbacks* obsolete_call
 	if (position != vec.end()) {
 		vec.erase(position);
 		obsolete_callbacks->Release();
+		if (vec.empty())
+			stop_keysync();
+
 		return S_OK;
 	}
 

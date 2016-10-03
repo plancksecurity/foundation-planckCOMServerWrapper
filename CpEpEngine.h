@@ -44,6 +44,7 @@ public:
 
     ~CpEpEngine()
     {
+        stop_keysync();
         stop_keyserver_lookup();
         ::unregister_sync_callbacks(m_session);
         ::log_event(m_session, "Shutdown", "pEp COM Adapter", NULL, NULL);
@@ -97,7 +98,7 @@ protected:
             me->session_mutex.unlock();
         }
 
-        operator PEP_SESSION const () 
+        operator PEP_SESSION const ()
         {
             return me->m_session;
         }
@@ -141,8 +142,6 @@ protected:
     static PEP_STATUS messageToSend(void * obj, message *msg);
     static PEP_STATUS showHandshake(void * obj, pEp_identity *self, pEp_identity *partner);
 
-	static int inject_sync_msg(void *msg, void* management);
-	static void* retreive_next_sync_msg(void* management);
 
     HRESULT error(_bstr_t msg);
 
@@ -166,19 +165,24 @@ private:
 	vector<IpEpEngineCallbacks*> callback_vector;
 
 	// Keysync members
-	static std::mutex keysync_mutex;
-	static std::condition_variable keysync_condition;
-	static std::thread *keysync_thread;
-	static std::queue<void*> keysync_queue;
-	static bool keysync_thread_running;
-	static bool keysync_abort_requested;
-	static PEP_SESSION keysync_session;
+    static int inject_sync_msg(void *msg, void* management);
+    static void* retreive_next_sync_msg(void* management);
+    void start_keysync();
+    void stop_keysync();
+
+    std::mutex keysync_mutex;
+    std::condition_variable keysync_condition;
+    std::thread *keysync_thread = NULL;
+    std::queue<void*> keysync_queue;
+    bool keysync_thread_running = false;
+    bool keysync_abort_requested = false;
+    PEP_SESSION keysync_session;
 
 public:
     // runtime config of the adapter
 
     STDMETHOD(verbose_logging)(VARIANT_BOOL enable);
-    
+
     // runtime config of the engine
 
     STDMETHOD(passive_mode)(VARIANT_BOOL enable);
@@ -221,9 +225,6 @@ public:
     STDMETHOD(key_reset_trust)(struct pEp_identity_s *ident);
     STDMETHOD(trust_personal_key)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
 
-	// keysync API
-	STDMETHOD(start_keysync)();
-	STDMETHOD(stop_keysync)();
 
     // Blacklist API
 
@@ -244,7 +245,7 @@ public:
 
 	STDMETHOD(register_callbacks)(IpEpEngineCallbacks *new_callback);
 	STDMETHOD(unregister_callbacks)(IpEpEngineCallbacks *obsolete_callback);
-    
+
     // PGP compatibility functions
     STDMETHOD(OpenPGP_list_keyinfo)(BSTR search_pattern, LPSAFEARRAY* keyinfo_list);
 

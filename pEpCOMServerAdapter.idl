@@ -190,8 +190,6 @@ interface IpEpEngine : IUnknown {
 
     HRESULT start_keyserver_lookup();
     HRESULT stop_keyserver_lookup();
-	HRESULT start_keysync();
-	HRESULT stop_keysync();
 
     HRESULT examine_identity([in] struct pEp_identity_s * ident);
     HRESULT myself([in] struct pEp_identity_s *ident, [out, retval] struct pEp_identity_s *result);
