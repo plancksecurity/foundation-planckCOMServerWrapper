@@ -25,19 +25,19 @@ STDMETHODIMP CpEpEngine::InterfaceSupportsErrorInfo(REFIID riid)
 
 #define FAIL(msg) error(msg)
 
-STDMETHODIMP CpEpEngine::verbose_logging(VARIANT_BOOL enable)
+STDMETHODIMP CpEpEngine::VerboseLogging(VARIANT_BOOL enable)
 {
 	verbose_mode = enable != VARIANT_FALSE;
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::passive_mode(VARIANT_BOOL enable)
+STDMETHODIMP CpEpEngine::PassiveMode(VARIANT_BOOL enable)
 {
 	::config_passive_mode(get_session(), enable != VARIANT_FALSE);
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::unencrypted_subject(VARIANT_BOOL enable)
+STDMETHODIMP CpEpEngine::UnencryptedSubject(VARIANT_BOOL enable)
 {
 	::config_unencrypted_subject(get_session(), enable != VARIANT_FALSE);
 	return S_OK;
@@ -81,7 +81,7 @@ STDMETHODIMP CpEpEngine::log(BSTR title, BSTR entity, BSTR description, BSTR com
 }
 
 
-STDMETHODIMP CpEpEngine::decrypt(BSTR ctext, BSTR * ptext, LPSAFEARRAY * key_list, pEp_STATUS * status)
+STDMETHODIMP CpEpEngine::decrypt(BSTR ctext, BSTR * ptext, LPSAFEARRAY * key_list, pEpStatus * status)
 {
 	assert(ctext);
 	assert(ptext);
@@ -110,7 +110,7 @@ STDMETHODIMP CpEpEngine::decrypt(BSTR ctext, BSTR * ptext, LPSAFEARRAY * key_lis
 	if (_status == PEP_OUT_OF_MEMORY)
 		return E_OUTOFMEMORY;
 
-	*status = (pEp_STATUS)_status;
+	*status = (pEpStatus)_status;
 	if (_ptext == NULL) {
 		if (_keylist) {
 			string msg;
@@ -145,7 +145,7 @@ STDMETHODIMP CpEpEngine::decrypt(BSTR ctext, BSTR * ptext, LPSAFEARRAY * key_lis
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::decrypt_b(BSTR ctext, LPSAFEARRAY * ptext, LPSAFEARRAY * key_list, pEp_STATUS * status)
+STDMETHODIMP CpEpEngine::decrypt_b(BSTR ctext, LPSAFEARRAY * ptext, LPSAFEARRAY * key_list, pEpStatus * status)
 {
 	assert(ctext);
 	assert(ptext);
@@ -185,7 +185,7 @@ STDMETHODIMP CpEpEngine::decrypt_b(BSTR ctext, LPSAFEARRAY * ptext, LPSAFEARRAY 
 		::free_stringlist(_keylist);
 		return E_OUTOFMEMORY;
 	}
-	*status = (pEp_STATUS)_status;
+	*status = (pEpStatus)_status;
 
 	if (_ptext == NULL) {
 		::free_stringlist(_keylist);
@@ -220,7 +220,7 @@ STDMETHODIMP CpEpEngine::decrypt_b(BSTR ctext, LPSAFEARRAY * ptext, LPSAFEARRAY 
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::verify(BSTR text, BSTR signature, LPSAFEARRAY * key_list, pEp_STATUS * verify_status)
+STDMETHODIMP CpEpEngine::verify(BSTR text, BSTR signature, LPSAFEARRAY * key_list, pEpStatus * verify_status)
 {
 	assert(text);
 	assert(signature);
@@ -241,7 +241,7 @@ STDMETHODIMP CpEpEngine::verify(BSTR text, BSTR signature, LPSAFEARRAY * key_lis
 	if (_status == PEP_DECRYPT_WRONG_FORMAT || _status == PEP_UNKNOWN_ERROR)
 		return FAIL(L"verify_text");
 
-	*verify_status = (pEp_STATUS)_status;
+	*verify_status = (pEpStatus)_status;
 
 	if (_keylist && _keylist->value)
 		*key_list = string_array(_keylist);
@@ -252,7 +252,7 @@ STDMETHODIMP CpEpEngine::verify(BSTR text, BSTR signature, LPSAFEARRAY * key_lis
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::encrypt(SAFEARRAY * key_list, BSTR ptext, BSTR * ctext, pEp_STATUS * status)
+STDMETHODIMP CpEpEngine::encrypt(SAFEARRAY * key_list, BSTR ptext, BSTR * ctext, pEpStatus * status)
 {
 	assert(key_list);
 	assert(ptext);
@@ -282,7 +282,7 @@ STDMETHODIMP CpEpEngine::encrypt(SAFEARRAY * key_list, BSTR ptext, BSTR * ctext,
 	::free_stringlist(_keylist);
 	if (_status == PEP_OUT_OF_MEMORY)
 		return E_OUTOFMEMORY;
-	*status = (pEp_STATUS)_status;
+	*status = (pEpStatus)_status;
 
 	if (_ctext == NULL)
 		return FAIL(L"encrypt_and_sign");
@@ -293,7 +293,7 @@ STDMETHODIMP CpEpEngine::encrypt(SAFEARRAY * key_list, BSTR ptext, BSTR * ctext,
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::encrypt_b(SAFEARRAY * key_list, SAFEARRAY * ptext, BSTR * ctext, pEp_STATUS * status)
+STDMETHODIMP CpEpEngine::encrypt_b(SAFEARRAY * key_list, SAFEARRAY * ptext, BSTR * ctext, pEpStatus * status)
 {
 	assert(key_list);
 	assert(ptext);
@@ -321,12 +321,12 @@ STDMETHODIMP CpEpEngine::encrypt_b(SAFEARRAY * key_list, SAFEARRAY * ptext, BSTR
 	::free_stringlist(_keylist);
 	if (_status == PEP_OUT_OF_MEMORY)
 		return E_OUTOFMEMORY;
-	*status = (pEp_STATUS)_status;
+	*status = (pEpStatus)_status;
 
 	if (_ctext == NULL)
 		return FAIL(L"encrypt_and_sign");
 
-	*status = (pEp_STATUS)_status;
+	*status = (pEpStatus)_status;
 	wchar_t *w_ctext = NULL;
 	int w_csize = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, _ctext, _csize, NULL, 0);
 	if (w_csize) {
@@ -389,7 +389,7 @@ STDMETHODIMP CpEpEngine::trustword(LONG value, BSTR lang, BSTR * word)
 	}
 }
 
-STDMETHODIMP CpEpEngine::trustwords(BSTR fpr, BSTR lang, LONG max_words, BSTR * words)
+STDMETHODIMP CpEpEngine::TrustWords(BSTR fpr, BSTR lang, LONG max_words, BSTR * words)
 {
 	assert(fpr);
 	assert(max_words >= 0);
@@ -435,7 +435,7 @@ STDMETHODIMP CpEpEngine::trustwords(BSTR fpr, BSTR lang, LONG max_words, BSTR * 
 
 	if (_words == NULL) {
 		*words = NULL;
-		return FAIL(L"trustwords");
+		return FAIL(L"TrustWords");
 	}
 	else {
 		*words = utf16_bstr(_words);
@@ -444,7 +444,7 @@ STDMETHODIMP CpEpEngine::trustwords(BSTR fpr, BSTR lang, LONG max_words, BSTR * 
 	}
 }
 
-STDMETHODIMP CpEpEngine::get_crashdump_log(LONG maxlines, BSTR * log)
+STDMETHODIMP CpEpEngine::GetCrashdumpLog(LONG maxlines, BSTR * log)
 {
 	assert(maxlines >= 0);
 	assert(log);
@@ -458,14 +458,14 @@ STDMETHODIMP CpEpEngine::get_crashdump_log(LONG maxlines, BSTR * log)
 	if (status == PEP_OUT_OF_MEMORY)
 		return E_OUTOFMEMORY;
 	if (status != PEP_STATUS_OK || _log == NULL)
-		return FAIL(L"get_crashdump_log");
+		return FAIL(L"GetCrashdumpLog");
 
 	*log = utf16_bstr(_log);
 	pEp_free(_log);
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::get_engine_version(BSTR * engine_version)
+STDMETHODIMP CpEpEngine::GetEngineVersion(BSTR * engine_version)
 {
 	assert(engine_version);
 
@@ -475,14 +475,14 @@ STDMETHODIMP CpEpEngine::get_engine_version(BSTR * engine_version)
 	const char *_enginge_version = ::get_engine_version();
 
 	if (_enginge_version == NULL)
-		return FAIL(L"get_engine_version");
+		return FAIL(L"GetEngineVersion");
 
 	*engine_version = utf16_bstr(_enginge_version);
 
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::get_languagelist(BSTR * languages)
+STDMETHODIMP CpEpEngine::GetLanguagelist(BSTR * languages)
 {
 	assert(languages);
 
@@ -495,7 +495,7 @@ STDMETHODIMP CpEpEngine::get_languagelist(BSTR * languages)
 	if (status == PEP_OUT_OF_MEMORY)
 		return E_OUTOFMEMORY;
 	if (status != PEP_STATUS_OK || _languages == NULL)
-		return FAIL(L"get_languagelist");
+		return FAIL(L"GetLanguagelist");
 
 	*languages = utf16_bstr(_languages);
 	pEp_free(_languages);
@@ -527,7 +527,7 @@ STDMETHODIMP CpEpEngine::get_phrase(BSTR lang, LONG phrase_id, BSTR * phrase)
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::get_identity(BSTR address, BSTR user_id, pEp_identity_s * ident)
+STDMETHODIMP CpEpEngine::get_identity(BSTR address, BSTR user_id, pEpIdentity * ident)
 {
 	assert(address);
 	assert(user_id);
@@ -559,7 +559,7 @@ STDMETHODIMP CpEpEngine::get_identity(BSTR address, BSTR user_id, pEp_identity_s
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::set_identity(pEp_identity_s * ident)
+STDMETHODIMP CpEpEngine::set_identity(pEpIdentity * ident)
 {
 	assert(ident);
 	assert(ident->address);
@@ -581,7 +581,7 @@ STDMETHODIMP CpEpEngine::set_identity(pEp_identity_s * ident)
 		return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::generate_keypair(pEp_identity_s * ident, BSTR * fpr)
+STDMETHODIMP CpEpEngine::generate_keypair(pEpIdentity * ident, BSTR * fpr)
 {
 	assert(ident);
 	assert(ident->address);
@@ -647,7 +647,7 @@ STDMETHODIMP CpEpEngine::import_key(BSTR key_data)
 	if (status == PEP_OUT_OF_MEMORY)
 		return E_OUTOFMEMORY;
 
-	if (status != pEp_STATUS_OK)
+	if (status != pEpStatusOK)
 		return FAIL(L"import_key");
 	else
 		return S_OK;
@@ -766,7 +766,7 @@ STDMETHODIMP CpEpEngine::send_key(BSTR pattern)
 		return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::start_keyserver_lookup()
+STDMETHODIMP CpEpEngine::StartKeyserverLookup()
 {
 	if (identity_queue.load())
 		return S_OK;
@@ -777,7 +777,7 @@ STDMETHODIMP CpEpEngine::start_keyserver_lookup()
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::stop_keyserver_lookup()
+STDMETHODIMP CpEpEngine::StopKeyserverLookup()
 {
 	if (identity_queue.load() == NULL)
 		return S_OK;
@@ -797,7 +797,7 @@ STDMETHODIMP CpEpEngine::stop_keyserver_lookup()
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::examine_identity(pEp_identity_s * ident)
+STDMETHODIMP CpEpEngine::examine_identity(pEpIdentity * ident)
 {
 	assert(ident);
 	if (ident == NULL)
@@ -815,7 +815,7 @@ STDMETHODIMP CpEpEngine::examine_identity(pEp_identity_s * ident)
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::myself(struct pEp_identity_s *ident, struct pEp_identity_s *result)
+STDMETHODIMP CpEpEngine::Myself(struct pEpIdentity *ident, struct pEpIdentity *result)
 {
 	assert(ident);
 	assert(result);
@@ -829,7 +829,7 @@ STDMETHODIMP CpEpEngine::myself(struct pEp_identity_s *ident, struct pEp_identit
 		return E_OUTOFMEMORY;
 
 	// DEBUG CODE - REMOVE BEFORE RELEASE!
-	// sync_handshake_result_s handshakeResult;
+	// SyncHandshakeResult handshakeResult;
 	//
 	// HRESULT res = Fire_ShowHandshake(ident, result, &handshakeResult);
 	// 
@@ -852,7 +852,7 @@ STDMETHODIMP CpEpEngine::myself(struct pEp_identity_s *ident, struct pEp_identit
 	}
 }
 
-STDMETHODIMP CpEpEngine::update_identity(struct pEp_identity_s *ident, struct pEp_identity_s *result)
+STDMETHODIMP CpEpEngine::UpdateIdentity(struct pEpIdentity *ident, struct pEpIdentity *result)
 {
 	assert(ident);
 	assert(result);
@@ -878,11 +878,11 @@ STDMETHODIMP CpEpEngine::update_identity(struct pEp_identity_s *ident, struct pE
 		if (status == PEP_OUT_OF_MEMORY)
 			return E_OUTOFMEMORY;
 		else
-			return FAIL(L"update_identity");
+			return FAIL(L"UpdateIdentity");
 	}
 }
 
-STDMETHODIMP CpEpEngine::key_mistrusted(struct pEp_identity_s *ident)
+STDMETHODIMP CpEpEngine::KeyMistrusted(struct pEpIdentity *ident)
 {
 	::pEp_identity *_ident;
 
@@ -913,7 +913,7 @@ STDMETHODIMP CpEpEngine::key_mistrusted(struct pEp_identity_s *ident)
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::key_reset_trust(struct pEp_identity_s *ident)
+STDMETHODIMP CpEpEngine::KeyResetTrust(struct pEpIdentity *ident)
 {
 	::pEp_identity *_ident;
 
@@ -995,8 +995,8 @@ PEP_STATUS CpEpEngine::messageToSend(void * obj, message *msg)
 	if (msg == NULL)
 		return PEP_ILLEGAL_VALUE;
 
-	text_message _msg;
-	memset(&_msg, 0, sizeof(text_message));
+	TextMessage _msg;
+	memset(&_msg, 0, sizeof(TextMessage));
 
 	text_message_from_C(&_msg, msg);
 	CpEpEngine *me = (CpEpEngine *)obj;
@@ -1017,12 +1017,12 @@ PEP_STATUS CpEpEngine::showHandshake(void * obj, pEp_identity *self, pEp_identit
 	if (!(self && partner))
 		return PEP_ILLEGAL_VALUE;
 
-	pEp_identity_s _self;
+	pEpIdentity _self;
 	copy_identity(&_self, self);
-	pEp_identity_s _partner;
+	pEpIdentity _partner;
 	copy_identity(&_partner, partner);
 	CpEpEngine *me = (CpEpEngine *)obj;
-	sync_handshake_result_s _result;
+	SyncHandshakeResult _result;
 	HRESULT r = me->Fire_ShowHandshake(&_self, &_partner, &_result);
 	assert(r == S_OK);
 	clear_identity_s(_self);
@@ -1036,7 +1036,7 @@ PEP_STATUS CpEpEngine::showHandshake(void * obj, pEp_identity *self, pEp_identit
 	return status;
 }
 
-STDMETHODIMP CpEpEngine::blacklist_add(BSTR fpr)
+STDMETHODIMP CpEpEngine::BlacklistAdd(BSTR fpr)
 {
 	assert(fpr);
 
@@ -1049,7 +1049,7 @@ STDMETHODIMP CpEpEngine::blacklist_add(BSTR fpr)
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::blacklist_delete(BSTR fpr)
+STDMETHODIMP CpEpEngine::BlacklistDelete(BSTR fpr)
 {
 	assert(fpr);
 
@@ -1062,7 +1062,7 @@ STDMETHODIMP CpEpEngine::blacklist_delete(BSTR fpr)
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::blacklist_is_listed(BSTR fpr, VARIANT_BOOL *listed)
+STDMETHODIMP CpEpEngine::BlacklistIsListed(BSTR fpr, VARIANT_BOOL *listed)
 {
 	assert(fpr);
 	assert(listed);
@@ -1078,7 +1078,7 @@ STDMETHODIMP CpEpEngine::blacklist_is_listed(BSTR fpr, VARIANT_BOOL *listed)
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::blacklist_retrieve(SAFEARRAY **blacklist)
+STDMETHODIMP CpEpEngine::BlacklistRetreive(SAFEARRAY **blacklist)
 {
 	assert(blacklist);
 
@@ -1116,7 +1116,7 @@ HRESULT CpEpEngine::error(_bstr_t msg)
 	return E_FAIL;
 }
 
-STDMETHODIMP CpEpEngine::encrypt_message(text_message * src, text_message * dst, SAFEARRAY * extra, pEpEncryptFlags flags)
+STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SAFEARRAY * extra, pEpEncryptFlags flags)
 {
 	assert(src);
 	assert(dst);
@@ -1145,7 +1145,7 @@ STDMETHODIMP CpEpEngine::encrypt_message(text_message * src, text_message * dst,
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst, SAFEARRAY ** keylist, pEpDecryptFlags *flags, pEp_rating *rating)
+STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SAFEARRAY ** keylist, pEpDecryptFlags *flags, pEpRating *rating)
 {
 	assert(src);
 	assert(dst);
@@ -1153,7 +1153,7 @@ STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst,
 	assert(rating);
 
 	*keylist = NULL;
-	*rating = pEp_rating_undefined;
+	*rating = pEpRatingUndefined;
 
 	::message *_src = text_message_to_C(src);
 	::message *msg_dst = NULL;
@@ -1176,12 +1176,12 @@ STDMETHODIMP CpEpEngine::decrypt_message(text_message * src, text_message * dst,
 		free_stringlist(_keylist);
 	}
 
-	*rating = (pEp_rating)_rating;
+	*rating = (pEpRating)_rating;
 
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::outgoing_message_rating(text_message *msg, pEp_rating * pVal)
+STDMETHODIMP CpEpEngine::OutgoingMessageRating(TextMessage *msg, pEpRating * pVal)
 {
 	assert(msg);
 	assert(pVal);
@@ -1193,11 +1193,11 @@ STDMETHODIMP CpEpEngine::outgoing_message_rating(text_message *msg, pEp_rating *
 	if (status != PEP_STATUS_OK)
 		return FAIL(L"cannot get message rating");
 
-	*pVal = (pEp_rating)_rating;
+	*pVal = (pEpRating)_rating;
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::identity_rating(struct pEp_identity_s *ident, pEp_rating * pVal)
+STDMETHODIMP CpEpEngine::IdentityRating(struct pEpIdentity *ident, pEpRating * pVal)
 {
 	::pEp_identity *_ident;
 
@@ -1220,23 +1220,23 @@ STDMETHODIMP CpEpEngine::identity_rating(struct pEp_identity_s *ident, pEp_ratin
 	if (status != PEP_STATUS_OK)
 		return FAIL(L"cannot get message color");
 
-	*pVal = (pEp_rating)_rating;
+	*pVal = (pEpRating)_rating;
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::color_from_rating(pEp_rating rating, pEp_color * pVal)
+STDMETHODIMP CpEpEngine::ColorFromRating(pEpRating rating, pEpColor * pVal)
 {
 	assert(pVal);
 
 	PEP_rating engineRating = (PEP_rating)rating;
 	PEP_color _color = ::color_from_rating(engineRating);
 
-	*pVal = (pEp_color)_color;
+	*pVal = (pEpColor)_color;
 
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::trust_personal_key(struct pEp_identity_s *ident, struct pEp_identity_s *result)
+STDMETHODIMP CpEpEngine::TrustPersonalKey(struct pEpIdentity *ident, struct pEpIdentity *result)
 {
 	::pEp_identity *_ident;
 
@@ -1255,7 +1255,7 @@ STDMETHODIMP CpEpEngine::trust_personal_key(struct pEp_identity_s *ident, struct
 
 	if (verbose_mode) {
 		stringstream ss;
-		ss << "trust_personal_key called with ";
+		ss << "TrustPersonalKey called with ";
 		ss << utf8_string(ident->address);
 		ss << L": ";
 		ss << ident->comm_type;
@@ -1282,7 +1282,7 @@ STDMETHODIMP CpEpEngine::trust_personal_key(struct pEp_identity_s *ident, struct
 	if (status == PEP_OUT_OF_MEMORY)
 		return E_OUTOFMEMORY;
 	else if (status != PEP_STATUS_OK)
-		return FAIL(L"failure while executing trust_personal_key()");
+		return FAIL(L"failure while executing TrustPersonalKey()");
 
 	return S_OK;
 }
@@ -1426,7 +1426,7 @@ void * CpEpEngine::retreive_next_sync_msg(void * management)
 
 // Event callbacks
 
-STDMETHODIMP CpEpEngine::register_callbacks(IpEpEngineCallbacks* new_callbacks)
+STDMETHODIMP CpEpEngine::RegisterCallbacks(IpEpEngineCallbacks* new_callbacks)
 {
 	callbacks cbs = get_callbacks();
 	vector<IpEpEngineCallbacks*>& vec = cbs;
@@ -1438,7 +1438,7 @@ STDMETHODIMP CpEpEngine::register_callbacks(IpEpEngineCallbacks* new_callbacks)
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::unregister_callbacks(IpEpEngineCallbacks* obsolete_callbacks)
+STDMETHODIMP CpEpEngine::UnregisterCallbacks(IpEpEngineCallbacks* obsolete_callbacks)
 {
 	callbacks cbs = get_callbacks();
 	vector<IpEpEngineCallbacks*>& vec = cbs;
@@ -1488,7 +1488,7 @@ STDMETHODIMP CpEpEngine::OpenPGP_list_keyinfo(BSTR search_pattern, LPSAFEARRAY* 
 
 }
 
-HRESULT CpEpEngine::Fire_MessageToSend(text_message * msg)
+HRESULT CpEpEngine::Fire_MessageToSend(TextMessage * msg)
 {
 	callbacks cbs = get_callbacks();
 	vector<IpEpEngineCallbacks*>& vec = cbs;
@@ -1504,7 +1504,7 @@ HRESULT CpEpEngine::Fire_MessageToSend(text_message * msg)
 	return S_OK;
 }
 
-HRESULT CpEpEngine::Fire_ShowHandshake(pEp_identity_s * self, pEp_identity_s * partner, sync_handshake_result_s * result)
+HRESULT CpEpEngine::Fire_ShowHandshake(pEpIdentity * self, pEpIdentity * partner, SyncHandshakeResult * result)
 {
 	callbacks cbs = get_callbacks();
 	vector<IpEpEngineCallbacks*>& vec = cbs;

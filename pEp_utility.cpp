@@ -16,11 +16,11 @@ namespace pEp {
                 user_id = _ident->user_id;
             if (_ident->username)
                 username = _ident->username;
-            comm_type = (pEp_comm_type) _ident->comm_type;
+            comm_type = (pEpComType) _ident->comm_type;
             lang = _ident->lang;
         }
 
-        pEp_identity_cpp::pEp_identity_cpp(const pEp_identity_s *_ident)
+        pEp_identity_cpp::pEp_identity_cpp(const pEpIdentity *_ident)
             : me(false)
         {
             if (_ident->address)
@@ -56,9 +56,9 @@ namespace pEp {
             return _ident;
         }
 
-        pEp_identity_s * pEp_identity_cpp::to_pEp_identity_s()
+        pEpIdentity * pEp_identity_cpp::to_pEp_identity_s()
         {
-            pEp_identity_s *_ident = (pEp_identity_s *) calloc(1, sizeof(pEp_identity_s));
+            pEpIdentity *_ident = (pEpIdentity *) calloc(1, sizeof(pEpIdentity));
             assert(_ident);
             if (_ident == NULL)
                 throw bad_alloc();
@@ -73,11 +73,11 @@ namespace pEp {
             return _ident;
         }
 
-        void copy_identity(pEp_identity_s * ident_s, const pEp_identity * ident)
+        void copy_identity(pEpIdentity * ident_s, const pEp_identity * ident)
         {
             assert(ident_s);
 
-            ::memset(ident_s, 0, sizeof(pEp_identity_s));
+            ::memset(ident_s, 0, sizeof(pEpIdentity));
             if (ident) {
                 if (ident->address)
                     ident_s->address = utf16_bstr(ident->address);
@@ -87,13 +87,13 @@ namespace pEp {
                     ident_s->user_id = utf16_bstr(ident->user_id);
                 if (ident->username)
                     ident_s->username = utf16_bstr(ident->username);
-                ident_s->comm_type = (pEp_comm_type) ident->comm_type;
+                ident_s->comm_type = (pEpComType) ident->comm_type;
                 if (ident->lang)
                     ident_s->lang = utf16_bstr(ident->lang);
             }
         }
 
-        ::pEp_identity *new_identity(const pEp_identity_s * ident)
+        ::pEp_identity *new_identity(const pEpIdentity * ident)
         {
             if (ident == NULL)
                 return NULL;
@@ -162,7 +162,7 @@ namespace pEp {
             return utf16_bstr(s);
         }
 
-        template<> blob *from_C< blob *, bloblist_t >(bloblist_t *tl)
+        template<> Blob *from_C< Blob *, bloblist_t >(bloblist_t *tl)
         {
             CComSafeArray<BYTE> sa;
             sa.Create(tl->size);
@@ -174,7 +174,7 @@ namespace pEp {
                 SafeArrayUnaccessData(sa);
             }
 
-            blob *_blob = new blob();
+            Blob *_blob = new Blob();
 
             _blob->value = sa.Detach();
             _blob->mime_type = bstr(tl->mime_type);
@@ -204,7 +204,7 @@ namespace pEp {
             return sa;
         }
 
-        void clear_identity_s(pEp_identity_s& ident)
+        void clear_identity_s(pEpIdentity& ident)
         {
             SysFreeString(ident.address);
             SysFreeString(ident.fpr);
@@ -212,12 +212,12 @@ namespace pEp {
             SysFreeString(ident.username);
             SysFreeString(ident.user_id);
 
-            memset(&ident, 0, sizeof(pEp_identity_s));
+            memset(&ident, 0, sizeof(pEpIdentity));
         }
 
-        template<> pEp_identity_s from_C< pEp_identity_s, pEp_identity >(pEp_identity *tl)
+        template<> pEpIdentity from_C< pEpIdentity, pEp_identity >(pEp_identity *tl)
         {
-            pEp_identity_s _ident;
+            pEpIdentity _ident;
             memset(&_ident, 0, sizeof(_ident));
 
             if (tl)
@@ -225,15 +225,15 @@ namespace pEp {
             return _ident;
         }
 
-        pEp_identity_s identity_s(pEp_identity *ident)
+        pEpIdentity identity_s(pEp_identity *ident)
         {
-            return from_C< pEp_identity_s, pEp_identity >(ident);
+            return from_C< pEpIdentity, pEp_identity >(ident);
         }
 
-        template<> pEp_identity_s *from_C< pEp_identity_s *, identity_list >(identity_list *il)
+        template<> pEpIdentity *from_C< pEpIdentity *, identity_list >(identity_list *il)
         {
-            pEp_identity_s *ident = new pEp_identity_s();
-            memset(ident, 0, sizeof(pEp_identity_s));
+            pEpIdentity *ident = new pEpIdentity();
+            memset(ident, 0, sizeof(pEpIdentity));
 
             if (il)
                 copy_identity(ident, il->ident);
@@ -265,7 +265,7 @@ namespace pEp {
             return stringpair_list_length(tl);
         }
 
-        void clear_text_message(text_message *msg)
+        void clear_text_message(TextMessage *msg)
         {
             SysFreeString(msg->id);
             SysFreeString(msg->shortmsg);
@@ -283,32 +283,32 @@ namespace pEp {
             SysFreeString(msg->comments);
             SafeArrayDestroy(msg->opt_fields);
 
-            memset(msg, 0, sizeof(text_message));
+            memset(msg, 0, sizeof(TextMessage));
         }
 
-        void text_message_from_C(text_message *msg2, const ::message *msg)
+        void text_message_from_C(TextMessage *msg2, const ::message *msg)
         {
             assert(msg2);
             assert(msg);
 
             clear_text_message(msg2);
 
-            msg2->dir = (pEp_msg_direction) msg->dir;
+            msg2->dir = (pEpMsgDirection) msg->dir;
             msg2->id = bstr(msg->id);
             msg2->shortmsg = bstr(msg->shortmsg);
             msg2->longmsg = bstr(msg->longmsg);
             msg2->longmsg_formatted = bstr(msg->longmsg_formatted);
-            msg2->attachments = array_from_C<blob, bloblist_t>(msg->attachments);
+            msg2->attachments = array_from_C<Blob, bloblist_t>(msg->attachments);
             if (msg->sent)
                 msg2->sent = mktime(msg->sent);
             if (msg->recv)
                 msg2->recv = mktime(msg->recv);
             msg2->from = identity_s(msg->from);
-            msg2->to = array_from_C<pEp_identity_s, identity_list>(msg->to);
+            msg2->to = array_from_C<pEpIdentity, identity_list>(msg->to);
             msg2->recv_by = identity_s(msg->recv_by);
-            msg2->cc = array_from_C<pEp_identity_s, identity_list>(msg->cc);
-            msg2->bcc = array_from_C<pEp_identity_s, identity_list>(msg->bcc);
-            msg2->reply_to = array_from_C<pEp_identity_s, identity_list>(msg->reply_to);
+            msg2->cc = array_from_C<pEpIdentity, identity_list>(msg->cc);
+            msg2->bcc = array_from_C<pEpIdentity, identity_list>(msg->bcc);
+            msg2->reply_to = array_from_C<pEpIdentity, identity_list>(msg->reply_to);
             msg2->references = string_array(msg->references);
             msg2->keywords = string_array(msg->keywords);
             msg2->comments = bstr(msg->comments);
@@ -325,12 +325,12 @@ namespace pEp {
             return _s;
         }
 
-        void clear_blob(blob& b)
+        void clear_blob(Blob& b)
         {
             SysFreeString(b.filename);
             SysFreeString(b.mime_type);
             SafeArrayDestroy(b.value);
-            memset(&b, 0, sizeof(blob));
+            memset(&b, 0, sizeof(Blob));
         }
 
         bloblist_t *bloblist(SAFEARRAY *sa)
@@ -352,8 +352,8 @@ namespace pEp {
 
             bloblist_t *_bl = bl;
             for (LONG i = lbound; i <= ubound; i++) {
-                blob b;
-                memset(&b, 0, sizeof(blob));
+                Blob b;
+                memset(&b, 0, sizeof(Blob));
                 SafeArrayGetElement(sa, &i, &b);
 
                 LONG _lbound, _ubound;
@@ -410,8 +410,8 @@ namespace pEp {
 
             identity_list *_il = il;
             for (LONG i = lbound; i <= ubound; i++) {
-                pEp_identity_s s;
-                memset(&s, 0, sizeof(pEp_identity_s));
+                pEpIdentity s;
+                memset(&s, 0, sizeof(pEpIdentity));
                 SafeArrayGetElement(sa, &i, &s);
 
                 pEp_identity *ident;
@@ -493,7 +493,7 @@ namespace pEp {
             return il;
         }
         
-        ::message * text_message_to_C(text_message *msg)
+        ::message * text_message_to_C(TextMessage *msg)
         {
             assert(msg);
 

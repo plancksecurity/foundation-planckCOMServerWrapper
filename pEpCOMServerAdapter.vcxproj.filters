@@ -86,6 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+    <Text Include="LICENSE.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="pEpCOMServerAdapter.rgs">

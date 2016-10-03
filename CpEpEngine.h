@@ -4,12 +4,10 @@
 #include "resource.h"       // main symbols
 
 #include "pEpComServerAdapter_i.h"
-#include "_IpEpEngineEvents_CP.h"
 #include "locked_queue.hh"
 #include "utf8_helper.h"
 #include "pEp_utility.h"
 #include <queue>
-
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
@@ -19,14 +17,64 @@ using namespace ATL;
 using namespace utility;
 using namespace pEp::utility;
 
+
+// TODO: Remove this enum, it is not needed in the interface, but it currently is still used in the code which is
+// not removed / reworked yet...
+typedef enum pEpStatus {
+     pEpStatusOK = 0,
+
+     pEp_INIT_CANNOT_LOAD_GPGME = 0x0110,
+     pEp_INIT_GPGME_INIT_FAILED = 0x0111,
+     pEp_INIT_NO_GPG_HOME = 0x0112,
+     pEp_INIT_NETPGP_INIT_FAILED = 0x0113,
+
+     pEp_INIT_SQLITE3_WITHOUT_MUTEX = 0x0120,
+     pEp_INIT_CANNOT_OPEN_DB = 0x0121,
+     pEp_INIT_CANNOT_OPEN_SYSTEM_DB = 0x0122,
+
+     pEp_KEY_NOT_FOUND = 0x0201,
+     pEp_KEY_HAS_AMBIG_NAME = 0x0202,
+     pEp_GET_KEY_FAILED = 0x0203,
+
+     pEp_CANNOT_FIND_IDENTITY = 0x0301,
+     pEp_CANNOT_SET_PERSON = 0x0381,
+     pEp_CANNOT_SET_PGP_KEYPAIR = 0x0382,
+     pEp_CANNOT_SET_IDENTITY = 0x0383,
+     pEp_CANNOT_SET_TRUST = 0x0384,
+
+     pEp_UNENCRYPTED = 0x0400,
+     pEp_VERIFIED = 0x0401,
+     pEp_DECRYPTED = 0x0402,
+     pEp_DECRYPTED_AND_VERIFIED = 0x0403,
+     pEp_DECRYPT_WRONG_FORMAT = 0x0404,
+     pEp_DECRYPT_NO_KEY = 0x0405,
+     pEp_DECRYPT_SIGNATURE_DOES_NOT_MATCH = 0x0406,
+     pEp_VERIFY_NO_KEY = 0x0407,
+     pEp_VERIFIED_AND_TRUSTED = 0x0408,
+     pEp_CANNOT_DECRYPT_UNKNOWN = 0x04ff,
+
+     pEp_TRUSTWORD_NOT_FOUND = 0x0501,
+
+     pEp_CANNOT_CREATE_KEY = 0x0601,
+     pEp_CANNOT_SEND_KEY = 0x0602,
+
+     pEp_PHRASE_NOT_FOUND = 0x0701,
+
+     pEp_COMMIT_FAILED = 0xff01,
+
+     pEp_CANNOT_CREATE_TEMP_FILE = -5,
+     pEp_ILLEGAL_VALUE = -4,
+     pEp_BUFFER_TOO_SMALL = -3,
+     pEp_OUT_OF_MEMORY = -2,
+     pEp_UNKNOWN_ERROR = -1
+ } pEpStatus;
+
 // CpEpEngine
 
 class ATL_NO_VTABLE CpEpEngine :
     public CComObjectRootEx<CComObjectThreadModel>,
 	public CComCoClass<CpEpEngine, &CLSID_pEpEngine>,
 	public ISupportErrorInfo,
-	public IConnectionPointContainerImpl<CpEpEngine>,
-	public CProxy_IpEpEngineEvents<CpEpEngine>,
 	public IpEpEngine
 {
 protected:
@@ -45,7 +93,7 @@ public:
     ~CpEpEngine()
     {
         stop_keysync();
-        stop_keyserver_lookup();
+        StopKeyserverLookup();
         ::unregister_sync_callbacks(m_session);
         ::log_event(m_session, "Shutdown", "pEp COM Adapter", NULL, NULL);
         ::release(m_session);
@@ -58,12 +106,8 @@ DECLARE_NOT_AGGREGATABLE(CpEpEngine)
 BEGIN_COM_MAP(CpEpEngine)
     COM_INTERFACE_ENTRY(IpEpEngine)
     COM_INTERFACE_ENTRY(ISupportErrorInfo)
-    COM_INTERFACE_ENTRY(IConnectionPointContainer)
 END_COM_MAP()
 
-BEGIN_CONNECTION_POINT_MAP(CpEpEngine)
-	CONNECTION_POINT_ENTRY(__uuidof(_IpEpEngineEvents))
-END_CONNECTION_POINT_MAP()
 // ISupportsErrorInfo
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
@@ -181,25 +225,25 @@ private:
 public:
     // runtime config of the adapter
 
-    STDMETHOD(verbose_logging)(VARIANT_BOOL enable);
+    STDMETHOD(VerboseLogging)(VARIANT_BOOL enable);
 
     // runtime config of the engine
 
-    STDMETHOD(passive_mode)(VARIANT_BOOL enable);
-    STDMETHOD(unencrypted_subject)(VARIANT_BOOL enable);
+    STDMETHOD(PassiveMode)(VARIANT_BOOL enable);
+    STDMETHOD(UnencryptedSubject)(VARIANT_BOOL enable);
 
     // basic API
 
     STDMETHOD(log)(BSTR title, BSTR entity, BSTR description, BSTR comment);
-    STDMETHOD(decrypt)(BSTR ctext, BSTR * ptext, LPSAFEARRAY * key_list, pEp_STATUS * decrypt_status);
-    STDMETHOD(decrypt_b)(BSTR ctext, LPSAFEARRAY * ptext, LPSAFEARRAY * key_list, pEp_STATUS * decrypt_status);
-    STDMETHOD(encrypt)(SAFEARRAY * key_list, BSTR ptext, BSTR * ctext, pEp_STATUS * status);
-    STDMETHOD(encrypt_b)(SAFEARRAY * key_list, SAFEARRAY * ptext, BSTR * ctext, pEp_STATUS * status);
+    STDMETHOD(decrypt)(BSTR ctext, BSTR * ptext, LPSAFEARRAY * key_list, pEpStatus * decrypt_status);
+    STDMETHOD(decrypt_b)(BSTR ctext, LPSAFEARRAY * ptext, LPSAFEARRAY * key_list, pEpStatus * decrypt_status);
+    STDMETHOD(encrypt)(SAFEARRAY * key_list, BSTR ptext, BSTR * ctext, pEpStatus * status);
+    STDMETHOD(encrypt_b)(SAFEARRAY * key_list, SAFEARRAY * ptext, BSTR * ctext, pEpStatus * status);
     STDMETHOD(trustword)(LONG value, BSTR lang, BSTR * word);
-    STDMETHOD(trustwords)(BSTR fpr, BSTR lang, LONG max_words, BSTR * words);
-    STDMETHOD(get_identity)(BSTR address, BSTR user_id, pEp_identity_s * ident);
-    STDMETHOD(set_identity)(pEp_identity_s * ident);
-    STDMETHOD(generate_keypair)(pEp_identity_s * ident, BSTR * fpr);
+    STDMETHOD(TrustWords)(BSTR fpr, BSTR lang, LONG max_words, BSTR * words);
+    STDMETHOD(get_identity)(BSTR address, BSTR user_id, pEpIdentity * ident);
+    STDMETHOD(set_identity)(pEpIdentity * ident);
+    STDMETHOD(generate_keypair)(pEpIdentity * ident, BSTR * fpr);
     STDMETHOD(delete_keypair)(BSTR fpr);
     STDMETHOD(import_key)(BSTR key_data);
     STDMETHOD(import_key_b)(SAFEARRAY * key_data);
@@ -207,56 +251,56 @@ public:
     STDMETHOD(recv_key)(BSTR pattern);
     STDMETHOD(find_keys)(BSTR pattern, LPSAFEARRAY * key_list);
     STDMETHOD(send_key)(BSTR pattern);
-    STDMETHOD(get_crashdump_log)(LONG maxlines, BSTR * log);
-    STDMETHOD(get_engine_version)(BSTR * engine_version);
-    STDMETHOD(get_languagelist)(BSTR * languages);
+    STDMETHOD(GetCrashdumpLog)(LONG maxlines, BSTR * log);
+    STDMETHOD(GetEngineVersion)(BSTR * engine_version);
+    STDMETHOD(GetLanguagelist)(BSTR * languages);
     STDMETHOD(get_phrase)(BSTR lang, LONG phrase_id, BSTR * phrase);
 
     // keymanagement API
 
-    STDMETHOD(start_keyserver_lookup)();
-    STDMETHOD(stop_keyserver_lookup)();
+    STDMETHOD(StartKeyserverLookup)();
+    STDMETHOD(StopKeyserverLookup)();
 
-    STDMETHOD(examine_identity)(pEp_identity_s * ident);
-    STDMETHOD(verify)(BSTR text, BSTR signature, LPSAFEARRAY * key_list, pEp_STATUS * verify_status);
-    STDMETHOD(myself)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
-    STDMETHOD(update_identity)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
-    STDMETHOD(key_mistrusted)(struct pEp_identity_s *ident);
-    STDMETHOD(key_reset_trust)(struct pEp_identity_s *ident);
-    STDMETHOD(trust_personal_key)(struct pEp_identity_s *ident, struct pEp_identity_s *result);
+    STDMETHOD(examine_identity)(pEpIdentity * ident);
+    STDMETHOD(verify)(BSTR text, BSTR signature, LPSAFEARRAY * key_list, pEpStatus * verify_status);
+    STDMETHOD(Myself)(struct pEpIdentity *ident, struct pEpIdentity *result);
+    STDMETHOD(UpdateIdentity)(struct pEpIdentity *ident, struct pEpIdentity *result);
+    STDMETHOD(KeyMistrusted)(struct pEpIdentity *ident);
+    STDMETHOD(KeyResetTrust)(struct pEpIdentity *ident);
+    STDMETHOD(TrustPersonalKey)(struct pEpIdentity *ident, struct pEpIdentity *result);
 
 
     // Blacklist API
 
-    STDMETHOD(blacklist_add)(BSTR fpr);
-    STDMETHOD(blacklist_delete)(BSTR fpr);
-    STDMETHOD(blacklist_is_listed)(BSTR fpr, VARIANT_BOOL *listed);
-    STDMETHOD(blacklist_retrieve)(SAFEARRAY **blacklist);
+    STDMETHOD(BlacklistAdd)(BSTR fpr);
+    STDMETHOD(BlacklistDelete)(BSTR fpr);
+    STDMETHOD(BlacklistIsListed)(BSTR fpr, VARIANT_BOOL *listed);
+    STDMETHOD(BlacklistRetreive)(SAFEARRAY **blacklist);
 
     // Message API
 
-    STDMETHOD(encrypt_message)(text_message * src, text_message * dst, SAFEARRAY * extra, pEpEncryptFlags flags);
-    STDMETHOD(decrypt_message)(text_message * src, text_message * dst, SAFEARRAY ** keylist, pEpDecryptFlags* flags, pEp_rating *rating);
-    STDMETHOD(outgoing_message_rating)(text_message *msg, pEp_rating * pVal);
-    STDMETHOD(identity_rating)(pEp_identity_s * ident, pEp_rating * pVal);
-	STDMETHOD(color_from_rating)(pEp_rating rating, pEp_color * pVal);
+    STDMETHOD(EncryptMessage)(TextMessage * src, TextMessage * dst, SAFEARRAY * extra, pEpEncryptFlags flags);
+    STDMETHOD(DecryptMessage)(TextMessage * src, TextMessage * dst, SAFEARRAY ** keylist, pEpDecryptFlags* flags, pEpRating *rating);
+    STDMETHOD(OutgoingMessageRating)(TextMessage *msg, pEpRating * pVal);
+    STDMETHOD(IdentityRating)(pEpIdentity * ident, pEpRating * pVal);
+	STDMETHOD(ColorFromRating)(pEpRating rating, pEpColor * pVal);
 
 	// Event callbacks
 
-	STDMETHOD(register_callbacks)(IpEpEngineCallbacks *new_callback);
-	STDMETHOD(unregister_callbacks)(IpEpEngineCallbacks *obsolete_callback);
+	STDMETHOD(RegisterCallbacks)(IpEpEngineCallbacks *new_callback);
+	STDMETHOD(UnregisterCallbacks)(IpEpEngineCallbacks *obsolete_callback);
 
     // PGP compatibility functions
     STDMETHOD(OpenPGP_list_keyinfo)(BSTR search_pattern, LPSAFEARRAY* keyinfo_list);
 
 protected:
 	HRESULT Fire_MessageToSend(
-		/* [in] */ struct text_message *msg);
+		/* [in] */ struct TextMessage *msg);
 
 	HRESULT Fire_ShowHandshake(
-		/* [in] */ struct pEp_identity_s *self,
-		/* [in] */ struct pEp_identity_s *partner,
-		/* [retval][out] */ sync_handshake_result_s *result);
+		/* [in] */ struct pEpIdentity *self,
+		/* [in] */ struct pEpIdentity *partner,
+		/* [retval][out] */ SyncHandshakeResult *result);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)

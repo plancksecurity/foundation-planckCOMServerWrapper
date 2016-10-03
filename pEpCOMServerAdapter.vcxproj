@@ -169,6 +169,7 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
     <ResourceCompile Include="pEpCOMServerAdapter.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="LICENSE.txt" />
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
