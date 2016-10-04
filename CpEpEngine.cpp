@@ -1314,7 +1314,7 @@ void CpEpEngine::start_keysync()
 	// Init our keysync session
 	PEP_STATUS status = ::init(&keysync_session);
 	::register_sync_callbacks(keysync_session, (void*)this, messageToSend, showHandshake, inject_sync_msg, retreive_next_sync_msg);
-	assert(status = PEP_STATUS_OK, "");
+	assert(status == PEP_STATUS_OK);
 
     attach_sync_session(get_session(), keysync_session);
 
@@ -1357,6 +1357,7 @@ void CpEpEngine::stop_keysync()
 	keysync_thread = NULL;
 	::unregister_sync_callbacks(keysync_session);
 	release(keysync_session);
+    keysync_session == NULL;
 	keysync_abort_requested = false;
 }
 
