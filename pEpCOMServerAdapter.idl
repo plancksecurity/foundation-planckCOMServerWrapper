@@ -126,28 +126,28 @@ interface IpEpEngine : IUnknown {
         pEpCtB0rkenCrypto = 0x0b,
         pEpCtKeyTooShort = 0x0c,
 
-        pEpCtCompromised = 0x0e,                  // known compromized connection
-        pEpCtMistrusted = 0x0f,                   // known mistrusted key
+        pEpCtCompromised = 0x0e,                 // known compromized connection
+        pEpCtMistrusted = 0x0f,                  // known mistrusted key
 
         // range 0x10 to 0x3f: unconfirmed encryption
 
         pEpCtUnconfirmedEncryption = 0x10,       // generic
-        pEpCtOpenPGPWeakUnconfirmed = 0x11,     // RSA 1024 is weak
+        pEpCtOpenPGPWeakUnconfirmed = 0x11,      // RSA 1024 is weak
 
-        pEpCtToBeChecked = 0x20,                // generic
+        pEpCtToBeChecked = 0x20,                 // generic
         pEpCtSMIMEUnconfirmed = 0x21,
         pEpCtCMSUnconfirmed = 0x22,
 
-        pEpCtStrongButUnconfirmed = 0x30,       // generic
+        pEpCtStrongButUnconfirmed = 0x30,        // generic
         pEpCtOpenPGPUnconfirmed = 0x38,          // key at least 2048 bit RSA or EC
         pEpCtOTRUnconfirmed = 0x3a,
 
         // range 0x40 to 0x7f: unconfirmed encryption and anonymization
 
-        pEpCtUnconfirmedEncAnon = 0x40,         // generic
+        pEpCtUnconfirmedEncAnon = 0x40,          // generic
         pEpCtpEpUnconfirmed = 0x7f,
 
-        pEpCtConfirmed = 0x80,                    // this bit decides if trust is confirmed
+        pEpCtConfirmed = 0x80,                   // this bit decides if trust is confirmed
 
         // range 0x81 to 0x8f: reserved
         // range 0x90 to 0xbf: confirmed encryption
@@ -155,17 +155,17 @@ interface IpEpEngine : IUnknown {
         pEpCtConfirmedEncryption = 0x90,         // generic
         pEpCtOpenPGPWeak = 0x91,                 // RSA 1024 is weak
 
-        pEpCtToBeCheckedConfirmed = 0xa0,      //generic
+        pEpCtToBeCheckedConfirmed = 0xa0,        // generic
         pEpCtSMIME = 0xa1,
         pEpCtCMS = 0xa2,
 
         pEpCtStrongEncryption = 0xb0,            // generic
-        pEpCtOpenPGP = 0xb8,                      // key at least 2048 bit RSA or EC
+        pEpCtOpenPGP = 0xb8,                     // key at least 2048 bit RSA or EC
         pEpCtOTR = 0xba,
 
         // range 0xc0 to 0xff: confirmed encryption and anonymization
 
-        pEpCtConfirmedEncAnon = 0xc0,           // generic
+        pEpCtConfirmedEncAnon = 0xc0,            // generic
         pEpCtpEp = 0xff
     } pEpComType;
 
@@ -207,6 +207,7 @@ interface IpEpEngine : IUnknown {
     HRESULT BlacklistRetreive([out, retval] SAFEARRAY(BSTR) *blacklist);
 
 	// PGP compatibility functions
+
 	HRESULT OpenPGP_list_keyinfo([in] BSTR search_pattern, [out, retval] SAFEARRAY(struct StringPair)* keyinfo_list);
 
     // Message API
@@ -297,7 +298,6 @@ interface IpEpEngine : IUnknown {
 	HRESULT ColorFromRating([in] pEpRating rating, [out, retval] pEpColor* pVal);
 
 	HRESULT RegisterCallbacks([in] IpEpEngineCallbacks* new_callback);
-
 	HRESULT UnregisterCallbacks([in] IpEpEngineCallbacks* obsolete_callback);
 };
 

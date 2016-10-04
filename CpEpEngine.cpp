@@ -472,12 +472,12 @@ STDMETHODIMP CpEpEngine::GetEngineVersion(BSTR * engine_version)
 	if (!engine_version)
 		return E_INVALIDARG;
 
-	const char *_enginge_version = ::get_engine_version();
+	const char *_engine_version = ::get_engine_version();
 
-	if (_enginge_version == NULL)
+	if (_engine_version == NULL)
 		return FAIL(L"GetEngineVersion");
 
-	*engine_version = utf16_bstr(_enginge_version);
+	*engine_version = utf16_bstr(_engine_version);
 
 	return S_OK;
 }
