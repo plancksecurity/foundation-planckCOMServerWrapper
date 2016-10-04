@@ -1313,8 +1313,10 @@ void CpEpEngine::start_keysync()
 
 	// Init our keysync session
 	PEP_STATUS status = ::init(&keysync_session);
-	::register_sync_callbacks(m_session, (void*)this, messageToSend, showHandshake, inject_sync_msg, retreive_next_sync_msg);
-	assert(status = PEP_STATUS_OK);
+	::register_sync_callbacks(keysync_session, (void*)this, messageToSend, showHandshake, inject_sync_msg, retreive_next_sync_msg);
+	assert(status = PEP_STATUS_OK, "");
+
+    attach_sync_session(get_session(), keysync_session);
 
 	// Star the keysync thread
 	keysync_thread = new thread(::do_sync_protocol, keysync_session, this);
@@ -1344,6 +1346,8 @@ void CpEpEngine::stop_keysync()
 
 	if (!keysync_abort_requested)
 		return; // someone called start_keysync() while we were trying to stop it...
+
+    detach_sync_session(get_session());
 
 	// wait for the thread to end
 	keysync_thread->join();

@@ -86,7 +86,6 @@ public:
         PEP_STATUS status = ::init(&m_session);
         assert(status == PEP_STATUS_OK);
         ::register_examine_function(m_session, CpEpEngine::examine_identity, (void *)this);
-        ::register_sync_callbacks(m_session, (void*)this, messageToSend, showHandshake, inject_sync_msg, retreive_next_sync_msg);
         ::log_event(m_session, "Startup", "pEp COM Adapter", NULL, NULL);
     }
 
@@ -94,7 +93,6 @@ public:
     {
         stop_keysync();
         StopKeyserverLookup();
-        ::unregister_sync_callbacks(m_session);
         ::log_event(m_session, "Shutdown", "pEp COM Adapter", NULL, NULL);
         ::release(m_session);
     }
