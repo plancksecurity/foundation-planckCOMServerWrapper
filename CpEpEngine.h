@@ -18,57 +18,6 @@ using namespace utility;
 using namespace pEp::utility;
 
 
-// TODO: Remove this enum, it is not needed in the interface, but it currently is still used in the code which is
-// not removed / reworked yet...
-typedef enum pEpStatus {
-     pEpStatusOK = 0,
-
-     pEp_INIT_CANNOT_LOAD_GPGME = 0x0110,
-     pEp_INIT_GPGME_INIT_FAILED = 0x0111,
-     pEp_INIT_NO_GPG_HOME = 0x0112,
-     pEp_INIT_NETPGP_INIT_FAILED = 0x0113,
-
-     pEp_INIT_SQLITE3_WITHOUT_MUTEX = 0x0120,
-     pEp_INIT_CANNOT_OPEN_DB = 0x0121,
-     pEp_INIT_CANNOT_OPEN_SYSTEM_DB = 0x0122,
-
-     pEp_KEY_NOT_FOUND = 0x0201,
-     pEp_KEY_HAS_AMBIG_NAME = 0x0202,
-     pEp_GET_KEY_FAILED = 0x0203,
-
-     pEp_CANNOT_FIND_IDENTITY = 0x0301,
-     pEp_CANNOT_SET_PERSON = 0x0381,
-     pEp_CANNOT_SET_PGP_KEYPAIR = 0x0382,
-     pEp_CANNOT_SET_IDENTITY = 0x0383,
-     pEp_CANNOT_SET_TRUST = 0x0384,
-
-     pEp_UNENCRYPTED = 0x0400,
-     pEp_VERIFIED = 0x0401,
-     pEp_DECRYPTED = 0x0402,
-     pEp_DECRYPTED_AND_VERIFIED = 0x0403,
-     pEp_DECRYPT_WRONG_FORMAT = 0x0404,
-     pEp_DECRYPT_NO_KEY = 0x0405,
-     pEp_DECRYPT_SIGNATURE_DOES_NOT_MATCH = 0x0406,
-     pEp_VERIFY_NO_KEY = 0x0407,
-     pEp_VERIFIED_AND_TRUSTED = 0x0408,
-     pEp_CANNOT_DECRYPT_UNKNOWN = 0x04ff,
-
-     pEp_TRUSTWORD_NOT_FOUND = 0x0501,
-
-     pEp_CANNOT_CREATE_KEY = 0x0601,
-     pEp_CANNOT_SEND_KEY = 0x0602,
-
-     pEp_PHRASE_NOT_FOUND = 0x0701,
-
-     pEp_COMMIT_FAILED = 0xff01,
-
-     pEp_CANNOT_CREATE_TEMP_FILE = -5,
-     pEp_ILLEGAL_VALUE = -4,
-     pEp_BUFFER_TOO_SMALL = -3,
-     pEp_OUT_OF_MEMORY = -2,
-     pEp_UNKNOWN_ERROR = -1
- } pEpStatus;
-
 // CpEpEngine
 
 class ATL_NO_VTABLE CpEpEngine :
