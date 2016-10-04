@@ -27,11 +27,11 @@ namespace pEp {
                 address = utf8_string(_ident->address);
             if (_ident->fpr)
                 fpr = utf8_string(_ident->fpr);
-            if (_ident->user_id)
-                user_id = utf8_string(_ident->user_id);
+            if (_ident->userId)
+                user_id = utf8_string(_ident->userId);
             if (_ident->username)
                 username = utf8_string(_ident->username);
-            comm_type = _ident->comm_type;
+            comm_type = _ident->commType;
             if (_ident->lang)
                 lang = utf8_string(_ident->lang);
         }
@@ -64,11 +64,11 @@ namespace pEp {
                 throw bad_alloc();
 
             _ident->address = utf16_bstr(this->address);
-            _ident->comm_type = this->comm_type;
+            _ident->commType = this->comm_type;
             _ident->fpr = utf16_bstr(this->fpr);
             _ident->lang = utf16_bstr(this->lang);
             _ident->username = utf16_bstr(this->username);
-            _ident->user_id = utf16_bstr(this->user_id);
+            _ident->userId = utf16_bstr(this->user_id);
 
             return _ident;
         }
@@ -84,10 +84,10 @@ namespace pEp {
                 if (ident->fpr)
                     ident_s->fpr = utf16_bstr(ident->fpr);
                 if (ident->user_id)
-                    ident_s->user_id = utf16_bstr(ident->user_id);
+                    ident_s->userId = utf16_bstr(ident->user_id);
                 if (ident->username)
                     ident_s->username = utf16_bstr(ident->username);
-                ident_s->comm_type = (pEpComType) ident->comm_type;
+                ident_s->commType = (pEpComType) ident->comm_type;
                 if (ident->lang)
                     ident_s->lang = utf16_bstr(ident->lang);
             }
@@ -117,8 +117,8 @@ namespace pEp {
                     throw invalid_argument("invalid hex digits in fingerprint");
                 }
             }
-            if (ident->user_id)
-                _user_id = utf8_string(ident->user_id);
+            if (ident->userId)
+                _user_id = utf8_string(ident->userId);
             if (ident->username)
                 _username = utf8_string(ident->username);
 
@@ -127,7 +127,7 @@ namespace pEp {
             if (_ident == NULL)
                 throw bad_alloc();
 
-            _ident->comm_type = (PEP_comm_type) ident->comm_type;
+            _ident->comm_type = (PEP_comm_type) ident->commType;
 
             if (ident->lang) {
                 string _lang = utf8_string(ident->lang);
@@ -177,7 +177,7 @@ namespace pEp {
             Blob *_blob = new Blob();
 
             _blob->value = sa.Detach();
-            _blob->mime_type = bstr(tl->mime_type);
+            _blob->mimeType = bstr(tl->mime_type);
             _blob->filename = bstr(tl->filename);
 
             return _blob;
@@ -210,7 +210,7 @@ namespace pEp {
             SysFreeString(ident.fpr);
             SysFreeString(ident.lang);
             SysFreeString(ident.username);
-            SysFreeString(ident.user_id);
+            SysFreeString(ident.userId);
 
             memset(&ident, 0, sizeof(pEpIdentity));
         }
@@ -270,18 +270,18 @@ namespace pEp {
             SysFreeString(msg->id);
             SysFreeString(msg->shortmsg);
             SysFreeString(msg->longmsg);
-            SysFreeString(msg->longmsg_formatted);
+            SysFreeString(msg->longmsgFormatted);
             SafeArrayDestroy(msg->attachments);
             clear_identity_s(msg->from);
             SafeArrayDestroy(msg->to);
-            clear_identity_s(msg->recv_by);
+            clear_identity_s(msg->recvBy);
             SafeArrayDestroy(msg->cc);
             SafeArrayDestroy(msg->bcc);
-            SafeArrayDestroy(msg->reply_to);
+            SafeArrayDestroy(msg->replyTo);
             SafeArrayDestroy(msg->references);
             SafeArrayDestroy(msg->keywords);
             SysFreeString(msg->comments);
-            SafeArrayDestroy(msg->opt_fields);
+            SafeArrayDestroy(msg->optFields);
 
             memset(msg, 0, sizeof(TextMessage));
         }
@@ -297,7 +297,7 @@ namespace pEp {
             msg2->id = bstr(msg->id);
             msg2->shortmsg = bstr(msg->shortmsg);
             msg2->longmsg = bstr(msg->longmsg);
-            msg2->longmsg_formatted = bstr(msg->longmsg_formatted);
+            msg2->longmsgFormatted = bstr(msg->longmsg_formatted);
             msg2->attachments = array_from_C<Blob, bloblist_t>(msg->attachments);
             if (msg->sent)
                 msg2->sent = mktime(msg->sent);
@@ -305,14 +305,14 @@ namespace pEp {
                 msg2->recv = mktime(msg->recv);
             msg2->from = identity_s(msg->from);
             msg2->to = array_from_C<pEpIdentity, identity_list>(msg->to);
-            msg2->recv_by = identity_s(msg->recv_by);
+            msg2->recvBy = identity_s(msg->recv_by);
             msg2->cc = array_from_C<pEpIdentity, identity_list>(msg->cc);
             msg2->bcc = array_from_C<pEpIdentity, identity_list>(msg->bcc);
-            msg2->reply_to = array_from_C<pEpIdentity, identity_list>(msg->reply_to);
+            msg2->replyTo = array_from_C<pEpIdentity, identity_list>(msg->reply_to);
             msg2->references = string_array(msg->references);
             msg2->keywords = string_array(msg->keywords);
             msg2->comments = bstr(msg->comments);
-            msg2->opt_fields = array_from_C<StringPair, stringpair_list_t>(msg->opt_fields);
+            msg2->optFields = array_from_C<StringPair, stringpair_list_t>(msg->opt_fields);
         }
 
         char * str(BSTR s)
@@ -328,7 +328,7 @@ namespace pEp {
         void clear_blob(Blob& b)
         {
             SysFreeString(b.filename);
-            SysFreeString(b.mime_type);
+            SysFreeString(b.mimeType);
             SafeArrayDestroy(b.value);
             memset(&b, 0, sizeof(Blob));
         }
@@ -379,7 +379,7 @@ namespace pEp {
                         throw bad_alloc();
 
                 }
-                _bl = bloblist_add(_bl, buffer, size, str(b.mime_type), str(b.filename));
+                _bl = bloblist_add(_bl, buffer, size, str(b.mimeType), str(b.filename));
                 if (_bl == NULL) {
                     free(buffer);
                     clear_blob(b);
@@ -504,23 +504,24 @@ namespace pEp {
             msg2->id = str(msg->id);
             msg2->shortmsg = str(msg->shortmsg);
             msg2->longmsg = str(msg->longmsg);
-            msg2->longmsg_formatted = str(msg->longmsg_formatted);
+            msg2->longmsg_formatted = str(msg->longmsgFormatted);
             msg2->attachments = bloblist(msg->attachments);
             msg2->sent = new_timestamp(msg->sent);
             msg2->recv = new_timestamp(msg->recv);
             msg2->from = new_identity(&msg->from);
             msg2->to = identities(msg->to);
-            msg2->recv_by = new_identity(&msg->recv_by);
+            msg2->recv_by = new_identity(&msg->recvBy);
             msg2->cc = identities(msg->cc);
             msg2->bcc = identities(msg->bcc);
-            msg2->reply_to = identities(msg->reply_to);
+            msg2->reply_to = identities(msg->replyTo);
             msg2->references = new_stringlist(msg->references);
             msg2->keywords = new_stringlist(msg->keywords);
             msg2->comments = str(msg->comments);
-            msg2->opt_fields = stringpair_list(msg->opt_fields);
+            msg2->opt_fields = stringpair_list(msg->optFields);
 
             return msg2;
         }
+
 		void opt_field_array_from_C(stringpair_list_t* spair_list, LPSAFEARRAY* pair_list_out) {
 			assert(spair_list);
 			assert(pair_list_out);
@@ -530,6 +531,7 @@ namespace pEp {
 
 			*pair_list_out = array_from_C<StringPair, stringpair_list_t>(spair_list);
 		}
+
 		void clear_opt_field_array(LPSAFEARRAY* opt_field_array) {
 			SafeArrayDestroy(*opt_field_array);
 			//memset(*opt_field_array, 0, sizeof(SAFEARRAY*));

@@ -232,35 +232,17 @@ public:
 
     // basic API
 
-    STDMETHOD(log)(BSTR title, BSTR entity, BSTR description, BSTR comment);
-    STDMETHOD(decrypt)(BSTR ctext, BSTR * ptext, LPSAFEARRAY * key_list, pEpStatus * decrypt_status);
-    STDMETHOD(decrypt_b)(BSTR ctext, LPSAFEARRAY * ptext, LPSAFEARRAY * key_list, pEpStatus * decrypt_status);
-    STDMETHOD(encrypt)(SAFEARRAY * key_list, BSTR ptext, BSTR * ctext, pEpStatus * status);
-    STDMETHOD(encrypt_b)(SAFEARRAY * key_list, SAFEARRAY * ptext, BSTR * ctext, pEpStatus * status);
-    STDMETHOD(trustword)(LONG value, BSTR lang, BSTR * word);
+    STDMETHOD(Log)(BSTR title, BSTR entity, BSTR description, BSTR comment);
     STDMETHOD(TrustWords)(BSTR fpr, BSTR lang, LONG max_words, BSTR * words);
-    STDMETHOD(get_identity)(BSTR address, BSTR user_id, pEpIdentity * ident);
-    STDMETHOD(set_identity)(pEpIdentity * ident);
-    STDMETHOD(generate_keypair)(pEpIdentity * ident, BSTR * fpr);
-    STDMETHOD(delete_keypair)(BSTR fpr);
-    STDMETHOD(import_key)(BSTR key_data);
-    STDMETHOD(import_key_b)(SAFEARRAY * key_data);
-    STDMETHOD(export_key)(BSTR fpr, BSTR * key_data);
-    STDMETHOD(recv_key)(BSTR pattern);
-    STDMETHOD(find_keys)(BSTR pattern, LPSAFEARRAY * key_list);
-    STDMETHOD(send_key)(BSTR pattern);
     STDMETHOD(GetCrashdumpLog)(LONG maxlines, BSTR * log);
-    STDMETHOD(GetEngineVersion)(BSTR * engine_version);
-    STDMETHOD(GetLanguagelist)(BSTR * languages);
-    STDMETHOD(get_phrase)(BSTR lang, LONG phrase_id, BSTR * phrase);
+    STDMETHOD(GetEngineVersion)(BSTR * engineVersion);
+    STDMETHOD(GetLanguageList)(BSTR * languages);
 
     // keymanagement API
 
     STDMETHOD(StartKeyserverLookup)();
     STDMETHOD(StopKeyserverLookup)();
 
-    STDMETHOD(examine_identity)(pEpIdentity * ident);
-    STDMETHOD(verify)(BSTR text, BSTR signature, LPSAFEARRAY * key_list, pEpStatus * verify_status);
     STDMETHOD(Myself)(struct pEpIdentity *ident, struct pEpIdentity *result);
     STDMETHOD(UpdateIdentity)(struct pEpIdentity *ident, struct pEpIdentity *result);
     STDMETHOD(KeyMistrusted)(struct pEpIdentity *ident);
@@ -289,7 +271,7 @@ public:
 	STDMETHOD(UnregisterCallbacks)(IpEpEngineCallbacks *obsolete_callback);
 
     // PGP compatibility functions
-    STDMETHOD(OpenPGP_list_keyinfo)(BSTR search_pattern, LPSAFEARRAY* keyinfo_list);
+    STDMETHOD(OpenPGPListKeyinfo)(BSTR search_pattern, LPSAFEARRAY* keyinfo_list);
 
 protected:
 	HRESULT Fire_MessageToSend(

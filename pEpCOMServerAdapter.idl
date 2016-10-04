@@ -35,6 +35,7 @@ interface IpEpEngineCallbacks : IUnknown {
     pointer_default(unique)
 ]
 interface IpEpEngine : IUnknown {
+
     // runtime config of the adapter
 
     HRESULT VerboseLogging([in] VARIANT_BOOL enable);
@@ -46,68 +47,11 @@ interface IpEpEngine : IUnknown {
 
     // basic API
 
-   // // TODO: Remove this enum, it is not needed in the interface, but it currently is still used in the code...
-   //typedef [v1_enum] enum pEpStatus {
-   //     pEpStatusOK = 0,
-
-   //     pEp_INIT_CANNOT_LOAD_GPGME = 0x0110,
-   //     pEp_INIT_GPGME_INIT_FAILED = 0x0111,
-   //     pEp_INIT_NO_GPG_HOME = 0x0112,
-   //     pEp_INIT_NETPGP_INIT_FAILED = 0x0113,
-
-   //     pEp_INIT_SQLITE3_WITHOUT_MUTEX = 0x0120,
-   //     pEp_INIT_CANNOT_OPEN_DB = 0x0121,
-   //     pEp_INIT_CANNOT_OPEN_SYSTEM_DB = 0x0122,
-
-   //     pEp_KEY_NOT_FOUND = 0x0201,
-   //     pEp_KEY_HAS_AMBIG_NAME = 0x0202,
-   //     pEp_GET_KEY_FAILED = 0x0203,
-
-   //     pEp_CANNOT_FIND_IDENTITY = 0x0301,
-   //     pEp_CANNOT_SET_PERSON = 0x0381,
-   //     pEp_CANNOT_SET_PGP_KEYPAIR = 0x0382,
-   //     pEp_CANNOT_SET_IDENTITY = 0x0383,
-   //     pEp_CANNOT_SET_TRUST = 0x0384,
-
-   //     pEp_UNENCRYPTED = 0x0400,
-   //     pEp_VERIFIED = 0x0401,
-   //     pEp_DECRYPTED = 0x0402,
-   //     pEp_DECRYPTED_AND_VERIFIED = 0x0403,
-   //     pEp_DECRYPT_WRONG_FORMAT = 0x0404,
-   //     pEp_DECRYPT_NO_KEY = 0x0405,
-   //     pEp_DECRYPT_SIGNATURE_DOES_NOT_MATCH = 0x0406,
-   //     pEp_VERIFY_NO_KEY = 0x0407,
-   //     pEp_VERIFIED_AND_TRUSTED = 0x0408,
-   //     pEp_CANNOT_DECRYPT_UNKNOWN = 0x04ff,
-
-   //     pEp_TRUSTWORD_NOT_FOUND = 0x0501,
-
-   //     pEp_CANNOT_CREATE_KEY = 0x0601,
-   //     pEp_CANNOT_SEND_KEY = 0x0602,
-
-   //     pEp_PHRASE_NOT_FOUND = 0x0701,
-
-   //     pEp_COMMIT_FAILED = 0xff01,
-
-   //     pEp_CANNOT_CREATE_TEMP_FILE = -5,
-   //     pEp_ILLEGAL_VALUE = -4,
-   //     pEp_BUFFER_TOO_SMALL = -3,
-   //     pEp_OUT_OF_MEMORY = -2,
-   //     pEp_UNKNOWN_ERROR = -1
-   // } pEpStatus;
-
-    // HRESULT log([in] BSTR title, [in] BSTR entity, [in, defaultvalue("")] BSTR description, [in, defaultvalue("")] BSTR comment);
-    // HRESULT decrypt([in] BSTR ctext, [out] BSTR * ptext, [out] SAFEARRAY(BSTR) * key_list, [out, retval] pEpStatus * decrypt_status);
-    // HRESULT decrypt_b([in] BSTR ctext, [out] SAFEARRAY(BYTE) * ptext, [out] SAFEARRAY(BSTR) * key_list, [out, retval] pEpStatus * decrypt_status);
-    // HRESULT encrypt([in] SAFEARRAY(BSTR) key_list, [in] BSTR ptext, [out] BSTR * ctext, [out, retval] pEpStatus * status);
-    // HRESULT encrypt_b([in] SAFEARRAY(BSTR) key_list, [in] SAFEARRAY(BYTE) ptext, [out] BSTR * ctext, [out, retval] pEpStatus * status);
-    // HRESULT verify([in] BSTR text, [in] BSTR signature, [out] SAFEARRAY(BSTR) * key_list, [out, retval] pEpStatus * verify_status);
-    // HRESULT trustword([in] LONG value, [in, defaultvalue("en")] BSTR lang, [out, retval] BSTR * word);
-    HRESULT TrustWords([in] BSTR fpr, [in, defaultvalue("en")] BSTR lang, [in, defaultvalue(0)] LONG max_words, [out, retval] BSTR * words);
+    HRESULT Log([in] BSTR title, [in] BSTR entity, [in, defaultvalue("")] BSTR description, [in, defaultvalue("")] BSTR comment);
+    HRESULT TrustWords([in] BSTR fpr, [in, defaultvalue("en")] BSTR lang, [in, defaultvalue(0)] LONG maxWords, [out, retval] BSTR * words);
     HRESULT GetCrashdumpLog([in, defaultvalue(0)] LONG maxlines, [out, retval] BSTR * log);
-    HRESULT GetEngineVersion([out, retval] BSTR * engine_version);
-    HRESULT GetLanguagelist([out, retval] BSTR * languages);
-    // HRESULT get_phrase([in] BSTR lang, [in] LONG phrase_id, [out, retval] BSTR * phrase);
+    HRESULT GetEngineVersion([out, retval] BSTR * engineVersion);
+    HRESULT GetLanguageList([out, retval] BSTR * languages);
 
     typedef [v1_enum] enum pEpComType {
         pEpCtUnknown = 0,
@@ -172,27 +116,16 @@ interface IpEpEngine : IUnknown {
     [uuid(0CB90E62-8A6A-4CA0-99D7-481704051FF0)] struct pEpIdentity {
         BSTR address;
         BSTR fpr;
-        BSTR user_id;
+        BSTR userId;
         BSTR username;
-        pEpComType comm_type;
+        pEpComType commType;
         BSTR lang;
     };
-
-    //HRESULT get_identity([in] BSTR address, [in] BSTR user_id, [out, retval] struct pEpIdentity * ident);
-    //HRESULT set_identity([in] struct pEpIdentity * ident);
-    //HRESULT generate_keypair([in] struct pEpIdentity * ident, [out, retval] BSTR * fpr);
-    //HRESULT delete_keypair([in] BSTR fpr);
-    //HRESULT import_key([in] BSTR key_data);
-    //HRESULT import_key_b([in] SAFEARRAY(BYTE) key_data);
-    //HRESULT export_key([in] BSTR fpr, [out, retval] BSTR * key_data);
-    //HRESULT recv_key([in] BSTR pattern);
-    //HRESULT find_keys([in] BSTR pattern, [out, retval] SAFEARRAY(BSTR) * key_list);
-    //HRESULT send_key([in] BSTR pattern);
-
+    
+    // Keymanagement API
     HRESULT StartKeyserverLookup();
     HRESULT StopKeyserverLookup();
 
-    //HRESULT examine_identity([in] struct pEpIdentity * ident);
     HRESULT Myself([in] struct pEpIdentity *ident, [out, retval] struct pEpIdentity *result);
     HRESULT UpdateIdentity([in] struct pEpIdentity *ident, [out, retval] struct pEpIdentity *result);
     HRESULT KeyMistrusted([in] struct pEpIdentity *ident);
@@ -208,7 +141,7 @@ interface IpEpEngine : IUnknown {
 
 	// PGP compatibility functions
 
-	HRESULT OpenPGP_list_keyinfo([in] BSTR search_pattern, [out, retval] SAFEARRAY(struct StringPair)* keyinfo_list);
+	HRESULT OpenPGPListKeyinfo([in] BSTR searchPattern, [out, retval] SAFEARRAY(struct StringPair)* keyinfoList);
 
     // Message API
 
@@ -251,14 +184,6 @@ interface IpEpEngine : IUnknown {
         pEpDirOutgoing
     } pEpMsgDirection;
 
-    //typedef  enum _pEp_enc_format {
-    //    pEp_enc_none = 0,                       // message is not encrypted
-    //    pEp_enc_pieces,                         // inline PGP + PGP extensions
-    //    pEp_enc_S_MIME,                         // RFC5751
-    //    pEp_enc_PGP_MIME,                       // RFC3156
-    //    pEp_enc_pEp                             // pEp encryption format
-    //} pEp_enc_format;
-
     [uuid(3A8A4F13-3402-4C4C-94AB-598D87869380)] struct StringPair {
         BSTR name;
         BSTR value;
@@ -266,7 +191,7 @@ interface IpEpEngine : IUnknown {
 
     [uuid(61DA7AD4-192E-4616-8678-B19AEFB45B45)] struct Blob {
         SAFEARRAY(BYTE) value;
-        BSTR mime_type;
+        BSTR mimeType;
         BSTR filename;
     };
 
@@ -275,30 +200,32 @@ interface IpEpEngine : IUnknown {
         BSTR id;
         BSTR shortmsg;
         BSTR longmsg;
-        BSTR longmsg_formatted;
+        BSTR longmsgFormatted;
         SAFEARRAY(struct Blob) attachments;
         hyper sent; // Timestamp: 64 Bit time_t from mktime(), seconds since January 1, 1970, 0:00 UTC.
         hyper recv; // Timestamp: 64 Bit time_t from mktime(), seconds since January 1, 1970, 0:00 UTC.
         struct pEpIdentity from;
         SAFEARRAY(struct pEpIdentity) to;
-        struct pEpIdentity recv_by;
+        struct pEpIdentity recvBy;
         SAFEARRAY(struct pEpIdentity) cc;
         SAFEARRAY(struct pEpIdentity) bcc;
-        SAFEARRAY(struct pEpIdentity) reply_to;
+        SAFEARRAY(struct pEpIdentity) replyTo;
         SAFEARRAY(BSTR) references;
         SAFEARRAY(BSTR) keywords;
         BSTR comments;
-        SAFEARRAY(struct StringPair) opt_fields;
+        SAFEARRAY(struct StringPair) optFields;
     };
 
     HRESULT EncryptMessage([in] struct TextMessage *src, [out] struct TextMessage * dst, [in] SAFEARRAY(BSTR) extra, [in, defaultvalue(pEpEncryptFlagsNone)] pEpEncryptFlags flags);
     HRESULT DecryptMessage([in] struct TextMessage *src, [out] struct TextMessage * dst, [out] SAFEARRAY(BSTR) *keylist, [out] pEpDecryptFlags* flags, [out, retval] pEpRating *rating);
+
     HRESULT OutgoingMessageRating([in] struct TextMessage *msg, [out, retval] pEpRating * pVal);
     HRESULT IdentityRating([in] struct pEpIdentity * ident, [out, retval] pEpRating * pVal);
 	HRESULT ColorFromRating([in] pEpRating rating, [out, retval] pEpColor* pVal);
 
-	HRESULT RegisterCallbacks([in] IpEpEngineCallbacks* new_callback);
-	HRESULT UnregisterCallbacks([in] IpEpEngineCallbacks* obsolete_callback);
+    // callback / keysync API
+	HRESULT RegisterCallbacks([in] IpEpEngineCallbacks* newCallback);
+	HRESULT UnregisterCallbacks([in] IpEpEngineCallbacks* obsoleteCallback);
 };
 
 [
