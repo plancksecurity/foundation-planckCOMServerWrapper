@@ -665,9 +665,9 @@ STDMETHODIMP CpEpEngine::TrustPersonalKey(struct pEpIdentity *ident, struct pEpI
 	if (verbose_mode) {
 		stringstream ss;
 		ss << "TrustPersonalKey called with ";
-		ss << utf8_string(ident->address);
+		ss << utf8_string(ident->Address);
 		ss << L": ";
-		ss << ident->commType;
+		ss << ident->CommType;
 		verbose(ss.str());
 	}
 
@@ -766,7 +766,7 @@ void CpEpEngine::stop_keysync()
 	keysync_thread = NULL;
 	::unregister_sync_callbacks(keysync_session);
 	release(keysync_session);
-    keysync_session == NULL;
+    keysync_session = NULL;
 	keysync_abort_requested = false;
 }
 

@@ -114,12 +114,12 @@ interface IpEpEngine : IUnknown {
     } pEpComType;
 
     [uuid(0CB90E62-8A6A-4CA0-99D7-481704051FF0)] struct pEpIdentity {
-        BSTR address;
-        BSTR fpr;
-        BSTR userId;
-        BSTR username;
-        pEpComType commType;
-        BSTR lang;
+        BSTR Address;
+        BSTR Fpr;
+        BSTR UserId;
+        BSTR UserName;
+        pEpComType CommType;
+        BSTR Lang;
     };
     
     // Keymanagement API
@@ -185,35 +185,35 @@ interface IpEpEngine : IUnknown {
     } pEpMsgDirection;
 
     [uuid(3A8A4F13-3402-4C4C-94AB-598D87869380)] struct StringPair {
-        BSTR name;
-        BSTR value;
+        BSTR Name;
+        BSTR Value;
     };
 
     [uuid(61DA7AD4-192E-4616-8678-B19AEFB45B45)] struct Blob {
         SAFEARRAY(BYTE) value;
-        BSTR mimeType;
-        BSTR filename;
+        BSTR MimeType;
+        BSTR Filename;
     };
 
     [uuid(D763A8F3-BA23-4229-A037-1BB7BDC3E0C8)] struct TextMessage {
-        pEpMsgDirection dir;
-        BSTR id;
-        BSTR shortmsg;
-        BSTR longmsg;
-        BSTR longmsgFormatted;
-        SAFEARRAY(struct Blob) attachments;
-        hyper sent; // Timestamp: 64 Bit time_t from mktime(), seconds since January 1, 1970, 0:00 UTC.
-        hyper recv; // Timestamp: 64 Bit time_t from mktime(), seconds since January 1, 1970, 0:00 UTC.
-        struct pEpIdentity from;
-        SAFEARRAY(struct pEpIdentity) to;
-        struct pEpIdentity recvBy;
-        SAFEARRAY(struct pEpIdentity) cc;
-        SAFEARRAY(struct pEpIdentity) bcc;
-        SAFEARRAY(struct pEpIdentity) replyTo;
-        SAFEARRAY(BSTR) references;
-        SAFEARRAY(BSTR) keywords;
-        BSTR comments;
-        SAFEARRAY(struct StringPair) optFields;
+        pEpMsgDirection Dir;
+        BSTR Id;
+        BSTR Shortmsg;
+        BSTR Longmsg;
+        BSTR LongmsgFormatted;
+        SAFEARRAY(struct Blob) Attachments;
+        hyper Sent; // Timestamp: 64 Bit time_t from mktime(), seconds since January 1, 1970, 0:00 UTC.
+        hyper Recv; // Timestamp: 64 Bit time_t from mktime(), seconds since January 1, 1970, 0:00 UTC.
+        struct pEpIdentity From;
+        SAFEARRAY(struct pEpIdentity) To;
+        struct pEpIdentity RecvBy;
+        SAFEARRAY(struct pEpIdentity) Cc;
+        SAFEARRAY(struct pEpIdentity) Bcc;
+        SAFEARRAY(struct pEpIdentity) ReplyTo;
+        SAFEARRAY(BSTR) References;
+        SAFEARRAY(BSTR) Keywords;
+        BSTR Comments;
+        SAFEARRAY(struct StringPair) OptFields;
     };
 
     HRESULT EncryptMessage([in] struct TextMessage *src, [out] struct TextMessage * dst, [in] SAFEARRAY(BSTR) extra, [in, defaultvalue(pEpEncryptFlagsNone)] pEpEncryptFlags flags);
