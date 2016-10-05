@@ -2,23 +2,23 @@ HKCR
 {
        pEpCOMServerAdapter.pEpCOMServerAdapter.1 = s 'pEpCOMServerAdapter Class'
        {
-              CLSID = s '{EF1B073D-5058-4E0E-829E-B4D22CA21EA2}'
+              CLSID = s '{5FF6682B-727B-4DFE-A68D-28982874C0C7}'
        }
        pEpCOMServerAdapter.pEpEngine = s 'pEpEngine Class'
        {
-              CLSID = s '{EF1B073D-5058-4E0E-829E-B4D22CA21EA2}'
+              CLSID = s '{5FF6682B-727B-4DFE-A68D-28982874C0C7}'
               CurVer = s 'pEpCOMServerAdapter.pEpCOMServerAdapter.1'
        }
        NoRemove CLSID
        {
-	          ForceRemove {EF1B073D-5058-4E0E-829E-B4D22CA21EA2} = s 'pEpEngine Class'
+	          ForceRemove {5FF6682B-727B-4DFE-A68D-28982874C0C7} = s 'pEpEngine Class'
               {
                      ProgID = s 'ATLExeCOMServer.ATLSimpleObjectSTA.1'
                      VersionIndependentProgID = s 'pEpCOMServerAdapter.pEpCOMServerAdapter'
                      LocalServer32 = s '%MODULE%'
                     
                      ForceRemove 'Programmable'
-                     TypeLib = s '{3EC2E1A4-40E8-48E4-A7B0-1876D34F9462}'
+                     TypeLib = s '{564A4350-419E-47F1-B0DF-6FCCF0CD0BBC}'
                      Version = s '1.0'
               }
        }

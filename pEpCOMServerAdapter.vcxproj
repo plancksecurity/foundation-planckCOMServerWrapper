@@ -164,12 +164,12 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
     <ClInclude Include="targetver.h" />
     <ClInclude Include="utf8_helper.h" />
     <ClInclude Include="xdlldata.h" />
-    <ClInclude Include="_IpEpEngineEvents_CP.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="pEpCOMServerAdapter.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="LICENSE.txt" />
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
