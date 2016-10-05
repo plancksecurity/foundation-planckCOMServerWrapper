@@ -8,22 +8,22 @@ import "oaidl.idl";
 import "ocidl.idl";
 
 [
-	object,
-	uuid(4DA92647-A858-448E-B01F-BE4DCB8C86A1),
-	oleautomation,
-	nonextensible,
-	pointer_default(unique)
+    object,
+    uuid(4DA92647-A858-448E-B01F-BE4DCB8C86A1),
+    oleautomation,
+    nonextensible,
+    pointer_default(unique)
 ]
 interface IpEpEngineCallbacks : IUnknown {
 
     typedef [v1_enum] enum SyncHandshakeResult {
-	    SyncHandshakeCancel = -1,
-	    SyncHandshakeAccepted = 0,
-	    SyncHandshakeRejected = 1
+        SyncHandshakeCancel = -1,
+        SyncHandshakeAccepted = 0,
+        SyncHandshakeRejected = 1
     } SyncHandshakeResult;
 
-	[id(1)] HRESULT MessageToSend([in] struct TextMessage * msg);
-	[id(2)] HRESULT ShowHandshake([in] struct pEpIdentity * self, [in] struct pEpIdentity * partner, [out, retval] SyncHandshakeResult * result);
+    [id(1)] HRESULT MessageToSend([in] struct TextMessage * msg);
+    [id(2)] HRESULT ShowHandshake([in] struct pEpIdentity * self, [in] struct pEpIdentity * partner, [out, retval] SyncHandshakeResult * result);
 };
 
 
@@ -113,7 +113,7 @@ interface IpEpEngine : IUnknown {
         pEpCtpEp = 0xff
     } pEpComType;
 
-    [uuid(0CB90E62-8A6A-4CA0-99D7-481704051FF0)] struct pEpIdentity {
+    [uuid(C3A3814E-567F-4D1C-9F44-9B1DA3957A89)] struct pEpIdentity {
         BSTR Address;
         BSTR Fpr;
         BSTR UserId;
@@ -121,7 +121,7 @@ interface IpEpEngine : IUnknown {
         pEpComType CommType;
         BSTR Lang;
     };
-    
+
     // Keymanagement API
     HRESULT StartKeyserverLookup();
     HRESULT StopKeyserverLookup();
@@ -139,63 +139,63 @@ interface IpEpEngine : IUnknown {
     HRESULT BlacklistIsListed([in] BSTR fpr, [out, retval] VARIANT_BOOL *listed);
     HRESULT BlacklistRetreive([out, retval] SAFEARRAY(BSTR) *blacklist);
 
-	// PGP compatibility functions
+    // PGP compatibility functions
 
-	HRESULT OpenPGPListKeyinfo([in] BSTR searchPattern, [out, retval] SAFEARRAY(struct StringPair)* keyinfoList);
+    HRESULT OpenPGPListKeyinfo([in] BSTR searchPattern, [out, retval] SAFEARRAY(struct StringPair)* keyinfoList);
 
     // Message API
 
-	typedef [v1_enum] enum pEpRating {
-		pEpRatingUndefined = 0,
-		pEpRatingCannotDecrypt,
-		pEpRatingHaveNoKey,
-		pEpRatingUnencrypted,
-		pEpRatingUnencryptedForSome,
-		pEpRatingUnreliable,
-		pEpRatingReliable,
-		pEpRatingTrusted,
-		pEpRatingTrustedAndAnonymized,
-		pEpRatingFullyAnonymous,
+    typedef [v1_enum] enum pEpRating {
+        pEpRatingUndefined = 0,
+        pEpRatingCannotDecrypt,
+        pEpRatingHaveNoKey,
+        pEpRatingUnencrypted,
+        pEpRatingUnencryptedForSome,
+        pEpRatingUnreliable,
+        pEpRatingReliable,
+        pEpRatingTrusted,
+        pEpRatingTrustedAndAnonymized,
+        pEpRatingFullyAnonymous,
 
-		pEpRatingMistrust = -1,
-		pEpRatingB0rken = -2,
-		pEpRatingUnderAttack = -3
-	} pEpRating;
+        pEpRatingMistrust = -1,
+        pEpRatingB0rken = -2,
+        pEpRatingUnderAttack = -3
+    } pEpRating;
 
-	typedef [v1_enum] enum pEpColor {
-		pEpColorNoColor = 0,
-		pEpColorYellow,
-		pEpColorGreen,
-		pEpColorRed = -1,
-	} pEpColor;
+    typedef [v1_enum] enum pEpColor {
+        pEpColorNoColor = 0,
+        pEpColorYellow,
+        pEpColorGreen,
+        pEpColorRed = -1,
+    } pEpColor;
 
-	typedef [v1_enum] enum pEpEncryptFlags {
-		pEpEncryptFlagsNone = 0,
-		pEpEncryptFlagForceEncryption = 0x1,
-	} pEpEncryptFlags;
+    typedef [v1_enum] enum pEpEncryptFlags {
+        pEpEncryptFlagsNone = 0,
+        pEpEncryptFlagForceEncryption = 0x1,
+    } pEpEncryptFlags;
 
-	typedef [v1_enum] enum pEpDecryptFlags {
-		pEpDecryptFlagsNone = 0,
-		pEpDecryptFlagOwnPrivateKey = 0x1
-	} pEpDecryptFlags;
+    typedef [v1_enum] enum pEpDecryptFlags {
+        pEpDecryptFlagsNone = 0,
+        pEpDecryptFlagOwnPrivateKey = 0x1
+    } pEpDecryptFlags;
 
     typedef [v1_enum] enum pEpMsgDirection {
         pEpDirIncoming = 0,
         pEpDirOutgoing
     } pEpMsgDirection;
 
-    [uuid(3A8A4F13-3402-4C4C-94AB-598D87869380)] struct StringPair {
+    [uuid(47FB0795-6B64-455C-BB0E-54998CAB8ACB)] struct StringPair {
         BSTR Name;
         BSTR Value;
     };
 
-    [uuid(61DA7AD4-192E-4616-8678-B19AEFB45B45)] struct Blob {
+    [uuid(634EB7CE-99AA-460D-BDF8-F7CDA7232CA6)] struct Blob {
         SAFEARRAY(BYTE) value;
         BSTR MimeType;
         BSTR Filename;
     };
 
-    [uuid(D763A8F3-BA23-4229-A037-1BB7BDC3E0C8)] struct TextMessage {
+    [uuid(B6F40887-E761-4A47-B204-A0193EE0284D)] struct TextMessage {
         pEpMsgDirection Dir;
         BSTR Id;
         BSTR Shortmsg;
@@ -221,11 +221,11 @@ interface IpEpEngine : IUnknown {
 
     HRESULT OutgoingMessageRating([in] struct TextMessage *msg, [out, retval] pEpRating * pVal);
     HRESULT IdentityRating([in] struct pEpIdentity * ident, [out, retval] pEpRating * pVal);
-	HRESULT ColorFromRating([in] pEpRating rating, [out, retval] pEpColor* pVal);
+    HRESULT ColorFromRating([in] pEpRating rating, [out, retval] pEpColor* pVal);
 
     // callback / keysync API
-	HRESULT RegisterCallbacks([in] IpEpEngineCallbacks* newCallback);
-	HRESULT UnregisterCallbacks([in] IpEpEngineCallbacks* obsoleteCallback);
+    HRESULT RegisterCallbacks([in] IpEpEngineCallbacks* newCallback);
+    HRESULT UnregisterCallbacks([in] IpEpEngineCallbacks* obsoleteCallback);
 };
 
 [
@@ -235,7 +235,7 @@ interface IpEpEngine : IUnknown {
 library pEpCOMServerAdapterLib
 {
     importlib("stdole2.tlb");
-    
+
     [
         uuid(5FF6682B-727B-4DFE-A68D-28982874C0C7)
     ]
