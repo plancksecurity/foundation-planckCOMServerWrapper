@@ -268,9 +268,9 @@ namespace pEp {
         void clear_text_message(TextMessage *msg)
         {
             SysFreeString(msg->Id);
-            SysFreeString(msg->Shortmsg);
-            SysFreeString(msg->Longmsg);
-            SysFreeString(msg->LongmsgFormatted);
+            SysFreeString(msg->ShortMsg);
+            SysFreeString(msg->LongMsg);
+            SysFreeString(msg->LongMsgFormatted);
             SafeArrayDestroy(msg->Attachments);
             clear_identity_s(msg->From);
             SafeArrayDestroy(msg->To);
@@ -295,9 +295,9 @@ namespace pEp {
 
             msg2->Dir = (pEpMsgDirection) msg->dir;
             msg2->Id = bstr(msg->id);
-            msg2->Shortmsg = bstr(msg->shortmsg);
-            msg2->Longmsg = bstr(msg->longmsg);
-            msg2->LongmsgFormatted = bstr(msg->longmsg_formatted);
+            msg2->ShortMsg = bstr(msg->shortmsg);
+            msg2->LongMsg = bstr(msg->longmsg);
+            msg2->LongMsgFormatted = bstr(msg->longmsg_formatted);
             msg2->Attachments = array_from_C<Blob, bloblist_t>(msg->attachments);
             if (msg->sent)
                 msg2->Sent = mktime(msg->sent);
@@ -502,9 +502,9 @@ namespace pEp {
                 throw bad_alloc();
 
             msg2->id = str(msg->Id);
-            msg2->shortmsg = str(msg->Shortmsg);
-            msg2->longmsg = str(msg->Longmsg);
-            msg2->longmsg_formatted = str(msg->LongmsgFormatted);
+            msg2->shortmsg = str(msg->ShortMsg);
+            msg2->longmsg = str(msg->LongMsg);
+            msg2->longmsg_formatted = str(msg->LongMsgFormatted);
             msg2->attachments = bloblist(msg->Attachments);
             msg2->sent = new_timestamp(msg->Sent);
             msg2->recv = new_timestamp(msg->Recv);

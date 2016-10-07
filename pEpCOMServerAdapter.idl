@@ -198,9 +198,9 @@ interface IpEpEngine : IUnknown {
     [uuid(B6F40887-E761-4A47-B204-A0193EE0284D)] struct TextMessage {
         pEpMsgDirection Dir;
         BSTR Id;
-        BSTR Shortmsg;
-        BSTR Longmsg;
-        BSTR LongmsgFormatted;
+        BSTR ShortMsg;
+        BSTR LongMsg;
+        BSTR LongMsgFormatted;
         SAFEARRAY(struct Blob) Attachments;
         hyper Sent; // Timestamp: 64 Bit time_t from mktime(), seconds since January 1, 1970, 0:00 UTC.
         hyper Recv; // Timestamp: 64 Bit time_t from mktime(), seconds since January 1, 1970, 0:00 UTC.
