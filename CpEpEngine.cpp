@@ -46,7 +46,7 @@ STDMETHODIMP CpEpEngine::UnencryptedSubject(VARIANT_BOOL enable)
 STDMETHODIMP CpEpEngine::ExportKey(BSTR fpr, BSTR * keyData)
 {
     assert(fpr);
-    assert(key_data);
+    assert(keyData);
 
     if (fpr == NULL || keyData == NULL)
         return E_INVALIDARG;
