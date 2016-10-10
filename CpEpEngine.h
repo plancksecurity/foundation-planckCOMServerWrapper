@@ -181,6 +181,7 @@ public:
 
     // basic API
 
+    STDMETHOD(ExportKey)(BSTR fpr, BSTR * key_data);
     STDMETHOD(Log)(BSTR title, BSTR entity, BSTR description, BSTR comment);
     STDMETHOD(TrustWords)(BSTR fpr, BSTR lang, LONG max_words, BSTR * words);
     STDMETHOD(GetCrashdumpLog)(LONG maxlines, BSTR * log);

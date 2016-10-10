@@ -43,6 +43,33 @@ STDMETHODIMP CpEpEngine::UnencryptedSubject(VARIANT_BOOL enable)
 	return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::ExportKey(BSTR fpr, BSTR * key_data)
+{
+    assert(fpr);
+    assert(key_data);
+
+    if (fpr == NULL || key_data == NULL)
+        return E_INVALIDARG;
+
+    string _fpr = utf8_string(fpr);
+    char *_key_data = NULL;
+    size_t _size = 0;
+
+    ::PEP_STATUS status = ::export_key(get_session(), _fpr.c_str(), &_key_data, &_size);
+    assert(status != ::PEP_OUT_OF_MEMORY);
+    if (status == ::PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+
+    if (status != ::PEP_STATUS_OK)
+        return FAIL(L"export_key");
+
+    _bstr_t b_key_data(utf16_string(_key_data).c_str());
+    pEp_free(_key_data);
+    * key_data = b_key_data.Detach();
+
+    return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::Log(BSTR title, BSTR entity, BSTR description, BSTR comment)
 {
 	string _title;
