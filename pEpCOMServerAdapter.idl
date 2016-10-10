@@ -47,7 +47,7 @@ interface IpEpEngine : IUnknown {
 
     // basic API
 
-    HRESULT ExportKey([in] BSTR fpr, [out, retval] BSTR * key_data);
+    HRESULT ExportKey([in] BSTR fpr, [out, retval] BSTR * keyData);
     HRESULT Log([in] BSTR title, [in] BSTR entity, [in, defaultvalue("")] BSTR description, [in, defaultvalue("")] BSTR comment);
     HRESULT TrustWords([in] BSTR fpr, [in, defaultvalue("en")] BSTR lang, [in, defaultvalue(0)] LONG maxWords, [out, retval] BSTR * words);
     HRESULT GetCrashdumpLog([in, defaultvalue(0)] LONG maxlines, [out, retval] BSTR * log);

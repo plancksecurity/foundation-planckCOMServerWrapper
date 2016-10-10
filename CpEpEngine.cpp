@@ -43,12 +43,12 @@ STDMETHODIMP CpEpEngine::UnencryptedSubject(VARIANT_BOOL enable)
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::ExportKey(BSTR fpr, BSTR * key_data)
+STDMETHODIMP CpEpEngine::ExportKey(BSTR fpr, BSTR * keyData)
 {
     assert(fpr);
     assert(key_data);
 
-    if (fpr == NULL || key_data == NULL)
+    if (fpr == NULL || keyData == NULL)
         return E_INVALIDARG;
 
     string _fpr = utf8_string(fpr);
@@ -65,7 +65,7 @@ STDMETHODIMP CpEpEngine::ExportKey(BSTR fpr, BSTR * key_data)
 
     _bstr_t b_key_data(utf16_string(_key_data).c_str());
     pEp_free(_key_data);
-    * key_data = b_key_data.Detach();
+    * keyData = b_key_data.Detach();
 
     return S_OK;
 }
