@@ -514,7 +514,7 @@ STDMETHODIMP CpEpEngine::BlacklistIsListed(BSTR fpr, VARIANT_BOOL *listed)
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::BlacklistRetreive(SAFEARRAY **blacklist)
+STDMETHODIMP CpEpEngine::BlacklistRetrieve(SAFEARRAY **blacklist)
 {
 	assert(blacklist);
 
@@ -749,7 +749,7 @@ void CpEpEngine::start_keysync()
 
 	// Init our keysync session
 	PEP_STATUS status = ::init(&keysync_session);
-	::register_sync_callbacks(keysync_session, (void*)this, messageToSend, showHandshake, inject_sync_msg, retreive_next_sync_msg);
+	::register_sync_callbacks(keysync_session, (void*)this, messageToSend, showHandshake, inject_sync_msg, retrieve_next_sync_msg);
 	assert(status == PEP_STATUS_OK);
 
     attach_sync_session(get_session(), keysync_session);
@@ -823,7 +823,7 @@ int CpEpEngine::inject_sync_msg(void * msg, void * management)
     return S_OK;
 }
 
-void * CpEpEngine::retreive_next_sync_msg(void * management)
+void * CpEpEngine::retrieve_next_sync_msg(void * management)
 {
 	// sanity check
 	assert(management);

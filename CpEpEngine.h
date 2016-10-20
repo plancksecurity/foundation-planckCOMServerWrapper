@@ -157,7 +157,7 @@ private:
 
 	// Keysync members
     static int inject_sync_msg(void *msg, void* management);
-    static void* retreive_next_sync_msg(void* management);
+    static void* retrieve_next_sync_msg(void* management);
     void start_keysync();
     void stop_keysync();
 
@@ -205,7 +205,7 @@ public:
     STDMETHOD(BlacklistAdd)(BSTR fpr);
     STDMETHOD(BlacklistDelete)(BSTR fpr);
     STDMETHOD(BlacklistIsListed)(BSTR fpr, VARIANT_BOOL *listed);
-    STDMETHOD(BlacklistRetreive)(SAFEARRAY **blacklist);
+    STDMETHOD(BlacklistRetrieve)(SAFEARRAY **blacklist);
 
     // Message API
 

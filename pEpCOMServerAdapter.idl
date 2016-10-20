@@ -139,7 +139,7 @@ interface IpEpEngine : IUnknown {
     HRESULT BlacklistAdd([in] BSTR fpr);
     HRESULT BlacklistDelete([in] BSTR fpr);
     HRESULT BlacklistIsListed([in] BSTR fpr, [out, retval] VARIANT_BOOL *listed);
-    HRESULT BlacklistRetreive([out, retval] SAFEARRAY(BSTR) *blacklist);
+    HRESULT BlacklistRetrieve([out, retval] SAFEARRAY(BSTR) *blacklist);
 
     // PGP compatibility functions
 
