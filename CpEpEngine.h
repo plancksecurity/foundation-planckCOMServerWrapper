@@ -100,34 +100,6 @@ protected:
         return session(this);
     }
 
-	class callbacks
-	{
-	private:
-		CpEpEngine *me;
-
-	public:
-		callbacks(CpEpEngine *myself)
-		{
-			me = myself;
-			me->callback_mutex.lock();
-		}
-
-		~callbacks()
-		{
-			me->callback_mutex.unlock();
-		}
-
-		operator vector<IpEpEngineCallbacks *>& ()
-		{
-			return me->callback_vector;
-		}
-	};
-
-	callbacks get_callbacks()
-	{
-		return callbacks(this);
-	}
-
     typedef locked_queue<pEp_identity_cpp> identity_queue_t;
     static ::pEp_identity * retrieve_next_identity(void *management);
     static PEP_STATUS messageToSend(void * obj, message *msg);
@@ -152,20 +124,20 @@ private:
     thread *keymanagement_thread;
     bool verbose_mode;
 
-	mutex callback_mutex;
-	vector<IpEpEngineCallbacks*> callback_vector;
+	IpEpEngineCallbacks* client_callbacks = NULL;
+    IpEpEngineCallbacks* client_callbacks_on_sync_thread = NULL;
 
 	// Keysync members
     static int inject_sync_msg(void *msg, void* management);
     static void* retrieve_next_sync_msg(void* management);
     void start_keysync();
+    static void do_keysync_in_thread(CpEpEngine* self, LPSTREAM marshaled_callbacks);
     void stop_keysync();
 
     std::mutex keysync_mutex;
     std::condition_variable keysync_condition;
     std::thread *keysync_thread = NULL;
     std::queue<void*> keysync_queue;
-    bool keysync_thread_running = false;
     bool keysync_abort_requested = false;
     PEP_SESSION keysync_session;
 
@@ -218,7 +190,7 @@ public:
 	// Event callbacks
 
 	STDMETHOD(RegisterCallbacks)(IpEpEngineCallbacks *new_callback);
-	STDMETHOD(UnregisterCallbacks)(IpEpEngineCallbacks *obsolete_callback);
+	STDMETHOD(UnregisterCallbacks)();
 
     // PGP compatibility functions
     STDMETHOD(OpenPGPListKeyinfo)(BSTR search_pattern, LPSAFEARRAY* keyinfo_list);

@@ -227,7 +227,7 @@ interface IpEpEngine : IUnknown {
 
     // callback / keysync API
     HRESULT RegisterCallbacks([in] IpEpEngineCallbacks* newCallback);
-    HRESULT UnregisterCallbacks([in] IpEpEngineCallbacks* obsoleteCallback);
+    HRESULT UnregisterCallbacks();
 };
 
 [
@@ -243,5 +243,6 @@ library pEpCOMServerAdapterLib
     ]
     coclass pEpEngine {
         [default] interface IpEpEngine;
+        interface IpEpEngineCallbacks;
     };
 };

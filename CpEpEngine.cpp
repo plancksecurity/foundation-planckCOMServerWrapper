@@ -730,18 +730,8 @@ void CpEpEngine::start_keysync()
 	// acquire the lock
 	std::unique_lock<std::mutex> lock(keysync_mutex);
 
-	// Check if we're already running.
-	if (keysync_thread_running) 
-	{
-		// If we have pending aborts, we need to wake up those threads
-		// and cancel the pending abort.
-		if (keysync_abort_requested) 
-		{
-			keysync_abort_requested = false;
-			keysync_condition.notify_all();
-		}
-		return;
-	}
+	// Assert if we're not already running.
+    assert(!this->keysync_thread);
 
 	// Ensure we are not aborting the new thread due to a
 	// left over flag.
@@ -754,11 +744,39 @@ void CpEpEngine::start_keysync()
 
     attach_sync_session(get_session(), keysync_session);
 
-	// Star the keysync thread
-	keysync_thread = new thread(::do_sync_protocol, keysync_session, this);
+    // We need to marshal the callbacks to the keysync thread
+    LPSTREAM marshaled_callbacks;
 
-	// flag to signal we're running
-	keysync_thread_running = true;
+    auto result = CoMarshalInterThreadInterfaceInStream(IID_IpEpEngineCallbacks, client_callbacks, &marshaled_callbacks);
+    assert(result == S_OK);
+
+	// Star the keysync thread
+	keysync_thread = new thread(do_keysync_in_thread, this, marshaled_callbacks);
+}
+
+void CpEpEngine::do_keysync_in_thread(CpEpEngine* self, LPSTREAM marshaled_callbacks) 
+{
+    assert(self);
+    // We need to initialize COM here for successfull delivery of the callbacks.
+    // As we don't create any COM instances in our thread, the COMINIT value is
+    // currently irrelevant, so we go with the safest value.
+    auto res = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+    assert(res == S_OK);
+
+    LPVOID vp;
+
+    res = CoGetInterfaceAndReleaseStream(marshaled_callbacks, IID_IpEpEngineCallbacks, &vp);
+    assert(SUCCEEDED(res));
+
+    self->client_callbacks_on_sync_thread = static_cast<IpEpEngineCallbacks*>(vp);
+
+    ::do_sync_protocol(self->keysync_session, self);
+
+    self->client_callbacks_on_sync_thread->Release();
+
+    self->client_callbacks_on_sync_thread = NULL;
+
+    CoUninitialize();
 }
 
 void CpEpEngine::stop_keysync()
@@ -766,10 +784,11 @@ void CpEpEngine::stop_keysync()
 	// acquire the lock
 	std::unique_lock<std::mutex> lock(keysync_mutex);
 
-	// check whether we're not running, or there's a concurrent abort
-	if (keysync_abort_requested || !keysync_thread_running)
-		return;
+    // Do nothing if keysync is not running.
+    if (!keysync_thread)
+        return;
 
+    assert(!keysync_abort_requested);
 	// signal that we're gonna abort
 	keysync_abort_requested = true;
 
@@ -777,24 +796,20 @@ void CpEpEngine::stop_keysync()
 	keysync_condition.notify_all();
 
 	// Wait for the other thread to finish and clean up
-	while (keysync_thread_running && keysync_abort_requested)
+	while (keysync_abort_requested)
 		keysync_condition.wait(lock);
 
-	if (!keysync_abort_requested)
-		return; // someone called start_keysync() while we were trying to stop it...
-
-    detach_sync_session(get_session());
-
-	// wait for the thread to end
+	// collect the child thread for the thread to end
 	keysync_thread->join();
 
 	// clean up
 	delete keysync_thread;
 	keysync_thread = NULL;
+
+    ::detach_sync_session(get_session());
 	::unregister_sync_callbacks(keysync_session);
 	release(keysync_session);
     keysync_session = NULL;
-	keysync_abort_requested = false;
 }
 
 int CpEpEngine::inject_sync_msg(void * msg, void * management)
@@ -810,8 +825,8 @@ int CpEpEngine::inject_sync_msg(void * msg, void * management)
 	// acquire the lock
 	std::unique_lock<std::mutex> lock(me->keysync_mutex);
 
-	// check whether we're running:
-	if (me->keysync_abort_requested || !me->keysync_thread_running)
+	// check whether we're in a valid state running:
+	if (!me->keysync_thread)
 		return E_ASYNC_OPERATION_NOT_STARTED;
 
 	// queue the message
@@ -854,7 +869,7 @@ void * CpEpEngine::retrieve_next_sync_msg(void * management)
 	}
 
 	// we acknowledge that we're quitting...
-	me->keysync_thread_running = false;
+	me->keysync_abort_requested = false;
 
 	// We signal the main thread that we got his signal
 	// so it can gain the mutex again and call join() on us.
@@ -869,32 +884,36 @@ void * CpEpEngine::retrieve_next_sync_msg(void * management)
 
 STDMETHODIMP CpEpEngine::RegisterCallbacks(IpEpEngineCallbacks* new_callbacks)
 {
-	callbacks cbs = get_callbacks();
-	vector<IpEpEngineCallbacks*>& vec = cbs;
+    // check for valid parameter
+    if (!new_callbacks)
+        return E_INVALIDARG;
 
-	vec.push_back(new_callbacks);
-	new_callbacks->AddRef();
+    // don't allow double registration.
+    if (this->client_callbacks)
+        return E_ILLEGAL_STATE_CHANGE;
+
+    this->client_callbacks = new_callbacks;
+    new_callbacks->AddRef();
+
 	start_keysync();
 
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::UnregisterCallbacks(IpEpEngineCallbacks* obsolete_callbacks)
+STDMETHODIMP CpEpEngine::UnregisterCallbacks()
 {
-	callbacks cbs = get_callbacks();
-	vector<IpEpEngineCallbacks*>& vec = cbs;
+    // don't allow double deregistration.
+    // S_FALSE still is no error (as double deregistration is not fatal).
+    if (!this->client_callbacks)
+        return S_FALSE;
 
-	auto position = std::find(vec.begin(), vec.end(), obsolete_callbacks);
-	if (position != vec.end()) {
-		vec.erase(position);
-		obsolete_callbacks->Release();
-		if (vec.empty())
-			stop_keysync();
+    stop_keysync();
 
-		return S_OK;
-	}
+    this->client_callbacks->Release();
 
-	return S_FALSE;
+    this->client_callbacks = NULL;
+
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::OpenPGPListKeyinfo(BSTR search_pattern, LPSAFEARRAY* keyinfo_list) {
@@ -931,34 +950,22 @@ STDMETHODIMP CpEpEngine::OpenPGPListKeyinfo(BSTR search_pattern, LPSAFEARRAY* ke
 
 HRESULT CpEpEngine::Fire_MessageToSend(TextMessage * msg)
 {
-	callbacks cbs = get_callbacks();
-	vector<IpEpEngineCallbacks*>& vec = cbs;
-
 	assert(msg);
+    assert(this->client_callbacks_on_sync_thread);
 
-	for (auto it = vec.begin(); it != vec.end(); ++it)
-	{
-		auto res = (*it)->MessageToSend(msg);
-		if (res != S_OK)
-			return res;
-	}
-	return S_OK;
+    auto result = this->client_callbacks_on_sync_thread->MessageToSend(msg);
+
+	return result;
 }
 
 HRESULT CpEpEngine::Fire_ShowHandshake(pEpIdentity * self, pEpIdentity * partner, SyncHandshakeResult * result)
 {
-	callbacks cbs = get_callbacks();
-	vector<IpEpEngineCallbacks*>& vec = cbs;
-
 	assert(self);
 	assert(partner);
 	assert(result);
-
-	for (auto it = vec.begin(); it != vec.end(); ++it)
-	{
-		auto res = (*it)->ShowHandshake(self, partner, result);
-		if (res != S_OK)
-			return res;
-	}
-	return S_OK;
+    assert(this->client_callbacks_on_sync_thread);
+    	
+	auto res = this->client_callbacks_on_sync_thread->ShowHandshake(self, partner, result);
+		
+	return res;	
 }
