@@ -23,7 +23,8 @@ STDMETHODIMP CpEpEngine::InterfaceSupportsErrorInfo(REFIID riid)
 	return S_FALSE;
 }
 
-#define FAIL(msg) error(msg)
+// The second argument is optional, and currently supports PEP_STATUS.
+#define FAIL(msg, ...) error(msg, __VA_ARGS__)
 
 STDMETHODIMP CpEpEngine::VerboseLogging(VARIANT_BOOL enable)
 {
@@ -61,7 +62,7 @@ STDMETHODIMP CpEpEngine::ExportKey(BSTR fpr, BSTR * keyData)
         return E_OUTOFMEMORY;
 
     if (status != ::PEP_STATUS_OK)
-        return FAIL(L"export_key");
+        return FAIL(L"export_key", status);
 
     _bstr_t b_key_data(utf16_string(_key_data).c_str());
     pEp_free(_key_data);
@@ -102,7 +103,7 @@ STDMETHODIMP CpEpEngine::Log(BSTR title, BSTR entity, BSTR description, BSTR com
 	PEP_STATUS _status = ::log_event(get_session(), _title.c_str(), _entity.c_str(), _description.c_str(), _comment.c_str());
 	assert(_status == PEP_STATUS_OK);
 	if (_status != PEP_STATUS_OK)
-		return FAIL(L"log_event");
+		return FAIL(L"log_event", _status);
 	else
 		return S_OK;
 }
@@ -153,7 +154,7 @@ STDMETHODIMP CpEpEngine::TrustWords(BSTR fpr, BSTR lang, LONG max_words, BSTR * 
 
 	if (_words == NULL) {
 		*words = NULL;
-		return FAIL(L"TrustWords");
+		return FAIL(L"TrustWords: _words == NULL", status);
 	}
 	else {
 		*words = utf16_bstr(_words);
@@ -175,8 +176,10 @@ STDMETHODIMP CpEpEngine::GetCrashdumpLog(LONG maxlines, BSTR * log)
 	assert(status == PEP_STATUS_OK);
 	if (status == PEP_OUT_OF_MEMORY)
 		return E_OUTOFMEMORY;
-	if (status != PEP_STATUS_OK || _log == NULL)
-		return FAIL(L"GetCrashdumpLog");
+	if (status != PEP_STATUS_OK)
+		return FAIL(L"GetCrashdumpLog", status);
+    if (_log == NULL)
+        return FAIL(L"GetCrashdumpLog: _log == NULL");
 
 	*log = utf16_bstr(_log);
 	pEp_free(_log);
@@ -193,7 +196,7 @@ STDMETHODIMP CpEpEngine::GetEngineVersion(BSTR * engine_version)
 	const char *_engine_version = ::get_engine_version();
 
 	if (_engine_version == NULL)
-		return FAIL(L"GetEngineVersion");
+		return FAIL(L"GetEngineVersion: _engine_version == NULL");
 
 	*engine_version = utf16_bstr(_engine_version);
 
@@ -212,8 +215,10 @@ STDMETHODIMP CpEpEngine::GetLanguageList(BSTR * languages)
 	assert(status == PEP_STATUS_OK);
 	if (status == PEP_OUT_OF_MEMORY)
 		return E_OUTOFMEMORY;
-	if (status != PEP_STATUS_OK || _languages == NULL)
-		return FAIL(L"GetLanguageList");
+    if (status != PEP_STATUS_OK)
+        return FAIL(L"GetLanguageList", status);
+	if (_languages == NULL)
+		return FAIL(L"GetLanguageList: _languages == NULL");
 
 	*languages = utf16_bstr(_languages);
 	pEp_free(_languages);
@@ -284,7 +289,7 @@ STDMETHODIMP CpEpEngine::Myself(struct pEpIdentity *ident, struct pEpIdentity *r
 		if (status == PEP_OUT_OF_MEMORY)
 			return E_OUTOFMEMORY;
 		else
-			return FAIL(L"myself");
+			return FAIL(L"myself", status);
 	}
 }
 
@@ -314,7 +319,7 @@ STDMETHODIMP CpEpEngine::UpdateIdentity(struct pEpIdentity *ident, struct pEpIde
 		if (status == PEP_OUT_OF_MEMORY)
 			return E_OUTOFMEMORY;
 		else
-			return FAIL(L"UpdateIdentity");
+			return FAIL(L"UpdateIdentity", status);
 	}
 }
 
@@ -344,7 +349,7 @@ STDMETHODIMP CpEpEngine::KeyMistrusted(struct pEpIdentity *ident)
 		return FAIL(L"key not found");
 
 	if (status != ::PEP_STATUS_OK)
-		return FAIL(L"cannot revoke compromized key");
+		return FAIL(L"cannot revoke compromized key", status);
 
 	return S_OK;
 }
@@ -375,7 +380,7 @@ STDMETHODIMP CpEpEngine::KeyResetTrust(struct pEpIdentity *ident)
 		return FAIL(L"key not found");
 
 	if (status != ::PEP_STATUS_OK)
-		return FAIL(L"cannot reset trust");
+		return FAIL(L"cannot reset trust", status);
 
 	return S_OK;
 }
@@ -480,7 +485,7 @@ STDMETHODIMP CpEpEngine::BlacklistAdd(BSTR fpr)
 	PEP_STATUS status = ::blacklist_add(get_session(), _fpr.c_str());
 	assert(status == PEP_STATUS_OK);
 	if (status != PEP_STATUS_OK)
-		return FAIL(L"blacklist_add failed in pEp engine");
+		return FAIL(L"blacklist_add failed in pEp engine", status);
 
 	return S_OK;
 }
@@ -493,7 +498,7 @@ STDMETHODIMP CpEpEngine::BlacklistDelete(BSTR fpr)
 	PEP_STATUS status = ::blacklist_delete(get_session(), _fpr.c_str());
 	assert(status == PEP_STATUS_OK);
 	if (status != PEP_STATUS_OK)
-		return FAIL(L"blacklist_delete failed in pEp engine");
+		return FAIL(L"blacklist_delete failed in pEp engine", status);
 
 	return S_OK;
 }
@@ -508,7 +513,7 @@ STDMETHODIMP CpEpEngine::BlacklistIsListed(BSTR fpr, VARIANT_BOOL *listed)
 	PEP_STATUS status = ::blacklist_is_listed(get_session(), _fpr.c_str(), &result);
 	assert(status == PEP_STATUS_OK);
 	if (status != PEP_STATUS_OK)
-		return FAIL(L"blacklist_is_listed failed in pEp engine");
+		return FAIL(L"blacklist_is_listed failed in pEp engine", status);
 
 	*listed = result ? VARIANT_TRUE : VARIANT_FALSE;
 	return S_OK;
@@ -522,7 +527,7 @@ STDMETHODIMP CpEpEngine::BlacklistRetrieve(SAFEARRAY **blacklist)
 	PEP_STATUS status = ::blacklist_retrieve(get_session(), &_blacklist);
 	assert(status == PEP_STATUS_OK);
 	if (status != PEP_STATUS_OK)
-		return FAIL(L"blacklist_retrieve failed in pEp engine");
+		return FAIL(L"blacklist_retrieve failed in pEp engine", status);
 	assert(_blacklist);
 
 	*blacklist = string_array(_blacklist);
@@ -550,6 +555,21 @@ HRESULT CpEpEngine::error(_bstr_t msg)
 		cei->Release();
 	}
 	return E_FAIL;
+}
+
+HRESULT CpEpEngine::error(_bstr_t msg, PEP_STATUS status)
+{
+    std::stringstream stream;
+    stream << msg;
+    stream << ": ";
+    stream << std::hex << status;
+    
+    error(stream.str().c_str());
+
+    if (status == ::PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+
+    return E_FAIL;
 }
 
 STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SAFEARRAY * extra, pEpEncryptFlags flags)
@@ -627,7 +647,7 @@ STDMETHODIMP CpEpEngine::OutgoingMessageRating(TextMessage *msg, pEpRating * pVa
 	PEP_rating _rating;
 	PEP_STATUS status = ::outgoing_message_rating(get_session(), _msg, &_rating);
 	if (status != PEP_STATUS_OK)
-		return FAIL(L"cannot get message rating");
+		return FAIL(L"cannot get message rating", status);
 
 	*pVal = (pEpRating)_rating;
 	return S_OK;
@@ -654,7 +674,7 @@ STDMETHODIMP CpEpEngine::IdentityRating(struct pEpIdentity *ident, pEpRating * p
 	PEP_STATUS status = ::identity_rating(get_session(), _ident, &_rating);
 	free_identity(_ident);
 	if (status != PEP_STATUS_OK)
-		return FAIL(L"cannot get message color");
+		return FAIL(L"cannot get message color", status);
 
 	*pVal = (pEpRating)_rating;
 	return S_OK;
@@ -718,7 +738,7 @@ STDMETHODIMP CpEpEngine::TrustPersonalKey(struct pEpIdentity *ident, struct pEpI
 	if (status == PEP_OUT_OF_MEMORY)
 		return E_OUTOFMEMORY;
 	else if (status != PEP_STATUS_OK)
-		return FAIL(L"failure while executing TrustPersonalKey()");
+		return FAIL(L"failure while executing TrustPersonalKey()", status);
 
 	return S_OK;
 }
@@ -933,7 +953,7 @@ STDMETHODIMP CpEpEngine::OpenPGPListKeyinfo(BSTR search_pattern, LPSAFEARRAY* ke
 		return E_OUTOFMEMORY;
 
 	if (status != ::PEP_STATUS_OK)
-		return FAIL(L"OpenPGP_list_keyinfo");
+		return FAIL(L"OpenPGP_list_keyinfo", status);
 
 	if (_keyinfo_list && _keyinfo_list->value) {
 		::opt_field_array_from_C(_keyinfo_list, keyinfo_list);

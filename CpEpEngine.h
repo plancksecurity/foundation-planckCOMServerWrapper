@@ -107,6 +107,7 @@ protected:
 
 
     HRESULT error(_bstr_t msg);
+    HRESULT error(_bstr_t msg, PEP_STATUS errorcode);
 
     void verbose(string text)
     {
