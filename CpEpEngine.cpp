@@ -49,7 +49,7 @@ STDMETHODIMP CpEpEngine::ExportKey(BSTR fpr, BSTR * keyData)
     assert(fpr);
     assert(keyData);
 
-    if (fpr == NULL || keyData == NULL)
+    if (!(fpr && keyData))
         return E_INVALIDARG;
 
     string _fpr = utf8_string(fpr);
@@ -169,7 +169,7 @@ STDMETHODIMP CpEpEngine::GetTrustWords(struct pEpIdentity *id1, struct pEpIdenti
     assert(id2);
     assert(words);
 
-    if (id1 == NULL || id2 == NULL || words == NULL)
+    if (!(id1 && id2 && words))
     {
         return E_INVALIDARG;
     }
@@ -326,7 +326,7 @@ STDMETHODIMP CpEpEngine::Myself(struct pEpIdentity *ident, struct pEpIdentity *r
 	assert(ident);
 	assert(result);
 
-	if (ident == NULL || result == NULL)
+	if (!(ident && result))
 		return E_INVALIDARG;
 
 	::pEp_identity *_ident = new_identity(ident);
@@ -363,7 +363,7 @@ STDMETHODIMP CpEpEngine::UpdateIdentity(struct pEpIdentity *ident, struct pEpIde
 	assert(ident);
 	assert(result);
 
-	if (ident == NULL || result == NULL)
+	if (!(ident && result))
 		return E_INVALIDARG;
 
 	::pEp_identity *_ident = new_identity(ident);
@@ -393,6 +393,8 @@ STDMETHODIMP CpEpEngine::KeyMistrusted(struct pEpIdentity *ident)
 	::pEp_identity *_ident;
 
 	assert(ident);
+	if (!ident)
+		return E_INVALIDARG;
 
 	try {
 		_ident = new_identity(ident);
@@ -423,7 +425,10 @@ STDMETHODIMP CpEpEngine::KeyResetTrust(struct pEpIdentity *ident)
 {
 	::pEp_identity *_ident;
 
-	assert(ident);
+	assert(ident); 
+	
+	if (!ident)
+		return E_INVALIDARG;
 
 	try {
 		_ident = new_identity(ident);
@@ -475,6 +480,9 @@ int CpEpEngine::examine_identity(pEp_identity *ident, void *management)
 ::pEp_identity * CpEpEngine::retrieve_next_identity(void *management)
 {
 	assert(management);
+	if (!management)
+		return NULL;
+
 	identity_queue_t *iq = (identity_queue_t *)management;
 
 	do /* poll queue */ {
@@ -498,7 +506,8 @@ int CpEpEngine::examine_identity(pEp_identity *ident, void *management)
 PEP_STATUS CpEpEngine::messageToSend(void * obj, message *msg)
 {
 	assert(msg);
-	if (msg == NULL)
+	assert(obj);
+	if (!(msg && obj))
 		return PEP_ILLEGAL_VALUE;
 
 	TextMessage _msg;
@@ -545,6 +554,8 @@ PEP_STATUS CpEpEngine::showHandshake(void * obj, pEp_identity *self, pEp_identit
 STDMETHODIMP CpEpEngine::BlacklistAdd(BSTR fpr)
 {
 	assert(fpr);
+	if (!fpr)
+		return E_INVALIDARG;
 
 	string _fpr = utf8_string(fpr);
 	PEP_STATUS status = ::blacklist_add(get_session(), _fpr.c_str());
@@ -558,6 +569,8 @@ STDMETHODIMP CpEpEngine::BlacklistAdd(BSTR fpr)
 STDMETHODIMP CpEpEngine::BlacklistDelete(BSTR fpr)
 {
 	assert(fpr);
+	if (!fpr)
+		return E_INVALIDARG;
 
 	string _fpr = utf8_string(fpr);
 	PEP_STATUS status = ::blacklist_delete(get_session(), _fpr.c_str());
@@ -573,6 +586,9 @@ STDMETHODIMP CpEpEngine::BlacklistIsListed(BSTR fpr, VARIANT_BOOL *listed)
 	assert(fpr);
 	assert(listed);
 
+	if (!(fpr && listed))
+		return E_INVALIDARG;
+
 	string _fpr = utf8_string(fpr);
 	bool result;
 	PEP_STATUS status = ::blacklist_is_listed(get_session(), _fpr.c_str(), &result);
@@ -587,6 +603,9 @@ STDMETHODIMP CpEpEngine::BlacklistIsListed(BSTR fpr, VARIANT_BOOL *listed)
 STDMETHODIMP CpEpEngine::BlacklistRetrieve(SAFEARRAY **blacklist)
 {
 	assert(blacklist);
+
+	if (!blacklist)
+		return E_INVALIDARG;
 
 	::stringlist_t *_blacklist = NULL;
 	PEP_STATUS status = ::blacklist_retrieve(get_session(), &_blacklist);
@@ -642,13 +661,16 @@ STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SA
 	assert(src);
 	assert(dst);
 
+	if (!(src && dst))
+		return E_INVALIDARG;
+
 	::message *_src = text_message_to_C(src);
 
 	// COM-19: Initialize msg_dst to NULL, or we end up calling
 	// free_message() below with a pointer to random garbage in
 	// case of an error in encrypt_message().
 	::message *msg_dst = NULL;
-	::stringlist_t *_extra = new_stringlist(extra);
+	::stringlist_t *_extra = new_stringlist(extra); // can cope with NULL
 
 	// _PEP_enc_format is intentionally hardcoded to PEP_enc_PEP:
 	// 2016-10-02 14:10 < fdik> schabi: actually, all adapters now must use PEP_enc_PEP
@@ -675,7 +697,11 @@ STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SA
 	assert(src);
 	assert(dst);
 	assert(keylist);
+	assert(flags);
 	assert(rating);
+
+	if (!(src && dst && keylist && flags && rating))
+		return E_INVALIDARG;
 
 	*keylist = NULL;
 	*rating = pEpRatingUndefined;
@@ -711,6 +737,9 @@ STDMETHODIMP CpEpEngine::OutgoingMessageRating(TextMessage *msg, pEpRating * pVa
 	assert(msg);
 	assert(pVal);
 
+	if (!(msg  && pVal))
+		return E_INVALIDARG;
+
 	::message *_msg = text_message_to_C(msg);
 
 	PEP_rating _rating;
@@ -729,6 +758,9 @@ STDMETHODIMP CpEpEngine::IdentityRating(struct pEpIdentity *ident, pEpRating * p
 	assert(ident);
 	assert(pVal);
 
+	if (!(ident  && pVal))
+		return E_INVALIDARG;
+
 	try {
 		_ident = new_identity(ident);
 	}
@@ -742,6 +774,7 @@ STDMETHODIMP CpEpEngine::IdentityRating(struct pEpIdentity *ident, pEpRating * p
 	PEP_rating _rating;
 	PEP_STATUS status = ::identity_rating(get_session(), _ident, &_rating);
 	free_identity(_ident);
+
 	if (status != PEP_STATUS_OK)
 		return FAIL(L"cannot get message color", status);
 
@@ -752,6 +785,9 @@ STDMETHODIMP CpEpEngine::IdentityRating(struct pEpIdentity *ident, pEpRating * p
 STDMETHODIMP CpEpEngine::ColorFromRating(pEpRating rating, pEpColor * pVal)
 {
 	assert(pVal);
+
+	if (!pVal)
+		return E_INVALIDARG;
 
 	PEP_rating engineRating = (PEP_rating)rating;
 	PEP_color _color = ::color_from_rating(engineRating);
@@ -767,6 +803,9 @@ STDMETHODIMP CpEpEngine::TrustPersonalKey(struct pEpIdentity *ident, struct pEpI
 
 	assert(ident);
 	assert(result);
+
+	if (!ident || !result)
+		return E_INVALIDARG;
 
 	try {
 		_ident = new_identity(ident);
@@ -846,6 +885,8 @@ void CpEpEngine::start_keysync()
 void CpEpEngine::do_keysync_in_thread(CpEpEngine* self, LPSTREAM marshaled_callbacks) 
 {
     assert(self);
+	assert(marshaled_callbacks);
+
     // We need to initialize COM here for successfull delivery of the callbacks.
     // As we don't create any COM instances in our thread, the COMINIT value is
     // currently irrelevant, so we go with the safest value.
@@ -903,6 +944,8 @@ void CpEpEngine::stop_keysync()
 
 int CpEpEngine::inject_sync_msg(void * msg, void * management)
 {
+	assert(msg);
+	assert(management);
 	// check argument
 	if (!msg)
 		return E_INVALIDARG;
@@ -931,6 +974,8 @@ void * CpEpEngine::retrieve_next_sync_msg(void * management)
 {
 	// sanity check
 	assert(management);
+	if (!management)
+		return NULL;
 
 	CpEpEngine* me = (CpEpEngine*)management;
 
@@ -1042,6 +1087,12 @@ HRESULT CpEpEngine::Fire_MessageToSend(TextMessage * msg)
 	assert(msg);
     assert(this->client_callbacks_on_sync_thread);
 
+	if (!msg)
+		return E_INVALIDARG;
+
+	if (!this->client_callbacks_on_sync_thread)
+		return E_ILLEGAL_METHOD_CALL;
+
     auto result = this->client_callbacks_on_sync_thread->MessageToSend(msg);
 
 	return result;
@@ -1053,6 +1104,11 @@ HRESULT CpEpEngine::Fire_ShowHandshake(pEpIdentity * self, pEpIdentity * partner
 	assert(partner);
 	assert(result);
     assert(this->client_callbacks_on_sync_thread);
+
+	if (!(self && partner && result))
+		return E_INVALIDARG;
+	if (!this->client_callbacks_on_sync_thread)
+		return E_ILLEGAL_METHOD_CALL;
     	
 	auto res = this->client_callbacks_on_sync_thread->ShowHandshake(self, partner, result);
 		
