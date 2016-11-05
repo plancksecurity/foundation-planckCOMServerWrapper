@@ -230,10 +230,14 @@ STDMETHODIMP CpEpEngine::GetTrustWords(struct pEpIdentity *id1, struct pEpIdenti
 
 STDMETHODIMP CpEpEngine::GetCrashdumpLog(LONG maxlines, BSTR * log)
 {
-	assert(maxlines >= 0);
+	// COM-18: Currently, long == int on windows, so the check
+	// for INT_MAX is not strictly necessary. However, the code
+	// might get copy-pasted to other adapters in the future,
+	// so safety first...
+	assert(maxlines >= 0 && maxlines <= INT_MAX);
 	assert(log);
 
-	if (!(maxlines >= 0 && log))
+	if (!(maxlines >= 0 && maxlines <= INT_MAX && log))
 		return E_INVALIDARG;
 
 	char *_log;
