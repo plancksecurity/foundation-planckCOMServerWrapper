@@ -333,10 +333,21 @@ STDMETHODIMP CpEpEngine::Myself(struct pEpIdentity *ident, struct pEpIdentity *r
 	if (!(ident && result))
 		return E_INVALIDARG;
 
-	::pEp_identity *_ident = new_identity(ident);
-	assert(_ident);
-	if (_ident == NULL)
+	::pEp_identity *_ident = 0;
+	
+	try {
+		_ident = new_identity(ident);
+		assert(_ident);
+		if (_ident == NULL)
+			return E_OUTOFMEMORY;
+	}
+	catch (bad_alloc&) {
 		return E_OUTOFMEMORY;
+	}
+	catch (exception& ex) {
+		return FAIL(ex.what());;
+	}
+
 
 	// DEBUG CODE - REMOVE BEFORE RELEASE!
 	// SyncHandshakeResult handshakeResult;
@@ -370,7 +381,17 @@ STDMETHODIMP CpEpEngine::UpdateIdentity(struct pEpIdentity *ident, struct pEpIde
 	if (!(ident && result))
 		return E_INVALIDARG;
 
-	::pEp_identity *_ident = new_identity(ident);
+	::pEp_identity *_ident;
+	try {
+		_ident = new_identity(ident);
+	}
+	catch (bad_alloc&) {
+		return E_OUTOFMEMORY;
+	}
+	catch (exception& ex) {
+		return FAIL(ex.what());
+	}
+
 	assert(_ident);
 	if (_ident == NULL)
 		return E_OUTOFMEMORY;
@@ -406,8 +427,8 @@ STDMETHODIMP CpEpEngine::KeyMistrusted(struct pEpIdentity *ident)
 	catch (bad_alloc&) {
 		return E_OUTOFMEMORY;
 	}
-	catch (exception&) {
-		return E_FAIL;
+	catch (exception& ex) {
+		return FAIL(ex.what());;
 	}
 
 	PEP_STATUS status = ::key_mistrusted(get_session(), _ident);
@@ -440,8 +461,8 @@ STDMETHODIMP CpEpEngine::KeyResetTrust(struct pEpIdentity *ident)
 	catch (bad_alloc&) {
 		return E_OUTOFMEMORY;
 	}
-	catch (exception&) {
-		return E_FAIL;
+	catch (exception& ex) {
+		return FAIL(ex.what());;
 	}
 
 	PEP_STATUS status = ::key_reset_trust(get_session(), _ident);
@@ -772,8 +793,8 @@ STDMETHODIMP CpEpEngine::IdentityRating(struct pEpIdentity *ident, pEpRating * p
 	catch (bad_alloc&) {
 		return E_OUTOFMEMORY;
 	}
-	catch (exception&) {
-		return E_FAIL;
+	catch (exception& ex) {
+		return FAIL(ex.what());;
 	}
 
 	PEP_rating _rating;
@@ -818,8 +839,8 @@ STDMETHODIMP CpEpEngine::TrustPersonalKey(struct pEpIdentity *ident, struct pEpI
 	catch (bad_alloc&) {
 		return E_OUTOFMEMORY;
 	}
-	catch (exception&) {
-		return E_FAIL;
+	catch (exception& ex) {
+		return FAIL(ex.what());;
 	}
 
 	if (verbose_mode) {
