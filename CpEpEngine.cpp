@@ -715,6 +715,9 @@ STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SA
 	if (status == PEP_OUT_OF_MEMORY)
 		return E_OUTOFMEMORY;
 
+	if (status != PEP_STATUS_OK)
+		return FAIL("Failure to encrypt message", status);
+
 	return S_OK;
 }
 
