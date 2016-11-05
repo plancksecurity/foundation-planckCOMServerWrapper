@@ -615,6 +615,7 @@ STDMETHODIMP CpEpEngine::BlacklistRetrieve(SAFEARRAY **blacklist)
 	assert(_blacklist);
 
 	*blacklist = string_array(_blacklist);
+	::free_stringlist(_blacklist);
 	return S_OK;
 }
 
