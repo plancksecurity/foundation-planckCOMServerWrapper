@@ -713,7 +713,7 @@ STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SA
 
 	::message *_src = text_message_to_C(src);
 	::message *msg_dst = NULL;
-	::stringlist_t *_keylist;
+	::stringlist_t *_keylist = NULL;
 	::PEP_rating _rating;
 
 	PEP_decrypt_flags_t engineflags = 0;
