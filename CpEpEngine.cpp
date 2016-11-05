@@ -643,7 +643,11 @@ STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SA
 	assert(dst);
 
 	::message *_src = text_message_to_C(src);
-	::message *msg_dst;
+
+	// COM-19: Initialize msg_dst to NULL, or we end up calling
+	// free_message() below with a pointer to random garbage in
+	// case of an error in encrypt_message().
+	::message *msg_dst = NULL;
 	::stringlist_t *_extra = new_stringlist(extra);
 
 	// _PEP_enc_format is intentionally hardcoded to PEP_enc_PEP:
