@@ -379,6 +379,14 @@ namespace pEp {
 
     void GateKeeper::update_product(product p, DWORD context)
     {
+		{
+			HANDLE hMutex = CreateMutex(NULL, TRUE, _T("PEPINSTALLERMUTEX"));
+			if (hMutex)
+				CloseHandle(hMutex);
+			else
+				return;
+		}
+
         BCRYPT_KEY_HANDLE dk = delivery_key();
 #ifdef UNICODE
         tstring delivery = utility::utf16_string(wrapped_delivery_key(dk));
