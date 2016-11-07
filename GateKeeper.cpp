@@ -370,7 +370,11 @@ namespace pEp {
 
     void GateKeeper::install_msi(tstring filename)
     {
-        ShellExecute(NULL, _T("open"), filename.c_str(), NULL, NULL, SW_SHOW);
+		HANDLE hMutex = CreateMutex(NULL, TRUE, _T("PEPINSTALLERMUTEX"));
+		if (hMutex) {
+			CloseHandle(hMutex);
+			ShellExecute(NULL, _T("open"), filename.c_str(), NULL, NULL, SW_SHOW);
+		}
     }
 
     void GateKeeper::update_product(product p, DWORD context)
