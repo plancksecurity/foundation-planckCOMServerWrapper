@@ -715,8 +715,19 @@ STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SA
 	if (status == PEP_OUT_OF_MEMORY)
 		return E_OUTOFMEMORY;
 
-	if (status != PEP_STATUS_OK)
+	// COM-41: Enhanced PEP status handling
+	if ((status > PEP_STATUS_OK && status < PEP_UNENCRYPTED) ||
+		status < PEP_STATUS_OK ||
+		status >= PEP_TRUSTWORD_NOT_FOUND)
 		return FAIL("Failure to encrypt message", status);
+
+	// Statii like PEP_UNENCRYPTED due to no private key
+	// should not be a catastrophic failure here. Using S_FALSE
+	// still allows clients to differentiate with S_OK,
+	// although this does not work out of the box with
+	// the standard .NET mapping of COM.
+	if (status != PEP_STATUS_OK)
+		return S_FALSE;
 
 	return S_OK;
 }
