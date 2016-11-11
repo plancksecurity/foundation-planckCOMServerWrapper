@@ -49,8 +49,8 @@ interface IpEpEngine : IUnknown {
 
     HRESULT ExportKey([in] BSTR fpr, [out, retval] BSTR * keyData);
     HRESULT Log([in] BSTR title, [in] BSTR entity, [in, defaultvalue("")] BSTR description, [in, defaultvalue("")] BSTR comment);
-    HRESULT TrustWords([in] BSTR fpr, [in, defaultvalue("en")] BSTR lang, [in, defaultvalue(0)] LONG maxWords, [out, retval] BSTR * words);
-    HRESULT GetTrustWords([in] struct pEpIdentity * id1, [in] struct pEpIdentity * id2, [in, defaultvalue("en")] BSTR lang, [in, defaultvalue(0)] VARIANT_BOOL full, [out, retval] BSTR * words);
+    HRESULT Trustwords([in] BSTR fpr, [in, defaultvalue("en")] BSTR lang, [in, defaultvalue(0)] LONG maxWords, [out, retval] BSTR * words);
+    HRESULT GetTrustwords([in] struct pEpIdentity * id1, [in] struct pEpIdentity * id2, [in, defaultvalue("en")] BSTR lang, [in, defaultvalue(0)] VARIANT_BOOL full, [out, retval] BSTR * words);
     HRESULT GetCrashdumpLog([in, defaultvalue(0)] LONG maxlines, [out, retval] BSTR * log);
     HRESULT GetEngineVersion([out, retval] BSTR * engineVersion);
     HRESULT GetLanguageList([out, retval] BSTR * languages);
@@ -180,8 +180,8 @@ interface IpEpEngine : IUnknown {
     typedef [v1_enum] enum pEpDecryptFlags {
         pEpDecryptFlagsNone = 0,
         pEpDecryptFlagOwnPrivateKey = 0x1,
-		pEpDecryptFlagConsumed = 0x2,
-		pEpDecryptFlagDiscarded = 0x4
+        pEpDecryptFlagConsumed = 0x2,
+        pEpDecryptFlagDiscarded = 0x4
     } pEpDecryptFlags;
 
     typedef [v1_enum] enum pEpMsgDirection {

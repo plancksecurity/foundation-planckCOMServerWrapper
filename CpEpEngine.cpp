@@ -108,7 +108,7 @@ STDMETHODIMP CpEpEngine::Log(BSTR title, BSTR entity, BSTR description, BSTR com
 		return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::TrustWords(BSTR fpr, BSTR lang, LONG max_words, BSTR * words)
+STDMETHODIMP CpEpEngine::Trustwords(BSTR fpr, BSTR lang, LONG max_words, BSTR * words)
 {
 	assert(fpr);
 	assert(max_words >= 0);
@@ -154,7 +154,7 @@ STDMETHODIMP CpEpEngine::TrustWords(BSTR fpr, BSTR lang, LONG max_words, BSTR * 
 
 	if (_words == NULL) {
 		*words = NULL;
-		return FAIL(L"TrustWords: _words == NULL", status);
+		return FAIL(L"Trustwords: _words == NULL", status);
 	}
 	else {
 		*words = utf16_bstr(_words);
@@ -163,7 +163,7 @@ STDMETHODIMP CpEpEngine::TrustWords(BSTR fpr, BSTR lang, LONG max_words, BSTR * 
 	}
 }
 
-STDMETHODIMP CpEpEngine::GetTrustWords(struct pEpIdentity *id1, struct pEpIdentity *id2, BSTR lang, VARIANT_BOOL full, BSTR *words)
+STDMETHODIMP CpEpEngine::GetTrustwords(struct pEpIdentity *id1, struct pEpIdentity *id2, BSTR lang, VARIANT_BOOL full, BSTR *words)
 {
     assert(id1);
     assert(id2);
@@ -210,10 +210,10 @@ STDMETHODIMP CpEpEngine::GetTrustWords(struct pEpIdentity *id1, struct pEpIdenti
             result = E_OUTOFMEMORY;
         }
         else if (status == PEP_TRUSTWORD_NOT_FOUND) {
-            result = FAIL(L"GetTrustWords: Trustword not found", status);
+            result = FAIL(L"GetTrustwords: Trustword not found", status);
         }
         else if (!words) {
-            result = FAIL(L"GetTrustWords: _words == NULL", status);
+            result = FAIL(L"GetTrustwords: _words == NULL", status);
         }
         else {
             *words = utf16_bstr(_words);
