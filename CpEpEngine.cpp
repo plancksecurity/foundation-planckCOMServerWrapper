@@ -203,7 +203,7 @@ STDMETHODIMP CpEpEngine::GetTrustwords(struct pEpIdentity *id1, struct pEpIdenti
 
     char* _words;
     size_t _size;
-    if (result = S_OK) {
+    if (result == S_OK) {
         auto status = ::get_trustwords(get_session(), _id1, _id2, _lang.c_str(), &_words, &_size, full != 0 /* convert variant bool to C bool */);
 
         if (status == PEP_OUT_OF_MEMORY) {
