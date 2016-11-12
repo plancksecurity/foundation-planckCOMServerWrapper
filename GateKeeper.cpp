@@ -381,10 +381,15 @@ namespace pEp {
     {
 		{
 			HANDLE hSemaphore = CreateSemaphore(NULL, 0, 2, _T("PEPINSTALLERSEMAPHORE"));
-			if (GetLastError() != ERROR_SUCCESS)
-				return;
-			else if (hSemaphore)
+			DWORD le = GetLastError();
+			if (hSemaphore) {
 				CloseHandle(hSemaphore);
+				if (le == ERROR_ALREADY_EXISTS)
+					return;
+			}
+			else {
+				return;
+			}
 		}
 
         BCRYPT_KEY_HANDLE dk = delivery_key();
