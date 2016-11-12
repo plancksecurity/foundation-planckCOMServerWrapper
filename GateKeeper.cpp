@@ -380,11 +380,11 @@ namespace pEp {
     void GateKeeper::update_product(product p, DWORD context)
     {
 		{
-			HANDLE hMutex = CreateMutex(NULL, TRUE, _T("PEPINSTALLERMUTEX"));
-			if (hMutex)
-				CloseHandle(hMutex);
-			else
+			HANDLE hSemaphore = CreateSemaphore(NULL, 0, 2, _T("PEPINSTALLERSEMAPHORE"));
+			if (GetLastError() != ERROR_SUCCESS)
 				return;
+			else if (hSemaphore)
+				CloseHandle(hSemaphore);
 		}
 
         BCRYPT_KEY_HANDLE dk = delivery_key();
