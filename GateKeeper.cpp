@@ -380,15 +380,23 @@ namespace pEp {
     void GateKeeper::update_product(product p, DWORD context)
     {
 		{
-			HANDLE hSemaphore = CreateSemaphore(NULL, 0, 2, _T("PEPINSTALLERSEMAPHORE"));
-			DWORD le = GetLastError();
-			if (hSemaphore) {
-				CloseHandle(hSemaphore);
-				if (le == ERROR_ALREADY_EXISTS)
-					return;
+			const tstring _fileName = _T("\\pEpSetup.lck");
+
+			unique_ptr < TCHAR[] > _pathName(new TCHAR[MAX_PATH + 1]);
+			DWORD size = GetTempPath(MAX_PATH, _pathName.get());
+			if (size > MAX_PATH - _fileName.size())
+				throw runtime_error("TEMP path too long");
+
+			tstring fileName(_pathName.get());
+			fileName += _fileName;
+
+			HANDLE file = CreateFile(fileName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+			if (file == INVALID_HANDLE_VALUE) {
+				return;
 			}
 			else {
-				return;
+				CloseHandle(file);
+				DeleteFile(fileName.c_str());
 			}
 		}
 
