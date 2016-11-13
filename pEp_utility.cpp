@@ -8,6 +8,9 @@ namespace pEp {
         pEp_identity_cpp::pEp_identity_cpp(const ::pEp_identity *_ident)
             : me(false)
         {
+			if (!_ident)
+				return;
+
             if (_ident->address)
                 address = _ident->address;
             if (_ident->fpr)
@@ -23,7 +26,10 @@ namespace pEp {
         pEp_identity_cpp::pEp_identity_cpp(const pEpIdentity *_ident)
             : me(false)
         {
-            if (_ident->Address)
+			if (!_ident)
+				return;
+
+			if (_ident->Address)
                 address = utf8_string(_ident->Address);
             if (_ident->Fpr)
                 fpr = utf8_string(_ident->Fpr);
@@ -76,6 +82,8 @@ namespace pEp {
         void copy_identity(pEpIdentity * ident_s, const pEp_identity * ident)
         {
             assert(ident_s);
+			if (!ident_s)
+				throw invalid_argument("ident_s");
 
             ::memset(ident_s, 0, sizeof(pEpIdentity));
             if (ident) {
@@ -164,15 +172,21 @@ namespace pEp {
 
         template<> Blob *from_C< Blob *, bloblist_t >(bloblist_t *tl)
         {
-            CComSafeArray<BYTE> sa;
-            sa.Create(tl->size);
+			assert(tl);
 
-            if (tl->size) {
-                char *data;
-                SafeArrayAccessData(sa, (void **) &data);
-                memcpy(data, tl->value, tl->size);
-                SafeArrayUnaccessData(sa);
-            }
+            CComSafeArray<BYTE> sa;
+			if (tl) {
+				sa.Create(tl->size);
+				if (tl->size) {
+					char *data;
+					SafeArrayAccessData(sa, (void **)&data);
+					memcpy(data, tl->value, tl->size);
+					SafeArrayUnaccessData(sa);
+				}
+			}
+			else {
+				sa.Create((ULONG)0);
+			}
 
             Blob *_blob = new Blob();
 
@@ -452,7 +466,14 @@ namespace pEp {
 
         stringpair_t *new_stringpair(StringPair *fld)
         {
-            stringpair_t *pair = ::new_stringpair(str(fld->Name), str(fld->Value));
+			stringpair_t *pair;
+
+			if (!fld) {
+				pair = ::new_stringpair(NULL, NULL);
+			}
+			else {
+				pair = ::new_stringpair(str(fld->Name), str(fld->Value));
+			}
             if (pair == NULL)
                 throw bad_alloc();
 
@@ -511,6 +532,8 @@ namespace pEp {
         ::message * text_message_to_C(TextMessage *msg)
         {
             assert(msg);
+			if (!msg)
+				throw invalid_argument("msg");
 
             ::message * msg2 = new_message((PEP_msg_direction) msg->Dir);
             if (msg2 == NULL)
@@ -548,9 +571,10 @@ namespace pEp {
 		}
 
 		void clear_opt_field_array(LPSAFEARRAY* opt_field_array) {
-			SafeArrayDestroy(*opt_field_array);
-			//memset(*opt_field_array, 0, sizeof(SAFEARRAY*));
-			*opt_field_array = NULL;
+			if (opt_field_array){
+				SafeArrayDestroy(*opt_field_array);
+				*opt_field_array = NULL;
+			}
 		}
     }
 }
