@@ -390,7 +390,7 @@ namespace pEp {
 			if (size > MAX_PATH - _fileName.size())
 				throw runtime_error("TEMP path too long");
 
-			tstring fileName(_pathName.get());
+			fileName = _pathName.get();
 			fileName += _fileName;
 		}
 
