@@ -295,7 +295,18 @@ namespace pEp {
             assert(msg2);
             assert(msg);
 
-            clear_text_message(msg2);
+			if (!msg2) {
+				msg2 = (TextMessage *)calloc(1, sizeof(TextMessage));
+				assert(msg2);
+				if (!msg2)
+					throw bad_alloc();
+			}
+			else {
+				clear_text_message(msg2);
+			}
+
+			if (!msg)
+				return;
 
             msg2->Dir = (pEpMsgDirection) msg->dir;
             msg2->Id = bstr(msg->id);
