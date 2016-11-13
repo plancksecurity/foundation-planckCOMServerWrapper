@@ -267,6 +267,10 @@ namespace pEp {
 
         void clear_text_message(TextMessage *msg)
         {
+			assert(msg);
+			if (!msg)
+				return;
+
             SysFreeString(msg->Id);
             SysFreeString(msg->ShortMsg);
             SysFreeString(msg->LongMsg);
