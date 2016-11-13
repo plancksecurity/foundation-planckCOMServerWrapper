@@ -52,6 +52,7 @@ namespace pEp {
         void update_product(product p, DWORD context);
         product_list& registered_products();
         void keep_updated();
+		static tstring get_lockFile();
 
     private:
         time_t now;

@@ -122,6 +122,8 @@ namespace pEp {
         : _self(self), now(time(NULL)), next(now + time_diff()), hkUpdater(NULL), hkPluginStart(NULL),
             internet(NULL), hAES(NULL), hRSA(NULL)
     {
+		DeleteFile(get_lockFile().c_str());
+
         LONG lResult = RegOpenCurrentUser(KEY_READ, &cu);
         assert(lResult == ERROR_SUCCESS);
         if (lResult == ERROR_SUCCESS)
@@ -377,11 +379,12 @@ namespace pEp {
 		}
     }
 
-    void GateKeeper::update_product(product p, DWORD context)
-    {
-		{
-			const tstring _fileName = _T("\\pEpSetup.lck");
+	tstring GateKeeper::get_lockFile()
+	{
+		static const tstring _fileName = _T("\\pEpSetup.lck");
+		static tstring fileName;
 
+		if (fileName.length() == 0) {
 			unique_ptr < TCHAR[] > _pathName(new TCHAR[MAX_PATH + 1]);
 			DWORD size = GetTempPath(MAX_PATH, _pathName.get());
 			if (size > MAX_PATH - _fileName.size())
@@ -389,14 +392,21 @@ namespace pEp {
 
 			tstring fileName(_pathName.get());
 			fileName += _fileName;
+		}
 
-			HANDLE file = CreateFile(fileName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+		return fileName;
+	}
+
+    void GateKeeper::update_product(product p, DWORD context)
+    {
+		{
+			HANDLE file = CreateFile(get_lockFile().c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
 			if (file == INVALID_HANDLE_VALUE) {
 				return;
 			}
 			else {
 				CloseHandle(file);
-				DeleteFile(fileName.c_str());
+				DeleteFile(get_lockFile().c_str());
 			}
 		}
 
