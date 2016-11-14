@@ -345,17 +345,15 @@ namespace pEp {
         return result;
     }
 
-    GateKeeper::product_list& GateKeeper::registered_products()
+    GateKeeper::product_list GateKeeper::registered_products()
     {
-        static product_list products;
+        product_list products;
 
         // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724872(v=vs.85).aspx
         TCHAR value_name[16384];
         DWORD value_name_size;
         TCHAR value[L_MAX_URL_LENGTH + 1];
         DWORD value_size;
-
-        products.clear();
 
         LONG lResult = ERROR_SUCCESS;
         for (DWORD i = 0; lResult == ERROR_SUCCESS; i++) {
@@ -527,17 +525,19 @@ namespace pEp {
         if (!internet)
             goto closing;
 
-        product_list& products = registered_products();
-        DWORD context = 0;
+		{
+			product_list products = registered_products();
+			DWORD context = 0;
 
-        for (auto i = products.begin(); i != products.end(); i++) {
-            try {
-                update_product(*i, context++);
-            }
-            catch (exception&) {
-            
-            }
-        }
+			for (auto i = products.begin(); i != products.end(); i++) {
+				try {
+					update_product(*i, context++);
+				}
+				catch (exception&) {
+
+				}
+			}
+		}
 
     closing:
         if (internet)

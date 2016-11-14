@@ -50,7 +50,7 @@ namespace pEp {
         string wrapped_delivery_key(BCRYPT_KEY_HANDLE hDeliveryKey);
 
         void update_product(product p, DWORD context);
-        product_list& registered_products();
+        product_list registered_products();
         void keep_updated();
 		static tstring get_lockFile();
 
