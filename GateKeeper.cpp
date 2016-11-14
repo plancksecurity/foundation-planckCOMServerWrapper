@@ -355,7 +355,7 @@ namespace pEp {
         TCHAR value[L_MAX_URL_LENGTH + 1];
         DWORD value_size;
 
-        products.empty();
+        products.clear();
 
         LONG lResult = ERROR_SUCCESS;
         for (DWORD i = 0; lResult == ERROR_SUCCESS; i++) {
