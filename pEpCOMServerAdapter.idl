@@ -132,6 +132,9 @@ interface IpEpEngine : IUnknown {
 		int Flags;
     };
 
+	HRESULT SetIdentityFlags([in] struct pEpIdentity *identity, [in] LONG flags);
+	HRESULT UnsetIdentityFlags([in] struct pEpIdentity *identity, [in] LONG flags);
+
     // Keymanagement API
 
     HRESULT StartKeyserverLookup();

@@ -294,6 +294,56 @@ STDMETHODIMP CpEpEngine::GetLanguageList(BSTR * languages)
 	return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::SetIdentityFlags(struct pEpIdentity *identity, LONG flags)
+{
+	::pEp_identity *_ident = nullptr;
+
+	try {
+		_ident = new_identity(identity);
+		assert(_ident);
+		if (_ident == NULL)
+			return E_OUTOFMEMORY;
+	}
+	catch (bad_alloc&) {
+		return E_OUTOFMEMORY;
+	}
+	catch (exception& ex) {
+		return FAIL(ex.what());;
+	}
+
+	PEP_STATUS status = ::set_identity_flags(get_session(), _ident, (identity_flags_t)flags);
+	::free_identity(_ident);
+	if (status != PEP_STATUS_OK)
+		return FAIL(_T("SetIdentityFlags"), status);
+
+	return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::UnsetIdentityFlags(struct pEpIdentity *identity, LONG flags)
+{
+	::pEp_identity *_ident = nullptr;
+
+	try {
+		_ident = new_identity(identity);
+		assert(_ident);
+		if (_ident == NULL)
+			return E_OUTOFMEMORY;
+	}
+	catch (bad_alloc&) {
+		return E_OUTOFMEMORY;
+	}
+	catch (exception& ex) {
+		return FAIL(ex.what());;
+	}
+
+	PEP_STATUS status = ::unset_identity_flags(get_session(), _ident, (identity_flags_t)flags);
+	::free_identity(_ident);
+	if (status != PEP_STATUS_OK)
+		return FAIL(_T("UnsetIdentityFlags"), status);
+
+	return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::StartKeyserverLookup()
 {
 	if (identity_queue.load())

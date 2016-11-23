@@ -161,6 +161,8 @@ public:
     STDMETHOD(GetCrashdumpLog)(LONG maxlines, BSTR * log);
     STDMETHOD(GetEngineVersion)(BSTR * engineVersion);
     STDMETHOD(GetLanguageList)(BSTR * languages);
+	STDMETHOD(SetIdentityFlags)(struct pEpIdentity *identity, LONG flags);
+	STDMETHOD(UnsetIdentityFlags)(struct pEpIdentity *identity, LONG flags);
 
     // keymanagement API
 
