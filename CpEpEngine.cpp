@@ -404,6 +404,16 @@ STDMETHODIMP CpEpEngine::UpdateIdentity(struct pEpIdentity *ident, struct pEpIde
 		::free_identity(_ident);
 		return S_OK;
 	}
+	else if (status == PEP_GET_KEY_FAILED) {
+		if (_ident->fpr) {
+			pEp_free(_ident->fpr);
+			_ident->fpr = NULL;
+		}
+		copy_identity(result, _ident);
+		result->Fpr = NULL;
+		::free_identity(_ident);
+		return S_OK;
+	}
 	else {
 		::free_identity(_ident);
 		if (status == PEP_OUT_OF_MEMORY)
