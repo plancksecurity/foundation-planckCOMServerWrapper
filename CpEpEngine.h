@@ -161,8 +161,8 @@ public:
     STDMETHOD(GetCrashdumpLog)(LONG maxlines, BSTR * log);
     STDMETHOD(GetEngineVersion)(BSTR * engineVersion);
     STDMETHOD(GetLanguageList)(BSTR * languages);
-	STDMETHOD(SetIdentityFlags)(struct pEpIdentity *identity, LONG flags);
-	STDMETHOD(UnsetIdentityFlags)(struct pEpIdentity *identity, LONG flags);
+	STDMETHOD(SetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
+	STDMETHOD(UnsetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
 
     // keymanagement API
 
@@ -174,7 +174,7 @@ public:
     STDMETHOD(KeyMistrusted)(struct pEpIdentity *ident);
     STDMETHOD(KeyResetTrust)(struct pEpIdentity *ident);
     STDMETHOD(TrustPersonalKey)(struct pEpIdentity *ident, struct pEpIdentity *result);
-
+	STDMETHOD(OwnIdentitiesRetrieve)(LPSAFEARRAY* own_identities);
 
     // Blacklist API
 

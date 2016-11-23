@@ -79,7 +79,7 @@ namespace pEp {
             _ident->Lang = utf16_bstr(this->lang);
             _ident->UserName = utf16_bstr(this->username);
             _ident->UserId = utf16_bstr(this->user_id);
-			_ident->Flags = this->flags;
+			_ident->Flags = (pEpIdentityFlags) this->flags;
 
             return _ident;
         }
@@ -103,7 +103,7 @@ namespace pEp {
                 ident_s->CommType = (pEpComType) ident->comm_type;
                 if (ident->lang)
                     ident_s->Lang = utf16_bstr(ident->lang);
-				ident_s->Flags = (int) ident->flags;
+				ident_s->Flags = (pEpIdentityFlags) ident->flags;
             }
         }
 

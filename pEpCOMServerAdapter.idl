@@ -129,11 +129,11 @@ interface IpEpEngine : IUnknown {
         BSTR UserName;
         pEpComType CommType;
         BSTR Lang;
-		int Flags;
+		pEpIdentityFlags Flags;
     };
 
-	HRESULT SetIdentityFlags([in] struct pEpIdentity *identity, [in] LONG flags);
-	HRESULT UnsetIdentityFlags([in] struct pEpIdentity *identity, [in] LONG flags);
+	HRESULT SetIdentityFlags([in] struct pEpIdentity *identity, [in] pEpIdentityFlags flags);
+	HRESULT UnsetIdentityFlags([in] struct pEpIdentity *identity, [in] pEpIdentityFlags flags);
 
     // Keymanagement API
 
@@ -145,6 +145,7 @@ interface IpEpEngine : IUnknown {
     HRESULT KeyMistrusted([in] struct pEpIdentity *ident);
     HRESULT KeyResetTrust([in] struct pEpIdentity *ident);
     HRESULT TrustPersonalKey([in] struct pEpIdentity *ident, [out, retval] struct pEpIdentity *result);
+	HRESULT OwnIdentitiesRetrieve([out, retval] SAFEARRAY(struct pEpIdentity)* own_identities);
 
     // Blacklist API
 

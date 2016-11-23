@@ -294,8 +294,12 @@ STDMETHODIMP CpEpEngine::GetLanguageList(BSTR * languages)
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::SetIdentityFlags(struct pEpIdentity *identity, LONG flags)
+STDMETHODIMP CpEpEngine::SetIdentityFlags(struct pEpIdentity *identity, pEpIdentityFlags flags)
 {
+	assert(identity);
+	if (!identity)
+		return E_INVALIDARG;
+
 	::pEp_identity *_ident = nullptr;
 
 	try {
@@ -319,8 +323,12 @@ STDMETHODIMP CpEpEngine::SetIdentityFlags(struct pEpIdentity *identity, LONG fla
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::UnsetIdentityFlags(struct pEpIdentity *identity, LONG flags)
+STDMETHODIMP CpEpEngine::UnsetIdentityFlags(struct pEpIdentity *identity, pEpIdentityFlags flags)
 {
+	assert(identity);
+	if (!identity)
+		return E_INVALIDARG;
+
 	::pEp_identity *_ident = nullptr;
 
 	try {
@@ -893,6 +901,16 @@ STDMETHODIMP CpEpEngine::ColorFromRating(pEpRating rating, pEpColor * pVal)
 	PEP_color _color = ::color_from_rating(engineRating);
 
 	*pVal = (pEpColor)_color;
+
+	return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::OwnIdentitiesRetrieve(LPSAFEARRAY* own_identities)
+{
+	assert(own_identities);
+	if (!own_identities)
+		return E_INVALIDARG;
+
 
 	return S_OK;
 }
