@@ -44,6 +44,7 @@ namespace pEp {
 
 		void opt_field_array_from_C(stringpair_list_t* spair_list, LPSAFEARRAY* pair_list_out);
 		void clear_opt_field_array(LPSAFEARRAY* pair_list);
+		template< class T2, class T > SAFEARRAY * array_from_C(T *tl);
 
         static LPTYPELIB pTypelib = NULL;
 

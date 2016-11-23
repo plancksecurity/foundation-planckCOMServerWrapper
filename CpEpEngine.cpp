@@ -911,7 +911,37 @@ STDMETHODIMP CpEpEngine::OwnIdentitiesRetrieve(LPSAFEARRAY* own_identities)
 	if (!own_identities)
 		return E_INVALIDARG;
 
+	*own_identities = nullptr;
 
+	::identity_list *il = nullptr;
+	PEP_STATUS status = ::own_identities_retrieve(get_session(), &il);
+	if (status == PEP_OUT_OF_MEMORY) {
+		return E_OUTOFMEMORY;
+	}
+	else if (status != PEP_STATUS_OK)
+	{
+		return FAIL(_T("OwnIdentitiesRetrieve"), status);
+	}
+
+	SAFEARRAY * _own_identities = nullptr;
+	try {
+		_own_identities = array_from_C<pEpIdentity, identity_list>(il);
+	}
+	catch (exception& ex)
+	{
+		::free_identity_list(il);
+		try {
+			dynamic_cast<bad_alloc&>(ex);
+		}
+		catch (bad_cast&)
+		{
+			return FAIL(ex.what());
+		}
+		return E_OUTOFMEMORY;
+	}
+	free_identity_list(il);
+
+	*own_identities = _own_identities;
 	return S_OK;
 }
 
