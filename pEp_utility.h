@@ -17,6 +17,7 @@ namespace pEp {
             pEpComType comm_type;
             string lang;
             bool me;
+			int flags;
 
             pEp_identity_cpp(
                 string _address = string(),

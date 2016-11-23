@@ -115,6 +115,13 @@ interface IpEpEngine : IUnknown {
         pEpCtpEp = 0xff
     } pEpComType;
 
+	typedef [v1_enum] enum pEpIdentityFlags {
+		pEpIdfNone = 0,
+		pEpIdfNotForSync = 0x0001,
+		pEpIdfList = 0x0002,
+		pEpIdfDevicegroup = 0x0100
+	} pEpIdentityFlags;
+
     [uuid(C3A3814E-567F-4D1C-9F44-9B1DA3957A89)] struct pEpIdentity {
         BSTR Address;
         BSTR Fpr;
@@ -122,6 +129,7 @@ interface IpEpEngine : IUnknown {
         BSTR UserName;
         pEpComType CommType;
         BSTR Lang;
+		int Flags;
     };
 
     // Keymanagement API
