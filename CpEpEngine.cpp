@@ -784,9 +784,7 @@ STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SA
 		return E_OUTOFMEMORY;
 
 	// COM-41: Enhanced PEP status handling
-	if ((status > PEP_STATUS_OK && status < PEP_UNENCRYPTED) ||
-		status < PEP_STATUS_OK ||
-		status >= PEP_TRUSTWORD_NOT_FOUND)
+	if ((status != PEP_STATUS_OK) && (status < PEP_UNENCRYPTED || status >= PEP_TRUSTWORD_NOT_FOUND))
 		return FAIL("Failure to encrypt message", status);
 
 	// Statii like PEP_UNENCRYPTED due to no private key
