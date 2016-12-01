@@ -400,7 +400,7 @@ namespace pEp {
 
                 char *buffer;
                 if (size) {
-                    buffer = (char *) calloc(1, size);
+                    buffer = (char *) malloc(size + 1);
                     if (buffer == NULL)
                         throw bad_alloc();
 
@@ -408,6 +408,7 @@ namespace pEp {
 
                     SafeArrayAccessData(b.value, (void **) &data);
                     memcpy(buffer, data, size);
+					buffer[size] = 0; // safeguard
                     SafeArrayUnaccessData(sa);
                 }
                 else {
