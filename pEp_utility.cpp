@@ -400,7 +400,7 @@ namespace pEp {
 
                 char *buffer;
                 if (size) {
-                    buffer = (char *) malloc(size);
+                    buffer = (char *) calloc(1, size);
                     if (buffer == NULL)
                         throw bad_alloc();
 
