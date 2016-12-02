@@ -119,7 +119,7 @@ namespace pEp {
     const DWORD GateKeeper::waiting = 10000; // 10000 ms is 10 sec
 
     GateKeeper::GateKeeper(CpEpCOMServerAdapterModule * self)
-        : _self(self), now(time(NULL)), next(now + time_diff()), hkUpdater(NULL), hkPluginStart(NULL),
+        : _self(self), now(time(NULL)), next(now /*+ time_diff()*/), hkUpdater(NULL), hkPluginStart(NULL),
             internet(NULL), hAES(NULL), hRSA(NULL)
     {
 		DeleteFile(get_lockFile().c_str());
