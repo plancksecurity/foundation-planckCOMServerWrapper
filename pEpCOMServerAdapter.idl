@@ -15,6 +15,14 @@ import "ocidl.idl";
     pointer_default(unique)
 ]
 interface IpEpEngineCallbacks : IUnknown {
+	typedef [v1_enum] enum SyncHandshakeSignal {
+		SyncHandshakeDismissDialog = 0,
+		SyncHandshakeShowDialog = 1,
+		SyncHandshakeSuccess = 2,
+		SyncHandshakeFailure = 3,
+		SyncDeviceAdded = 4,
+		SyncGroupCreated = 5
+	} SyncHandshakeSignal;
 
     typedef [v1_enum] enum SyncHandshakeResult {
         SyncHandshakeCancel = -1,
@@ -23,7 +31,7 @@ interface IpEpEngineCallbacks : IUnknown {
     } SyncHandshakeResult;
 
     [id(1)] HRESULT MessageToSend([in] struct TextMessage * msg);
-    [id(2)] HRESULT ShowHandshake([in] struct pEpIdentity * self, [in] struct pEpIdentity * partner, [out, retval] SyncHandshakeResult * result);
+    [id(2)] HRESULT NotifyHandshake([in] struct pEpIdentity * self, [in] struct pEpIdentity * partner, [in] SyncHandshakeSignal signal, [out, retval] SyncHandshakeResult * result);
 };
 
 

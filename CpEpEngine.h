@@ -103,7 +103,7 @@ protected:
     typedef locked_queue<pEp_identity_cpp> identity_queue_t;
     static ::pEp_identity * retrieve_next_identity(void *management);
     static PEP_STATUS messageToSend(void * obj, message *msg);
-    static PEP_STATUS showHandshake(void * obj, pEp_identity *self, pEp_identity *partner);
+    static PEP_STATUS notifyHandshake(void * obj, pEp_identity *self, pEp_identity *partner, sync_handshake_signal signal);
 
 
     HRESULT error(_bstr_t msg);
@@ -130,7 +130,7 @@ private:
 
 	// Keysync members
     static int inject_sync_msg(void *msg, void* management);
-    static void* retrieve_next_sync_msg(void* management);
+    static void* retrieve_next_sync_msg(void* management, time_t *timeout);
     void start_keysync();
     static void do_keysync_in_thread(CpEpEngine* self, LPSTREAM marshaled_callbacks);
     void stop_keysync();
@@ -203,9 +203,10 @@ protected:
 	HRESULT Fire_MessageToSend(
 		/* [in] */ struct TextMessage *msg);
 
-	HRESULT Fire_ShowHandshake(
+	HRESULT Fire_NotifyHandshake(
 		/* [in] */ struct pEpIdentity *self,
 		/* [in] */ struct pEpIdentity *partner,
+		/* [in] */ SyncHandshakeSignal signal,
 		/* [retval][out] */ SyncHandshakeResult *result);
 };
 

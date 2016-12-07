@@ -410,7 +410,7 @@ STDMETHODIMP CpEpEngine::Myself(struct pEpIdentity *ident, struct pEpIdentity *r
 	// DEBUG CODE - REMOVE BEFORE RELEASE!
 	// SyncHandshakeResult handshakeResult;
 	//
-	// HRESULT res = Fire_ShowHandshake(ident, result, &handshakeResult);
+	// HRESULT res = Fire_NotifyHandshake(ident, result, signal, &handshakeResult);
 	// 
 	// HRESULT res2 = Fire_TestEvent(15, _bstr_t( "hallo"));
 
@@ -619,7 +619,7 @@ PEP_STATUS CpEpEngine::messageToSend(void * obj, message *msg)
 	return PEP_STATUS_OK;
 }
 
-PEP_STATUS CpEpEngine::showHandshake(void * obj, pEp_identity *self, pEp_identity *partner)
+PEP_STATUS CpEpEngine::notifyHandshake(void * obj, pEp_identity *self, pEp_identity *partner, sync_handshake_signal signal)
 {
 	assert(self && partner);
 	if (!(self && partner))
@@ -631,7 +631,7 @@ PEP_STATUS CpEpEngine::showHandshake(void * obj, pEp_identity *self, pEp_identit
 	copy_identity(&_partner, partner);
 	CpEpEngine *me = (CpEpEngine *)obj;
 	SyncHandshakeResult _result;
-	HRESULT r = me->Fire_ShowHandshake(&_self, &_partner, &_result);
+	HRESULT r = me->Fire_NotifyHandshake(&_self, &_partner, (SyncHandshakeSignal)(int)signal, &_result);
 	assert(r == S_OK);
 	clear_identity_s(_self);
 	clear_identity_s(_partner);
@@ -1013,7 +1013,7 @@ void CpEpEngine::start_keysync()
 
 	// Init our keysync session
 	PEP_STATUS status = ::init(&keysync_session);
-	::register_sync_callbacks(keysync_session, (void*)this, messageToSend, showHandshake, inject_sync_msg, retrieve_next_sync_msg);
+	::register_sync_callbacks(keysync_session, (void*)this, messageToSend, notifyHandshake, inject_sync_msg, retrieve_next_sync_msg);
 	assert(status == PEP_STATUS_OK);
 
     attach_sync_session(get_session(), keysync_session);
@@ -1116,7 +1116,7 @@ int CpEpEngine::inject_sync_msg(void * msg, void * management)
     return S_OK;
 }
 
-void * CpEpEngine::retrieve_next_sync_msg(void * management)
+void * CpEpEngine::retrieve_next_sync_msg(void * management, time_t *timeout)
 {
 	// sanity check
 	assert(management);
@@ -1244,7 +1244,7 @@ HRESULT CpEpEngine::Fire_MessageToSend(TextMessage * msg)
 	return result;
 }
 
-HRESULT CpEpEngine::Fire_ShowHandshake(pEpIdentity * self, pEpIdentity * partner, SyncHandshakeResult * result)
+HRESULT CpEpEngine::Fire_NotifyHandshake(pEpIdentity * self, pEpIdentity * partner, SyncHandshakeSignal signal, SyncHandshakeResult * result)
 {
 	assert(self);
 	assert(partner);
@@ -1256,7 +1256,7 @@ HRESULT CpEpEngine::Fire_ShowHandshake(pEpIdentity * self, pEpIdentity * partner
 	if (!this->client_callbacks_on_sync_thread)
 		return E_ILLEGAL_METHOD_CALL;
     	
-	auto res = this->client_callbacks_on_sync_thread->ShowHandshake(self, partner, result);
+	auto res = this->client_callbacks_on_sync_thread->NotifyHandshake(self, partner, signal, result);
 		
 	return res;	
 }
