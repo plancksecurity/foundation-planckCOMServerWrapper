@@ -119,7 +119,7 @@ namespace pEp {
     const DWORD GateKeeper::waiting = 10000; // 10000 ms is 10 sec
 
     GateKeeper::GateKeeper(CpEpCOMServerAdapterModule * self)
-        : _self(self), now(time(NULL)), next(now /*+ time_diff()*/), hkUpdater(NULL), hkPluginStart(NULL),
+        : _self(self), now(time(NULL)), next(now /*+ time_diff()*/), hkUpdater(NULL),
             internet(NULL), hAES(NULL), hRSA(NULL)
     {
 		DeleteFile(get_lockFile().c_str());
@@ -133,16 +133,9 @@ namespace pEp {
 
         if (cu_open) {
             LONG lResult = RegOpenKeyEx(cu, updater_reg_path, 0, KEY_READ, &hkUpdater);
-            assert(lResult == ERROR_SUCCESS);
-            if (lResult != ERROR_SUCCESS)
-                return;
-
-            lResult = RegOpenKeyEx(cu, plugin_reg_path, 0, KEY_WRITE, &hkPluginStart);
-            assert(lResult == ERROR_SUCCESS);
-            if (lResult != ERROR_SUCCESS)
-                return;
-            RegCloseKey(hkPluginStart);
-        }
+			if (lResult != ERROR_SUCCESS)
+				RegCreateKeyEx(cu, updater_reg_path, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ, NULL, &hkUpdater, NULL);
+		}
     }
     
     GateKeeper::~GateKeeper()
@@ -192,11 +185,9 @@ namespace pEp {
 
     void GateKeeper::keep_plugin()
     {
-        if (!hkPluginStart)
-            return;
+		HKEY hkPluginStart = NULL;
 
         LONG lResult = RegOpenKeyEx(cu, plugin_reg_path, 0, KEY_WRITE, &hkPluginStart);
-        assert(lResult == ERROR_SUCCESS);
         if (lResult != ERROR_SUCCESS)
             return;
 
