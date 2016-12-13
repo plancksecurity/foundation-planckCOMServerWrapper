@@ -16,12 +16,13 @@ import "ocidl.idl";
 ]
 interface IpEpEngineCallbacks : IUnknown {
 	typedef [v1_enum] enum SyncHandshakeSignal {
-		SyncHandshakeDismissDialog = 0,
-		SyncHandshakeShowDialog = 1,
-		SyncHandshakeSuccess = 2,
-		SyncHandshakeFailure = 3,
-		SyncDeviceAdded = 4,
-		SyncGroupCreated = 5
+        SyncNotifyUndefined = 0,
+        SyncNotifyInitAddOurDevice = 1,
+        SyncNotifyInitAddOtherDevice = 2,
+        SyncNotifyInitFormGroup = 3,
+        SyncNotifyTimeout = 4,
+        SyncNotifyAcceptedDeviceAdded = 5,
+        SyncNotifyAcceptedGroupCreated = 6
 	} SyncHandshakeSignal;
 
     typedef [v1_enum] enum SyncHandshakeResult {
