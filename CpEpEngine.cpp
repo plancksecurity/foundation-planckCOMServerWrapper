@@ -185,7 +185,7 @@ STDMETHODIMP CpEpEngine::GetTrustwords(struct pEpIdentity *id1, struct pEpIdenti
         _id1 = new_identity(id1);
         _id2 = new_identity(id2);
 
-        if (!lang) {
+        if (lang) {
             _lang = utf8_string(lang);
             if (_lang.length() == 0) {
                 _lang = "en";
