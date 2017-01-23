@@ -201,8 +201,8 @@ interface IpEpEngine : IUnknown {
     typedef [v1_enum] enum pEpDecryptFlags {
         pEpDecryptFlagsNone = 0,
         pEpDecryptFlagOwnPrivateKey = 0x1,
-        pEpDecryptFlagConsumed = 0x2,
-        pEpDecryptFlagDiscarded = 0x4
+        pEpDecryptFlagConsume = 0x2,
+        pEpDecryptFlagIgnore = 0x4
     } pEpDecryptFlags;
 
     typedef [v1_enum] enum pEpMsgDirection {
