@@ -227,6 +227,90 @@ STDMETHODIMP CpEpEngine::GetTrustwords(struct pEpIdentity *id1, struct pEpIdenti
     return result;
 }
 
+STDMETHODIMP CpEpEngine::GetMessageTrustwords(
+    /* [in] */ struct TextMessage *msg,
+    /* [in] */ struct pEpIdentity *receivedBy,
+    /* [in] */ SAFEARRAY *keylist,
+    /* [defaultvalue][in] */ BSTR lang,
+    /* [defaultvalue][in] */ VARIANT_BOOL full,
+    /* [retval][out] */ BSTR *words) {
+    assert(msg);
+    assert(receivedBy);
+    assert(words);
+
+    if (!(msg && receivedBy && words))
+    {
+        return E_INVALIDARG;
+    }
+
+    HRESULT result = S_OK;
+
+    pEp_identity * _received_by = NULL;
+    ::message * _msg = NULL;
+    ::stringlist_t *_keylist = NULL;
+    string _lang;
+    *words = NULL;
+
+    try {
+        _received_by = new_identity(receivedBy);
+        _msg = text_message_to_C(msg);
+
+        if (keylist) {
+            _keylist = new_stringlist(keylist);
+        }
+
+        if (lang) {
+            _lang = utf8_string(lang);
+            if (_lang.length() == 0) {
+                _lang = "en";
+            }
+            else if (_lang.length() != 2) {
+                result = E_INVALIDARG;
+            }
+        }
+        else {
+            _lang = "en";
+        }
+    }
+    catch (bad_alloc&) {
+        result = E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        result = FAIL(ex.what());
+    }
+
+    char* _words = NULL;
+    if (result == S_OK) {
+        auto status = ::get_message_trustwords(
+            get_session(),
+            _msg,
+            _keylist,
+            _received_by,
+            _lang.c_str(),
+            &_words,
+            full != 0 /* convert variant bool to C bool */);
+
+        if (status == PEP_OUT_OF_MEMORY) {
+            result = E_OUTOFMEMORY;
+        }
+        else if (status == PEP_TRUSTWORD_NOT_FOUND) {
+            result = FAIL(L"GetTrustwords: Trustword not found", status);
+        }
+        else if (!words) {
+            result = FAIL(L"GetTrustwords: _words == NULL", status);
+        }
+        else {
+            *words = utf16_bstr(_words);
+        }
+    }
+
+    ::pEp_free(_words);
+    ::free_message(_msg);
+    ::free_stringlist(_keylist);
+    ::free_identity(_received_by);
+
+    return result;
+}
 
 STDMETHODIMP CpEpEngine::GetCrashdumpLog(LONG maxlines, BSTR * log)
 {
@@ -1044,13 +1128,23 @@ void CpEpEngine::do_keysync_in_thread(CpEpEngine* self, LPSTREAM marshaled_callb
     res = CoGetInterfaceAndReleaseStream(marshaled_callbacks, IID_IpEpEngineCallbacks, &vp);
     assert(SUCCEEDED(res));
 
+    self->client_last_signalled_polling_state = false;
     self->client_callbacks_on_sync_thread = static_cast<IpEpEngineCallbacks*>(vp);
+
+    res = self->client_callbacks_on_sync_thread->QueryInterface(
+        &self->client_callbacks2_on_sync_thread);
+    if (res != S_OK)
+        self->client_callbacks2_on_sync_thread = NULL;
 
     ::do_sync_protocol(self->keysync_session, self);
 
     self->client_callbacks_on_sync_thread->Release();
 
     self->client_callbacks_on_sync_thread = NULL;
+
+    if (self->client_callbacks2_on_sync_thread)
+        self->client_callbacks2_on_sync_thread->Release();
+    self->client_callbacks2_on_sync_thread = NULL;
 
     CoUninitialize();
 }
@@ -1120,43 +1214,75 @@ void * CpEpEngine::retrieve_next_sync_msg(void * management, time_t *timeout)
 {
 	// sanity check
 	assert(management);
-	if (!management)
+	if (!(management))
 		return NULL;
 
 	CpEpEngine* me = (CpEpEngine*)management;
 
+    if ((timeout && *timeout)
+        && me->client_callbacks2_on_sync_thread
+        && me->client_last_signalled_polling_state == false)
+    {
+        me->client_callbacks2_on_sync_thread->NeedFastPolling(VARIANT_TRUE);
+        me->client_last_signalled_polling_state == true;
+    }
+    else if (!(timeout && *timeout)
+        && me->client_callbacks2_on_sync_thread
+        && me->client_last_signalled_polling_state == true)
+    {
+        me->client_callbacks2_on_sync_thread->NeedFastPolling(VARIANT_FALSE);
+        me->client_last_signalled_polling_state == false;
+    }
+
 	// acquire the lock
 	std::unique_lock<std::mutex> lock(me->keysync_mutex);
+    
+    if (timeout && *timeout) {
+        auto end_time = std::chrono::steady_clock::now()
+            + std::chrono::seconds(*timeout);
 
-	// as long as we're supposed to be active 
-	// (we won't wait for the queue to empty currently...)
-	while (!me->keysync_abort_requested)
-	{
-		// If the queue is empty, wait for a signal, and try again.
-		if (me->keysync_queue.empty())
-		{
-			me->keysync_condition.wait(lock);
-			continue;
-		}
+        while (me->keysync_queue.empty() && !me->keysync_abort_requested)
+        {
+            auto status = me->keysync_condition.wait_until(lock, end_time);
 
-		// Pop the message and return it.
-		void* msg = me->keysync_queue.front();
-		assert(msg);
+            if (status == std::cv_status::timeout)
+            {
+                *timeout = 1; // Signal timeout
+                return NULL;
+            }            
+        }
+    }
+    else 
+    {
+        while (me->keysync_queue.empty() && !me->keysync_abort_requested)
+        {
+            me->keysync_condition.wait(lock);
+        }
+    }
 
-		me->keysync_queue.pop();
+    if (me->keysync_abort_requested) {
+        // we acknowledge that we're quitting...
+        me->keysync_abort_requested = false;
 
-		return msg;
-	}
+        // We signal the main thread that we got his signal
+        // so it can gain the mutex again and call join() on us.
+        me->keysync_condition.notify_all();
 
-	// we acknowledge that we're quitting...
-	me->keysync_abort_requested = false;
+        // and tell the pep engine we're done.
+        if (timeout)
+            *timeout = 0; // signal for termination.
+        return NULL;
+    }
 
-	// We signal the main thread that we got his signal
-	// so it can gain the mutex again and call join() on us.
-	me->keysync_condition.notify_all();
+    assert(!me->keysync_queue.empty());	
 
-	// and tell the pep engine we're done.
-	return NULL;
+	// Pop the message and return it.
+	void* msg = me->keysync_queue.front();
+	assert(msg);
+
+	me->keysync_queue.pop();
+
+	return msg;
 }
 
 

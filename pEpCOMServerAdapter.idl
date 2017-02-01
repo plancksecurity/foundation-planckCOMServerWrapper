@@ -35,6 +35,17 @@ interface IpEpEngineCallbacks : IUnknown {
     [id(2)] HRESULT NotifyHandshake([in] struct pEpIdentity * self, [in] struct pEpIdentity * partner, [in] SyncHandshakeSignal signal, [out, retval] SyncHandshakeResult * result);
 };
 
+[
+    object,
+    uuid(64E964B2-880A-4E92-B0B5-66FF4286A3B3),
+    oleautomation,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IpEpEngineCallbacks2 : IpEpEngineCallbacks 
+{
+    [id(3)] HRESULT NeedFastPolling([in] VARIANT_BOOL enableFastPolling);
+};
 
 [
     object,
@@ -255,6 +266,25 @@ interface IpEpEngine : IUnknown {
 };
 
 [
+    object,
+    uuid(8A042123-D433-4DEA-ADA2-2E5E61A00292),
+    oleautomation,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IpEpEngine2 : IpEpEngine
+{
+    HRESULT GetMessageTrustwords(
+        [in] struct TextMessage *msg,
+        [in] struct pEpIdentity * receivedBy,
+        [in] SAFEARRAY(BSTR) keylist,
+        [in, defaultvalue("en")] BSTR lang,
+        [in, defaultvalue(0)] VARIANT_BOOL full,
+        [out, retval] BSTR * words
+    );
+};
+
+[
     uuid(564A4350-419E-47F1-B0DF-6FCCF0CD0BBC),
     version(1.0),
 ]
@@ -266,7 +296,8 @@ library pEpCOMServerAdapterLib
         uuid(5FF6682B-727B-4DFE-A68D-28982874C0C7)
     ]
     coclass pEpEngine {
-        [default] interface IpEpEngine;
-        interface IpEpEngineCallbacks;
+        [default] interface IpEpEngine2;
+        interface IpEpEngine;
+        interface IpEpEngineCallbacks2;
     };
 };

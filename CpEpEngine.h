@@ -24,7 +24,7 @@ class ATL_NO_VTABLE CpEpEngine :
     public CComObjectRootEx<CComObjectThreadModel>,
 	public CComCoClass<CpEpEngine, &CLSID_pEpEngine>,
 	public ISupportErrorInfo,
-	public IpEpEngine
+	public IpEpEngine2
 {
 protected:
     static int examine_identity(pEp_identity *ident, void *management);
@@ -127,6 +127,8 @@ private:
 
 	IpEpEngineCallbacks* client_callbacks = NULL;
     IpEpEngineCallbacks* client_callbacks_on_sync_thread = NULL;
+    IpEpEngineCallbacks2* client_callbacks2_on_sync_thread = NULL;
+    bool client_last_signalled_polling_state = true;
 
 	// Keysync members
     static int inject_sync_msg(void *msg, void* management);
@@ -158,6 +160,13 @@ public:
     STDMETHOD(Log)(BSTR title, BSTR entity, BSTR description, BSTR comment);
     STDMETHOD(Trustwords)(BSTR fpr, BSTR lang, LONG max_words, BSTR * words);
     STDMETHOD(GetTrustwords)(struct pEpIdentity *id1, struct pEpIdentity *id2, BSTR lang, VARIANT_BOOL full, BSTR *words);
+    STDMETHOD(GetMessageTrustwords)(
+        /* [in] */ struct TextMessage *msg,
+        /* [in] */ struct pEpIdentity *receivedBy,
+        /* [in] */ SAFEARRAY *keylist,
+        /* [defaultvalue][in] */ BSTR lang,
+        /* [defaultvalue][in] */ VARIANT_BOOL full,
+        /* [retval][out] */ BSTR *words);
     STDMETHOD(GetCrashdumpLog)(LONG maxlines, BSTR * log);
     STDMETHOD(GetEngineVersion)(BSTR * engineVersion);
     STDMETHOD(GetLanguageList)(BSTR * languages);
