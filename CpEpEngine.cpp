@@ -12,7 +12,8 @@ STDMETHODIMP CpEpEngine::InterfaceSupportsErrorInfo(REFIID riid)
 {
 	static const IID* const arr[] =
 	{
-		&IID_IpEpEngine
+		&IID_IpEpEngine,
+        &IID_IpEpEngine2,
 	};
 
 	for (int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -1224,14 +1225,14 @@ void * CpEpEngine::retrieve_next_sync_msg(void * management, time_t *timeout)
         && me->client_last_signalled_polling_state == false)
     {
         me->client_callbacks2_on_sync_thread->NeedFastPolling(VARIANT_TRUE);
-        me->client_last_signalled_polling_state == true;
+        me->client_last_signalled_polling_state = true;
     }
     else if (!(timeout && *timeout)
         && me->client_callbacks2_on_sync_thread
         && me->client_last_signalled_polling_state == true)
     {
         me->client_callbacks2_on_sync_thread->NeedFastPolling(VARIANT_FALSE);
-        me->client_last_signalled_polling_state == false;
+        me->client_last_signalled_polling_state = false;
     }
 
 	// acquire the lock
