@@ -145,6 +145,19 @@ private:
     bool keysync_abort_requested = false;
     PEP_SESSION keysync_session;
 
+    // Members used for handshake notification dispatch to the background thread.
+    static void notify_handshake_background_thread(CpEpEngine* self, LPSTREAM marshaled_callbacks);
+    void notify_handshake_deliver_result();
+    bool notify_handshake_active = false;
+    bool notify_handshake_finished = false;
+    std::thread *notify_handshake_thread = NULL;
+    pEpIdentity notify_handshake_self;
+    pEpIdentity notify_handshake_partner;
+    SyncHandshakeSignal notify_handshake_signal;
+    SyncHandshakeResult notify_handshake_result;
+    LPSTREAM notify_handshake_error_info = NULL;
+    HRESULT notify_handshake_error;
+
 public:
     // runtime config of the adapter
 

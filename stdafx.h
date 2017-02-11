@@ -26,6 +26,7 @@
 #include <atlsafe.h>
 
 #include <comutil.h>
+#include <comdef.h>
 
 #include <Wininet.h>
 #include <intsafe.h>
