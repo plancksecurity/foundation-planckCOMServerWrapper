@@ -138,8 +138,8 @@ private:
     static void do_keysync_in_thread(CpEpEngine* self, LPSTREAM marshaled_callbacks);
     void stop_keysync();
 
-    std::mutex keysync_mutex;
-    std::condition_variable keysync_condition;
+    std::recursive_mutex keysync_mutex;
+    std::condition_variable_any keysync_condition;
     std::thread *keysync_thread = NULL;
     std::queue<void*> keysync_queue;
     bool keysync_abort_requested = false;

@@ -1066,7 +1066,7 @@ STDMETHODIMP CpEpEngine::TrustPersonalKey(struct pEpIdentity *ident, struct pEpI
 void CpEpEngine::start_keysync()
 {
     // acquire the lock
-    std::unique_lock<std::mutex> lock(keysync_mutex);
+    std::unique_lock<std::recursive_mutex> lock(keysync_mutex);
 
     // Assert if we're not already running.
     assert(!this->keysync_thread);
@@ -1132,7 +1132,7 @@ void CpEpEngine::do_keysync_in_thread(CpEpEngine* self, LPSTREAM marshaled_callb
 void CpEpEngine::stop_keysync()
 {
     // acquire the lock
-    std::unique_lock<std::mutex> lock(keysync_mutex);
+    std::unique_lock<std::recursive_mutex> lock(keysync_mutex);
 
     // Do nothing if keysync is not running.
     if (!keysync_thread)
@@ -1175,7 +1175,7 @@ int CpEpEngine::inject_sync_msg(void * msg, void * management)
     CpEpEngine* me = (CpEpEngine*)management;
 
     // acquire the lock
-    std::unique_lock<std::mutex> lock(me->keysync_mutex);
+    std::unique_lock<std::recursive_mutex> lock(me->keysync_mutex);
 
     // check whether we're in a valid state running:
     if (!me->keysync_thread)
@@ -1215,7 +1215,7 @@ void * CpEpEngine::retrieve_next_sync_msg(void * management, time_t *timeout)
     }
 
     // acquire the lock
-    std::unique_lock<std::mutex> lock(me->keysync_mutex);
+    std::unique_lock<std::recursive_mutex> lock(me->keysync_mutex);
 
     if (me->notify_handshake_finished)
         me->notify_handshake_deliver_result();
