@@ -1371,8 +1371,57 @@ PEP_STATUS CpEpEngine::notifyHandshake(void * obj, pEp_identity *self, pEp_ident
     CpEpEngine *me = (CpEpEngine *)obj;
 
     if (me->notify_handshake_active) {
-        // We don't support concurrent handshakes currently...
-        me->FAIL("Reentrant notify_handshake call!");
+        // We don't support concurrent handshakes currently, 
+        // with the exception of an abort of the handshake, 
+        // which we deliver synchroneously (as it's non-blocking).
+        if (signal == SYNC_NOTIFY_TIMEOUT) {
+            pEpIdentity timeout_self;
+            pEpIdentity timeout_partner;
+            SyncHandshakeSignal timeout_signal = (SyncHandshakeSignal)signal;
+            copy_identity(&timeout_self, self);
+            copy_identity(&timeout_partner, partner);
+            SyncHandshakeResult result;
+            auto res = me->client_callbacks_on_sync_thread->NotifyHandshake(&timeout_self, &timeout_partner, timeout_signal, &result);
+
+            clear_identity_s(timeout_self);
+            clear_identity_s(timeout_partner);
+
+            if (FAILED(res)) {
+                IErrorInfo* errorInfo = NULL;
+                if (FAILED(GetErrorInfo(0, &errorInfo)))
+                    errorInfo = NULL;
+
+                // The _com_error takes ownership of the errorInfo
+                // and will Release() it. It can also cope with
+                // NULL errorInfos.
+                _com_error error(res, errorInfo);
+
+                string _description = utf8_string(
+                    error.ErrorMessage());
+
+                string _comment = utf8_string(error.Description());
+
+                auto source = error.Source();
+                if (source.length() > 0) {
+                    _comment += "\r\nSource: ";
+                    _comment += utf8_string(source);
+                }
+
+                ::log_event(me->keysync_session,
+                    "Error on NotifyHandshakeTimeout",
+                    "pEp COM Adapter",
+                    _description.c_str(),
+                    _comment.c_str());
+
+                return PEP_UNKNOWN_ERROR;
+            }
+
+            if (res != S_OK)
+
+            return PEP_STATUS_OK;
+        }
+
+        ::log_event(me->keysync_session, "Reentrant notify_handshake call!", "pEp COM Adapter", NULL, NULL);
         return PEP_UNKNOWN_ERROR;
     }
 
@@ -1457,6 +1506,8 @@ void CpEpEngine::notify_handshake_deliver_result()
     }
     notify_handshake_error_info = NULL;
 
+    clear_identity_s(notify_handshake_self);
+    clear_identity_s(notify_handshake_partner);
     notify_handshake_active = false;
     notify_handshake_finished = false;
 }
