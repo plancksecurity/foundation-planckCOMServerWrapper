@@ -214,6 +214,8 @@ public:
     STDMETHOD(IdentityRating)(pEpIdentity * ident, pEpRating * pVal);
 	STDMETHOD(ColorFromRating)(pEpRating rating, pEpColor * pVal);
 
+    STDMETHOD(EncryptMessageForSelf)(pEpIdentity * target_id, TextMessage* src, TextMessage *dst);
+
 	// Event callbacks
 
 	STDMETHOD(RegisterCallbacks)(IpEpEngineCallbacks *new_callback);

@@ -284,6 +284,12 @@ interface IpEpEngine2 : IpEpEngine
         [in, defaultvalue(0)] VARIANT_BOOL full,
         [out, retval] BSTR * words
     );
+
+    HRESULT EncryptMessageForSelf(
+        [in] struct pEpIdentity* target_id,
+        [in] struct TextMessage* src, 
+        [out] struct TextMessage* dst
+    );
 };
 
 [

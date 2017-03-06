@@ -862,6 +862,46 @@ STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SA
     return S_OK;
 }
 
+
+STDMETHODIMP CpEpEngine::EncryptMessageForSelf(pEpIdentity * target_id, TextMessage * src, TextMessage * dst)
+{
+    assert(target_id);
+    assert(src);
+    assert(dst);
+
+    if (!(target_id && src && dst))
+        return E_INVALIDARG;
+
+    ::pEp_identity *_target_id = new_identity(target_id);
+
+    ::message *_src = text_message_to_C(src);
+
+    // COM-19: Initialize msg_dst to NULL, or we end up calling
+    // free_message() below with a pointer to random garbage in
+    // case of an error in encrypt_message().
+    ::message *msg_dst = NULL;
+    PEP_STATUS status = ::encrypt_message_for_self(get_session(), _target_id, _src, &msg_dst, PEP_enc_PEP);
+
+    if (status == PEP_STATUS_OK)
+        text_message_from_C(dst, msg_dst);
+    else
+        text_message_from_C(dst, _src);
+
+    ::free_message(msg_dst);
+    ::free_message(_src);
+    ::free_identity(_target_id);
+
+    if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+
+    // Different to encrypt_message, this should never fail (we ought to always
+    // have a private key for ourself).#
+    if (status != PEP_STATUS_OK)
+        return FAIL("Failure to encrypt message", status);
+
+    return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SAFEARRAY ** keylist, pEpDecryptFlags *flags, pEpRating *rating)
 {
     assert(src);
