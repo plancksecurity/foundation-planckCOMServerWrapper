@@ -878,7 +878,7 @@ STDMETHODIMP CpEpEngine::EncryptMessageForSelf(pEpIdentity * target_id, TextMess
 
     // COM-19: Initialize msg_dst to NULL, or we end up calling
     // free_message() below with a pointer to random garbage in
-    // case of an error in encrypt_message().
+    // case of an error in encrypt_message_for_self().
     ::message *msg_dst = NULL;
     PEP_STATUS status = ::encrypt_message_for_self(get_session(), _target_id, _src, &msg_dst, PEP_enc_PEP);
 
