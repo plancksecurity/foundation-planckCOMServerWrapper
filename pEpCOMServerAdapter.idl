@@ -15,17 +15,17 @@ import "ocidl.idl";
     pointer_default(unique)
 ]
 interface IpEpEngineCallbacks : IUnknown {
-	typedef [v1_enum] enum SyncHandshakeSignal {
-		SyncNotifyUndefined = 0,
-		SyncNotifyInitAddOurDevice = 1,
-		SyncNotifyInitAddOtherDevice = 2,
-		SyncNotifyInitFormGroup = 3,
-		SyncNotifyInitMoveOurDevice = 4,
-		SyncNotifyTimeout = 5,
-		SyncNotifyAcceptedDeviceAdded = 6,
-		SyncNotifyAcceptedGroupCreated = 7,
-		SyncNotifyAcceptedDeviceMoved = 8
-	} SyncHandshakeSignal;
+    typedef [v1_enum] enum SyncHandshakeSignal {
+        SyncNotifyUndefined = 0,
+        SyncNotifyInitAddOurDevice = 1,
+        SyncNotifyInitAddOtherDevice = 2,
+        SyncNotifyInitFormGroup = 3,
+        SyncNotifyInitMoveOurDevice = 4,
+        SyncNotifyTimeout = 5,
+        SyncNotifyAcceptedDeviceAdded = 6,
+        SyncNotifyAcceptedGroupCreated = 7,
+        SyncNotifyAcceptedDeviceMoved = 8
+    } SyncHandshakeSignal;
 
     typedef [v1_enum] enum SyncHandshakeResult {
         SyncHandshakeCancel = -1,
@@ -137,12 +137,12 @@ interface IpEpEngine : IUnknown {
         pEpCtpEp = 0xff
     } pEpComType;
 
-	typedef [v1_enum] enum pEpIdentityFlags {
-		pEpIdfNone = 0,
-		pEpIdfNotForSync = 0x0001,
-		pEpIdfList = 0x0002,
-		pEpIdfDevicegroup = 0x0100
-	} pEpIdentityFlags;
+    typedef [v1_enum] enum pEpIdentityFlags {
+        pEpIdfNone = 0,
+        pEpIdfNotForSync = 0x0001,
+        pEpIdfList = 0x0002,
+        pEpIdfDevicegroup = 0x0100
+    } pEpIdentityFlags;
 
     [uuid(C3A3814E-567F-4D1C-9F44-9B1DA3957A89)] struct pEpIdentity {
         BSTR Address;
@@ -151,11 +151,11 @@ interface IpEpEngine : IUnknown {
         BSTR UserName;
         pEpComType CommType;
         BSTR Lang;
-		pEpIdentityFlags Flags;
+        pEpIdentityFlags Flags;
     };
 
-	HRESULT SetIdentityFlags([in] struct pEpIdentity *identity, [in] pEpIdentityFlags flags);
-	HRESULT UnsetIdentityFlags([in] struct pEpIdentity *identity, [in] pEpIdentityFlags flags);
+    HRESULT SetIdentityFlags([in] struct pEpIdentity *identity, [in] pEpIdentityFlags flags);
+    HRESULT UnsetIdentityFlags([in] struct pEpIdentity *identity, [in] pEpIdentityFlags flags);
 
     // Keymanagement API
 
@@ -167,7 +167,7 @@ interface IpEpEngine : IUnknown {
     HRESULT KeyMistrusted([in] struct pEpIdentity *ident);
     HRESULT KeyResetTrust([in] struct pEpIdentity *ident);
     HRESULT TrustPersonalKey([in] struct pEpIdentity *ident, [out, retval] struct pEpIdentity *result);
-	HRESULT OwnIdentitiesRetrieve([out, retval] SAFEARRAY(struct pEpIdentity)* own_identities);
+    HRESULT OwnIdentitiesRetrieve([out, retval] SAFEARRAY(struct pEpIdentity)* own_identities);
 
     // Blacklist API
 
@@ -209,6 +209,10 @@ interface IpEpEngine : IUnknown {
     typedef [v1_enum] enum pEpEncryptFlags {
         pEpEncryptFlagsNone = 0,
         pEpEncryptFlagForceEncryption = 0x1,
+
+        // This flag is for special uses and should not be used
+        // by normal pEp clients!
+        pEpEncryptFlagsForceUnsigned = 0x2,
     } pEpEncryptFlags;
 
     typedef [v1_enum] enum pEpDecryptFlags {
@@ -288,7 +292,8 @@ interface IpEpEngine2 : IpEpEngine
     HRESULT EncryptMessageForSelf(
         [in] struct pEpIdentity* target_id,
         [in] struct TextMessage* src, 
-        [out] struct TextMessage* dst
+        [out] struct TextMessage* dst,
+        [in, defaultvalue(pEpEncryptFlagsNone)] pEpEncryptFlags flags
     );
 };
 

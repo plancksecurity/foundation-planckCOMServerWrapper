@@ -863,7 +863,7 @@ STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SA
 }
 
 
-STDMETHODIMP CpEpEngine::EncryptMessageForSelf(pEpIdentity * target_id, TextMessage * src, TextMessage * dst)
+STDMETHODIMP CpEpEngine::EncryptMessageForSelf(pEpIdentity * target_id, TextMessage * src, TextMessage * dst, pEpEncryptFlags flags)
 {
     assert(target_id);
     assert(src);
@@ -871,6 +871,8 @@ STDMETHODIMP CpEpEngine::EncryptMessageForSelf(pEpIdentity * target_id, TextMess
 
     if (!(target_id && src && dst))
         return E_INVALIDARG;
+
+    PEP_encrypt_flags_t engineFlags = (PEP_encrypt_flags_t)flags;
 
     ::pEp_identity *_target_id = new_identity(target_id);
 
@@ -880,7 +882,7 @@ STDMETHODIMP CpEpEngine::EncryptMessageForSelf(pEpIdentity * target_id, TextMess
     // free_message() below with a pointer to random garbage in
     // case of an error in encrypt_message_for_self().
     ::message *msg_dst = NULL;
-    PEP_STATUS status = ::encrypt_message_for_self(get_session(), _target_id, _src, &msg_dst, PEP_enc_PEP);
+    PEP_STATUS status = ::encrypt_message_for_self(get_session(), _target_id, _src, &msg_dst, PEP_enc_PEP, engineFlags);
 
     if (status == PEP_STATUS_OK)
         text_message_from_C(dst, msg_dst);

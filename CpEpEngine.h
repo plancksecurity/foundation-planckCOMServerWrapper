@@ -214,7 +214,12 @@ public:
     STDMETHOD(IdentityRating)(pEpIdentity * ident, pEpRating * pVal);
 	STDMETHOD(ColorFromRating)(pEpRating rating, pEpColor * pVal);
 
-    STDMETHOD(EncryptMessageForSelf)(pEpIdentity * target_id, TextMessage* src, TextMessage *dst);
+    STDMETHOD(EncryptMessageForSelf)(
+        pEpIdentity * target_id, 
+        TextMessage* src,
+        TextMessage *dst,
+        pEpEncryptFlags flags
+        );
 
 	// Event callbacks
 
