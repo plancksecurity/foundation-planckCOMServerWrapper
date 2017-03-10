@@ -207,7 +207,7 @@ interface IpEpEngine : IUnknown {
     } pEpColor;
 
     typedef [v1_enum] enum pEpEncryptFlags {
-        pEpEncryptFlagsNone = 0,
+        pEpEncryptFlagsDefault = 0,
         pEpEncryptFlagForceEncryption = 0x1,
 
         // This flag is for special uses and should not be used
@@ -259,8 +259,18 @@ interface IpEpEngine : IUnknown {
         SAFEARRAY(struct StringPair) OptFields;
     };
 
-    HRESULT EncryptMessage([in] struct TextMessage *src, [out] struct TextMessage * dst, [in] SAFEARRAY(BSTR) extra, [in, defaultvalue(pEpEncryptFlagsNone)] pEpEncryptFlags flags);
-    HRESULT DecryptMessage([in] struct TextMessage *src, [out] struct TextMessage * dst, [out] SAFEARRAY(BSTR) *keylist, [out] pEpDecryptFlags* flags, [out, retval] pEpRating *rating);
+    HRESULT EncryptMessage(
+        [in] struct TextMessage *src,
+        [out] struct TextMessage * dst,
+        [in] SAFEARRAY(BSTR) extra,
+        [in, defaultvalue(pEpEncryptFlagsDefault)] pEpEncryptFlags flags);
+
+    HRESULT DecryptMessage(
+        [in] struct TextMessage *src,
+        [out] struct TextMessage * dst,
+        [out] SAFEARRAY(BSTR) *keylist,
+        [out] pEpDecryptFlags* flags,
+        [out, retval] pEpRating *rating);
 
     HRESULT OutgoingMessageRating([in] struct TextMessage *msg, [out, retval] pEpRating * pVal);
     HRESULT IdentityRating([in] struct pEpIdentity * ident, [out, retval] pEpRating * pVal);
@@ -293,7 +303,7 @@ interface IpEpEngine2 : IpEpEngine
         [in] struct pEpIdentity* target_id,
         [in] struct TextMessage* src, 
         [out] struct TextMessage* dst,
-        [in, defaultvalue(pEpEncryptFlagsNone)] pEpEncryptFlags flags
+        [in, defaultvalue(pEpEncryptFlagsDefault)] pEpEncryptFlags flags
     );
 };
 
