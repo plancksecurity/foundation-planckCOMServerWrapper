@@ -207,12 +207,17 @@ interface IpEpEngine : IUnknown {
     } pEpColor;
 
     typedef [v1_enum] enum pEpEncryptFlags {
-        pEpEncryptFlagsDefault = 0,
+        pEpEncryptFlagDefault = 0,
         pEpEncryptFlagForceEncryption = 0x1,
 
         // This flag is for special uses and should not be used
         // by normal pEp clients!
-        pEpEncryptFlagsForceUnsigned = 0x2,
+        pEpEncryptFlagForceUnsigned = 0x2,
+
+        // This flag is for special uses and should not be used
+        // by normal pEp clients!
+        pEpEncryptFlagForceNoAttachedKey = 0x4,
+
     } pEpEncryptFlags;
 
     typedef [v1_enum] enum pEpDecryptFlags {
@@ -263,7 +268,7 @@ interface IpEpEngine : IUnknown {
         [in] struct TextMessage *src,
         [out] struct TextMessage * dst,
         [in] SAFEARRAY(BSTR) extra,
-        [in, defaultvalue(pEpEncryptFlagsDefault)] pEpEncryptFlags flags);
+        [in, defaultvalue(pEpEncryptFlagDefault)] pEpEncryptFlags flags);
 
     HRESULT DecryptMessage(
         [in] struct TextMessage *src,
@@ -303,7 +308,7 @@ interface IpEpEngine2 : IpEpEngine
         [in] struct pEpIdentity* target_id,
         [in] struct TextMessage* src, 
         [out] struct TextMessage* dst,
-        [in, defaultvalue(pEpEncryptFlagsDefault)] pEpEncryptFlags flags
+        [in, defaultvalue(pEpEncryptFlagDefault)] pEpEncryptFlags flags
     );
 };
 
