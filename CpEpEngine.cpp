@@ -1277,6 +1277,19 @@ void * CpEpEngine::retrieve_next_sync_msg(void * management, time_t *timeout)
             {
                 *timeout = 1; // Signal timeout
                 return NULL;
+            } 
+            else 
+            {
+                auto now = std::chrono::steady_clock::now()
+                if (now < end_time) 
+                {
+                    std::chrono::duration<time_t> remaining_seconds = end_time - now;
+                    *timeout = remaining_seconds.count();
+                } 
+                else 
+                {
+                    *timeout = 0;
+                }
             }
         }
     }
