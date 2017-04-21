@@ -1284,8 +1284,7 @@ void * CpEpEngine::retrieve_next_sync_msg(void * management, time_t *timeout)
 
                 if (now < end_time) 
                 {
-                    std::chrono::seconds remaining = end_time - now;
-                    *timeout = remaining.count();
+                    *timeout = std::chrono::duration_cast<std::chrono::seconds>(end_time - now).count();
                 } 
                 else 
                 {
