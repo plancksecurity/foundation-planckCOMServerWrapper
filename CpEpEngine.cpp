@@ -1263,7 +1263,7 @@ void * CpEpEngine::retrieve_next_sync_msg(void * management, time_t *timeout)
         me->notify_handshake_deliver_result();
 
     if (timeout && *timeout) {
-        auto end_time = std::chrono::steady_clock::now()
+        std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now()
             + std::chrono::seconds(*timeout);
 
         while (me->keysync_queue.empty() && !me->keysync_abort_requested)
@@ -1277,6 +1277,19 @@ void * CpEpEngine::retrieve_next_sync_msg(void * management, time_t *timeout)
             {
                 *timeout = 1; // Signal timeout
                 return NULL;
+            } 
+            else 
+            {
+                std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+
+                if (now < end_time) 
+                {
+                    *timeout = std::chrono::duration_cast<std::chrono::seconds>(end_time - now).count();
+                } 
+                else 
+                {
+                    *timeout = 0;
+                }
             }
         }
     }
