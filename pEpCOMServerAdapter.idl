@@ -286,6 +286,12 @@ interface IpEpEngine : IUnknown {
         [out] pEpDecryptFlags* flags,
         [out, retval] pEpRating *rating);
 
+    HRESULT ReEvaluateMessageRating(
+        [in] struct TextMessage *src,
+        [in] SAFEARRAY(BSTR) x_keylist,
+        [in] pEpRating x_enc_status,
+        [out, retval] pEpRating *rating);
+
     HRESULT OutgoingMessageRating([in] struct TextMessage *msg, [out, retval] pEpRating * pVal);
     HRESULT IdentityRating([in] struct pEpIdentity * ident, [out, retval] pEpRating * pVal);
     HRESULT ColorFromRating([in] pEpRating rating, [out, retval] pEpColor* pVal);

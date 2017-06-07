@@ -210,6 +210,7 @@ public:
 
     STDMETHOD(EncryptMessage)(TextMessage * src, TextMessage * dst, SAFEARRAY * extra, pEpEncryptFlags flags);
     STDMETHOD(DecryptMessage)(TextMessage * src, TextMessage * dst, SAFEARRAY ** keylist, pEpDecryptFlags* flags, pEpRating *rating);
+    STDMETHOD(ReEvaluateMessageRating)(TextMessage * msg, SAFEARRAY * x_keylist, pEpRating x_enc_status, pEpRating *rating);
     STDMETHOD(OutgoingMessageRating)(TextMessage *msg, pEpRating * pVal);
     STDMETHOD(IdentityRating)(pEpIdentity * ident, pEpRating * pVal);
 	STDMETHOD(ColorFromRating)(pEpRating rating, pEpColor * pVal);

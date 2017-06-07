@@ -944,6 +944,31 @@ STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SA
     return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::ReEvaluateMessageRating(TextMessage * msg, SAFEARRAY * x_keylist, pEpRating x_enc_status, pEpRating *rating)
+{
+    assert(msg);
+    assert(x_keylist);
+    assert(x_enc_status != PEP_rating_undefined);
+    assert(rating);
+
+    if (!(msg && x_keylist && x_enc_status != PEP_rating_undefined && rating))
+        return E_INVALIDARG;
+
+    *rating = pEpRatingUndefined;
+
+    ::message *_msg = text_message_to_C(msg);
+    ::stringlist_t *_keylist = new_stringlist(x_keylist);
+    ::PEP_rating _rating = PEP_rating_undefined;
+
+    PEP_STATUS status = ::re_evaluate_message_rating(get_session(), _msg, _keylist, x_enc_status, &_rating);
+
+    ::free_message(_msg);
+
+    *rating = (pEpRating)_rating;
+
+    return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::OutgoingMessageRating(TextMessage *msg, pEpRating * pVal)
 {
     assert(msg);
