@@ -962,6 +962,7 @@ STDMETHODIMP CpEpEngine::ReEvaluateMessageRating(TextMessage * msg, SAFEARRAY * 
 
     PEP_STATUS status = ::re_evaluate_message_rating(get_session(), _msg, _keylist, (PEP_rating)x_enc_status, &_rating);
 
+    ::free_stringlist(x_keylist);
     ::free_message(_msg);
 
     *rating = (pEpRating)_rating;
