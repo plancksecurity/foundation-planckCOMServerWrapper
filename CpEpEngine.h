@@ -197,7 +197,7 @@ public:
     STDMETHOD(KeyMistrusted)(struct pEpIdentity *ident);
     STDMETHOD(KeyResetTrust)(struct pEpIdentity *ident);
     STDMETHOD(TrustPersonalKey)(struct pEpIdentity *ident, struct pEpIdentity *result);
-	STDMETHOD(OwnIdentitiesRetrieve)(LPSAFEARRAY* own_identities);
+	STDMETHOD(OwnIdentitiesRetrieve)(LPSAFEARRAY* ownIdentities);
 
     // Blacklist API
 
@@ -210,13 +210,13 @@ public:
 
     STDMETHOD(EncryptMessage)(TextMessage * src, TextMessage * dst, SAFEARRAY * extra, pEpEncryptFlags flags);
     STDMETHOD(DecryptMessage)(TextMessage * src, TextMessage * dst, SAFEARRAY ** keylist, pEpDecryptFlags* flags, pEpRating *rating);
-    STDMETHOD(ReEvaluateMessageRating)(TextMessage * msg, SAFEARRAY * x_keylist, pEpRating x_enc_status, pEpRating *rating);
+    STDMETHOD(ReEvaluateMessageRating)(TextMessage * msg, SAFEARRAY * x_KeyList, pEpRating x_EncStatus, pEpRating *rating);
     STDMETHOD(OutgoingMessageRating)(TextMessage *msg, pEpRating * pVal);
     STDMETHOD(IdentityRating)(pEpIdentity * ident, pEpRating * pVal);
 	STDMETHOD(ColorFromRating)(pEpRating rating, pEpColor * pVal);
 
     STDMETHOD(EncryptMessageForSelf)(
-        pEpIdentity * target_id, 
+        pEpIdentity * targetId, 
         TextMessage* src,
         TextMessage *dst,
         pEpEncryptFlags flags
@@ -233,12 +233,6 @@ public:
 protected:
 	HRESULT Fire_MessageToSend(
 		/* [in] */ struct TextMessage *msg);
-
-	HRESULT Fire_NotifyHandshake(
-		/* [in] */ struct pEpIdentity *self,
-		/* [in] */ struct pEpIdentity *partner,
-		/* [in] */ SyncHandshakeSignal signal,
-		/* [retval][out] */ SyncHandshakeResult *result);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)

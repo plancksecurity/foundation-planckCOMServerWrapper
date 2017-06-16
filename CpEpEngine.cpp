@@ -863,18 +863,18 @@ STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SA
 }
 
 
-STDMETHODIMP CpEpEngine::EncryptMessageForSelf(pEpIdentity * target_id, TextMessage * src, TextMessage * dst, pEpEncryptFlags flags)
+STDMETHODIMP CpEpEngine::EncryptMessageForSelf(pEpIdentity * targetId, TextMessage * src, TextMessage * dst, pEpEncryptFlags flags)
 {
-    assert(target_id);
+    assert(targetId);
     assert(src);
     assert(dst);
 
-    if (!(target_id && src && dst))
+    if (!(targetId && src && dst))
         return E_INVALIDARG;
 
     PEP_encrypt_flags_t engineFlags = (PEP_encrypt_flags_t)flags;
 
-    ::pEp_identity *_target_id = new_identity(target_id);
+    ::pEp_identity *_target_id = new_identity(targetId);
 
     ::message *_src = text_message_to_C(src);
 
@@ -944,25 +944,25 @@ STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SA
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::ReEvaluateMessageRating(TextMessage * msg, SAFEARRAY * x_keylist, pEpRating x_enc_status, pEpRating *rating)
+STDMETHODIMP CpEpEngine::ReEvaluateMessageRating(TextMessage * msg, SAFEARRAY * x_KeyList, pEpRating x_EncStatus, pEpRating *rating)
 {
     assert(msg);
-    assert(x_keylist);
-    assert(x_enc_status != PEP_rating_undefined);
+    assert(x_KeyList);
+    assert(x_EncStatus != PEP_rating_undefined);
     assert(rating);
 
-    if (!(msg && x_keylist && x_enc_status != PEP_rating_undefined && rating))
+    if (!(msg && x_KeyList && x_EncStatus != PEP_rating_undefined && rating))
         return E_INVALIDARG;
 
     *rating = pEpRatingUndefined;
 
     ::message *_msg = text_message_to_C(msg);
-    ::stringlist_t *_keylist = new_stringlist(x_keylist);
+    ::stringlist_t *_keylist = new_stringlist(x_KeyList);
     ::PEP_rating _rating = PEP_rating_undefined;
 
-    PEP_STATUS status = ::re_evaluate_message_rating(get_session(), _msg, _keylist, (PEP_rating)x_enc_status, &_rating);
+    PEP_STATUS status = ::re_evaluate_message_rating(get_session(), _msg, _keylist, (PEP_rating)x_EncStatus, &_rating);
 
-    ::free_stringlist(x_keylist);
+    ::free_stringlist(_keylist);
     ::free_message(_msg);
 
     *rating = (pEpRating)_rating;
@@ -1035,13 +1035,13 @@ STDMETHODIMP CpEpEngine::ColorFromRating(pEpRating rating, pEpColor * pVal)
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::OwnIdentitiesRetrieve(LPSAFEARRAY* own_identities)
+STDMETHODIMP CpEpEngine::OwnIdentitiesRetrieve(LPSAFEARRAY* ownIdentities)
 {
-    assert(own_identities);
-    if (!own_identities)
+    assert(ownIdentities);
+    if (!ownIdentities)
         return E_INVALIDARG;
 
-    *own_identities = nullptr;
+    *ownIdentities = nullptr;
 
     ::identity_list *il = nullptr;
     PEP_STATUS status = ::own_identities_retrieve(get_session(), &il);
@@ -1071,7 +1071,7 @@ STDMETHODIMP CpEpEngine::OwnIdentitiesRetrieve(LPSAFEARRAY* own_identities)
     }
     free_identity_list(il);
 
-    *own_identities = _own_identities;
+    *ownIdentities = _own_identities;
     return S_OK;
 }
 
