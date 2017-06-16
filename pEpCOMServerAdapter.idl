@@ -176,7 +176,7 @@ interface IpEpEngine : IUnknown {
     HRESULT KeyMistrusted([in] struct pEpIdentity *ident);
     HRESULT KeyResetTrust([in] struct pEpIdentity *ident);
     HRESULT TrustPersonalKey([in] struct pEpIdentity *ident, [out, retval] struct pEpIdentity *result);
-    HRESULT OwnIdentitiesRetrieve([out, retval] SAFEARRAY(struct pEpIdentity)* own_identities);
+    HRESULT OwnIdentitiesRetrieve([out, retval] SAFEARRAY(struct pEpIdentity)* ownIdentities);
 
     // Blacklist API
 
@@ -314,10 +314,17 @@ interface IpEpEngine2 : IpEpEngine
     );
 
     HRESULT EncryptMessageForSelf(
-        [in] struct pEpIdentity* target_id,
+        [in] struct pEpIdentity* targetId,
         [in] struct TextMessage* src, 
         [out] struct TextMessage* dst,
         [in, defaultvalue(pEpEncryptFlagDefault)] pEpEncryptFlags flags
+    );
+
+    HRESULT ReEvaluateMessageRating(
+        [in] struct TextMessage *src,
+        [in] SAFEARRAY(BSTR) x_KeyList, // referring to X-KeyList mail header
+        [in] pEpRating x_EncStatus, // referring to X-EncStatus mail header
+        [out, retval] pEpRating *rating
     );
 };
 
