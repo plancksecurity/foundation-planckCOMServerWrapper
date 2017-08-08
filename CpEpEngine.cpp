@@ -947,11 +947,10 @@ STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SA
 STDMETHODIMP CpEpEngine::ReEvaluateMessageRating(TextMessage * msg, SAFEARRAY * x_KeyList, pEpRating x_EncStatus, pEpRating *rating)
 {
     assert(msg);
-    assert(x_KeyList);
     assert(x_EncStatus != PEP_rating_undefined);
     assert(rating);
 
-    if (!(msg && x_KeyList && x_EncStatus != PEP_rating_undefined && rating))
+    if (!(msg && x_EncStatus != PEP_rating_undefined && rating))
         return E_INVALIDARG;
 
     *rating = pEpRatingUndefined;
