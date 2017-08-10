@@ -16,7 +16,6 @@ namespace pEp {
             string username;
             pEpComType comm_type;
             string lang;
-            bool me;
 			int flags;
 
             pEp_identity_cpp(
@@ -26,7 +25,7 @@ namespace pEp {
                 string _username = string(),
                 pEpComType _comm_type = pEpCtUnknown,
                 string _lang = string()
-                ) : address(_address), fpr(_fpr), user_id(_user_id), username(_username), comm_type(_comm_type), lang(_lang), me(false)
+                ) : address(_address), fpr(_fpr), user_id(_user_id), username(_username), comm_type(_comm_type), lang(_lang)
             { }
 
             pEp_identity_cpp(const ::pEp_identity *_ident);

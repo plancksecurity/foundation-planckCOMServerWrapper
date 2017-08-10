@@ -6,7 +6,6 @@ using namespace ATL;
 namespace pEp {
     namespace utility {
         pEp_identity_cpp::pEp_identity_cpp(const ::pEp_identity *_ident)
-            : me(false)
         {
 			if (!_ident)
 				return;
@@ -25,7 +24,6 @@ namespace pEp {
         }
 
         pEp_identity_cpp::pEp_identity_cpp(const pEpIdentity *_ident)
-            : me(false)
         {
 			if (!_ident)
 				return;
@@ -52,7 +50,6 @@ namespace pEp {
                 throw bad_alloc();
 
             _ident->comm_type = (::PEP_comm_type) this->comm_type;
-            _ident->me = this->me;
 
             assert(this->lang.size() == 0 || this->lang.size() == 2);
 
