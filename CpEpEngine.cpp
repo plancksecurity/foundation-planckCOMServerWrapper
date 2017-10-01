@@ -2,11 +2,13 @@
 
 #include "stdafx.h"
 #include "CpEpEngine.h"
+#include <mutex>
 
 using namespace std;
 using namespace pEp::utility;
 
 // CpEpEngine
+std::mutex CpEpEngine::init_mutex;
 
 STDMETHODIMP CpEpEngine::InterfaceSupportsErrorInfo(REFIID riid)
 {
@@ -1143,9 +1145,12 @@ void CpEpEngine::start_keysync()
     keysync_abort_requested = false;
 
     // Init our keysync session
-    PEP_STATUS status = ::init(&keysync_session);
-    ::register_sync_callbacks(keysync_session, (void*)this, messageToSend, notifyHandshake, inject_sync_msg, retrieve_next_sync_msg);
-    assert(status == PEP_STATUS_OK);
+	{ // begin lock scope
+		std::lock_guard<std::mutex> lock(init_mutex);
+		PEP_STATUS status = ::init(&keysync_session);
+		::register_sync_callbacks(keysync_session, (void*)this, messageToSend, notifyHandshake, inject_sync_msg, retrieve_next_sync_msg);
+		assert(status == PEP_STATUS_OK);
+	} // end lock scope
 
     attach_sync_session(get_session(), keysync_session);
 
@@ -1225,6 +1230,8 @@ void CpEpEngine::stop_keysync()
 
     ::detach_sync_session(get_session());
     ::unregister_sync_callbacks(keysync_session);
+
+	std::lock_guard<std::mutex> releaselock(init_mutex);
     release(keysync_session);
     keysync_session = NULL;
 }
