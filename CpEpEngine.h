@@ -8,6 +8,7 @@
 #include "utf8_helper.h"
 #include "pEp_utility.h"
 #include <queue>
+#include <mutex>
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
@@ -17,7 +18,6 @@ using namespace ATL;
 using namespace utility;
 using namespace pEp::utility;
 
-
 // CpEpEngine
 
 class ATL_NO_VTABLE CpEpEngine :
@@ -26,14 +26,17 @@ class ATL_NO_VTABLE CpEpEngine :
 	public ISupportErrorInfo,
 	public IpEpEngine2
 {
+
 protected:
     static int examine_identity(pEp_identity *ident, void *management);
 
 public:
     CpEpEngine() : keymanagement_thread(NULL), identity_queue(NULL), verbose_mode(false)
 	{
-        PEP_STATUS status = ::init(&m_session);
-        assert(status == PEP_STATUS_OK);
+		std::lock_guard<std::mutex> lock(init_mutex);
+		PEP_STATUS status = ::init(&m_session);
+		assert(status == PEP_STATUS_OK);
+
         ::register_examine_function(m_session, CpEpEngine::examine_identity, (void *)this);
         ::log_event(m_session, "Startup", "pEp COM Adapter", NULL, NULL);
     }
@@ -43,7 +46,8 @@ public:
         stop_keysync();
         StopKeyserverLookup();
         ::log_event(m_session, "Shutdown", "pEp COM Adapter", NULL, NULL);
-        ::release(m_session);
+		std::lock_guard<std::mutex> lock(init_mutex);
+		::release(m_session);
     }
 
 DECLARE_REGISTRY_RESOURCEID(IDR_PEPENGINE)
@@ -126,6 +130,7 @@ private:
     thread *keymanagement_thread;
     bool verbose_mode;
 
+
 	IpEpEngineCallbacks* client_callbacks = NULL;
     IpEpEngineCallbacks* client_callbacks_on_sync_thread = NULL;
     IpEpEngineCallbacks2* client_callbacks2_on_sync_thread = NULL;
@@ -137,6 +142,8 @@ private:
     void start_keysync();
     static void do_keysync_in_thread(CpEpEngine* self, LPSTREAM marshaled_callbacks);
     void stop_keysync();
+
+	static std::mutex init_mutex;
 
     std::recursive_mutex keysync_mutex;
     std::condition_variable_any keysync_condition;
