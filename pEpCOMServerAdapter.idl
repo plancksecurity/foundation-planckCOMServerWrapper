@@ -326,6 +326,8 @@ interface IpEpEngine2 : IpEpEngine
         [in] pEpRating x_EncStatus, // referring to X-EncStatus mail header
         [out, retval] pEpRating *rating
     );
+
+	HRESULT UndoLastMistrust();
 };
 
 [

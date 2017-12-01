@@ -605,6 +605,19 @@ STDMETHODIMP CpEpEngine::KeyMistrusted(struct pEpIdentity *ident)
     return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::UndoLastMistrust()
+{
+	PEP_STATUS status = ::undo_last_mistrust(get_session());
+
+	if (status == PEP_CANNOT_FIND_IDENTITY)
+		return FAIL(L"Cannot find identity!", status);
+
+	if (status != ::PEP_STATUS_OK)
+		return FAIL(L"cannot revoke compromized key", status);
+
+	return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::KeyResetTrust(struct pEpIdentity *ident)
 {
     ::pEp_identity *_ident;

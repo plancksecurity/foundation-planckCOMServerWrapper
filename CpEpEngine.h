@@ -237,6 +237,8 @@ public:
     // PGP compatibility functions
     STDMETHOD(OpenPGPListKeyinfo)(BSTR search_pattern, LPSAFEARRAY* keyinfo_list);
 
+	STDMETHOD(UndoLastMistrust)();
+
 protected:
 	HRESULT Fire_MessageToSend(
 		/* [in] */ struct TextMessage *msg);
