@@ -304,6 +304,15 @@ interface IpEpEngine : IUnknown {
 ]
 interface IpEpEngine2 : IpEpEngine
 {
+    typedef [v1_enum] enum pEpEncFormat {
+        pEpEncNone = 0,                       // message is not encrypted
+        pEpEncPieces,                         // inline PGP + PGP extensions
+        pEpEncSMime,                          // RFC5751
+        pEpEncPgpMime,                        // RFC3156
+        pEpEncPep,                            // pEp encryption format
+        pEpEncPgpMimeOutlook1                 // Message B0rken by Outlook type 1
+    } pEpEncFormat;
+
     HRESULT GetMessageTrustwords(
         [in] struct TextMessage *msg,
         [in] struct pEpIdentity * receivedBy,
@@ -327,7 +336,17 @@ interface IpEpEngine2 : IpEpEngine
         [out, retval] pEpRating *rating
     );
 
-	HRESULT UndoLastMistrust();
+    HRESULT UndoLastMistrust();
+
+    HRESULT EncryptMessage2(
+        [in] struct TextMessage *src,
+        [out] struct TextMessage * dst,
+        [in] SAFEARRAY(BSTR) extra,
+        [in, defaultvalue(pEpEncryptFlagDefault)] pEpEncryptFlags flags,
+        // Use pEpEncFormat.pEpEncNone for unencrypted, outgoing messages.
+        // Default is pEpEncFormat.pEpEncPep, all other formats are only 
+        // for compatibility and not intended for normal use.
+        [in, defaultvalue(pEpEncPep)] pEpEncFormat encFormat);
 };
 
 [

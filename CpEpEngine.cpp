@@ -831,6 +831,11 @@ HRESULT CpEpEngine::error(_bstr_t msg, PEP_STATUS status)
 
 STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SAFEARRAY * extra, pEpEncryptFlags flags)
 {
+	return EncryptMessage2(src, dst, extra, flags, pEpEncPep);
+}
+
+STDMETHODIMP CpEpEngine::EncryptMessage2(TextMessage * src, TextMessage * dst, SAFEARRAY * extra, pEpEncryptFlags flags, pEpEncFormat encFormat)
+{
     assert(src);
     assert(dst);
 
@@ -839,16 +844,19 @@ STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SA
 
     ::message *_src = text_message_to_C(src);
 
+	_PEP_enc_format _encFormat = (_PEP_enc_format)encFormat;
+
     // COM-19: Initialize msg_dst to NULL, or we end up calling
     // free_message() below with a pointer to random garbage in
     // case of an error in encrypt_message().
     ::message *msg_dst = NULL;
     ::stringlist_t *_extra = new_stringlist(extra); // can cope with NULL
 
-    // _PEP_enc_format is intentionally hardcoded to PEP_enc_PEP:
-    // 2016-10-02 14:10 < fdik> schabi: actually, all adapters now must use PEP_enc_PEP
+    // _PEP_enc_format used to be intentionally hardcoded to PEP_enc_PEP:
+    // Since COM-74, this has been changed to an explicit parameter, to allow the engine to attach
+	// the keys and headers to outgoing, unencrypted messages.
     PEP_encrypt_flags_t engineFlags = (PEP_encrypt_flags_t)flags;
-    PEP_STATUS status = ::encrypt_message(get_session(), _src, _extra, &msg_dst, PEP_enc_PEP, engineFlags);
+    PEP_STATUS status = ::encrypt_message(get_session(), _src, _extra, &msg_dst, _encFormat, engineFlags);
     ::free_stringlist(_extra);
 
     if (status == PEP_STATUS_OK)

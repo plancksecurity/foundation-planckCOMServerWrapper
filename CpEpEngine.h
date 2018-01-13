@@ -22,9 +22,9 @@ using namespace pEp::utility;
 
 class ATL_NO_VTABLE CpEpEngine :
     public CComObjectRootEx<CComObjectThreadModel>,
-	public CComCoClass<CpEpEngine, &CLSID_pEpEngine>,
-	public ISupportErrorInfo,
-	public IpEpEngine2
+    public CComCoClass<CpEpEngine, &CLSID_pEpEngine>,
+    public ISupportErrorInfo,
+    public IpEpEngine2
 {
 
 protected:
@@ -32,10 +32,10 @@ protected:
 
 public:
     CpEpEngine() : keymanagement_thread(NULL), identity_queue(NULL), verbose_mode(false)
-	{
-		std::lock_guard<std::mutex> lock(init_mutex);
-		PEP_STATUS status = ::init(&m_session);
-		assert(status == PEP_STATUS_OK);
+    {
+        std::lock_guard<std::mutex> lock(init_mutex);
+        PEP_STATUS status = ::init(&m_session);
+        assert(status == PEP_STATUS_OK);
 
         ::register_examine_function(m_session, CpEpEngine::examine_identity, (void *)this);
         ::log_event(m_session, "Startup", "pEp COM Adapter", NULL, NULL);
@@ -46,8 +46,8 @@ public:
         stop_keysync();
         StopKeyserverLookup();
         ::log_event(m_session, "Shutdown", "pEp COM Adapter", NULL, NULL);
-		std::lock_guard<std::mutex> lock(init_mutex);
-		::release(m_session);
+        std::lock_guard<std::mutex> lock(init_mutex);
+        ::release(m_session);
     }
 
 DECLARE_REGISTRY_RESOURCEID(IDR_PEPENGINE)
@@ -61,19 +61,19 @@ BEGIN_COM_MAP(CpEpEngine)
 END_COM_MAP()
 
 // ISupportsErrorInfo
-	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
+    STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
 
-	DECLARE_PROTECT_FINAL_CONSTRUCT()
+    DECLARE_PROTECT_FINAL_CONSTRUCT()
 
-	HRESULT FinalConstruct()
-	{
-		return S_OK;
-	}
+    HRESULT FinalConstruct()
+    {
+        return S_OK;
+    }
 
-	void FinalRelease()
-	{
-	}
+    void FinalRelease()
+    {
+    }
 
 
 protected:
@@ -131,19 +131,19 @@ private:
     bool verbose_mode;
 
 
-	IpEpEngineCallbacks* client_callbacks = NULL;
+    IpEpEngineCallbacks* client_callbacks = NULL;
     IpEpEngineCallbacks* client_callbacks_on_sync_thread = NULL;
     IpEpEngineCallbacks2* client_callbacks2_on_sync_thread = NULL;
     bool client_last_signalled_polling_state = true;
 
-	// Keysync members
+    // Keysync members
     static int inject_sync_msg(void *msg, void* management);
     static void* retrieve_next_sync_msg(void* management, time_t *timeout);
     void start_keysync();
     static void do_keysync_in_thread(CpEpEngine* self, LPSTREAM marshaled_callbacks);
     void stop_keysync();
 
-	static std::mutex init_mutex;
+    static std::mutex init_mutex;
 
     std::recursive_mutex keysync_mutex;
     std::condition_variable_any keysync_condition;
@@ -191,8 +191,8 @@ public:
     STDMETHOD(GetCrashdumpLog)(LONG maxlines, BSTR * log);
     STDMETHOD(GetEngineVersion)(BSTR * engineVersion);
     STDMETHOD(GetLanguageList)(BSTR * languages);
-	STDMETHOD(SetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
-	STDMETHOD(UnsetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
+    STDMETHOD(SetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
+    STDMETHOD(UnsetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
 
     // keymanagement API
 
@@ -204,7 +204,7 @@ public:
     STDMETHOD(KeyMistrusted)(struct pEpIdentity *ident);
     STDMETHOD(KeyResetTrust)(struct pEpIdentity *ident);
     STDMETHOD(TrustPersonalKey)(struct pEpIdentity *ident, struct pEpIdentity *result);
-	STDMETHOD(OwnIdentitiesRetrieve)(LPSAFEARRAY* ownIdentities);
+    STDMETHOD(OwnIdentitiesRetrieve)(LPSAFEARRAY* ownIdentities);
 
     // Blacklist API
 
@@ -220,7 +220,7 @@ public:
     STDMETHOD(ReEvaluateMessageRating)(TextMessage * msg, SAFEARRAY * x_KeyList, pEpRating x_EncStatus, pEpRating *rating);
     STDMETHOD(OutgoingMessageRating)(TextMessage *msg, pEpRating * pVal);
     STDMETHOD(IdentityRating)(pEpIdentity * ident, pEpRating * pVal);
-	STDMETHOD(ColorFromRating)(pEpRating rating, pEpColor * pVal);
+    STDMETHOD(ColorFromRating)(pEpRating rating, pEpColor * pVal);
 
     STDMETHOD(EncryptMessageForSelf)(
         pEpIdentity * targetId, 
@@ -229,19 +229,26 @@ public:
         pEpEncryptFlags flags
         );
 
-	// Event callbacks
+    STDMETHOD(EncryptMessage2)(
+        /* [in] */ struct TextMessage *src,
+        /* [out] */ struct TextMessage *dst,
+        /* [in] */ SAFEARRAY * extra,
+        /* [defaultvalue][in] */ pEpEncryptFlags flags = pEpEncryptFlagDefault,
+        /* [defaultvalue][in] */ pEpEncFormat encFormat = pEpEncPep);
 
-	STDMETHOD(RegisterCallbacks)(IpEpEngineCallbacks *new_callback);
-	STDMETHOD(UnregisterCallbacks)();
+    // Event callbacks
+
+    STDMETHOD(RegisterCallbacks)(IpEpEngineCallbacks *new_callback);
+    STDMETHOD(UnregisterCallbacks)();
 
     // PGP compatibility functions
     STDMETHOD(OpenPGPListKeyinfo)(BSTR search_pattern, LPSAFEARRAY* keyinfo_list);
 
-	STDMETHOD(UndoLastMistrust)();
+    STDMETHOD(UndoLastMistrust)();
 
 protected:
-	HRESULT Fire_MessageToSend(
-		/* [in] */ struct TextMessage *msg);
+    HRESULT Fire_MessageToSend(
+        /* [in] */ struct TextMessage *msg);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)
