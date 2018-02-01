@@ -8,6 +8,10 @@ using namespace std;
 using namespace pEp::utility;
 
 // CpEpEngine
+
+// the init_mutex protects our initialization and destruction
+// against a running keysync thread, and it ensures that the
+// keysync thread actually has finished before we're destructed.
 std::mutex CpEpEngine::init_mutex;
 
 STDMETHODIMP CpEpEngine::InterfaceSupportsErrorInfo(REFIID riid)
@@ -826,7 +830,7 @@ HRESULT CpEpEngine::error(_bstr_t msg, PEP_STATUS status)
     if (status == ::PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
 
-    return E_FAIL;
+    return MAKE_HRESULT(1, FACILITY_ITF, (0xFFFF & status));
 }
 
 STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SAFEARRAY * extra, pEpEncryptFlags flags)

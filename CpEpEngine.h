@@ -33,21 +33,20 @@ protected:
 public:
     CpEpEngine() : keymanagement_thread(NULL), identity_queue(NULL), verbose_mode(false)
 	{
-		std::lock_guard<std::mutex> lock(init_mutex);
-		PEP_STATUS status = ::init(&m_session);
-		assert(status == PEP_STATUS_OK);
-
-        ::register_examine_function(m_session, CpEpEngine::examine_identity, (void *)this);
-        ::log_event(m_session, "Startup", "pEp COM Adapter", NULL, NULL);
-    }
+		// See FinalConstruct() below for most initialization work, and an
+		// explanation why it had to be moved there...
+    }	
 
     ~CpEpEngine()
     {
         stop_keysync();
         StopKeyserverLookup();
-        ::log_event(m_session, "Shutdown", "pEp COM Adapter", NULL, NULL);
-		std::lock_guard<std::mutex> lock(init_mutex);
-		::release(m_session);
+		if (m_session) // may be zero when FinalConstruct failed to initialize the engine
+		{
+			::log_event(m_session, "Shutdown", "pEp COM Adapter", NULL, NULL);
+			std::lock_guard<std::mutex> lock(init_mutex);
+			::release(m_session);
+		}
     }
 
 DECLARE_REGISTRY_RESOURCEID(IDR_PEPENGINE)
@@ -63,11 +62,26 @@ END_COM_MAP()
 // ISupportsErrorInfo
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
-
 	DECLARE_PROTECT_FINAL_CONSTRUCT()
 
+	// Unfortunately, neither FAIL nor error() work in the constructor, as 
+	// CreateErrorInfo/SetErrorInfo cannot work when the instance is not constructed.
+	// AtlThrow works, but the exception is caught in CComCreator.CreateInstance, and
+	// unconditionally turned into E_OUTOFMEMORY. Thus, we need to do most constructor
+	// work in FinalConstruct. CreateErrorInfo/SetErrorInfo still won't work, but at least,
+	// we can return a meaningful HRESULT. Thus, we pack our PEP_STATUS into a custom HRESULT.	
 	HRESULT FinalConstruct()
 	{
+		std::lock_guard<std::mutex> lock(init_mutex);
+		PEP_STATUS status = ::init(&m_session);
+		assert(status == PEP_STATUS_OK);
+		if (status != PEP_STATUS_OK) {
+			HRESULT res = MAKE_HRESULT(1, FACILITY_ITF, (0xFFFF & status));
+			return res;
+		}
+
+		::register_examine_function(m_session, CpEpEngine::examine_identity, (void *)this);
+		::log_event(m_session, "Startup", "pEp COM Adapter", NULL, NULL);
 		return S_OK;
 	}
 
