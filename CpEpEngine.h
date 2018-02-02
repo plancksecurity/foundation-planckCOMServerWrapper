@@ -22,9 +22,9 @@ using namespace pEp::utility;
 
 class ATL_NO_VTABLE CpEpEngine :
     public CComObjectRootEx<CComObjectThreadModel>,
-	public CComCoClass<CpEpEngine, &CLSID_pEpEngine>,
-	public ISupportErrorInfo,
-	public IpEpEngine2
+    public CComCoClass<CpEpEngine, &CLSID_pEpEngine>,
+    public ISupportErrorInfo,
+    public IpEpEngine2
 {
 
 protected:
@@ -32,62 +32,62 @@ protected:
 
 public:
     CpEpEngine() : keymanagement_thread(NULL), identity_queue(NULL), verbose_mode(false)
-	{
-		// See FinalConstruct() below for most initialization work, and an
-		// explanation why it had to be moved there...
-    }	
+    {
+        // See FinalConstruct() below for most initialization work, and an
+        // explanation why it had to be moved there...
+    }
 
     ~CpEpEngine()
     {
         stop_keysync();
         StopKeyserverLookup();
-		if (m_session) // may be zero when FinalConstruct failed to initialize the engine
-		{
-			::log_event(m_session, "Shutdown", "pEp COM Adapter", NULL, NULL);
-			std::lock_guard<std::mutex> lock(init_mutex);
-			::release(m_session);
-		}
+        if (m_session) // may be zero when FinalConstruct failed to initialize the engine
+        {
+            ::log_event(m_session, "Shutdown", "pEp COM Adapter", NULL, NULL);
+            std::lock_guard<std::mutex> lock(init_mutex);
+            ::release(m_session);
+        }
     }
 
-DECLARE_REGISTRY_RESOURCEID(IDR_PEPENGINE)
+    DECLARE_REGISTRY_RESOURCEID(IDR_PEPENGINE)
 
-DECLARE_NOT_AGGREGATABLE(CpEpEngine)
+    DECLARE_NOT_AGGREGATABLE(CpEpEngine)
 
-BEGIN_COM_MAP(CpEpEngine)
-    COM_INTERFACE_ENTRY(IpEpEngine)
-    COM_INTERFACE_ENTRY(IpEpEngine2)
-    COM_INTERFACE_ENTRY(ISupportErrorInfo)
-END_COM_MAP()
+    BEGIN_COM_MAP(CpEpEngine)
+        COM_INTERFACE_ENTRY(IpEpEngine)
+        COM_INTERFACE_ENTRY(IpEpEngine2)
+        COM_INTERFACE_ENTRY(ISupportErrorInfo)
+    END_COM_MAP()
 
-// ISupportsErrorInfo
-	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
+    // ISupportsErrorInfo
+    STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
-	DECLARE_PROTECT_FINAL_CONSTRUCT()
+    DECLARE_PROTECT_FINAL_CONSTRUCT()
 
-	// Unfortunately, neither FAIL nor error() work in the constructor, as 
-	// CreateErrorInfo/SetErrorInfo cannot work when the instance is not constructed.
-	// AtlThrow works, but the exception is caught in CComCreator.CreateInstance, and
-	// unconditionally turned into E_OUTOFMEMORY. Thus, we need to do most constructor
-	// work in FinalConstruct. CreateErrorInfo/SetErrorInfo still won't work, but at least,
-	// we can return a meaningful HRESULT. Thus, we pack our PEP_STATUS into a custom HRESULT.	
-	HRESULT FinalConstruct()
-	{
-		std::lock_guard<std::mutex> lock(init_mutex);
-		PEP_STATUS status = ::init(&m_session);
-		assert(status == PEP_STATUS_OK);
-		if (status != PEP_STATUS_OK) {
-			HRESULT res = MAKE_HRESULT(1, FACILITY_ITF, (0xFFFF & status));
-			return res;
-		}
+    // Unfortunately, neither FAIL nor error() work in the constructor, as 
+    // CreateErrorInfo/SetErrorInfo cannot work when the instance is not constructed.
+    // AtlThrow works, but the exception is caught in CComCreator.CreateInstance, and
+    // unconditionally turned into E_OUTOFMEMORY. Thus, we need to do most constructor
+    // work in FinalConstruct. CreateErrorInfo/SetErrorInfo still won't work, but at least,
+    // we can return a meaningful HRESULT. Thus, we pack our PEP_STATUS into a custom HRESULT.	
+    HRESULT FinalConstruct()
+    {
+        std::lock_guard<std::mutex> lock(init_mutex);
+        PEP_STATUS status = ::init(&m_session);
+        assert(status == PEP_STATUS_OK);
+        if (status != PEP_STATUS_OK) {
+            HRESULT res = MAKE_HRESULT(1, FACILITY_ITF, (0xFFFF & status));
+            return res;
+        }
 
-		::register_examine_function(m_session, CpEpEngine::examine_identity, (void *)this);
-		::log_event(m_session, "Startup", "pEp COM Adapter", NULL, NULL);
-		return S_OK;
-	}
+        ::register_examine_function(m_session, CpEpEngine::examine_identity, (void *)this);
+        ::log_event(m_session, "Startup", "pEp COM Adapter", NULL, NULL);
+        return S_OK;
+    }
 
-	void FinalRelease()
-	{
-	}
+    void FinalRelease()
+    {
+    }
 
 
 protected:
@@ -145,19 +145,19 @@ private:
     bool verbose_mode;
 
 
-	IpEpEngineCallbacks* client_callbacks = NULL;
+    IpEpEngineCallbacks* client_callbacks = NULL;
     IpEpEngineCallbacks* client_callbacks_on_sync_thread = NULL;
     IpEpEngineCallbacks2* client_callbacks2_on_sync_thread = NULL;
     bool client_last_signalled_polling_state = true;
 
-	// Keysync members
+    // Keysync members
     static int inject_sync_msg(void *msg, void* management);
     static void* retrieve_next_sync_msg(void* management, time_t *timeout);
     void start_keysync();
     static void do_keysync_in_thread(CpEpEngine* self, LPSTREAM marshaled_callbacks);
     void stop_keysync();
 
-	static std::mutex init_mutex;
+    static std::mutex init_mutex;
 
     std::recursive_mutex keysync_mutex;
     std::condition_variable_any keysync_condition;
@@ -205,8 +205,8 @@ public:
     STDMETHOD(GetCrashdumpLog)(LONG maxlines, BSTR * log);
     STDMETHOD(GetEngineVersion)(BSTR * engineVersion);
     STDMETHOD(GetLanguageList)(BSTR * languages);
-	STDMETHOD(SetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
-	STDMETHOD(UnsetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
+    STDMETHOD(SetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
+    STDMETHOD(UnsetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
 
     // keymanagement API
 
@@ -218,7 +218,7 @@ public:
     STDMETHOD(KeyMistrusted)(struct pEpIdentity *ident);
     STDMETHOD(KeyResetTrust)(struct pEpIdentity *ident);
     STDMETHOD(TrustPersonalKey)(struct pEpIdentity *ident, struct pEpIdentity *result);
-	STDMETHOD(OwnIdentitiesRetrieve)(LPSAFEARRAY* ownIdentities);
+    STDMETHOD(OwnIdentitiesRetrieve)(LPSAFEARRAY* ownIdentities);
 
     // Blacklist API
 
@@ -234,28 +234,28 @@ public:
     STDMETHOD(ReEvaluateMessageRating)(TextMessage * msg, SAFEARRAY * x_KeyList, pEpRating x_EncStatus, pEpRating *rating);
     STDMETHOD(OutgoingMessageRating)(TextMessage *msg, pEpRating * pVal);
     STDMETHOD(IdentityRating)(pEpIdentity * ident, pEpRating * pVal);
-	STDMETHOD(ColorFromRating)(pEpRating rating, pEpColor * pVal);
+    STDMETHOD(ColorFromRating)(pEpRating rating, pEpColor * pVal);
 
     STDMETHOD(EncryptMessageForSelf)(
-        pEpIdentity * targetId, 
+        pEpIdentity * targetId,
         TextMessage* src,
         TextMessage *dst,
         pEpEncryptFlags flags
         );
 
-	// Event callbacks
+    // Event callbacks
 
-	STDMETHOD(RegisterCallbacks)(IpEpEngineCallbacks *new_callback);
-	STDMETHOD(UnregisterCallbacks)();
+    STDMETHOD(RegisterCallbacks)(IpEpEngineCallbacks *new_callback);
+    STDMETHOD(UnregisterCallbacks)();
 
     // PGP compatibility functions
     STDMETHOD(OpenPGPListKeyinfo)(BSTR search_pattern, LPSAFEARRAY* keyinfo_list);
 
-	STDMETHOD(UndoLastMistrust)();
+    STDMETHOD(UndoLastMistrust)();
 
 protected:
-	HRESULT Fire_MessageToSend(
-		/* [in] */ struct TextMessage *msg);
+    HRESULT Fire_MessageToSend(
+        /* [in] */ struct TextMessage *msg);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)

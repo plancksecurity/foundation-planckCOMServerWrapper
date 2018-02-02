@@ -48,9 +48,9 @@ namespace pEp {
         {
             if (bstr == NULL)
                 return "";
-            
+
             _bstr_t _bstr(bstr);
-            wstring wstr = (wchar_t *) _bstr;
+            wstring wstr = (wchar_t *)_bstr;
             _bstr.Detach();
 
             return utf8_string(wstr, norm);
@@ -90,7 +90,7 @@ namespace pEp {
             if (len == 0)
                 return NULL;
 
-            CComSafeArray<BSTR> sa_string_list((LONG) len);
+            CComSafeArray<BSTR> sa_string_list((LONG)len);
             LONG n = 0;
             for (const ::stringlist_t *k = stringlist; k && k->value; k = k->next) {
                 if (k->value) {
@@ -112,7 +112,7 @@ namespace pEp {
 
             CComSafeArray<BSTR> sa(safearray);
             int n_strings = 0;
-            ::stringlist_t *_stringlist = ::new_stringlist((const char *) NULL);
+            ::stringlist_t *_stringlist = ::new_stringlist((const char *)NULL);
             assert(_stringlist);
             if (_stringlist == NULL)
                 throw std::bad_alloc();

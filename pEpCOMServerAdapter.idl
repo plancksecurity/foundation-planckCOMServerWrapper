@@ -53,7 +53,7 @@ interface IpEpEngineCallbacks : IUnknown {
     nonextensible,
     pointer_default(unique)
 ]
-interface IpEpEngineCallbacks2 : IpEpEngineCallbacks 
+interface IpEpEngineCallbacks2 : IpEpEngineCallbacks
 {
     [id(3)] HRESULT NeedFastPolling([in] VARIANT_BOOL enableFastPolling);
 };
@@ -146,93 +146,93 @@ interface IpEpEngine : IUnknown {
         pEpCtpEp = 0xff
     } pEpComType;
 
-        typedef enum pEpStatus {
-                pEpStatusOk = 0,
+    typedef enum pEpStatus {
+        pEpStatusOk = 0,
 
-                pEpInitCannotLoadGpgme = 0x0110,
-                pEpInitGpgmeInitFailed = 0x0111,
-                pEpInitNoGpgHome = 0x0112,
-                pEpInitNetpgpInitFailed = 0x0113,
-                pEpInitCannotDetermineGpgVersion = 0x0114,
-                pEpInitUnsupportedGpgVersion = 0x0115,
-                pEpInitCannotConfigGpgAgent = 0x0116,
+        pEpInitCannotLoadGpgme = 0x0110,
+        pEpInitGpgmeInitFailed = 0x0111,
+        pEpInitNoGpgHome = 0x0112,
+        pEpInitNetpgpInitFailed = 0x0113,
+        pEpInitCannotDetermineGpgVersion = 0x0114,
+        pEpInitUnsupportedGpgVersion = 0x0115,
+        pEpInitCannotConfigGpgAgent = 0x0116,
 
-                pEpInitSqlite3WithoutMutex = 0x0120,
-                pEpInitCannotOpenDb = 0x0121,
-                pEpInitCannotOpenSystemDb = 0x0122,
+        pEpInitSqlite3WithoutMutex = 0x0120,
+        pEpInitCannotOpenDb = 0x0121,
+        pEpInitCannotOpenSystemDb = 0x0122,
 
-                pEpKeyNotFound = 0x0201,
-                pEpKeyHasAmbigName = 0x0202,
-                pEpGetKeyFailed = 0x0203,
-                pEpCannotExportKey = 0x0204,
-                pEpCannotEditKey = 0x0205,
-                pEpKeyUnsuitable = 0x0206,
+        pEpKeyNotFound = 0x0201,
+        pEpKeyHasAmbigName = 0x0202,
+        pEpGetKeyFailed = 0x0203,
+        pEpCannotExportKey = 0x0204,
+        pEpCannotEditKey = 0x0205,
+        pEpKeyUnsuitable = 0x0206,
 
-                pEpCannotFindIdentity = 0x0301,
-                pEpCannotSetPerson = 0x0381,
-                pEpCannotSetPgpKeypair = 0x0382,
-                pEpCannotSetIdentity = 0x0383,
-                pEpCannotSetTrust = 0x0384,
-                pEpKeyBlacklisted = 0x0385,
-                pEpCannotFindPerson = 0x0386,
+        pEpCannotFindIdentity = 0x0301,
+        pEpCannotSetPerson = 0x0381,
+        pEpCannotSetPgpKeypair = 0x0382,
+        pEpCannotSetIdentity = 0x0383,
+        pEpCannotSetTrust = 0x0384,
+        pEpKeyBlacklisted = 0x0385,
+        pEpCannotFindPerson = 0x0386,
 
-                pEpCannotFindAlias = 0x0391,
-                pEpCannotSetAlias = 0x0392,
+        pEpCannotFindAlias = 0x0391,
+        pEpCannotSetAlias = 0x0392,
 
-                pEpUnencrypted = 0x0400,
-                pEpVerified = 0x0401,
-                pEpDecrypted = 0x0402,
-                pEpDecryptedAndVerified = 0x0403,
-                pEpDecryptWrongFormat = 0x0404,
-                pEpDecryptNoKey = 0x0405,
-                pEpDecryptSignatureDoesNotMatch = 0x0406,
-                pEpVerifyNoKey = 0x0407,
-                pEpVerifiedAndTrusted = 0x0408,
-                pEpCannotDecryptUnknown = 0x04ff,
+        pEpUnencrypted = 0x0400,
+        pEpVerified = 0x0401,
+        pEpDecrypted = 0x0402,
+        pEpDecryptedAndVerified = 0x0403,
+        pEpDecryptWrongFormat = 0x0404,
+        pEpDecryptNoKey = 0x0405,
+        pEpDecryptSignatureDoesNotMatch = 0x0406,
+        pEpVerifyNoKey = 0x0407,
+        pEpVerifiedAndTrusted = 0x0408,
+        pEpCannotDecryptUnknown = 0x04ff,
 
-                pEpTrustwordNotFound = 0x0501,
-                pEpTrustwordsFprWrongLength = 0x0502,
-                pEpTrustwordsDuplicateFpr = 0x0503,
+        pEpTrustwordNotFound = 0x0501,
+        pEpTrustwordsFprWrongLength = 0x0502,
+        pEpTrustwordsDuplicateFpr = 0x0503,
 
-                pEpCannotCreateKey = 0x0601,
-                pEpCannotSendKey = 0x0602,
+        pEpCannotCreateKey = 0x0601,
+        pEpCannotSendKey = 0x0602,
 
-                pEpPhraseNotFound = 0x0701,
+        pEpPhraseNotFound = 0x0701,
 
-                pEpSendFunctionNotRegistered = 0x0801,
-                pEpContraintsViolated = 0x0802,
-                pEpCannotEncode = 0x0803,
+        pEpSendFunctionNotRegistered = 0x0801,
+        pEpContraintsViolated = 0x0802,
+        pEpCannotEncode = 0x0803,
 
-                pEpSyncNoNotifyCallback = 0x0901,
-                pEpSyncIllegalMessage = 0x0902,
-                pEpSyncNoInjectCallback = 0x0903,
+        pEpSyncNoNotifyCallback = 0x0901,
+        pEpSyncIllegalMessage = 0x0902,
+        pEpSyncNoInjectCallback = 0x0903,
 
-                pEpSequenceViolated = 0x0970,
-                pEpCannotIncreaseSequence = 0x0971,
-                pEpCannotSetSequenceValue = 0x0972,
-                pEpOwnSequence = 0x097f,
+        pEpSequenceViolated = 0x0970,
+        pEpCannotIncreaseSequence = 0x0971,
+        pEpCannotSetSequenceValue = 0x0972,
+        pEpOwnSequence = 0x097f,
 
-                pEpSyncStatemachineError = 0x0980,
-                pEpSyncNoTrust = 0x0981,
-                pEpStatemachineInvalidState = 0x0982,
-                pEpStatemachineInvalidEvent = 0x0983,
-                pEpStatemachineInvalidCondition = 0x0984,
-                pEpStatemachineInvalidAction = 0x0985,
-                pEpStatemachineInhibitedEvent = 0x0986,
+        pEpSyncStatemachineError = 0x0980,
+        pEpSyncNoTrust = 0x0981,
+        pEpStatemachineInvalidState = 0x0982,
+        pEpStatemachineInvalidEvent = 0x0983,
+        pEpStatemachineInvalidCondition = 0x0984,
+        pEpStatemachineInvalidAction = 0x0985,
+        pEpStatemachineInhibitedEvent = 0x0986,
 
-                pEpCommitFailed = 0xff01,
-                pEpMessageConsume = 0xff02,
-                pEpMessageIgnore = 0xff03,
+        pEpCommitFailed = 0xff01,
+        pEpMessageConsume = 0xff02,
+        pEpMessageIgnore = 0xff03,
 
-                pEpRecordNotFound = -6,
-                pEpCannotCreateTempFile = -5,
-                pEpIllegalValue = -4,
-                pEpBufferTooSmall = -3,
-                pEpOutOfMemory = -2,
-                pEpUnknownError = -1,
+        pEpRecordNotFound = -6,
+        pEpCannotCreateTempFile = -5,
+        pEpIllegalValue = -4,
+        pEpBufferTooSmall = -3,
+        pEpOutOfMemory = -2,
+        pEpUnknownError = -1,
 
-                pEpVersionMismatch = -7,
-        } pEpStatus;
+        pEpVersionMismatch = -7,
+    } pEpStatus;
 
     typedef [v1_enum] enum pEpIdentityFlags {
         pEpIdfNone = 0,
@@ -403,7 +403,7 @@ interface IpEpEngine2 : IpEpEngine
 
     HRESULT EncryptMessageForSelf(
         [in] struct pEpIdentity* targetId,
-        [in] struct TextMessage* src, 
+        [in] struct TextMessage* src,
         [out] struct TextMessage* dst,
         [in, defaultvalue(pEpEncryptFlagDefault)] pEpEncryptFlags flags
     );
@@ -415,7 +415,7 @@ interface IpEpEngine2 : IpEpEngine
         [out, retval] pEpRating *rating
     );
 
-        HRESULT UndoLastMistrust();
+    HRESULT UndoLastMistrust();
 };
 
 [

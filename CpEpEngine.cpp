@@ -611,15 +611,15 @@ STDMETHODIMP CpEpEngine::KeyMistrusted(struct pEpIdentity *ident)
 
 STDMETHODIMP CpEpEngine::UndoLastMistrust()
 {
-	PEP_STATUS status = ::undo_last_mistrust(get_session());
+    PEP_STATUS status = ::undo_last_mistrust(get_session());
 
-	if (status == PEP_CANNOT_FIND_IDENTITY)
-		return FAIL(L"Cannot find identity!", status);
+    if (status == PEP_CANNOT_FIND_IDENTITY)
+        return FAIL(L"Cannot find identity!", status);
 
-	if (status != ::PEP_STATUS_OK)
-		return FAIL(L"cannot revoke compromized key", status);
+    if (status != ::PEP_STATUS_OK)
+        return FAIL(L"cannot revoke compromized key", status);
 
-	return S_OK;
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::KeyResetTrust(struct pEpIdentity *ident)
@@ -1162,12 +1162,12 @@ void CpEpEngine::start_keysync()
     keysync_abort_requested = false;
 
     // Init our keysync session
-	{ // begin lock scope
-		std::lock_guard<std::mutex> lock(init_mutex);
-		PEP_STATUS status = ::init(&keysync_session);
-		::register_sync_callbacks(keysync_session, (void*)this, messageToSend, notifyHandshake, inject_sync_msg, retrieve_next_sync_msg);
-		assert(status == PEP_STATUS_OK);
-	} // end lock scope
+    { // begin lock scope
+        std::lock_guard<std::mutex> lock(init_mutex);
+        PEP_STATUS status = ::init(&keysync_session);
+        ::register_sync_callbacks(keysync_session, (void*)this, messageToSend, notifyHandshake, inject_sync_msg, retrieve_next_sync_msg);
+        assert(status == PEP_STATUS_OK);
+    } // end lock scope
 
     attach_sync_session(get_session(), keysync_session);
 
@@ -1248,7 +1248,7 @@ void CpEpEngine::stop_keysync()
     ::detach_sync_session(get_session());
     ::unregister_sync_callbacks(keysync_session);
 
-	std::lock_guard<std::mutex> releaselock(init_mutex);
+    std::lock_guard<std::mutex> releaselock(init_mutex);
     release(keysync_session);
     keysync_session = NULL;
 }
@@ -1326,16 +1326,16 @@ void * CpEpEngine::retrieve_next_sync_msg(void * management, time_t *timeout)
             {
                 *timeout = 1; // Signal timeout
                 return NULL;
-            } 
-            else 
+            }
+            else
             {
                 std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
 
-                if (now < end_time) 
+                if (now < end_time)
                 {
                     *timeout = std::chrono::duration_cast<std::chrono::seconds>(end_time - now).count();
-                } 
-                else 
+                }
+                else
                 {
                     *timeout = 0;
                 }
@@ -1522,7 +1522,7 @@ PEP_STATUS CpEpEngine::notifyHandshake(void * obj, pEp_identity *self, pEp_ident
 
             if (res != S_OK)
 
-            return PEP_STATUS_OK;
+                return PEP_STATUS_OK;
         }
 
         ::log_event(me->keysync_session, "Reentrant notify_handshake call!", "pEp COM Adapter", NULL, NULL);

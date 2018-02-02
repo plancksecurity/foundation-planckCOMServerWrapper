@@ -18,7 +18,7 @@ static void ReverseMemCopy(
     _Out_ BYTE       *pbDest,
     _In_  BYTE const *pbSource,
     _In_  DWORD       cb
-    )
+)
 {
     for (DWORD i = 0; i < cb; i++) {
         pbDest[cb - 1 - i] = pbSource[i];
@@ -29,7 +29,7 @@ static NTSTATUS ImportRsaPublicKey(
     _In_ BCRYPT_ALG_HANDLE  hAlg,    // CNG provider
     _In_ PUBLIC_KEY_VALUES *pKey,    // Pointer to the RSAPUBKEY blob.
     _In_ BCRYPT_KEY_HANDLE *phKey    // Receives a handle the imported public key.
-    )
+)
 {
     NTSTATUS hr = 0;
 
@@ -62,14 +62,14 @@ static NTSTATUS ImportRsaPublicKey(
 
     cbKey += cbExp;
 
-    pbPublicKey = (PBYTE) CoTaskMemAlloc(cbKey);
+    pbPublicKey = (PBYTE)CoTaskMemAlloc(cbKey);
     if (pbPublicKey == NULL) {
         hr = E_OUTOFMEMORY;
         goto cleanup;
     }
 
     ZeroMemory(pbPublicKey, cbKey);
-    pRsaBlob = (BCRYPT_RSAKEY_BLOB *) (pbPublicKey);
+    pRsaBlob = (BCRYPT_RSAKEY_BLOB *)(pbPublicKey);
 
     //
     // Make the Public Key Blob Header
@@ -82,13 +82,13 @@ static NTSTATUS ImportRsaPublicKey(
     pRsaBlob->cbPrime1 = 0;
     pRsaBlob->cbPrime2 = 0;
 
-    pbCurrent = (PBYTE) (pRsaBlob + 1);
+    pbCurrent = (PBYTE)(pRsaBlob + 1);
 
     //
     // Copy pubExp Big Endian 
     //
 
-    ReverseMemCopy(pbCurrent, (PBYTE) &dwExp, cbExp);
+    ReverseMemCopy(pbCurrent, (PBYTE)&dwExp, cbExp);
     pbCurrent += cbExp;
 
     //
@@ -101,7 +101,7 @@ static NTSTATUS ImportRsaPublicKey(
     // Import the public key
     //
 
-    hr = BCryptImportKeyPair(hAlg, NULL, BCRYPT_RSAPUBLIC_BLOB, phKey, (PUCHAR) pbPublicKey, cbKey, 0);
+    hr = BCryptImportKeyPair(hAlg, NULL, BCRYPT_RSAPUBLIC_BLOB, phKey, (PUCHAR)pbPublicKey, cbKey, 0);
 
 cleanup:
     CoTaskMemFree(pbPublicKey);
@@ -120,9 +120,9 @@ namespace pEp {
 
     GateKeeper::GateKeeper(CpEpCOMServerAdapterModule * self)
         : _self(self), now(time(NULL)), next(now /*+ time_diff()*/), hkUpdater(NULL),
-            internet(NULL), hAES(NULL), hRSA(NULL)
+        internet(NULL), hAES(NULL), hRSA(NULL)
     {
-		DeleteFile(get_lockFile().c_str());
+        DeleteFile(get_lockFile().c_str());
 
         LONG lResult = RegOpenCurrentUser(KEY_READ, &cu);
         assert(lResult == ERROR_SUCCESS);
@@ -133,11 +133,11 @@ namespace pEp {
 
         if (cu_open) {
             LONG lResult = RegOpenKeyEx(cu, updater_reg_path, 0, KEY_READ, &hkUpdater);
-			if (lResult != ERROR_SUCCESS)
-				RegCreateKeyEx(cu, updater_reg_path, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ, NULL, &hkUpdater, NULL);
-		}
+            if (lResult != ERROR_SUCCESS)
+                RegCreateKeyEx(cu, updater_reg_path, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ, NULL, &hkUpdater, NULL);
+        }
     }
-    
+
     GateKeeper::~GateKeeper()
     {
         if (cu_open) {
@@ -153,7 +153,7 @@ namespace pEp {
             static random_device rd;
             static mt19937 gen(rd());
 
-            uniform_int_distribution<time_t> dist(0, cycle/fraction);
+            uniform_int_distribution<time_t> dist(0, cycle / fraction);
 
             return dist(gen);
         }
@@ -185,14 +185,14 @@ namespace pEp {
 
     void GateKeeper::keep_plugin()
     {
-		HKEY hkPluginStart = NULL;
+        HKEY hkPluginStart = NULL;
 
         LONG lResult = RegOpenKeyEx(cu, plugin_reg_path, 0, KEY_WRITE, &hkPluginStart);
         if (lResult != ERROR_SUCCESS)
             return;
 
         DWORD v = 3;
-        lResult = RegSetValueEx(hkPluginStart, plugin_reg_value_name, 0, REG_DWORD, (const BYTE *) &v, sizeof(DWORD));
+        lResult = RegSetValueEx(hkPluginStart, plugin_reg_value_name, 0, REG_DWORD, (const BYTE *)&v, sizeof(DWORD));
         assert(lResult == ERROR_SUCCESS);
 
         RegCloseKey(hkPluginStart);
@@ -230,11 +230,11 @@ namespace pEp {
         uniform_int_distribution<int64_t> dist(0, UINT32_MAX);
 
         for (int i = 0; i < 8; i++)
-            key.dw_key[i] = (uint32_t) dist(gen);
+            key.dw_key[i] = (uint32_t)dist(gen);
 
         BCRYPT_KEY_HANDLE hKey;
 
-        NTSTATUS status = BCryptGenerateSymmetricKey(hAES, &hKey, NULL, 0, (PUCHAR) &key, (ULONG) sizeof(aeskey_t), 0);
+        NTSTATUS status = BCryptGenerateSymmetricKey(hAES, &hKey, NULL, 0, (PUCHAR)&key, (ULONG) sizeof(aeskey_t), 0);
         assert(status == 0);
         if (status)
             throw runtime_error("BCryptGenerateSymmetricKey");
@@ -242,7 +242,7 @@ namespace pEp {
 #ifndef NDEBUG
         DWORD keylength = 0;
         ULONG copied = 0;
-        status = BCryptGetProperty(hKey, BCRYPT_KEY_LENGTH, (PUCHAR) &keylength, sizeof(DWORD), &copied, 0);
+        status = BCryptGetProperty(hKey, BCRYPT_KEY_LENGTH, (PUCHAR)&keylength, sizeof(DWORD), &copied, 0);
         assert(keylength == 256);
 #endif
 
@@ -260,7 +260,7 @@ namespace pEp {
         DWORD uk_size;
 
         BOOL bResult = CryptDecodeObjectEx(X509_ASN_ENCODING, X509_PUBLIC_KEY_INFO,
-                (const BYTE *) _update_key.data(), _update_key.size(), CRYPT_DECODE_ALLOC_FLAG, NULL, &uk, &uk_size);
+            (const BYTE *)_update_key.data(), _update_key.size(), CRYPT_DECODE_ALLOC_FLAG, NULL, &uk, &uk_size);
         if (!bResult)
             throw runtime_error("CryptDecodeObjectEx: X509_PUBLIC_KEY_INFO");
 
@@ -281,8 +281,8 @@ namespace pEp {
         ULONG psize;
         NTSTATUS status = BCryptGetProperty(hUpdateKey, BCRYPT_ALGORITHM_NAME, NULL, 0, &psize, 0);
         char *prop = new char[psize];
-        TCHAR *_prop = (TCHAR *) prop;
-        BCryptGetProperty(hUpdateKey, BCRYPT_ALGORITHM_NAME, (PUCHAR) prop, psize, &psize, 0);
+        TCHAR *_prop = (TCHAR *)prop;
+        BCryptGetProperty(hUpdateKey, BCRYPT_ALGORITHM_NAME, (PUCHAR)prop, psize, &psize, 0);
 
         ULONG export_size;
         status = BCryptExportKey(hDeliveryKey, NULL, BCRYPT_KEY_DATA_BLOB, NULL, NULL,
@@ -293,7 +293,7 @@ namespace pEp {
         PUCHAR _delivery_key = new UCHAR[export_size];
         ULONG copied;
         status = BCryptExportKey(hDeliveryKey, NULL, BCRYPT_KEY_DATA_BLOB, _delivery_key, export_size,
-                &copied, 0);
+            &copied, 0);
         if (status) {
             delete[] _delivery_key;
             throw runtime_error("BCryptExportKey: delivery_key");
@@ -328,7 +328,7 @@ namespace pEp {
         stringstream s;
         for (ULONG i = 0; i < copied; i++) {
             s << hex << setw(2) << setfill('0');
-            s << (int) _result[i];
+            s << (int)_result[i];
         }
         delete[] _result;
         s >> result;
@@ -350,7 +350,7 @@ namespace pEp {
         for (DWORD i = 0; lResult == ERROR_SUCCESS; i++) {
             value_name_size = 16383;
             value_size = L_MAX_URL_LENGTH + 1;
-            lResult = RegEnumValue(hkUpdater, i, value_name, &value_name_size, NULL, NULL, (LPBYTE) value, &value_size);
+            lResult = RegEnumValue(hkUpdater, i, value_name, &value_name_size, NULL, NULL, (LPBYTE)value, &value_size);
             if (lResult == ERROR_SUCCESS) {
                 products.push_back({ value_name, value });
             }
@@ -361,43 +361,43 @@ namespace pEp {
 
     void GateKeeper::install_msi(tstring filename)
     {
-		HANDLE hMutex = CreateMutex(NULL, TRUE, _T("PEPINSTALLERMUTEX"));
-		if (hMutex) {
-			CloseHandle(hMutex);
-			ShellExecute(NULL, _T("open"), filename.c_str(), NULL, NULL, SW_SHOW);
-		}
+        HANDLE hMutex = CreateMutex(NULL, TRUE, _T("PEPINSTALLERMUTEX"));
+        if (hMutex) {
+            CloseHandle(hMutex);
+            ShellExecute(NULL, _T("open"), filename.c_str(), NULL, NULL, SW_SHOW);
+        }
     }
 
-	tstring GateKeeper::get_lockFile()
-	{
-		static const tstring _fileName = _T("\\pEpSetup.lck");
-		static tstring fileName;
+    tstring GateKeeper::get_lockFile()
+    {
+        static const tstring _fileName = _T("\\pEpSetup.lck");
+        static tstring fileName;
 
-		if (fileName.length() == 0) {
-			unique_ptr < TCHAR[] > _pathName(new TCHAR[MAX_PATH + 1]);
-			DWORD size = GetTempPath(MAX_PATH, _pathName.get());
-			if (size > MAX_PATH - _fileName.size())
-				throw runtime_error("TEMP path too long");
+        if (fileName.length() == 0) {
+            unique_ptr < TCHAR[] > _pathName(new TCHAR[MAX_PATH + 1]);
+            DWORD size = GetTempPath(MAX_PATH, _pathName.get());
+            if (size > MAX_PATH - _fileName.size())
+                throw runtime_error("TEMP path too long");
 
-			fileName = _pathName.get();
-			fileName += _fileName;
-		}
+            fileName = _pathName.get();
+            fileName += _fileName;
+        }
 
-		return fileName;
-	}
+        return fileName;
+    }
 
     void GateKeeper::update_product(product p, DWORD context)
     {
-		{
-			HANDLE file = CreateFile(get_lockFile().c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
-			if (file == INVALID_HANDLE_VALUE) {
-				return;
-			}
-			else {
-				CloseHandle(file);
-				DeleteFile(get_lockFile().c_str());
-			}
-		}
+        {
+            HANDLE file = CreateFile(get_lockFile().c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+            if (file == INVALID_HANDLE_VALUE) {
+                return;
+            }
+            else {
+                CloseHandle(file);
+                DeleteFile(get_lockFile().c_str());
+            }
+        }
 
         BCRYPT_KEY_HANDLE dk = delivery_key();
 #ifdef UNICODE
@@ -410,7 +410,7 @@ namespace pEp {
         url += delivery;
         tstring headers;
         HINTERNET hUrl = InternetOpenUrl(internet, url.c_str(), headers.c_str(), headers.length(),
-                INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_UI | INTERNET_FLAG_SECURE, context);
+            INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_UI | INTERNET_FLAG_SECURE, context);
         if (hUrl == NULL)
             return;
 
@@ -428,8 +428,8 @@ namespace pEp {
             InternetReadFile(hUrl, iv, sizeof(iv), &reading);
 
             if (reading) do {
-                static char buffer[1024*1024];
-                BOOL bResult = InternetReadFile(hUrl, buffer, 1024*1024, &reading);
+                static char buffer[1024 * 1024];
+                BOOL bResult = InternetReadFile(hUrl, buffer, 1024 * 1024, &reading);
                 if (!bResult || !reading)
                     break;
                 crypted += string(buffer, reading);
@@ -452,18 +452,18 @@ namespace pEp {
         authInfo.cbTag = sizeof(tag);
 
         ULONG unencrypted_size;
-        NTSTATUS status = BCryptDecrypt(dk, (PUCHAR) crypted.data(), crypted.size(),
-                &authInfo, iv, sizeof(iv), NULL, 0, &unencrypted_size, 0);
+        NTSTATUS status = BCryptDecrypt(dk, (PUCHAR)crypted.data(), crypted.size(),
+            &authInfo, iv, sizeof(iv), NULL, 0, &unencrypted_size, 0);
         if (status)
             goto closing;
-        
+
         unencrypted_buffer = new char[unencrypted_size];
-        PUCHAR crypted_data = (PUCHAR) crypted.data();
-        ULONG crypted_size = (ULONG) crypted.size() - sizeof(tag);
+        PUCHAR crypted_data = (PUCHAR)crypted.data();
+        ULONG crypted_size = (ULONG)crypted.size() - sizeof(tag);
         memcpy(tag, crypted_data + crypted_size, sizeof(tag));
 
         status = BCryptDecrypt(dk, crypted_data, crypted_size,
-            &authInfo, iv, sizeof(iv), (PUCHAR) unencrypted_buffer, unencrypted_size, &unencrypted_size, 0);
+            &authInfo, iv, sizeof(iv), (PUCHAR)unencrypted_buffer, unencrypted_size, &unencrypted_size, 0);
         if (status)
             goto closing;
 
@@ -503,7 +503,7 @@ namespace pEp {
         assert(status == 0);
         if (status)
             goto closing;
-        status = BCryptSetProperty(hAES, BCRYPT_CHAINING_MODE, (PUCHAR) BCRYPT_CHAIN_MODE_GCM, sizeof(BCRYPT_CHAIN_MODE_GCM), 0);
+        status = BCryptSetProperty(hAES, BCRYPT_CHAINING_MODE, (PUCHAR)BCRYPT_CHAIN_MODE_GCM, sizeof(BCRYPT_CHAIN_MODE_GCM), 0);
         if (status)
             goto closing;
 
@@ -516,19 +516,19 @@ namespace pEp {
         if (!internet)
             goto closing;
 
-		{
-			product_list products = registered_products();
-			DWORD context = 0;
+        {
+            product_list products = registered_products();
+            DWORD context = 0;
 
-			for (auto i = products.begin(); i != products.end(); i++) {
-				try {
-					update_product(*i, context++);
-				}
-				catch (exception&) {
+            for (auto i = products.begin(); i != products.end(); i++) {
+                try {
+                    update_product(*i, context++);
+                }
+                catch (exception&) {
 
-				}
-			}
-		}
+                }
+            }
+        }
 
     closing:
         if (internet)
