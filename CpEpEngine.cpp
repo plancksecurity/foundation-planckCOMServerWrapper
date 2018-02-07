@@ -551,7 +551,7 @@ STDMETHODIMP CpEpEngine::UpdateIdentity(struct pEpIdentity *ident, struct pEpIde
         ::free_identity(_ident);
         return S_OK;
     }
-    else if (status == PEP_GET_KEY_FAILED) {
+    else if (status == PEP_GET_KEY_FAILED || status == PEP_KEY_NOT_FOUND) {
         if (_ident->fpr) {
             pEp_free(_ident->fpr);
             _ident->fpr = NULL;
