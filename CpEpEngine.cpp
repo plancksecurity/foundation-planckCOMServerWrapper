@@ -19,7 +19,6 @@ STDMETHODIMP CpEpEngine::InterfaceSupportsErrorInfo(REFIID riid)
     static const IID* const arr[] =
     {
         &IID_IpEpEngine,
-        &IID_IpEpEngine2,
     };
 
     for (int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -552,12 +551,11 @@ STDMETHODIMP CpEpEngine::UpdateIdentity(struct pEpIdentity *ident, struct pEpIde
     PEP_STATUS status = ::update_identity(get_session(), _ident);
 
     if (status == PEP_STATUS_OK) {
-        assert(_ident->fpr); // Guaranteed not NULL, but possibly empty string.
         copy_identity(result, _ident);
         ::free_identity(_ident);
         return S_OK;
     }
-    else if (status == PEP_GET_KEY_FAILED) {
+    else if (status == PEP_GET_KEY_FAILED || status == PEP_KEY_NOT_FOUND) {
         if (_ident->fpr) {
             pEp_free(_ident->fpr);
             _ident->fpr = NULL;
@@ -833,7 +831,7 @@ HRESULT CpEpEngine::error(_bstr_t msg, PEP_STATUS status)
     return MAKE_HRESULT(1, FACILITY_ITF, (0xFFFF & status));
 }
 
-STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SAFEARRAY * extra, pEpEncryptFlags flags)
+STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SAFEARRAY * extra, pEpEncryptFlags flags, pEpEncFormat encFormat)
 {
     assert(src);
     assert(dst);
@@ -843,16 +841,19 @@ STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SA
 
     ::message *_src = text_message_to_C(src);
 
+    _PEP_enc_format _encFormat = (_PEP_enc_format)encFormat;
+
     // COM-19: Initialize msg_dst to NULL, or we end up calling
     // free_message() below with a pointer to random garbage in
     // case of an error in encrypt_message().
     ::message *msg_dst = NULL;
     ::stringlist_t *_extra = new_stringlist(extra); // can cope with NULL
 
-    // _PEP_enc_format is intentionally hardcoded to PEP_enc_PEP:
-    // 2016-10-02 14:10 < fdik> schabi: actually, all adapters now must use PEP_enc_PEP
+    // _PEP_enc_format used to be intentionally hardcoded to PEP_enc_PEP:
+    // Since COM-74, this has been changed to an explicit parameter, to allow the engine to attach
+    // the keys and headers to outgoing, unencrypted messages.
     PEP_encrypt_flags_t engineFlags = (PEP_encrypt_flags_t)flags;
-    PEP_STATUS status = ::encrypt_message(get_session(), _src, _extra, &msg_dst, PEP_enc_PEP, engineFlags);
+    PEP_STATUS status = ::encrypt_message(get_session(), _src, _extra, &msg_dst, _encFormat, engineFlags);
     ::free_stringlist(_extra);
 
     if (status == PEP_STATUS_OK)
@@ -1200,20 +1201,11 @@ void CpEpEngine::do_keysync_in_thread(CpEpEngine* self, LPSTREAM marshaled_callb
     self->client_last_signalled_polling_state = false;
     self->client_callbacks_on_sync_thread = static_cast<IpEpEngineCallbacks*>(vp);
 
-    res = self->client_callbacks_on_sync_thread->QueryInterface(
-        &self->client_callbacks2_on_sync_thread);
-    if (res != S_OK)
-        self->client_callbacks2_on_sync_thread = NULL;
-
     ::do_sync_protocol(self->keysync_session, self);
 
     self->client_callbacks_on_sync_thread->Release();
 
     self->client_callbacks_on_sync_thread = NULL;
-
-    if (self->client_callbacks2_on_sync_thread)
-        self->client_callbacks2_on_sync_thread->Release();
-    self->client_callbacks2_on_sync_thread = NULL;
 
     CoUninitialize();
 }
@@ -1291,17 +1283,17 @@ void * CpEpEngine::retrieve_next_sync_msg(void * management, time_t *timeout)
     CpEpEngine* me = (CpEpEngine*)management;
 
     if ((timeout && *timeout)
-        && me->client_callbacks2_on_sync_thread
+        && me->client_callbacks_on_sync_thread
         && me->client_last_signalled_polling_state == false)
     {
-        me->client_callbacks2_on_sync_thread->NeedFastPolling(VARIANT_TRUE);
+        me->client_callbacks_on_sync_thread->NeedFastPolling(VARIANT_TRUE);
         me->client_last_signalled_polling_state = true;
     }
     else if (!(timeout && *timeout)
-        && me->client_callbacks2_on_sync_thread
+        && me->client_callbacks_on_sync_thread
         && me->client_last_signalled_polling_state == true)
     {
-        me->client_callbacks2_on_sync_thread->NeedFastPolling(VARIANT_FALSE);
+        me->client_callbacks_on_sync_thread->NeedFastPolling(VARIANT_FALSE);
         me->client_last_signalled_polling_state = false;
     }
 

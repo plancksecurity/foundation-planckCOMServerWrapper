@@ -24,7 +24,7 @@ class ATL_NO_VTABLE CpEpEngine :
     public CComObjectRootEx<CComObjectThreadModel>,
     public CComCoClass<CpEpEngine, &CLSID_pEpEngine>,
     public ISupportErrorInfo,
-    public IpEpEngine2
+    public IpEpEngine
 {
 
 protected:
@@ -55,7 +55,6 @@ public:
 
     BEGIN_COM_MAP(CpEpEngine)
         COM_INTERFACE_ENTRY(IpEpEngine)
-        COM_INTERFACE_ENTRY(IpEpEngine2)
         COM_INTERFACE_ENTRY(ISupportErrorInfo)
     END_COM_MAP()
 
@@ -147,7 +146,6 @@ private:
 
     IpEpEngineCallbacks* client_callbacks = NULL;
     IpEpEngineCallbacks* client_callbacks_on_sync_thread = NULL;
-    IpEpEngineCallbacks2* client_callbacks2_on_sync_thread = NULL;
     bool client_last_signalled_polling_state = true;
 
     // Keysync members
@@ -229,7 +227,13 @@ public:
 
     // Message API
 
-    STDMETHOD(EncryptMessage)(TextMessage * src, TextMessage * dst, SAFEARRAY * extra, pEpEncryptFlags flags);
+    STDMETHOD(EncryptMessage)(
+        /* [in] */ struct TextMessage *src,
+        /* [out] */ struct TextMessage *dst,
+        /* [in] */ SAFEARRAY * extra,
+        /* [defaultvalue][in] */ pEpEncryptFlags flags = pEpEncryptFlagDefault,
+        /* [defaultvalue][in] */ pEpEncFormat encFormat = pEpEncPep);
+
     STDMETHOD(DecryptMessage)(TextMessage * src, TextMessage * dst, SAFEARRAY ** keylist, pEpDecryptFlags* flags, pEpRating *rating);
     STDMETHOD(ReEvaluateMessageRating)(TextMessage * msg, SAFEARRAY * x_KeyList, pEpRating x_EncStatus, pEpRating *rating);
     STDMETHOD(OutgoingMessageRating)(TextMessage *msg, pEpRating * pVal);
