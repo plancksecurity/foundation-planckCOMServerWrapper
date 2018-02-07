@@ -548,7 +548,6 @@ STDMETHODIMP CpEpEngine::UpdateIdentity(struct pEpIdentity *ident, struct pEpIde
     PEP_STATUS status = ::update_identity(get_session(), _ident);
 
     if (status == PEP_STATUS_OK) {
-        assert(_ident->fpr); // Guaranteed not NULL, but possibly empty string.
         copy_identity(result, _ident);
         ::free_identity(_ident);
         return S_OK;
