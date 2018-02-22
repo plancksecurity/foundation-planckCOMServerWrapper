@@ -257,17 +257,18 @@ interface IpEpEngine : IUnknown {
     [id(19)] HRESULT TrustPersonalKey([in] struct pEpIdentity *ident, [out, retval] struct pEpIdentity *result);
     [id(20)] HRESULT OwnIdentitiesRetrieve([out, retval] SAFEARRAY(struct pEpIdentity)* ownIdentities);
     [id(21)] HRESULT UndoLastMistrust();
+    [id(22)] HRESULT IsPepUser([in] struct pEpIdentity *ident, [out, retval] VARIANT_BOOL *ispEp);
 
     // Blacklist API
 
-    [id(22)] HRESULT BlacklistAdd([in] BSTR fpr);
-    [id(23)] HRESULT BlacklistDelete([in] BSTR fpr);
-    [id(24)] HRESULT BlacklistIsListed([in] BSTR fpr, [out, retval] VARIANT_BOOL *listed);
-    [id(25)] HRESULT BlacklistRetrieve([out, retval] SAFEARRAY(BSTR) *blacklist);
+    [id(23)] HRESULT BlacklistAdd([in] BSTR fpr);
+    [id(24)] HRESULT BlacklistDelete([in] BSTR fpr);
+    [id(25)] HRESULT BlacklistIsListed([in] BSTR fpr, [out, retval] VARIANT_BOOL *listed);
+    [id(26)] HRESULT BlacklistRetrieve([out, retval] SAFEARRAY(BSTR) *blacklist);
 
     // PGP compatibility functions
 
-    [id(26)] HRESULT OpenPGPListKeyinfo([in] BSTR searchPattern, [out, retval] SAFEARRAY(struct StringPair)* keyinfoList);
+    [id(27)] HRESULT OpenPGPListKeyinfo([in] BSTR searchPattern, [out, retval] SAFEARRAY(struct StringPair)* keyinfoList);
 
     // Message API
 
@@ -362,7 +363,7 @@ interface IpEpEngine : IUnknown {
         SAFEARRAY(struct StringPair) OptFields;
     };
 
-    [id(27)] HRESULT EncryptMessage(
+    [id(28)] HRESULT EncryptMessage(
         [in] struct TextMessage *src,
         [out] struct TextMessage * dst,
         [in] SAFEARRAY(BSTR) extra,
@@ -372,18 +373,18 @@ interface IpEpEngine : IUnknown {
         // for compatibility and not intended for normal use.
         [in, defaultvalue(pEpEncPep)] pEpEncFormat encFormat);
 
-    [id(28)] HRESULT DecryptMessage(
+    [id(29)] HRESULT DecryptMessage(
         [in] struct TextMessage *src,
         [out] struct TextMessage * dst,
         [out] SAFEARRAY(BSTR) *keylist,
         [out] pEpDecryptFlags* flags,
         [out, retval] pEpRating *rating);
 
-    [id(29)] HRESULT OutgoingMessageRating([in] struct TextMessage *msg, [out, retval] pEpRating * pVal);
-    [id(30)] HRESULT IdentityRating([in] struct pEpIdentity * ident, [out, retval] pEpRating * pVal);
-    [id(31)] HRESULT ColorFromRating([in] pEpRating rating, [out, retval] pEpColor* pVal);
+    [id(30)] HRESULT OutgoingMessageRating([in] struct TextMessage *msg, [out, retval] pEpRating * pVal);
+    [id(31)] HRESULT IdentityRating([in] struct pEpIdentity * ident, [out, retval] pEpRating * pVal);
+    [id(32)] HRESULT ColorFromRating([in] pEpRating rating, [out, retval] pEpColor* pVal);
 
-    [id(32)] HRESULT GetMessageTrustwords(
+    [id(33)] HRESULT GetMessageTrustwords(
         [in] struct TextMessage *msg,
         [in] struct pEpIdentity * receivedBy,
         [in] SAFEARRAY(BSTR) keylist,
@@ -392,14 +393,14 @@ interface IpEpEngine : IUnknown {
         [out, retval] BSTR * words
     );
 
-    [id(33)] HRESULT EncryptMessageForSelf(
+    [id(34)] HRESULT EncryptMessageForSelf(
         [in] struct pEpIdentity* targetId,
         [in] struct TextMessage* src,
         [out] struct TextMessage* dst,
         [in, defaultvalue(pEpEncryptFlagDefault)] pEpEncryptFlags flags
     );
 
-    [id(34)] HRESULT ReEvaluateMessageRating(
+    [id(35)] HRESULT ReEvaluateMessageRating(
         [in] struct TextMessage *src,
         [in] SAFEARRAY(BSTR) x_KeyList, // referring to X-KeyList mail header
         [in] pEpRating x_EncStatus, // referring to X-EncStatus mail header
@@ -407,8 +408,8 @@ interface IpEpEngine : IUnknown {
     );
 
     // callback / keysync API
-    [id(35)] HRESULT RegisterCallbacks([in] IpEpEngineCallbacks* newCallback);
-    [id(36)] HRESULT UnregisterCallbacks();
+    [id(36)] HRESULT RegisterCallbacks([in] IpEpEngineCallbacks* newCallback);
+    [id(37)] HRESULT UnregisterCallbacks();
 };
 
 [

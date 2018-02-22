@@ -218,6 +218,12 @@ public:
     STDMETHOD(TrustPersonalKey)(struct pEpIdentity *ident, struct pEpIdentity *result);
     STDMETHOD(OwnIdentitiesRetrieve)(LPSAFEARRAY* ownIdentities);
 
+    STDMETHOD(UndoLastMistrust)(); 
+    
+    STDMETHOD(IsPepUser)(
+        /* [in] */ struct pEpIdentity *ident,
+        /* [retval][out] */ VARIANT_BOOL *ispEp);
+
     // Blacklist API
 
     STDMETHOD(BlacklistAdd)(BSTR fpr);
@@ -255,7 +261,6 @@ public:
     // PGP compatibility functions
     STDMETHOD(OpenPGPListKeyinfo)(BSTR search_pattern, LPSAFEARRAY* keyinfo_list);
 
-    STDMETHOD(UndoLastMistrust)();
 
 protected:
     HRESULT Fire_MessageToSend(

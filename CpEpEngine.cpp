@@ -620,6 +620,41 @@ STDMETHODIMP CpEpEngine::UndoLastMistrust()
     return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::IsPepUser(/* [in] */ struct pEpIdentity *ident, /* [retval][out] */ VARIANT_BOOL *ispEp) 
+{
+    ::pEp_identity *_ident;
+
+    assert(ident);
+    if (!ident)
+        return E_INVALIDARG;
+
+    try {
+        _ident = new_identity(ident);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());;
+    }
+
+    bool is_pep = FALSE;
+    PEP_STATUS status = ::is_pep_user(get_session(), _ident, &is_pep);
+
+    *ispEp = is_pep;
+
+    if (status == PEP_CANNOT_FIND_PERSON)
+        return FAIL(L"Cannot find identity!", status);
+
+    if (status == PEP_ILLEGAL_VALUE)
+        return E_INVALIDARG;
+
+    if (status != ::PEP_STATUS_OK)
+        return FAIL(L"Engine is_pep_user returned error", status);
+
+    return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::KeyResetTrust(struct pEpIdentity *ident)
 {
     ::pEp_identity *_ident;
