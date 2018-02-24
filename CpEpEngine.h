@@ -260,6 +260,7 @@ public:
 
     // PGP compatibility functions
     STDMETHOD(OpenPGPListKeyinfo)(BSTR search_pattern, LPSAFEARRAY* keyinfo_list);
+	STDMETHOD(SetOwnKey)(pEpIdentity * ident, BSTR fpr, struct pEpIdentity *result);
 
 
 protected:

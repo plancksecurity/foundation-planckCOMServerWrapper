@@ -410,6 +410,14 @@ interface IpEpEngine : IUnknown {
     // callback / keysync API
     [id(36)] HRESULT RegisterCallbacks([in] IpEpEngineCallbacks* newCallback);
     [id(37)] HRESULT UnregisterCallbacks();
+
+	// mark imported keys as trusted
+
+	HRESULT SetOwnKey(
+		[in] struct pEpIdentity * ident,
+		[in] BSTR fpr,
+		[out, retval] struct pEpIdentity * result
+	);
 };
 
 [
