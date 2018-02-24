@@ -21,7 +21,7 @@ CpEpCOMServerAdapterModule _AtlModule;
 
 //
 extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, 
-								LPTSTR /*lpCmdLine*/, int nShowCmd)
+                                LPTSTR /*lpCmdLine*/, int nShowCmd)
 {
     _AtlModule.hModule(hInstance);
     _AtlModule.start_gatekeeper();

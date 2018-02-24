@@ -16,7 +16,7 @@ namespace pEp {
             string username;
             pEpComType comm_type;
             string lang;
-			int flags;
+            int flags;
 
             pEp_identity_cpp(
                 string _address = string(),
@@ -25,7 +25,7 @@ namespace pEp {
                 string _username = string(),
                 pEpComType _comm_type = pEpCtUnknown,
                 string _lang = string()
-                ) : address(_address), fpr(_fpr), user_id(_user_id), username(_username), comm_type(_comm_type), lang(_lang)
+            ) : address(_address), fpr(_fpr), user_id(_user_id), username(_username), comm_type(_comm_type), lang(_lang)
             { }
 
             pEp_identity_cpp(const ::pEp_identity *_ident);
@@ -41,9 +41,9 @@ namespace pEp {
         void clear_text_message(TextMessage *msg);
         ::pEp_identity *new_identity(const pEpIdentity * ident);
 
-		void opt_field_array_from_C(stringpair_list_t* spair_list, LPSAFEARRAY* pair_list_out);
-		void clear_opt_field_array(LPSAFEARRAY* pair_list);
-		template< class T2, class T > SAFEARRAY * array_from_C(T *tl);
+        void opt_field_array_from_C(stringpair_list_t* spair_list, LPSAFEARRAY* pair_list_out);
+        void clear_opt_field_array(LPSAFEARRAY* pair_list);
+        template< class T2, class T > SAFEARRAY * array_from_C(T *tl);
 
         static LPTYPELIB pTypelib = NULL;
 

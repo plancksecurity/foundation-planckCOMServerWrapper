@@ -8,6 +8,10 @@ using namespace std;
 using namespace pEp::utility;
 
 // CpEpEngine
+
+// the init_mutex protects our initialization and destruction
+// against a running keysync thread, and it ensures that the
+// keysync thread actually has finished before we're destructed.
 std::mutex CpEpEngine::init_mutex;
 
 STDMETHODIMP CpEpEngine::InterfaceSupportsErrorInfo(REFIID riid)
@@ -15,7 +19,6 @@ STDMETHODIMP CpEpEngine::InterfaceSupportsErrorInfo(REFIID riid)
     static const IID* const arr[] =
     {
         &IID_IpEpEngine,
-        &IID_IpEpEngine2,
     };
 
     for (int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)
@@ -548,12 +551,11 @@ STDMETHODIMP CpEpEngine::UpdateIdentity(struct pEpIdentity *ident, struct pEpIde
     PEP_STATUS status = ::update_identity(get_session(), _ident);
 
     if (status == PEP_STATUS_OK) {
-        assert(_ident->fpr); // Guaranteed not NULL, but possibly empty string.
         copy_identity(result, _ident);
         ::free_identity(_ident);
         return S_OK;
     }
-    else if (status == PEP_GET_KEY_FAILED) {
+    else if (status == PEP_GET_KEY_FAILED || status == PEP_KEY_NOT_FOUND) {
         if (_ident->fpr) {
             pEp_free(_ident->fpr);
             _ident->fpr = NULL;
@@ -607,69 +609,50 @@ STDMETHODIMP CpEpEngine::KeyMistrusted(struct pEpIdentity *ident)
 
 STDMETHODIMP CpEpEngine::UndoLastMistrust()
 {
-	PEP_STATUS status = ::undo_last_mistrust(get_session());
+    PEP_STATUS status = ::undo_last_mistrust(get_session());
 
-	if (status == PEP_CANNOT_FIND_IDENTITY)
-		return FAIL(L"Cannot find identity!", status);
+    if (status == PEP_CANNOT_FIND_IDENTITY)
+        return FAIL(L"Cannot find identity!", status);
 
-	if (status != ::PEP_STATUS_OK)
-		return FAIL(L"cannot revoke compromized key", status);
+    if (status != ::PEP_STATUS_OK)
+        return FAIL(L"cannot revoke compromized key", status);
 
-	return S_OK;
+    return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::SetOwnKey(pEpIdentity * ident, BSTR fpr, struct pEpIdentity *result)
+STDMETHODIMP CpEpEngine::IsPepUser(/* [in] */ struct pEpIdentity *ident, /* [retval][out] */ VARIANT_BOOL *ispEp) 
 {
-	assert(ident);
-	assert(result);
-	assert(fpr);
+    ::pEp_identity *_ident;
 
-	if (!(ident && result))
-		return E_INVALIDARG;
+    assert(ident);
+    if (!ident)
+        return E_INVALIDARG;
 
-	::pEp_identity *_ident;
-	try {
-		_ident = new_identity(ident);
-	}
-	catch (bad_alloc&) {
-		return E_OUTOFMEMORY;
-	}
-	catch (exception& ex) {
-		return FAIL(ex.what());
-	}
+    try {
+        _ident = new_identity(ident);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());;
+    }
 
-	assert(_ident);
-	if (_ident == NULL)
-		return E_OUTOFMEMORY;
+    bool is_pep = FALSE;
+    PEP_STATUS status = ::is_pep_user(get_session(), _ident, &is_pep);
 
-	string _fpr = utf8_string(fpr);
-	PEP_STATUS status = ::set_own_key(get_session(), _fpr.c_str(), _ident);
+    *ispEp = is_pep;
 
-	if (status == PEP_STATUS_OK) {
-		assert(_ident->fpr); // Guaranteed not NULL, but possibly empty string.
-		copy_identity(result, _ident);
-		::free_identity(_ident);
-		return S_OK;
-	}
-	else if (status == PEP_GET_KEY_FAILED) {
-		if (_ident->fpr) {
-			pEp_free(_ident->fpr);
-			_ident->fpr = NULL;
-		}
-		copy_identity(result, _ident);
-		result->Fpr = NULL;
-		::free_identity(_ident);
-		return S_OK;
-	}
-	else {
-		::free_identity(_ident);
-		if (status == PEP_OUT_OF_MEMORY)
-			return E_OUTOFMEMORY;
-		else
-			return FAIL(L"UpdateIdentity", status);
-	}
+    if (status == PEP_CANNOT_FIND_PERSON)
+        return FAIL(L"Cannot find identity!", status);
 
-	return S_OK;
+    if (status == PEP_ILLEGAL_VALUE)
+        return E_INVALIDARG;
+
+    if (status != ::PEP_STATUS_OK)
+        return FAIL(L"Engine is_pep_user returned error", status);
+
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::KeyResetTrust(struct pEpIdentity *ident)
@@ -880,10 +863,10 @@ HRESULT CpEpEngine::error(_bstr_t msg, PEP_STATUS status)
     if (status == ::PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
 
-    return E_FAIL;
+    return MAKE_HRESULT(1, FACILITY_ITF, (0xFFFF & status));
 }
 
-STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SAFEARRAY * extra, pEpEncryptFlags flags)
+STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SAFEARRAY * extra, pEpEncryptFlags flags, pEpEncFormat encFormat)
 {
     assert(src);
     assert(dst);
@@ -893,16 +876,19 @@ STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SA
 
     ::message *_src = text_message_to_C(src);
 
+    _PEP_enc_format _encFormat = (_PEP_enc_format)encFormat;
+
     // COM-19: Initialize msg_dst to NULL, or we end up calling
     // free_message() below with a pointer to random garbage in
     // case of an error in encrypt_message().
     ::message *msg_dst = NULL;
     ::stringlist_t *_extra = new_stringlist(extra); // can cope with NULL
 
-    // _PEP_enc_format is intentionally hardcoded to PEP_enc_PEP:
-    // 2016-10-02 14:10 < fdik> schabi: actually, all adapters now must use PEP_enc_PEP
+    // _PEP_enc_format used to be intentionally hardcoded to PEP_enc_PEP:
+    // Since COM-74, this has been changed to an explicit parameter, to allow the engine to attach
+    // the keys and headers to outgoing, unencrypted messages.
     PEP_encrypt_flags_t engineFlags = (PEP_encrypt_flags_t)flags;
-    PEP_STATUS status = ::encrypt_message(get_session(), _src, _extra, &msg_dst, PEP_enc_PEP, engineFlags);
+    PEP_STATUS status = ::encrypt_message(get_session(), _src, _extra, &msg_dst, _encFormat, engineFlags);
     ::free_stringlist(_extra);
 
     if (status == PEP_STATUS_OK)
@@ -1212,12 +1198,12 @@ void CpEpEngine::start_keysync()
     keysync_abort_requested = false;
 
     // Init our keysync session
-	{ // begin lock scope
-		std::lock_guard<std::mutex> lock(init_mutex);
-		PEP_STATUS status = ::init(&keysync_session);
-		::register_sync_callbacks(keysync_session, (void*)this, messageToSend, notifyHandshake, inject_sync_msg, retrieve_next_sync_msg);
-		assert(status == PEP_STATUS_OK);
-	} // end lock scope
+    { // begin lock scope
+        std::lock_guard<std::mutex> lock(init_mutex);
+        PEP_STATUS status = ::init(&keysync_session);
+        ::register_sync_callbacks(keysync_session, (void*)this, messageToSend, notifyHandshake, inject_sync_msg, retrieve_next_sync_msg);
+        assert(status == PEP_STATUS_OK);
+    } // end lock scope
 
     attach_sync_session(get_session(), keysync_session);
 
@@ -1250,20 +1236,11 @@ void CpEpEngine::do_keysync_in_thread(CpEpEngine* self, LPSTREAM marshaled_callb
     self->client_last_signalled_polling_state = false;
     self->client_callbacks_on_sync_thread = static_cast<IpEpEngineCallbacks*>(vp);
 
-    res = self->client_callbacks_on_sync_thread->QueryInterface(
-        &self->client_callbacks2_on_sync_thread);
-    if (res != S_OK)
-        self->client_callbacks2_on_sync_thread = NULL;
-
     ::do_sync_protocol(self->keysync_session, self);
 
     self->client_callbacks_on_sync_thread->Release();
 
     self->client_callbacks_on_sync_thread = NULL;
-
-    if (self->client_callbacks2_on_sync_thread)
-        self->client_callbacks2_on_sync_thread->Release();
-    self->client_callbacks2_on_sync_thread = NULL;
 
     CoUninitialize();
 }
@@ -1298,7 +1275,7 @@ void CpEpEngine::stop_keysync()
     ::detach_sync_session(get_session());
     ::unregister_sync_callbacks(keysync_session);
 
-	std::lock_guard<std::mutex> releaselock(init_mutex);
+    std::lock_guard<std::mutex> releaselock(init_mutex);
     release(keysync_session);
     keysync_session = NULL;
 }
@@ -1341,17 +1318,17 @@ void * CpEpEngine::retrieve_next_sync_msg(void * management, time_t *timeout)
     CpEpEngine* me = (CpEpEngine*)management;
 
     if ((timeout && *timeout)
-        && me->client_callbacks2_on_sync_thread
+        && me->client_callbacks_on_sync_thread
         && me->client_last_signalled_polling_state == false)
     {
-        me->client_callbacks2_on_sync_thread->NeedFastPolling(VARIANT_TRUE);
+        me->client_callbacks_on_sync_thread->NeedFastPolling(VARIANT_TRUE);
         me->client_last_signalled_polling_state = true;
     }
     else if (!(timeout && *timeout)
-        && me->client_callbacks2_on_sync_thread
+        && me->client_callbacks_on_sync_thread
         && me->client_last_signalled_polling_state == true)
     {
-        me->client_callbacks2_on_sync_thread->NeedFastPolling(VARIANT_FALSE);
+        me->client_callbacks_on_sync_thread->NeedFastPolling(VARIANT_FALSE);
         me->client_last_signalled_polling_state = false;
     }
 
@@ -1376,16 +1353,16 @@ void * CpEpEngine::retrieve_next_sync_msg(void * management, time_t *timeout)
             {
                 *timeout = 1; // Signal timeout
                 return NULL;
-            } 
-            else 
+            }
+            else
             {
                 std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
 
-                if (now < end_time) 
+                if (now < end_time)
                 {
                     *timeout = std::chrono::duration_cast<std::chrono::seconds>(end_time - now).count();
-                } 
-                else 
+                }
+                else
                 {
                     *timeout = 0;
                 }
@@ -1572,7 +1549,7 @@ PEP_STATUS CpEpEngine::notifyHandshake(void * obj, pEp_identity *self, pEp_ident
 
             if (res != S_OK)
 
-            return PEP_STATUS_OK;
+                return PEP_STATUS_OK;
         }
 
         ::log_event(me->keysync_session, "Reentrant notify_handshake call!", "pEp COM Adapter", NULL, NULL);
