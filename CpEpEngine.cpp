@@ -618,8 +618,56 @@ STDMETHODIMP CpEpEngine::UndoLastMistrust()
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::SetOwnKey(pEpIdentity * identity, BSTR fpr, struct pEpIdentity *result)
+STDMETHODIMP CpEpEngine::SetOwnKey(pEpIdentity * ident, BSTR fpr, struct pEpIdentity *result)
 {
+	assert(ident);
+	assert(result);
+	assert(fpr);
+
+	if (!(ident && result))
+		return E_INVALIDARG;
+
+	::pEp_identity *_ident;
+	try {
+		_ident = new_identity(ident);
+	}
+	catch (bad_alloc&) {
+		return E_OUTOFMEMORY;
+	}
+	catch (exception& ex) {
+		return FAIL(ex.what());
+	}
+
+	assert(_ident);
+	if (_ident == NULL)
+		return E_OUTOFMEMORY;
+
+	string _fpr = utf8_string(fpr);
+	PEP_STATUS status = ::set_own_key(get_session(), _fpr.c_str(), _ident);
+
+	if (status == PEP_STATUS_OK) {
+		assert(_ident->fpr); // Guaranteed not NULL, but possibly empty string.
+		copy_identity(result, _ident);
+		::free_identity(_ident);
+		return S_OK;
+	}
+	else if (status == PEP_GET_KEY_FAILED) {
+		if (_ident->fpr) {
+			pEp_free(_ident->fpr);
+			_ident->fpr = NULL;
+		}
+		copy_identity(result, _ident);
+		result->Fpr = NULL;
+		::free_identity(_ident);
+		return S_OK;
+	}
+	else {
+		::free_identity(_ident);
+		if (status == PEP_OUT_OF_MEMORY)
+			return E_OUTOFMEMORY;
+		else
+			return FAIL(L"UpdateIdentity", status);
+	}
 
 	return S_OK;
 }
