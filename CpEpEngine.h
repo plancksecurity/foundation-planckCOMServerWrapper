@@ -238,6 +238,7 @@ public:
     STDMETHOD(OpenPGPListKeyinfo)(BSTR search_pattern, LPSAFEARRAY* keyinfo_list);
 
 	STDMETHOD(UndoLastMistrust)();
+	STDMETHOD(SetOwnKey)(pEpIdentity * ident, BSTR fpr, struct pEpIdentity *result);
 
 protected:
 	HRESULT Fire_MessageToSend(

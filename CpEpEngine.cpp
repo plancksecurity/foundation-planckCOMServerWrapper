@@ -618,6 +618,12 @@ STDMETHODIMP CpEpEngine::UndoLastMistrust()
 	return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::SetOwnKey(pEpIdentity * identity, BSTR fpr, struct pEpIdentity *result)
+{
+
+	return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::KeyResetTrust(struct pEpIdentity *ident)
 {
     ::pEp_identity *_ident;
