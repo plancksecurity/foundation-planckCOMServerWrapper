@@ -434,58 +434,59 @@ namespace pEp {
                     break;
                 crypted += string(buffer, reading);
             } while (1);
+
+            InternetCloseHandle(hUrl);
+            hUrl = NULL;
+
+            memcpy(nonce, iv, sizeof(iv));
+
+            BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO authInfo;
+            BCRYPT_INIT_AUTH_MODE_INFO(authInfo);
+            authInfo.pbNonce = nonce;
+            authInfo.cbNonce = sizeof(nonce);
+            authInfo.pbTag = tag;
+            authInfo.cbTag = sizeof(tag);
+
+            ULONG unencrypted_size;
+            NTSTATUS status = BCryptDecrypt(dk, (PUCHAR)crypted.data(), crypted.size(),
+                &authInfo, iv, sizeof(iv), NULL, 0, &unencrypted_size, 0);
+            if (status)
+                goto closing;
+
+            unencrypted_buffer = new char[unencrypted_size];
+
+            PUCHAR crypted_data = (PUCHAR)crypted.data();
+            ULONG crypted_size = (ULONG)crypted.size() - sizeof(tag);
+            memcpy(tag, crypted_data + crypted_size, sizeof(tag));
+
+            status = BCryptDecrypt(dk, crypted_data, crypted_size,
+                &authInfo, iv, sizeof(iv), (PUCHAR)unencrypted_buffer, unencrypted_size, &unencrypted_size, 0);
+            if (status)
+                goto closing;
+
+            BCryptDestroyKey(dk);
+
+            TCHAR temp_path[MAX_PATH + 1];
+            GetTempPath(MAX_PATH, temp_path);
+            filename = temp_path;
+            filename += _T("\\pEp_");
+            filename += delivery.substr(0, 32);
+            filename += _T(".msi");
+
+            hFile = CreateFile(filename.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+            if (!hFile)
+                goto closing;
+            DWORD writing;
+            WriteFile(hFile, unencrypted_buffer, unencrypted_size, &writing, NULL);
+            CloseHandle(hFile);
+            delete[] unencrypted_buffer;
+            unencrypted_buffer = nullptr;
         }
         catch (exception&) {
             goto closing;
         }
 
-        InternetCloseHandle(hUrl);
-        hUrl = NULL;
-
-        memcpy(nonce, iv, sizeof(iv));
-
-        BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO authInfo;
-        BCRYPT_INIT_AUTH_MODE_INFO(authInfo);
-        authInfo.pbNonce = nonce;
-        authInfo.cbNonce = sizeof(nonce);
-        authInfo.pbTag = tag;
-        authInfo.cbTag = sizeof(tag);
-
-        ULONG unencrypted_size;
-        NTSTATUS status = BCryptDecrypt(dk, (PUCHAR)crypted.data(), crypted.size(),
-            &authInfo, iv, sizeof(iv), NULL, 0, &unencrypted_size, 0);
-        if (status)
-            goto closing;
-
-        unencrypted_buffer = new char[unencrypted_size];
-        PUCHAR crypted_data = (PUCHAR)crypted.data();
-        ULONG crypted_size = (ULONG)crypted.size() - sizeof(tag);
-        memcpy(tag, crypted_data + crypted_size, sizeof(tag));
-
-        status = BCryptDecrypt(dk, crypted_data, crypted_size,
-            &authInfo, iv, sizeof(iv), (PUCHAR)unencrypted_buffer, unencrypted_size, &unencrypted_size, 0);
-        if (status)
-            goto closing;
-
-        BCryptDestroyKey(dk);
-
-        TCHAR temp_path[MAX_PATH + 1];
-        GetTempPath(MAX_PATH, temp_path);
-        filename = temp_path;
-        filename += _T("\\pEp_");
-        filename += delivery.substr(0, 32);
-        filename += _T(".msi");
-
-        hFile = CreateFile(filename.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-        if (!hFile)
-            goto closing;
-        DWORD writing;
-        WriteFile(hFile, unencrypted_buffer, unencrypted_size, &writing, NULL);
-        CloseHandle(hFile);
-
         install_msi(filename);
-
-        return;
 
     closing:
         if (unencrypted_buffer)
