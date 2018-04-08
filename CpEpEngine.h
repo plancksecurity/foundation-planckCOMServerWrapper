@@ -249,6 +249,7 @@ public:
     STDMETHOD(EncryptMessageForSelf)(
         pEpIdentity * targetId,
         TextMessage* src,
+        /* [in] */ SAFEARRAY *extra,
         TextMessage *dst,
         pEpEncryptFlags flags
         );

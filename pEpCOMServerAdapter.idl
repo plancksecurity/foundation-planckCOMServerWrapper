@@ -396,6 +396,7 @@ interface IpEpEngine : IUnknown {
     [id(34)] HRESULT EncryptMessageForSelf(
         [in] struct pEpIdentity* targetId,
         [in] struct TextMessage* src,
+        [in] SAFEARRAY(BSTR) extra,
         [out] struct TextMessage* dst,
         [in, defaultvalue(pEpEncryptFlagDefault)] pEpEncryptFlags flags
     );
