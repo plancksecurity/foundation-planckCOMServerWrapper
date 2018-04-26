@@ -374,10 +374,10 @@ interface IpEpEngine : IUnknown {
         [in, defaultvalue(pEpEncPep)] pEpEncFormat encFormat);
 
     [id(29)] HRESULT DecryptMessage(
-        [in] struct TextMessage *src,
+        [in, out] struct TextMessage *src,
         [out] struct TextMessage * dst,
         [out] SAFEARRAY(BSTR) *keylist,
-        [out] pEpDecryptFlags* flags,
+        [in, out] pEpDecryptFlags* flags,
         [out, retval] pEpRating *rating);
 
     [id(30)] HRESULT OutgoingMessageRating([in] struct TextMessage *msg, [out, retval] pEpRating * pVal);
