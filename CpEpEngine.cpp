@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "CpEpEngine.h"
 #include <mutex>
+#include "GateKeeper.h"
 
 using namespace std;
 using namespace pEp::utility;
@@ -1472,6 +1473,20 @@ void * CpEpEngine::retrieve_next_sync_msg(void * management, time_t *timeout)
     return msg;
 }
 
+// Force an update check now
+STDMETHODIMP CpEpEngine::UpdateNow()
+{
+    try
+    {
+        ::pEp::GateKeeper::update_now();
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());;
+    }
+}
 
 // Event callbacks
 

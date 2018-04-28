@@ -109,6 +109,9 @@ cleanup:
 }
 
 namespace pEp {
+    std::mutex GateKeeper::update_wait_mtx;
+    std::condition_variable GateKeeper::update_wait_var;
+    bool GateKeeper::update_wait_forced = false;
 
     const LPCTSTR GateKeeper::plugin_reg_path = _T("Software\\Microsoft\\Office\\Outlook\\Addins\\pEp");
     const LPCTSTR GateKeeper::plugin_reg_value_name = _T("LoadBehavior");
@@ -116,7 +119,7 @@ namespace pEp {
 
     const time_t GateKeeper::cycle = 7200;   // 7200 sec is 2 h
     const time_t GateKeeper::fraction = 10;  // first update is at 10% of cycle
-    const DWORD GateKeeper::waiting = 10000; // 10000 ms is 10 sec
+    const chrono::seconds GateKeeper::waiting = 10s; //  10 sec
 
     GateKeeper::GateKeeper(CpEpCOMServerAdapterModule * self)
         : _self(self), now(time(NULL)), next(now /*+ time_diff()*/), hkUpdater(NULL),
@@ -174,13 +177,28 @@ namespace pEp {
             now = time(NULL);
             assert(now != -1);
 
-            if (now > next) {
+            bool force_check;
+            // We need to sleep, but we should be interruptible by the update_now() method.
+            {
+                std::unique_lock<std::mutex> guard(GateKeeper::update_wait_mtx);
+                GateKeeper::update_wait_var.wait_for(guard, waiting);
+                force_check = GateKeeper::update_wait_forced;
+                GateKeeper::update_wait_forced = false;
+            }
+
+            if (force_check || now > next) {
                 next = now + GateKeeper::cycle;
                 keep_updated();
             }
-
-            Sleep(waiting);
         }
+    }
+
+    void GateKeeper::update_now() 
+    {
+        // Signal the GateKeeper thread that we need to check for updates now.
+        std::unique_lock<std::mutex> guard(GateKeeper::update_wait_mtx);
+        GateKeeper::update_wait_forced = true;
+        GateKeeper::update_wait_var.notify_all();
     }
 
     void GateKeeper::keep_plugin()

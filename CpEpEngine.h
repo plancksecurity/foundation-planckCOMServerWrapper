@@ -270,7 +270,8 @@ public:
     STDMETHOD(OpenPGPListKeyinfo)(BSTR search_pattern, LPSAFEARRAY* keyinfo_list);
 	STDMETHOD(SetOwnKey)(pEpIdentity * ident, BSTR fpr, struct pEpIdentity *result);
 
-
+    // Trigger an immediate update
+    STDMETHOD(UpdateNow)();
 protected:
     HRESULT Fire_MessageToSend(
         /* [in] */ struct TextMessage *msg);

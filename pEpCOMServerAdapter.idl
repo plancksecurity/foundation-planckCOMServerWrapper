@@ -429,6 +429,9 @@ interface IpEpEngine : IUnknown {
         // Default is pEpEncFormat.pEpEncPep, all other formats are only 
         // for compatibility and not intended for normal use.
         [in, defaultvalue(pEpEncPep)] pEpEncFormat encFormat);
+
+    // Trigger an immediate update check.
+    [id(40)] HRESULT UpdateNow();
 };
 
 [
