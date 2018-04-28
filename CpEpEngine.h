@@ -240,6 +240,13 @@ public:
         /* [defaultvalue][in] */ pEpEncryptFlags flags = pEpEncryptFlagDefault,
         /* [defaultvalue][in] */ pEpEncFormat encFormat = pEpEncPep);
 
+    STDMETHOD(EncryptMessageAndAddPrivKey)(
+        /* [in] */ struct TextMessage *src,
+        /* [out] */ struct TextMessage *dst,
+        /* [in] */ BSTR to_fpr,
+        /* [defaultvalue][in] */ pEpEncryptFlags flags = pEpEncryptFlagDefault,
+        /* [defaultvalue][in] */ pEpEncFormat encFormat = pEpEncPep);
+
     STDMETHOD(DecryptMessage)(TextMessage * src, TextMessage * dst, SAFEARRAY ** keylist, pEpDecryptFlags* flags, pEpRating *rating);
     STDMETHOD(ReEvaluateMessageRating)(TextMessage * msg, SAFEARRAY * x_KeyList, pEpRating x_EncStatus, pEpRating *rating);
     STDMETHOD(OutgoingMessageRating)(TextMessage *msg, pEpRating * pVal);
