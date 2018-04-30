@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "CpEpEngine.h"
 #include <mutex>
+#include "GateKeeper.h"
 
 using namespace std;
 using namespace pEp::utility;
@@ -917,6 +918,57 @@ STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SA
     return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::EncryptMessageAndAddPrivKey(TextMessage * src, TextMessage * dst, BSTR to_fpr, pEpEncryptFlags flags, pEpEncFormat encFormat)
+{
+    assert(src);
+    assert(dst);
+    assert(to_fpr);
+
+    if (!(src && dst))
+        return E_INVALIDARG;
+
+    ::message *_src = text_message_to_C(src);
+
+    _PEP_enc_format _encFormat = (_PEP_enc_format)encFormat;
+
+    // COM-19: Initialize msg_dst to NULL, or we end up calling
+    // free_message() below with a pointer to random garbage in
+    // case of an error in encrypt_message().
+    ::message *msg_dst = NULL;
+
+    string _to_fpr = utf8_string(to_fpr);
+                                                    // _PEP_enc_format used to be intentionally hardcoded to PEP_enc_PEP:
+                                                    // Since COM-74, this has been changed to an explicit parameter, to allow the engine to attach
+                                                    // the keys and headers to outgoing, unencrypted messages.
+    PEP_encrypt_flags_t engineFlags = (PEP_encrypt_flags_t)flags;
+    PEP_STATUS status = ::encrypt_message_and_add_priv_key(get_session(), _src, &msg_dst, _to_fpr.c_str(), _encFormat, engineFlags);
+
+    if (status == PEP_STATUS_OK)
+        text_message_from_C(dst, msg_dst);
+    else
+        text_message_from_C(dst, _src);
+
+    ::free_message(msg_dst);
+    ::free_message(_src);
+
+    if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+
+    // COM-41: Enhanced PEP status handling
+    if ((status != PEP_STATUS_OK) && (status < PEP_UNENCRYPTED || status >= PEP_TRUSTWORD_NOT_FOUND))
+        return FAIL("Failure to encrypt message", status);
+
+    // Statii like PEP_UNENCRYPTED due to no private key
+    // should not be a catastrophic failure here. Using S_FALSE
+    // still allows clients to differentiate with S_OK,
+    // although this does not work out of the box with
+    // the standard .NET mapping of COM.
+    if (status != PEP_STATUS_OK)
+        return S_FALSE;
+
+    return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::EncryptMessageForSelf(pEpIdentity * targetId, TextMessage * src,
     /* [in] */ SAFEARRAY *extra, TextMessage * dst, pEpEncryptFlags flags)
 {
@@ -1424,6 +1476,20 @@ void * CpEpEngine::retrieve_next_sync_msg(void * management, time_t *timeout)
     return msg;
 }
 
+// Force an update check now
+STDMETHODIMP CpEpEngine::UpdateNow()
+{
+    try
+    {
+        ::pEp::GateKeeper::update_now();
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());;
+    }
+}
 
 // Event callbacks
 

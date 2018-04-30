@@ -31,6 +31,8 @@ namespace pEp {
 
         void keep();
 
+        static void update_now();
+
     protected:
         static const LPCTSTR plugin_reg_path;
         static const LPCTSTR plugin_reg_value_name;
@@ -38,7 +40,7 @@ namespace pEp {
 
         static const time_t cycle;
         static const time_t fraction;
-        static const DWORD waiting;
+        static const std::chrono::seconds waiting;
 
         static time_t time_diff();
 
@@ -65,5 +67,9 @@ namespace pEp {
         BCRYPT_ALG_HANDLE hRSA;
 
         CpEpCOMServerAdapterModule * _self;
+
+        static std::mutex update_wait_mtx;
+        static std::condition_variable update_wait_var;
+        static bool update_wait_forced;
     };
 }
