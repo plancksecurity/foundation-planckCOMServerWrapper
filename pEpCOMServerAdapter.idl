@@ -315,8 +315,8 @@ interface IpEpEngine : IUnknown {
         pEpDecryptFlagOwnPrivateKey = 0x1,
         pEpDecryptFlagConsume = 0x2,
         pEpDecryptFlagIgnore = 0x4,
-		pEpDecryptFlagsSrcModified = 0x8,
-		pEpDecryptFlagsUntrustedServer = 0x100
+		pEpDecryptFlagSrcModified = 0x8,
+		pEpDecryptFlagUntrustedServer = 0x100
     } pEpDecryptFlags;
 
     typedef [v1_enum] enum pEpMsgDirection {
