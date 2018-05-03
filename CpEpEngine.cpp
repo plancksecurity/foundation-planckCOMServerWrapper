@@ -1046,10 +1046,13 @@ STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SA
     ::stringlist_t *_keylist = NULL;
     ::PEP_rating _rating;
 
-    PEP_decrypt_flags_t engineflags = 0;
+    PEP_decrypt_flags_t engineflags = (PEP_decrypt_flags_t) *flags;
     PEP_STATUS status = ::decrypt_message(get_session(), _src, &msg_dst, &_keylist, &_rating, &engineflags);
 
     *flags = (pEpDecryptFlags)engineflags;
+
+    if (engineflags && PEP_decrypt_flag_src_modified)
+        text_message_from_C(src, _src);
 
     if (msg_dst)
         text_message_from_C(dst, msg_dst);

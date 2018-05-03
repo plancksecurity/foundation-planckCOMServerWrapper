@@ -314,7 +314,9 @@ interface IpEpEngine : IUnknown {
         pEpDecryptFlagsNone = 0,
         pEpDecryptFlagOwnPrivateKey = 0x1,
         pEpDecryptFlagConsume = 0x2,
-        pEpDecryptFlagIgnore = 0x4
+        pEpDecryptFlagIgnore = 0x4,
+		pEpDecryptFlagSrcModified = 0x8,
+		pEpDecryptFlagUntrustedServer = 0x100
     } pEpDecryptFlags;
 
     typedef [v1_enum] enum pEpMsgDirection {
@@ -364,7 +366,7 @@ interface IpEpEngine : IUnknown {
     };
 
     [id(28)] HRESULT EncryptMessage(
-        [in] struct TextMessage *src,
+        [in,out] struct TextMessage *src,
         [out] struct TextMessage * dst,
         [in] SAFEARRAY(BSTR) extra,
         [in, defaultvalue(pEpEncryptFlagDefault)] pEpEncryptFlags flags,
@@ -374,10 +376,10 @@ interface IpEpEngine : IUnknown {
         [in, defaultvalue(pEpEncPep)] pEpEncFormat encFormat);
 
     [id(29)] HRESULT DecryptMessage(
-        [in] struct TextMessage *src,
+        [in, out] struct TextMessage *src,
         [out] struct TextMessage * dst,
         [out] SAFEARRAY(BSTR) *keylist,
-        [out] pEpDecryptFlags* flags,
+        [in, out] pEpDecryptFlags* flags,
         [out, retval] pEpRating *rating);
 
     [id(30)] HRESULT OutgoingMessageRating([in] struct TextMessage *msg, [out, retval] pEpRating * pVal);
