@@ -378,7 +378,7 @@ interface IpEpEngine : IUnknown {
     [id(29)] HRESULT DecryptMessage(
         [in, out] struct TextMessage *src,
         [out] struct TextMessage * dst,
-        [out] SAFEARRAY(BSTR) *keylist,
+        [in, out] SAFEARRAY(BSTR) *keylist,
         [in, out] pEpDecryptFlags* flags,
         [out, retval] pEpRating *rating);
 

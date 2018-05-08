@@ -1038,12 +1038,11 @@ STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SA
     if (!(src && dst && keylist && flags && rating))
         return E_INVALIDARG;
 
-    *keylist = NULL;
     *rating = pEpRatingUndefined;
 
     ::message *_src = text_message_to_C(src);
     ::message *msg_dst = NULL;
-    ::stringlist_t *_keylist = NULL;
+    ::stringlist_t *_keylist = new_stringlist(*keylist);
     ::PEP_rating _rating;
 
     PEP_decrypt_flags_t engineflags = (PEP_decrypt_flags_t) *flags;
