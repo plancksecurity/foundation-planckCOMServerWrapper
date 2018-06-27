@@ -308,6 +308,9 @@ interface IpEpEngine : IUnknown {
         // by normal pEp clients!
         pEpEncryptFlagForceNoAttachedKey = 0x4,
 
+		// This is mainly used by pEp clients to send private keys to 
+		// their own PGP-only device
+		pEpEncryptFlagForceVersion1 = 0x16
     } pEpEncryptFlags;
 
     typedef [v1_enum] enum pEpDecryptFlags {
