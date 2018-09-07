@@ -1113,6 +1113,25 @@ STDMETHODIMP CpEpEngine::OutgoingMessageRating(TextMessage *msg, pEpRating * pVa
     return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::OutgoingMessageRatingPreview(TextMessage *msg, pEpRating * pVal)
+{
+	assert(msg);
+	assert(pVal);
+
+	if (!(msg  && pVal))
+		return E_INVALIDARG;
+
+	::message *_msg = text_message_to_C(msg);
+
+	PEP_rating _rating;
+	PEP_STATUS status = ::outgoing_message_rating_preview(get_session(), _msg, &_rating);
+	if (status != PEP_STATUS_OK)
+		return FAIL(L"cannot get message rating", status);
+
+	*pVal = (pEpRating)_rating;
+	return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::IdentityRating(struct pEpIdentity *ident, pEpRating * pVal)
 {
     ::pEp_identity *_ident;
