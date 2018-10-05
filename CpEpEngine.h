@@ -39,7 +39,6 @@ public:
 
     ~CpEpEngine()
     {
-        stop_keysync();
         StopKeyserverLookup();
         if (m_session) // may be zero when FinalConstruct failed to initialize the engine
         {
@@ -147,13 +146,6 @@ private:
     IpEpEngineCallbacks* client_callbacks = NULL;
     IpEpEngineCallbacks* client_callbacks_on_sync_thread = NULL;
     bool client_last_signalled_polling_state = true;
-
-    // Keysync members
-    static int inject_sync_msg(void *msg, void* management);
-    static void* retrieve_next_sync_msg(void* management, time_t *timeout);
-    void start_keysync();
-    static void do_keysync_in_thread(CpEpEngine* self, LPSTREAM marshaled_callbacks);
-    void stop_keysync();
 
     static std::mutex init_mutex;
 
