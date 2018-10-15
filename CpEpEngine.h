@@ -38,13 +38,18 @@ public:
     {
         // See FinalConstruct() below for most initialization work, and an
         // explanation why it had to be moved there...
+        ++count;
     }
 
     ~CpEpEngine()
     {
-        StopKeyserverLookup();
-        ::log_event(session(), "Shutdown", "pEp COM Adapter", NULL, NULL);
-        session(pEp::Adapter::release);
+        --count;
+        if (!count) {
+            StopKeyserverLookup();
+            ::log_event(session(), "Shutdown", "pEp COM Adapter", NULL, NULL);
+            session(pEp::Adapter::release);
+            shutdown();
+        }
     }
 
     DECLARE_REGISTRY_RESOURCEID(IDR_PEPENGINE)
@@ -80,6 +85,7 @@ public:
 
         ::register_examine_function(session(), CpEpEngine::examine_identity, (void *)this);
         ::log_event(session(), "Startup", "pEp COM Adapter", NULL, NULL);
+        startup(messageToSend, notifyHandshake);
         return S_OK;
     }
 
@@ -118,6 +124,8 @@ private:
 
     static std::list< IpEpEngineCallbacks * > all_callbacks;
     static std::mutex callbacks_mutex;
+
+    static atomic< int > count;
 
 public:
     // runtime config of the adapter

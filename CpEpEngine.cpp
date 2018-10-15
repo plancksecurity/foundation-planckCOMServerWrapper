@@ -21,6 +21,8 @@ std::mutex CpEpEngine::init_mutex;
 std::list< IpEpEngineCallbacks * > CpEpEngine::all_callbacks;
 std::mutex CpEpEngine::callbacks_mutex;
 
+atomic< int > CpEpEngine::count = 0;
+
 STDMETHODIMP CpEpEngine::InterfaceSupportsErrorInfo(REFIID riid)
 {
     static const IID* const arr[] =
