@@ -63,9 +63,6 @@
     <ClInclude Include="CpEpEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="locked_queue.hh">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="utf8_helper.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -41,10 +41,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\vb\Documents\Visual Studio 2015\Projects\pEp_for_Outlook_Solution;C:\Users\vb\Documents\Visual Studio 2015\Projects\pEp_for_Outlook_Solution\pEpEngine\src;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\vb\Documents\Visual Studio 2015\Projects\pEp_for_Outlook_Solution;C:\Users\vb\Documents\Visual Studio 2015\Projects\pEp_for_Outlook_Solution\pEpEngine\src;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'">
     <PostBuildEvent>
@@ -156,7 +158,6 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
   <ItemGroup>
     <ClInclude Include="CpEpEngine.h" />
     <ClInclude Include="GateKeeper.h" />
-    <ClInclude Include="locked_queue.hh" />
     <ClInclude Include="pEpCOMServerAdapter.h" />
     <ClInclude Include="pEpCOMServerAdapter_i.h" />
     <ClInclude Include="pEp_utility.h" />
@@ -183,6 +184,9 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
     <Midl Include="pEpCOMServerAdapter.idl" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\libpEpAdapter\libpEpAdapter\libpEpAdapter.vcxproj">
+      <Project>{ec44fec9-2f3a-4a0c-b60e-0f22aa43ef58}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\pEpEngine\build-windows\pEpEngine.vcxproj">
       <Project>{146e69f8-e1da-456a-b048-6dd29d9acf6b}</Project>
     </ProjectReference>

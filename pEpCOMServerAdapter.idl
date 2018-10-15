@@ -256,8 +256,8 @@ interface IpEpEngine : IUnknown {
     [id(18)] HRESULT KeyResetTrust([in] struct pEpIdentity *ident);
     [id(19)] HRESULT TrustPersonalKey([in] struct pEpIdentity *ident, [out, retval] struct pEpIdentity *result);
     [id(20)] HRESULT OwnIdentitiesRetrieve([out, retval] SAFEARRAY(struct pEpIdentity)* ownIdentities);
-    [id(21)] HRESULT UndoLastMistrust();
-    [id(22)] HRESULT IsPepUser([in] struct pEpIdentity *ident, [out, retval] VARIANT_BOOL *ispEp);
+    // [id(21)] HRESULT UndoLastMistrust(); NOT IMPLEMENTED ANY MORE - USE KeyResetTrust() instead
+    [id(22)] HRESULT IspEpUser([in] struct pEpIdentity *ident, [out, retval] VARIANT_BOOL *ispEp);
 
     // Blacklist API
 
