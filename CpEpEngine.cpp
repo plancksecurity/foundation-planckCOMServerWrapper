@@ -12,6 +12,8 @@ using namespace pEp::Adapter;
 
 // CpEpEngine
 
+pEp::pc_container< CpEpEngine::MarshaledCallbacks, IpEpEngineCallbacks > CpEpEngine::sync_callbacks;
+
 // the init_mutex protects our initialization and destruction
 // against a running keysync thread, and it ensures that the
 // keysync thread actually has finished before we're destructed.
