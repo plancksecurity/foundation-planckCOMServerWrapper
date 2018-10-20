@@ -17,10 +17,6 @@ using namespace pEp::Adapter;
 // keysync thread actually has finished before we're destructed.
 
 std::mutex CpEpEngine::init_mutex;
-
-std::list< IpEpEngineCallbacks * > CpEpEngine::all_callbacks;
-std::mutex CpEpEngine::callbacks_mutex;
-
 atomic< int > CpEpEngine::count = 0;
 
 STDMETHODIMP CpEpEngine::InterfaceSupportsErrorInfo(REFIID riid)
@@ -738,63 +734,85 @@ int CpEpEngine::examine_identity(pEp_identity *ident, void *management)
     return _ident;
 }
 
-PEP_STATUS CpEpEngine::messageToSend(message *msg)
+PEP_STATUS CpEpEngine::_messageToSend(message *msg, bool in_sync)
 {
     assert(msg);
     if (!msg)
         return PEP_ILLEGAL_VALUE;
 
-    lock_guard< mutex > lock(callbacks_mutex);
+    for (auto p = sync_callbacks.begin(); p != sync_callbacks.end(); ++p) {
+        IpEpEngineCallbacks *cb = p->pdata->unmarshaled;
 
-    // use the first one
-    IpEpEngineCallbacks *cb = all_callbacks.front();
+        if (cb) {
+            TextMessage _msg;
+            memset(&_msg, 0, sizeof(TextMessage));
 
-    TextMessage _msg;
-    memset(&_msg, 0, sizeof(TextMessage));
+            text_message_from_C(&_msg, msg);
+            HRESULT r = cb->MessageToSend(&_msg);
+            assert(r == S_OK);
+            clear_text_message(&_msg);
+            if (r == E_OUTOFMEMORY)
+                return PEP_OUT_OF_MEMORY;
+            if (r != S_OK)
+                return PEP_UNKNOWN_ERROR;
+        }
+    }
 
-    text_message_from_C(&_msg, msg);
-    HRESULT r = cb->MessageToSend(&_msg);
-    assert(r == S_OK);
-    clear_text_message(&_msg);
-    if (r == E_OUTOFMEMORY)
-        return PEP_OUT_OF_MEMORY;
-    if (r != S_OK)
-        return PEP_UNKNOWN_ERROR;
+    return PEP_STATUS_OK;
+}
+
+PEP_STATUS CpEpEngine::messageToSend(message *msg)
+{
+    return _messageToSend(msg);
+}
+
+PEP_STATUS CpEpEngine::messageToSend_sync(message *msg)
+{
+    return _messageToSend(msg, true);
+}
+
+PEP_STATUS CpEpEngine::_notifyHandshake(::pEp_identity *self, ::pEp_identity *partner, sync_handshake_signal signal, bool in_sync)
+{
+    assert(self && partner);
+    if (!(self && partner))
+        return PEP_ILLEGAL_VALUE;
+
+    // fire all of them
+    for (auto p = sync_callbacks.begin(); p != sync_callbacks.end(); ++p) {
+        IpEpEngineCallbacks *cb = nullptr;
+        if (in_sync)
+            cb = p->cdata;
+        else
+            cb = p->pdata->unmarshaled;
+
+        if (cb) {
+            pEpIdentity _self;
+            copy_identity(&_self, self);
+            pEpIdentity _partner;
+            copy_identity(&_partner, partner);
+
+            SyncHandshakeSignal _signal = (SyncHandshakeSignal)signal;
+            SyncHandshakeResult result;
+            HRESULT r = cb->NotifyHandshake(&_self, &_partner, _signal, &result);
+            assert(r == S_OK);
+            clear_identity_s(_self);
+            clear_identity_s(_partner);
+            if (r == E_OUTOFMEMORY)
+                return PEP_OUT_OF_MEMORY;
+        }
+    }
 
     return PEP_STATUS_OK;
 }
 
 PEP_STATUS CpEpEngine::notifyHandshake(::pEp_identity *self, ::pEp_identity *partner, sync_handshake_signal signal)
 {
-    assert(self && partner);
-    if (!(self && partner))
-        return PEP_ILLEGAL_VALUE;
+    return _notifyHandshake(self, partner, signal);
+}
 
-    lock_guard< mutex > lock(callbacks_mutex);
-    
-    if (all_callbacks.size() == 0)
-        return PEP_SYNC_NO_NOTIFY_CALLBACK;
-
-    // fire all of them
-    for (auto i = all_callbacks.begin(); i != all_callbacks.end(); ++i) {
-        IpEpEngineCallbacks *cb = *i;
-
-        pEpIdentity _self;
-        copy_identity(&_self, self);
-        pEpIdentity _partner;
-        copy_identity(&_partner, partner);
-
-        SyncHandshakeSignal _signal = (SyncHandshakeSignal) signal;
-        SyncHandshakeResult result;
-        HRESULT r = cb->NotifyHandshake(&_self, &_partner, _signal, &result);
-        assert(r == S_OK);
-        clear_identity_s(_self);
-        clear_identity_s(_partner);
-        if (r == E_OUTOFMEMORY)
-            return PEP_OUT_OF_MEMORY;
-    }
-
-    return PEP_STATUS_OK;
+PEP_STATUS CpEpEngine::notifyHandshake_sync(::pEp_identity *self, ::pEp_identity *partner, sync_handshake_signal signal)
+{
+    return _notifyHandshake(self, partner, signal, true);
 }
 
 STDMETHODIMP CpEpEngine::BlacklistAdd(BSTR fpr)
@@ -1340,10 +1358,12 @@ STDMETHODIMP CpEpEngine::RegisterCallbacks(IpEpEngineCallbacks* new_callbacks)
     this->client_callbacks = new_callbacks;
     new_callbacks->AddRef();
 
-    {
-        lock_guard< mutex > lock(callbacks_mutex);
-        all_callbacks.push_back(this->client_callbacks);
-    }
+    // provide callbacks to sync
+    LPSTREAM marshaled_callbacks;
+    auto result = CoMarshalInterThreadInterfaceInStream(IID_IpEpEngineCallbacks, client_callbacks, &marshaled_callbacks);
+    assert(SUCCEEDED(result));
+    assert(marshaled_callbacks);
+    sync_callbacks.insert(new MarshaledCallbacks({ this->client_callbacks, marshaled_callbacks }));
 
     return S_OK;
 }
@@ -1355,13 +1375,11 @@ STDMETHODIMP CpEpEngine::UnregisterCallbacks()
     if (!this->client_callbacks)
         return S_FALSE;
 
-    {
-        lock_guard< mutex > lock(callbacks_mutex);
-        for (auto i = all_callbacks.begin(); i != all_callbacks.end(); ++i) {
-            if (*i == this->client_callbacks) {
-                all_callbacks.erase(i);
-                break;
-            }
+    for (auto p = sync_callbacks.begin(); p != sync_callbacks.end(); ++p) {
+        if (p->pdata->unmarshaled == this->client_callbacks) {
+            delete p->pdata;
+            sync_callbacks.erase(p);
+            break;
         }
     }
 

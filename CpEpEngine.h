@@ -11,6 +11,7 @@
 #include <queue>
 #include <mutex>
 #include <vector>
+#include "..\libpEpAdapter\pc_container.hh"
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
@@ -85,7 +86,9 @@ public:
 
         ::register_examine_function(session(), CpEpEngine::examine_identity, (void *)this);
         ::log_event(session(), "Startup", "pEp COM Adapter", NULL, NULL);
-        startup(messageToSend, notifyHandshake);
+
+        startup<CpEpEngine>(messageToSend, notifyHandshake, messageToSend_sync, notifyHandshake_sync, this);
+
         return S_OK;
     }
 
@@ -93,12 +96,18 @@ public:
     {
     }
 
-
 protected:
     typedef locked_queue<pEp_identity_cpp> identity_queue_t;
     static ::pEp_identity * retrieve_next_identity(void *management);
+
+    static PEP_STATUS _messageToSend(message *msg, bool in_sync = false);
+    static PEP_STATUS _notifyHandshake(pEp_identity *self, pEp_identity *partner, sync_handshake_signal signal, bool in_sync = false);
+
     static PEP_STATUS messageToSend(message *msg);
     static PEP_STATUS notifyHandshake(pEp_identity *self, pEp_identity *partner, sync_handshake_signal signal);
+
+    static PEP_STATUS messageToSend_sync(message *msg);
+    static PEP_STATUS notifyHandshake_sync(pEp_identity *self, pEp_identity *partner, sync_handshake_signal signal);
 
     HRESULT error(_bstr_t msg);
     HRESULT error(_bstr_t msg, PEP_STATUS errorcode);
@@ -113,6 +122,14 @@ protected:
     }
 
 private:
+    // callbacks for sync
+    struct MarshaledCallbacks {
+        IpEpEngineCallbacks *unmarshaled;
+        LPSTREAM marshaled;
+    };
+
+    static pEp::pc_container< MarshaledCallbacks, IpEpEngineCallbacks > sync_callbacks;
+
     atomic< identity_queue_t * > identity_queue;
     thread *keymanagement_thread;
     bool verbose_mode;
@@ -121,10 +138,6 @@ private:
     bool client_last_signalled_polling_state = true;
 
     static std::mutex init_mutex;
-
-    static std::list< IpEpEngineCallbacks * > all_callbacks;
-    static std::mutex callbacks_mutex;
-
     static atomic< int > count;
 
 public:
