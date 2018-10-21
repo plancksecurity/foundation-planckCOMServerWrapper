@@ -271,19 +271,19 @@ namespace pEp {
     {
         string result;
 
-        BCRYPT_KEY_HANDLE hUpdateKey;
+        BCRYPT_KEY_HANDLE hUpdateKey = NULL;
         string _update_key = update_key();
 
-        PCERT_PUBLIC_KEY_INFO uk;
-        DWORD uk_size;
+        PCERT_PUBLIC_KEY_INFO uk = NULL;
+        DWORD uk_size = 0;
 
         BOOL bResult = CryptDecodeObjectEx(X509_ASN_ENCODING, X509_PUBLIC_KEY_INFO,
             (const BYTE *)_update_key.data(), _update_key.size(), CRYPT_DECODE_ALLOC_FLAG, NULL, &uk, &uk_size);
         if (!bResult)
             throw runtime_error("CryptDecodeObjectEx: X509_PUBLIC_KEY_INFO");
 
-        PUBLIC_KEY_VALUES *_uk;
-        DWORD _uk_size;
+        PUBLIC_KEY_VALUES *_uk = NULL;
+        DWORD _uk_size = 0;
 
         bResult = CryptDecodeObjectEx(X509_ASN_ENCODING, RSA_CSP_PUBLICKEYBLOB,
             uk->PublicKey.pbData, uk->PublicKey.cbData, CRYPT_DECODE_ALLOC_FLAG, NULL, &_uk, &_uk_size);
@@ -293,14 +293,14 @@ namespace pEp {
 
         HRESULT hResult = ImportRsaPublicKey(hRSA, _uk, &hUpdateKey);
         LocalFree(_uk);
-        if (hResult)
+        if (!SUCCEEDED(hResult))
             throw runtime_error("ImportRsaPublicKey");
 
         ULONG psize;
         NTSTATUS status = BCryptGetProperty(hUpdateKey, BCRYPT_ALGORITHM_NAME, NULL, 0, &psize, 0);
         char *prop = new char[psize];
         TCHAR *_prop = (TCHAR *)prop;
-        BCryptGetProperty(hUpdateKey, BCRYPT_ALGORITHM_NAME, (PUCHAR)prop, psize, &psize, 0);
+        status = BCryptGetProperty(hUpdateKey, BCRYPT_ALGORITHM_NAME, (PUCHAR)prop, psize, &psize, 0);
 
         ULONG export_size;
         status = BCryptExportKey(hDeliveryKey, NULL, BCRYPT_KEY_DATA_BLOB, NULL, NULL,
