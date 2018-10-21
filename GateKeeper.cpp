@@ -321,7 +321,7 @@ namespace pEp {
         memset(&pi, 0, sizeof(BCRYPT_OAEP_PADDING_INFO));
         pi.pszAlgId = BCRYPT_SHA256_ALGORITHM;
 
-        ULONG result_size;
+        ULONG result_size = 0;
         PUCHAR _result = NULL;
         ULONG blob_size = export_size - sizeof(BCRYPT_KEY_DATA_BLOB_HEADER);
         PUCHAR blob = _delivery_key + sizeof(BCRYPT_KEY_DATA_BLOB_HEADER);
@@ -332,7 +332,7 @@ namespace pEp {
             throw runtime_error("BCryptEncrypt: calculating result size");
         }
 
-        _result = new UCHAR[result_size];
+        _result = new UCHAR[result_size + 1];
         status = BCryptEncrypt(hUpdateKey, blob, blob_size, &pi, NULL, 0, _result, result_size, &copied, BCRYPT_PAD_OAEP);
         delete[] _delivery_key;
         if (status) {
