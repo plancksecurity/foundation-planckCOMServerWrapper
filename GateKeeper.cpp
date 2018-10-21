@@ -359,9 +359,9 @@ namespace pEp {
         product_list products;
 
         // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724872(v=vs.85).aspx
-        TCHAR value_name[16384];
+        static TCHAR value_name[16384];
         DWORD value_name_size;
-        TCHAR value[L_MAX_URL_LENGTH + 1];
+        static TCHAR value[L_MAX_URL_LENGTH + 1];
         DWORD value_size;
 
         LONG lResult = ERROR_SUCCESS;
