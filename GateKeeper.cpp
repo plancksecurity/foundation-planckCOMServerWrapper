@@ -293,7 +293,7 @@ namespace pEp {
 
         HRESULT hResult = ImportRsaPublicKey(hRSA, _uk, &hUpdateKey);
         LocalFree(_uk);
-        if (!SUCCEEDED(hResult))
+        if (!hUpdateKey)
             throw runtime_error("ImportRsaPublicKey");
 
         ULONG psize;
@@ -301,6 +301,8 @@ namespace pEp {
         char *prop = new char[psize];
         TCHAR *_prop = (TCHAR *)prop;
         status = BCryptGetProperty(hUpdateKey, BCRYPT_ALGORITHM_NAME, (PUCHAR)prop, psize, &psize, 0);
+        if (status)
+            throw runtime_error("BCryptGetProperty: BCRYPT_ALGORITHM_NAME");
 
         ULONG export_size;
         status = BCryptExportKey(hDeliveryKey, NULL, BCRYPT_KEY_DATA_BLOB, NULL, NULL,

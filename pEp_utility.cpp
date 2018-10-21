@@ -217,8 +217,11 @@ namespace pEp {
             SafeArrayGetUBound(sa, 1, &ubound);
 
             T *_tl = tl;
-            for (LONG i = lbound; i <= ubound; _tl = _tl->next, i++)
-                SafeArrayPutElement(sa, &i, from_C<T2 *, T>(_tl));
+            for (LONG i = lbound; i <= ubound; _tl = _tl->next, i++) {
+                HRESULT result = SafeArrayPutElement(sa, &i, from_C<T2 *, T>(_tl));
+                if (!SUCCEEDED(result))
+                    throw bad_alloc();
+            }
 
             return sa;
         }

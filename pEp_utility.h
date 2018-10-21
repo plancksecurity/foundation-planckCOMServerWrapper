@@ -52,15 +52,20 @@ namespace pEp {
             LPTYPEINFO pTypeInfo = NULL;
             LPSAFEARRAY psaUDType = NULL;
             IRecordInfo* pRecInfo = NULL;
+            HRESULT hr;
 
             // Fetch the IRecordInfo interface describing the UDT
-            if (pTypelib == NULL)
-                LoadRegTypeLib(LIBID_pEpCOMServerAdapterLib, 1, 0, GetUserDefaultLCID(), &pTypelib);
+            if (pTypelib == NULL) {
+                hr = LoadRegTypeLib(LIBID_pEpCOMServerAdapterLib, 1, 0, GetUserDefaultLCID(), &pTypelib);
+                assert(SUCCEEDED(hr));
+                if (!SUCCEEDED(hr))
+                    throw runtime_error("getRecordInfo(): LoadRegTypeLib cannot load LIBID_pEpCOMServerAdapterLib");
+            }
 
             assert(pTypelib);
 
             GUID guid = __uuidof(UDType);
-            HRESULT hr = pTypelib->GetTypeInfoOfGuid(guid, &pTypeInfo);
+            hr = pTypelib->GetTypeInfoOfGuid(guid, &pTypeInfo);
             assert(SUCCEEDED(hr) && pTypeInfo);
             hr = GetRecordInfoFromTypeInfo(pTypeInfo, &pRecInfo);
             assert(SUCCEEDED(hr) && pRecInfo);
