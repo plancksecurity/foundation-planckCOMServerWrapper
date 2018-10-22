@@ -50,6 +50,16 @@ public:
             ::log_event(session(), "Shutdown", "pEp COM Adapter", NULL, NULL);
             session(pEp::Adapter::release);
             shutdown();
+
+            sync_callbacks.clear([](CpEpEngine::MarshaledCallbacks *p) {
+                if (p) {
+                    if (p->marshaled)
+                        p->marshaled->Release();
+                    if (p->unmarshaled)
+                        p->unmarshaled->Release();
+                    delete p;
+                }
+            });
         }
     }
 
