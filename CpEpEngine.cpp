@@ -1378,7 +1378,7 @@ STDMETHODIMP CpEpEngine::UnregisterCallbacks()
         return S_FALSE;
 
     for (auto p = sync_callbacks.begin(); p != sync_callbacks.end(); ++p) {
-        if (p->pdata->unmarshaled == this->client_callbacks) {
+        if (p->pdata && p->pdata->unmarshaled == this->client_callbacks) {
             if (p->pdata->marshaled)
                 p->pdata->marshaled->Release();
             if (p->pdata->unmarshaled)
