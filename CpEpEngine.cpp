@@ -778,6 +778,8 @@ PEP_STATUS CpEpEngine::messageToSend(message *msg)
         }
     }
 
+    sync_callbacks.compact();
+
     return PEP_STATUS_OK;
 }
 
@@ -809,6 +811,8 @@ PEP_STATUS CpEpEngine::notifyHandshake(::pEp_identity *self, ::pEp_identity *par
                 return PEP_OUT_OF_MEMORY;
         }
     }
+
+    sync_callbacks.compact();
 
     return PEP_STATUS_OK;
 }
