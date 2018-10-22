@@ -736,13 +736,17 @@ int CpEpEngine::examine_identity(pEp_identity *ident, void *management)
     return _ident;
 }
 
-static IpEpEngineCallbacks * _unmarshaled_consumer(CpEpEngine::callback_container::Container::const_iterator p)
+static IpEpEngineCallbacks * _unmarshaled_consumer(CpEpEngine::callback_container::Container::iterator p)
 {
     if (!p->cdata && p->pdata && p->pdata->marshaled) {
         HRESULT r = CoGetInterfaceAndReleaseStream(p->pdata->marshaled, IID_IpEpEngineCallbacks, (LPVOID*) &p->cdata);
         if (!SUCCEEDED(r))
             throw runtime_error("_unmarshaled_consumer(): CoGetInterfaceAndReleaseStream() failed");
         p->pdata->marshaled = nullptr;
+    }
+    else if (p->cdata && !p->pdata) {
+        p->cdata->Release();
+        p->cdata = nullptr;
     }
 
     return p->cdata;
