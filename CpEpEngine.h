@@ -84,7 +84,7 @@ public:
             return res;
         }
 
-        startup<CpEpEngine>(messageToSend, notifyHandshake, this, &CpEpEngine::Startup_sync);
+        startup<CpEpEngine>(messageToSend, notifyHandshake, this, &CpEpEngine::Startup_sync, &CpEpEngine::Shutdown_sync);
 
         ::register_examine_function(session(), CpEpEngine::examine_identity, (void *)this);
         ::log_event(session(), "Startup", "pEp COM Adapter", NULL, NULL);
@@ -132,6 +132,11 @@ private:
         HRESULT r = CoInitializeEx(NULL, COINIT_MULTITHREADED);
         if (!SUCCEEDED(r))
             throw runtime_error("CoInitializeEx() failed on sync thread");
+    }
+
+    void Shutdown_sync()
+    {
+        CoUninitialize();
     }
 
     atomic< identity_queue_t * > identity_queue;
