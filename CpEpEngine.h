@@ -87,7 +87,7 @@ public:
         ::register_examine_function(session(), CpEpEngine::examine_identity, (void *)this);
         ::log_event(session(), "Startup", "pEp COM Adapter", NULL, NULL);
 
-        startup<CpEpEngine>(messageToSend, notifyHandshake, messageToSend_sync, notifyHandshake_sync, this);
+        startup<CpEpEngine>(messageToSend, notifyHandshake, messageToSend_sync, notifyHandshake_sync, this, &CpEpEngine::Startup_sync);
 
         return S_OK;
     }
@@ -129,6 +129,13 @@ private:
     };
 
     static pEp::pc_container< MarshaledCallbacks, IpEpEngineCallbacks > sync_callbacks;
+
+    void Startup_sync()
+    {
+        HRESULT r = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+        if (!SUCCEEDED(r))
+            throw runtime_error("CoInitializeEx() failed on sync thread");
+    }
 
     atomic< identity_queue_t * > identity_queue;
     thread *keymanagement_thread;
