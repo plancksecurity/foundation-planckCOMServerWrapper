@@ -84,10 +84,10 @@ public:
             return res;
         }
 
+        startup<CpEpEngine>(messageToSend, notifyHandshake, this, &CpEpEngine::Startup_sync);
+
         ::register_examine_function(session(), CpEpEngine::examine_identity, (void *)this);
         ::log_event(session(), "Startup", "pEp COM Adapter", NULL, NULL);
-
-        startup<CpEpEngine>(messageToSend, notifyHandshake, this, &CpEpEngine::Startup_sync);
 
         return S_OK;
     }
@@ -95,6 +95,13 @@ public:
     void FinalRelease()
     {
     }
+
+    struct MarshaledCallbacks {
+        IpEpEngineCallbacks *unmarshaled;
+        LPSTREAM marshaled;
+    };
+
+    typedef pEp::pc_container< MarshaledCallbacks, IpEpEngineCallbacks > callback_container;
 
 protected:
     typedef locked_queue<pEp_identity_cpp> identity_queue_t;
@@ -117,12 +124,8 @@ protected:
 
 private:
     // callbacks for sync
-    struct MarshaledCallbacks {
-        IpEpEngineCallbacks *unmarshaled;
-        LPSTREAM marshaled;
-    };
 
-    static pEp::pc_container< MarshaledCallbacks, IpEpEngineCallbacks > sync_callbacks;
+    static callback_container sync_callbacks;
 
     void Startup_sync()
     {

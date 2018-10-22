@@ -12,7 +12,7 @@ using namespace pEp::Adapter;
 
 // CpEpEngine
 
-pEp::pc_container< CpEpEngine::MarshaledCallbacks, IpEpEngineCallbacks > CpEpEngine::sync_callbacks;
+CpEpEngine::callback_container CpEpEngine::sync_callbacks;
 
 // the init_mutex protects our initialization and destruction
 // against a running keysync thread, and it ensures that the
@@ -736,6 +736,18 @@ int CpEpEngine::examine_identity(pEp_identity *ident, void *management)
     return _ident;
 }
 
+static IpEpEngineCallbacks * _unmarshaled_consumer(CpEpEngine::callback_container::Container::const_iterator p)
+{
+    if (!p->cdata && p->pdata->marshaled) {
+        HRESULT r = CoGetInterfaceAndReleaseStream(p->pdata->marshaled, IID_IpEpEngineCallbacks, (LPVOID*) &p->cdata);
+        if (!SUCCEEDED(r))
+            throw runtime_error("_unmarshaled_consumer(): CoGetInterfaceAndReleaseStream() failed");
+        p->pdata->marshaled = nullptr;
+    }
+
+    return p->cdata;
+}
+
 PEP_STATUS CpEpEngine::messageToSend(message *msg)
 {
     assert(msg);
@@ -745,11 +757,7 @@ PEP_STATUS CpEpEngine::messageToSend(message *msg)
     bool in_sync = on_sync_thread();
 
     for (auto p = sync_callbacks.begin(); p != sync_callbacks.end(); ++p) {
-        IpEpEngineCallbacks *cb;
-        if (in_sync)
-            cb = p->cdata;
-        else
-            cb = p->pdata->unmarshaled;
+        IpEpEngineCallbacks *cb = in_sync ? _unmarshaled_consumer(p) : p->pdata->unmarshaled;
 
         if (cb) {
             TextMessage _msg;
