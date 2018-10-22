@@ -743,7 +743,11 @@ PEP_STATUS CpEpEngine::_messageToSend(message *msg, bool in_sync)
         return PEP_ILLEGAL_VALUE;
 
     for (auto p = sync_callbacks.begin(); p != sync_callbacks.end(); ++p) {
-        IpEpEngineCallbacks *cb = p->pdata->unmarshaled;
+        IpEpEngineCallbacks *cb;
+        if (in_sync)
+            cb = p->cdata;
+        else
+            cb = p->pdata->unmarshaled;
 
         if (cb) {
             TextMessage _msg;
