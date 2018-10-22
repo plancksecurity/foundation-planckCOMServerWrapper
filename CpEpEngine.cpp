@@ -1379,14 +1379,18 @@ STDMETHODIMP CpEpEngine::UnregisterCallbacks()
 
     for (auto p = sync_callbacks.begin(); p != sync_callbacks.end(); ++p) {
         if (p->pdata->unmarshaled == this->client_callbacks) {
+            if (p->pdata->marshaled)
+                p->pdata->marshaled->Release();
+            if (p->pdata->unmarshaled)
+                p->pdata->unmarshaled->Release();
             delete p->pdata;
-            sync_callbacks.erase(p);
+            p->pdata = nullptr;
             break;
         }
     }
 
     this->client_callbacks->Release();
-    this->client_callbacks = NULL;
+    this->client_callbacks = nullptr;
 
     return S_OK;
 }
