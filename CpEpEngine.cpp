@@ -736,11 +736,13 @@ int CpEpEngine::examine_identity(pEp_identity *ident, void *management)
     return _ident;
 }
 
-PEP_STATUS CpEpEngine::_messageToSend(message *msg, bool in_sync)
+PEP_STATUS CpEpEngine::messageToSend(message *msg)
 {
     assert(msg);
     if (!msg)
         return PEP_ILLEGAL_VALUE;
+
+    bool in_sync = on_sync_thread();
 
     for (auto p = sync_callbacks.begin(); p != sync_callbacks.end(); ++p) {
         IpEpEngineCallbacks *cb;
@@ -767,21 +769,13 @@ PEP_STATUS CpEpEngine::_messageToSend(message *msg, bool in_sync)
     return PEP_STATUS_OK;
 }
 
-PEP_STATUS CpEpEngine::messageToSend(message *msg)
-{
-    return _messageToSend(msg);
-}
-
-PEP_STATUS CpEpEngine::messageToSend_sync(message *msg)
-{
-    return _messageToSend(msg, true);
-}
-
-PEP_STATUS CpEpEngine::_notifyHandshake(::pEp_identity *self, ::pEp_identity *partner, sync_handshake_signal signal, bool in_sync)
+PEP_STATUS CpEpEngine::notifyHandshake(::pEp_identity *self, ::pEp_identity *partner, sync_handshake_signal signal)
 {
     assert(self && partner);
     if (!(self && partner))
         return PEP_ILLEGAL_VALUE;
+
+    bool in_sync = on_sync_thread();
 
     // fire all of them
     for (auto p = sync_callbacks.begin(); p != sync_callbacks.end(); ++p) {
@@ -809,16 +803,6 @@ PEP_STATUS CpEpEngine::_notifyHandshake(::pEp_identity *self, ::pEp_identity *pa
     }
 
     return PEP_STATUS_OK;
-}
-
-PEP_STATUS CpEpEngine::notifyHandshake(::pEp_identity *self, ::pEp_identity *partner, sync_handshake_signal signal)
-{
-    return _notifyHandshake(self, partner, signal);
-}
-
-PEP_STATUS CpEpEngine::notifyHandshake_sync(::pEp_identity *self, ::pEp_identity *partner, sync_handshake_signal signal)
-{
-    return _notifyHandshake(self, partner, signal, true);
 }
 
 STDMETHODIMP CpEpEngine::BlacklistAdd(BSTR fpr)

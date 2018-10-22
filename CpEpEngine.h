@@ -87,7 +87,7 @@ public:
         ::register_examine_function(session(), CpEpEngine::examine_identity, (void *)this);
         ::log_event(session(), "Startup", "pEp COM Adapter", NULL, NULL);
 
-        startup<CpEpEngine>(messageToSend, notifyHandshake, messageToSend_sync, notifyHandshake_sync, this, &CpEpEngine::Startup_sync);
+        startup<CpEpEngine>(messageToSend, notifyHandshake, this, &CpEpEngine::Startup_sync);
 
         return S_OK;
     }
@@ -100,14 +100,8 @@ protected:
     typedef locked_queue<pEp_identity_cpp> identity_queue_t;
     static ::pEp_identity * retrieve_next_identity(void *management);
 
-    static PEP_STATUS _messageToSend(message *msg, bool in_sync = false);
-    static PEP_STATUS _notifyHandshake(pEp_identity *self, pEp_identity *partner, sync_handshake_signal signal, bool in_sync = false);
-
     static PEP_STATUS messageToSend(message *msg);
     static PEP_STATUS notifyHandshake(pEp_identity *self, pEp_identity *partner, sync_handshake_signal signal);
-
-    static PEP_STATUS messageToSend_sync(message *msg);
-    static PEP_STATUS notifyHandshake_sync(pEp_identity *self, pEp_identity *partner, sync_handshake_signal signal);
 
     HRESULT error(_bstr_t msg);
     HRESULT error(_bstr_t msg, PEP_STATUS errorcode);
