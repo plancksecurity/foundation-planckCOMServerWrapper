@@ -785,7 +785,7 @@ PEP_STATUS CpEpEngine::_notifyHandshake(::pEp_identity *self, ::pEp_identity *pa
 
     // fire all of them
     for (auto p = sync_callbacks.begin(); p != sync_callbacks.end(); ++p) {
-        IpEpEngineCallbacks *cb = nullptr;
+        IpEpEngineCallbacks *cb;
         if (in_sync)
             cb = p->cdata;
         else
