@@ -1361,7 +1361,7 @@ STDMETHODIMP CpEpEngine::RegisterCallbacks(IpEpEngineCallbacks* new_callbacks)
     new_callbacks->AddRef();
 
     // provide callbacks to sync
-    LPSTREAM marshaled_callbacks;
+    LPSTREAM marshaled_callbacks = nullptr;
     auto result = CoMarshalInterThreadInterfaceInStream(IID_IpEpEngineCallbacks, client_callbacks, &marshaled_callbacks);
     assert(SUCCEEDED(result));
     assert(marshaled_callbacks);
