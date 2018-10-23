@@ -46,10 +46,10 @@
 
 #include <assert.h>
 
-#include <pEp/pEpEngine.h>
-#include <pEp/keymanagement.h>
-#include <pEp/message_api.h>
-#include <pEp/stringpair.h>
-#include <pEp/blacklist.h>
+#include <pEpEngine.h>
+#include <keymanagement.h>
+#include <message_api.h>
+#include <stringpair.h>
+#include <blacklist.h>
 #include <pEp/sync_api.h>
-#include <pEp/openpgp_compat.h>
+#include <openpgp_compat.h>
