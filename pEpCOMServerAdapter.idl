@@ -440,6 +440,9 @@ interface IpEpEngine : IUnknown {
 
 	// Get a preview of the outgoint message rating
 	[id(41)] HRESULT OutgoingMessageRatingPreview([in] struct TextMessage *msg, [out, retval] pEpRating * pVal);
+
+	// Engine startup and shutdown
+	[id(42)] HRESULT Startup();
 };
 
 [

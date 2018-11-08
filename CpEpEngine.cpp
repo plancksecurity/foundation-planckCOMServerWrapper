@@ -1469,3 +1469,19 @@ STDMETHODIMP CpEpEngine::SetOwnKey(pEpIdentity * ident, BSTR fpr, struct pEpIden
 
 	return S_OK;
 }
+
+STDMETHODIMP CpEpEngine::Startup()
+{
+	try
+	{
+		startup<CpEpEngine>(messageToSend, notifyHandshake, this, &CpEpEngine::Startup_sync, &CpEpEngine::Shutdown_sync);
+	}
+	catch (bad_alloc&) {
+		return E_OUTOFMEMORY;
+	}
+	catch (exception& ex) {
+		return FAIL(ex.what());
+	}
+
+	return S_OK;
+}

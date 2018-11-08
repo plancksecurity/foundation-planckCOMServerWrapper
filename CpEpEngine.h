@@ -92,12 +92,10 @@ public:
         catch (pEp::RuntimeError& e) {
             HRESULT res = MAKE_HRESULT(1, FACILITY_ITF, (0xFFFF & e.status));
             return res;
-        }
-
-        startup<CpEpEngine>(messageToSend, notifyHandshake, this, &CpEpEngine::Startup_sync, &CpEpEngine::Shutdown_sync);
+        }       
 
         ::register_examine_function(session(), CpEpEngine::examine_identity, (void *)this);
-        ::log_event(session(), "Startup", "pEp COM Adapter", NULL, NULL);
+        ::log_event(session(), "FinalConstruct", "pEp COM Adapter", NULL, NULL);
 
         return S_OK;
     }
@@ -262,6 +260,8 @@ public:
 
     // Trigger an immediate update
     STDMETHOD(UpdateNow)();
+
+	STDMETHOD(Startup)();
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)
