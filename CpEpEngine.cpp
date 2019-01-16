@@ -1620,6 +1620,40 @@ STDMETHODIMP CpEpEngine::SetOwnKey(pEpIdentity * ident, BSTR fpr, struct pEpIden
 	return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::TrustOwnKey(pEpIdentity * ident)
+{
+	assert(ident);
+
+	if (!ident)
+		return E_INVALIDARG;
+
+	::pEp_identity *_ident;
+	try {
+		_ident = new_identity(ident);
+	}
+	catch (bad_alloc&) {
+		return E_OUTOFMEMORY;
+	}
+	catch (exception& ex) {
+		return FAIL(ex.what());
+	}
+
+	assert(_ident);
+	if (_ident == NULL)
+		return E_OUTOFMEMORY;
+
+	PEP_STATUS status = ::trust_own_key(get_session(), _ident);
+
+	::free_identity(_ident);
+
+	if (status == PEP_STATUS_OK)
+		return S_OK;
+	else if (status == PEP_OUT_OF_MEMORY)
+		return E_OUTOFMEMORY;
+	else
+		return FAIL(L"TrustOwnKey", status);
+}
+
 HRESULT CpEpEngine::Fire_MessageToSend(TextMessage * msg)
 {
     assert(msg);
