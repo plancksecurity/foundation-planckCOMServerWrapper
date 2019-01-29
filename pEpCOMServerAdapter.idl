@@ -441,8 +441,11 @@ interface IpEpEngine : IUnknown {
 	// Get a preview of the outgoint message rating
 	[id(41)] HRESULT OutgoingMessageRatingPreview([in] struct TextMessage *msg, [out, retval] pEpRating * pVal);
 
+	// Trust own public key. To be used for manual key import.
+	[id(42)] HRESULT TrustOwnKey([in] struct pEpIdentity * ident);
+	
 	// Engine startup and shutdown
-	[id(42)] HRESULT Startup();
+	[id(43)] HRESULT Startup();
 };
 
 [
