@@ -263,6 +263,8 @@ public:
     STDMETHOD(UpdateNow)();
 
 	STDMETHOD(Startup)();
+
+	STDMETHOD(GetKeyRatingForUser)(BSTR userId, BSTR fpr, pEpRating *rating);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)
