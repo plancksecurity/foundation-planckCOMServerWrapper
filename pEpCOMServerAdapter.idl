@@ -239,6 +239,7 @@ interface IpEpEngine : IUnknown {
 		BSTR UserName;
 		pEpComType CommType;
 		BSTR Lang;
+		VARIANT_BOOL Me;
 		pEpIdentityFlags Flags;
 	};
 
