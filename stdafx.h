@@ -48,6 +48,7 @@
 
 #include <pEp/pEpEngine.h>
 #include <pEp/keymanagement.h>
+#include <pEp/key_reset.h>
 #include <pEp/message_api.h>
 #include <pEp/stringpair.h>
 #include <pEp/blacklist.h>

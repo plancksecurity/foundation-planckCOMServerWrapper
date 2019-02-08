@@ -449,6 +449,9 @@ interface IpEpEngine : IUnknown {
 
 	// Get the rating for a specific key
 	[id(44)] HRESULT GetKeyRatingForUser([in] BSTR userId, [in] BSTR fpr, [out, retval] pEpRating *rating);
+
+	// Resets the database status for a key
+	[id(45)] HRESULT KeyReset([in] BSTR keyId, [in] struct pEpIdentity ident);
 };
 
 [

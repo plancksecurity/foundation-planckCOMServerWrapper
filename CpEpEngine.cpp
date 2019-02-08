@@ -654,6 +654,38 @@ STDMETHODIMP CpEpEngine::IspEpUser(/* [in] */ struct pEpIdentity *ident, /* [ret
     return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::KeyReset(BSTR keyId, struct pEpIdentity ident)
+{
+	::pEp_identity *_ident;
+
+	try {
+		_ident = new_identity(&ident);
+	}
+	catch (bad_alloc&) {
+		return E_OUTOFMEMORY;
+	}
+	catch (exception& ex) {
+		return FAIL(ex.what());;
+	}
+
+	string _keyId = utf8_string(keyId);
+
+	PEP_STATUS status = ::key_reset(session(), _keyId.c_str(), _ident);
+
+	free_identity(_ident);
+
+	if (status == PEP_OUT_OF_MEMORY)
+		return E_OUTOFMEMORY;
+
+	if (status == PEP_KEY_NOT_FOUND)
+		return FAIL(L"key not found");
+
+	if (status != PEP_STATUS_OK)
+		return FAIL(L"cannot reset key", status);
+
+	return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::KeyResetTrust(struct pEpIdentity *ident)
 {
     ::pEp_identity *_ident;

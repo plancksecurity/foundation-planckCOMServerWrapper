@@ -201,6 +201,7 @@ public:
     STDMETHOD(Myself)(struct pEpIdentity *ident, struct pEpIdentity *result);
     STDMETHOD(UpdateIdentity)(struct pEpIdentity *ident, struct pEpIdentity *result);
     STDMETHOD(KeyMistrusted)(struct pEpIdentity *ident);
+	STDMETHOD(KeyReset)(BSTR keyId, pEpIdentity ident);
     STDMETHOD(KeyResetTrust)(struct pEpIdentity *ident);
     STDMETHOD(TrustPersonalKey)(struct pEpIdentity *ident, struct pEpIdentity *result);
     STDMETHOD(OwnIdentitiesRetrieve)(LPSAFEARRAY* ownIdentities);
@@ -210,6 +211,7 @@ public:
     STDMETHOD(IspEpUser)(
         /* [in] */ struct pEpIdentity *ident,
         /* [retval][out] */ VARIANT_BOOL *ispEp);
+
 
     // Blacklist API
 
