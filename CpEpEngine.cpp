@@ -654,7 +654,7 @@ STDMETHODIMP CpEpEngine::IspEpUser(/* [in] */ struct pEpIdentity *ident, /* [ret
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::KeyReset(BSTR keyId, struct pEpIdentity ident)
+STDMETHODIMP CpEpEngine::KeyReset(BSTR fpr, struct pEpIdentity ident)
 {
 	::pEp_identity *_ident;
 
@@ -668,9 +668,9 @@ STDMETHODIMP CpEpEngine::KeyReset(BSTR keyId, struct pEpIdentity ident)
 		return FAIL(ex.what());;
 	}
 
-	string _keyId = utf8_string(keyId);
+	string _fpr = utf8_string(fpr);
 
-	PEP_STATUS status = ::key_reset(session(), _keyId.c_str(), _ident);
+	PEP_STATUS status = ::key_reset(session(), _fpr.c_str(), _ident);
 
 	free_identity(_ident);
 
