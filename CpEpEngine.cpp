@@ -1138,7 +1138,7 @@ STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SA
 
     *flags = (pEpDecryptFlags)engineflags;
 
-    if (engineflags & PEP_decrypt_flag_src_modified)
+    if (_src)
         text_message_from_C(src, _src);
 
     if (msg_dst)
