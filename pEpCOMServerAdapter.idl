@@ -452,7 +452,14 @@ interface IpEpEngine : IUnknown {
 	[id(44)] HRESULT GetKeyRatingForUser([in] BSTR userId, [in] BSTR fpr, [out, retval] pEpRating *rating);
 
 	// Resets the database status for a key
-	[id(45)] HRESULT KeyReset([in] BSTR fpr, [in] struct pEpIdentity ident);
+	[id(45)] HRESULT KeyResetIdentity([in] struct pEpIdentity ident, [in] BSTR fpr);
+
+	// Resets the default database status for the user / keypair provided
+	[id(46)] HRESULT KeyResetUser([in] BSTR userId, [in] BSTR fpr);
+
+	// revoke and mistrust all own keys, generate new keys for all own identities, and opportunistically communicate
+	// key reset information to people we have recently contacted. 
+	[id(47)] HRESULT KeyResetAllOwnKeys();
 };
 
 [

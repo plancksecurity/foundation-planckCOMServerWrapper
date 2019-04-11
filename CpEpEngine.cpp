@@ -654,7 +654,7 @@ STDMETHODIMP CpEpEngine::IspEpUser(/* [in] */ struct pEpIdentity *ident, /* [ret
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::KeyReset(BSTR fpr, struct pEpIdentity ident)
+STDMETHODIMP CpEpEngine::KeyResetIdentity(struct pEpIdentity ident, BSTR fpr)
 {
 	::pEp_identity *_ident;
 
@@ -670,7 +670,7 @@ STDMETHODIMP CpEpEngine::KeyReset(BSTR fpr, struct pEpIdentity ident)
 
 	string _fpr = utf8_string(fpr);
 
-	PEP_STATUS status = ::key_reset(session(), _fpr.c_str(), _ident);
+	PEP_STATUS status = ::key_reset_identity(session(), _ident, _fpr.c_str());
 
 	free_identity(_ident);
 
@@ -681,7 +681,39 @@ STDMETHODIMP CpEpEngine::KeyReset(BSTR fpr, struct pEpIdentity ident)
 		return FAIL(L"key not found");
 
 	if (status != PEP_STATUS_OK)
-		return FAIL(L"cannot reset key", status);
+		return FAIL(L"cannot reset identity", status);
+
+	return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::KeyResetUser(BSTR userId, BSTR keyId)
+{
+	string _userId = utf8_string(userId);
+	string _keyId = utf8_string(keyId);
+
+	PEP_STATUS status = ::key_reset_user(session(), _userId.c_str(), _keyId.c_str());
+
+	if (status == PEP_OUT_OF_MEMORY)
+		return E_OUTOFMEMORY;
+
+	if (status == PEP_KEY_NOT_FOUND)
+		return FAIL(L"key not found");
+
+	if (status != PEP_STATUS_OK)
+		return FAIL(L"cannot reset user", status);
+
+	return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::KeyResetAllOwnKeys()
+{
+	PEP_STATUS status = ::key_reset_all_own_keys(session());
+
+	if (status == PEP_OUT_OF_MEMORY)
+		return E_OUTOFMEMORY;
+
+	if (status != PEP_STATUS_OK)
+		return FAIL(L"cannot reset all own keys", status);
 
 	return S_OK;
 }
