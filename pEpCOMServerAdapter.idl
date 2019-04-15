@@ -22,7 +22,7 @@ interface IpEpEngineCallbacks : IUnknown {
         SyncNotifyInitAddOurDevice = 1,
         SyncNotifyInitAddOtherDevice = 2,
         SyncNotifyInitFormGroup = 3,
-        SyncNotifyInitMoveOurDevice = 4,
+        // SyncNotifyInitMoveOurDevice = 4,
 
         // handshake process timed out
         SyncNotifyTimeout = 5,
@@ -30,10 +30,14 @@ interface IpEpEngineCallbacks : IUnknown {
         // handshake accepted by user
         SyncNotifyAcceptedDeviceAdded = 6,
         SyncNotifyAcceptedGroupCreated = 7,
-        SyncNotifyAcceptedDeviceMoved = 8,
+        // SyncNotifyAcceptedDeviceMoved = 8,
 
         // handshake dialog must be closed
         SyncNotifyOvertaken = 9,
+
+		// notificaton of actual group status
+		SyncNotifySole = 254,
+		SyncNotifyInGroup = 255
     } SyncHandshakeSignal;
 
     typedef [v1_enum] enum SyncHandshakeResult {
