@@ -87,6 +87,7 @@ namespace pEp {
             return psaUDType;
         }
 
+		identity_list *identities(SAFEARRAY * sa);
         ::message * text_message_to_C(TextMessage *msg);
         void text_message_from_C(TextMessage *msg2, const ::message *msg);
     }

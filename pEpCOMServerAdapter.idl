@@ -467,7 +467,7 @@ interface IpEpEngine : IUnknown {
 		SyncHandshakeRejected = 1
 	} SyncHandshakeResult;
 
-	[id(48)] HRESULT deliverHandshakeResult([in] enum SyncHandshakeResult result, [in] SAFEARRAY(struct pEpIdentity) identities_sharing);
+	[id(48)] HRESULT DeliverHandshakeResult([in] enum SyncHandshakeResult result, [in] SAFEARRAY(struct pEpIdentity) identities_sharing);
 };
 
 [

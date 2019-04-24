@@ -1604,7 +1604,7 @@ STDMETHODIMP CpEpEngine::GetKeyRatingForUser(BSTR userId, BSTR fpr, pEpRating *r
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::deliverHandshakeResult(enum SyncHandshakeResult result, SAFEARRAY *identities_sharing)
+STDMETHODIMP CpEpEngine::DeliverHandshakeResult(enum SyncHandshakeResult result, SAFEARRAY *identities_sharing)
 {
 	assert(result);
 	assert(identities_sharing);
@@ -1613,7 +1613,16 @@ STDMETHODIMP CpEpEngine::deliverHandshakeResult(enum SyncHandshakeResult result,
 		return E_INVALIDARG;
 
 	sync_handshake_result _result = (sync_handshake_result)result;
-	PEP_STATUS status = ::deliverHandshakeResult(session(), _result, NULL);
+	identity_list *_identities_sharing = NULL;
+	try {
+		_identities_sharing = identities(identities_sharing);
+	}
+	catch (bad_alloc&) {
+		return E_OUTOFMEMORY;
+	}
+
+	PEP_STATUS status = ::deliverHandshakeResult(session(), _result, _identities_sharing);
+	free_identity_list(_identities_sharing);
 	switch (status) {
 	case PEP_STATUS_OK:
 		break;
