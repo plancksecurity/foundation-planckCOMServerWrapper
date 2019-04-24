@@ -269,6 +269,9 @@ public:
 	STDMETHOD(Startup)();
 
 	STDMETHOD(GetKeyRatingForUser)(BSTR userId, BSTR fpr, pEpRating *rating);
+
+	// sync API
+	STDMETHOD(deliverHandshakeResult)(enum SyncHandshakeResult result, SAFEARRAY *identities_sharing);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)

@@ -866,8 +866,7 @@ PEP_STATUS CpEpEngine::notifyHandshake(::pEp_identity *self, ::pEp_identity *par
             copy_identity(&_partner, partner);
 
             SyncHandshakeSignal _signal = (SyncHandshakeSignal)signal;
-            SyncHandshakeResult result;
-            HRESULT r = cb->NotifyHandshake(&_self, &_partner, _signal, &result);
+            HRESULT r = cb->NotifyHandshake(&_self, &_partner, _signal);
             assert(r == S_OK);
             clear_identity_s(_self);
             clear_identity_s(_partner);
@@ -1601,6 +1600,28 @@ STDMETHODIMP CpEpEngine::GetKeyRatingForUser(BSTR userId, BSTR fpr, pEpRating *r
 		return FAIL(L"cannot get key rating for user", status);
 
 	*rating = (pEpRating)_rating;
+
+	return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::deliverHandshakeResult(enum SyncHandshakeResult result, SAFEARRAY *identities_sharing)
+{
+	assert(result);
+	assert(identities_sharing);
+
+	if (!(result && identities_sharing))
+		return E_INVALIDARG;
+
+	sync_handshake_result _result = (sync_handshake_result)result;
+	PEP_STATUS status = ::deliverHandshakeResult(session(), _result, NULL);
+	switch (status) {
+	case PEP_STATUS_OK:
+		break;
+	case PEP_OUT_OF_MEMORY:
+		return E_OUTOFMEMORY;
+	default:
+		return FAIL(L"deliverHandshakeResult is reporting an error", status);
+	}
 
 	return S_OK;
 }

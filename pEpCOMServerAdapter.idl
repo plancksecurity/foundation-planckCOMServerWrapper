@@ -40,15 +40,9 @@ interface IpEpEngineCallbacks : IUnknown {
 		SyncNotifyInGroup = 255
     } SyncHandshakeSignal;
 
-    typedef [v1_enum] enum SyncHandshakeResult {
-        SyncHandshakeCancel = -1,
-        SyncHandshakeAccepted = 0,
-        SyncHandshakeRejected = 1
-    } SyncHandshakeResult;
-
     [id(1)] HRESULT MessageToSend([in] struct TextMessage * msg);
 
-    [id(2)] HRESULT NotifyHandshake([in] struct pEpIdentity * self, [in] struct pEpIdentity * partner, [in] SyncHandshakeSignal signal, [out, retval] SyncHandshakeResult * result);
+    [id(2)] HRESULT NotifyHandshake([in] struct pEpIdentity * self, [in] struct pEpIdentity * partner, [in] SyncHandshakeSignal signal);
 
     [id(3)] HRESULT NeedFastPolling([in] VARIANT_BOOL enableFastPolling);
 };
@@ -464,6 +458,16 @@ interface IpEpEngine : IUnknown {
 	// revoke and mistrust all own keys, generate new keys for all own identities, and opportunistically communicate
 	// key reset information to people we have recently contacted. 
 	[id(47)] HRESULT KeyResetAllOwnKeys();
+
+	// sync API
+
+	typedef [v1_enum] enum SyncHandshakeResult {
+		SyncHandshakeCancel = -1,
+		SyncHandshakeAccepted = 0,
+		SyncHandshakeRejected = 1
+	} SyncHandshakeResult;
+
+	[id(48)] HRESULT deliverHandshakeResult([in] enum SyncHandshakeResult result, [in] SAFEARRAY(struct pEpIdentity) identities_sharing);
 };
 
 [
