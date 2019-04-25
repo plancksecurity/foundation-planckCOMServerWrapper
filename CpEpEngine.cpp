@@ -1606,19 +1606,16 @@ STDMETHODIMP CpEpEngine::GetKeyRatingForUser(BSTR userId, BSTR fpr, pEpRating *r
 
 STDMETHODIMP CpEpEngine::DeliverHandshakeResult(enum SyncHandshakeResult result, SAFEARRAY *identities_sharing)
 {
-	assert(result);
-	assert(identities_sharing);
-
-	if (!(result && identities_sharing))
-		return E_INVALIDARG;
-
 	sync_handshake_result _result = (sync_handshake_result)result;
 	identity_list *_identities_sharing = NULL;
-	try {
-		_identities_sharing = identities(identities_sharing);
-	}
-	catch (bad_alloc&) {
-		return E_OUTOFMEMORY;
+	if (identities_sharing)
+	{
+		try {
+			_identities_sharing = identities(identities_sharing);
+		}
+		catch (bad_alloc&) {
+			return E_OUTOFMEMORY;
+		}
 	}
 
 	PEP_STATUS status = ::deliverHandshakeResult(session(), _result, _identities_sharing);
