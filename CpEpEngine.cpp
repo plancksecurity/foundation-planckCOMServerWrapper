@@ -507,14 +507,6 @@ STDMETHODIMP CpEpEngine::Myself(struct pEpIdentity *ident, struct pEpIdentity *r
         return FAIL(ex.what());;
     }
 
-
-    // DEBUG CODE - REMOVE BEFORE RELEASE!
-    // SyncHandshakeResult handshakeResult;
-    //
-    // HRESULT res = Fire_NotifyHandshake(ident, result, signal, &handshakeResult);
-    // 
-    // HRESULT res2 = Fire_TestEvent(15, _bstr_t( "hallo"));
-
     PEP_STATUS status = ::myself(session(), _ident);
 
     if (status == PEP_STATUS_OK) {
@@ -613,11 +605,6 @@ STDMETHODIMP CpEpEngine::KeyMistrusted(struct pEpIdentity *ident)
 
     return S_OK;
 }
-
-//STDMETHODIMP CpEpEngine::UndoLastMistrust()
-//{
-//    return FAIL(L"function UndoLastMistrust() not available any more - use KeyResetTrust() instead!", PEP_ILLEGAL_VALUE);
-//}
 
 STDMETHODIMP CpEpEngine::IspEpUser(/* [in] */ struct pEpIdentity *ident, /* [retval][out] */ VARIANT_BOOL *ispEp) 
 {

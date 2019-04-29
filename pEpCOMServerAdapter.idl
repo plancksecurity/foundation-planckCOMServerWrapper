@@ -43,8 +43,6 @@ interface IpEpEngineCallbacks : IUnknown {
     [id(1)] HRESULT MessageToSend([in] struct TextMessage * msg);
 
     [id(2)] HRESULT NotifyHandshake([in] struct pEpIdentity * self, [in] struct pEpIdentity * partner, [in] SyncHandshakeSignal signal);
-
-    [id(3)] HRESULT NeedFastPolling([in] VARIANT_BOOL enableFastPolling);
 };
 
 [
