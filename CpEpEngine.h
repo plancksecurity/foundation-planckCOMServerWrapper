@@ -192,6 +192,7 @@ public:
     STDMETHOD(GetLanguageList)(BSTR * languages);
     STDMETHOD(SetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
     STDMETHOD(UnsetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
+	STDMETHOD(ImportKey)(BSTR keyData, LPSAFEARRAY *privateKeys);
 
     // keymanagement API
 

@@ -57,6 +57,49 @@ STDMETHODIMP CpEpEngine::UnencryptedSubject(VARIANT_BOOL enable)
     return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::ImportKey(BSTR keyData, LPSAFEARRAY * privateKeys)
+{
+	assert(keyData);
+
+	if (!keyData)
+		return E_INVALIDARG;
+
+	string key_data = utf8_string(keyData);
+	size_t size = SysStringLen(keyData);
+	::identity_list *private_keys = nullptr;
+
+	PEP_STATUS status = ::import_key(session(), key_data.c_str(), size, &private_keys);
+	assert(status != ::PEP_OUT_OF_MEMORY);
+	if (status == ::PEP_OUT_OF_MEMORY)
+		return E_OUTOFMEMORY;
+
+	if ((status != PEP_STATUS_OK) && (status != PEP_KEY_IMPORTED))
+		return FAIL(L"import_key", status);
+
+	SAFEARRAY * _privateKeys = nullptr;
+	try {
+		_privateKeys = array_from_C<pEpIdentity, identity_list>(private_keys);
+	}
+	catch (exception& ex)
+	{
+		::free_identity_list(private_keys);
+		try {
+			dynamic_cast<bad_alloc&>(ex);
+		}
+		catch (bad_cast&)
+		{
+			return FAIL(ex.what());
+		}
+		return E_OUTOFMEMORY;
+	}
+	free_identity_list(private_keys);
+
+	*privateKeys = _privateKeys;
+
+	return status;
+}
+
+
 STDMETHODIMP CpEpEngine::ExportKey(BSTR fpr, BSTR * keyData)
 {
     assert(fpr);

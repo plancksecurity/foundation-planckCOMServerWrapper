@@ -257,7 +257,7 @@ interface IpEpEngine : IUnknown {
 	[id(22)] HRESULT IspEpUser([in] struct pEpIdentity *ident, [out, retval] VARIANT_BOOL *ispEp);
 
 	// Blacklist API
-
+	
 	[id(23)] HRESULT BlacklistAdd([in] BSTR fpr);
 	[id(24)] HRESULT BlacklistDelete([in] BSTR fpr);
 	[id(25)] HRESULT BlacklistIsListed([in] BSTR fpr, [out, retval] VARIANT_BOOL *listed);
@@ -466,6 +466,9 @@ interface IpEpEngine : IUnknown {
 	} SyncHandshakeResult;
 
 	[id(48)] HRESULT DeliverHandshakeResult([in] enum SyncHandshakeResult result, [in] SAFEARRAY(struct pEpIdentity) identities_sharing);
+
+	// Imports keys from data
+	[id(49)] HRESULT ImportKey([in] BSTR keyData, [out] SAFEARRAY(struct pEpIdentity)* privateKeys);
 };
 
 [
