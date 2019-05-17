@@ -57,6 +57,16 @@ STDMETHODIMP CpEpEngine::UnencryptedSubject(VARIANT_BOOL enable)
     return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::ConfigCipherSuite(pEpCipherSuite cipherSuite)
+{
+	PEP_STATUS status = ::config_cipher_suite(session(), (PEP_CIPHER_SUITE)cipherSuite);
+
+	if (status)
+		return FAIL(L"config_cipher_suite", status);
+	
+	return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::ImportKey(BSTR keyData, LPSAFEARRAY * privateKeys)
 {
 	assert(keyData);

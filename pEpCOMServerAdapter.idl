@@ -469,6 +469,21 @@ interface IpEpEngine : IUnknown {
 
 	// Imports keys from data
 	[id(49)] HRESULT ImportKey([in] BSTR keyData, [out] SAFEARRAY(struct pEpIdentity)* privateKeys);
+
+	typedef [v1_enum] enum pEpCipherSuite {
+		pEpCipherSuiteDefault = 0,
+		pEpCipherSuiteCV25519 = 1,
+		pEpCipherSuiteP256 = 2,
+		pEpCipherSuiteP384 = 3,
+		pEpCipherSuiteP521 = 4,
+		pEpCipherSuiteRSA2K = 5,
+		pEpCipherSuiteRSA3K = 6,
+		pEpCipherSuiteRSA4K = 7,
+		pEpCipherSuiteRSA8K = 8
+	} pEpCipherSuite;
+
+	// Sets the cipher suite
+	[id(50)] HRESULT ConfigCipherSuite([in, defaultvalue(pEpCipherSuiteDefault)] pEpCipherSuite cipherSuite);
 };
 
 [

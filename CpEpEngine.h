@@ -208,6 +208,7 @@ public:
     STDMETHOD(KeyResetTrust)(struct pEpIdentity *ident);
     STDMETHOD(TrustPersonalKey)(struct pEpIdentity *ident, struct pEpIdentity *result);
     STDMETHOD(OwnIdentitiesRetrieve)(LPSAFEARRAY* ownIdentities);
+	STDMETHOD(ConfigCipherSuite)(pEpCipherSuite cipherSuite);
 
     // STDMETHOD(UndoLastMistrust)(); 
     
