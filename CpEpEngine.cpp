@@ -137,6 +137,19 @@ STDMETHODIMP CpEpEngine::ExportKey(BSTR fpr, BSTR * keyData)
     return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::LeaveDeviceGroup()
+{
+	PEP_STATUS status = ::leave_device_group(session());
+
+	if (status == PEP_OUT_OF_MEMORY)
+		return E_OUTOFMEMORY;
+
+	if (status != PEP_STATUS_OK)
+		return FAIL(L"cannot leave device group", status);
+
+	return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::Log(BSTR title, BSTR entity, BSTR description, BSTR comment)
 {
     string _title;

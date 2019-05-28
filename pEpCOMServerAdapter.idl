@@ -484,6 +484,9 @@ interface IpEpEngine : IUnknown {
 
 	// Sets the cipher suite
 	[id(50)] HRESULT ConfigCipherSuite([in, defaultvalue(pEpCipherSuiteDefault)] pEpCipherSuite cipherSuite);
+
+	// Leave the device group
+	[id(51)] HRESULT LeaveDeviceGroup();
 };
 
 [

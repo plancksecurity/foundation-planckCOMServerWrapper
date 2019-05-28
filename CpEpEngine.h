@@ -274,6 +274,7 @@ public:
 
 	// sync API
 	STDMETHOD(DeliverHandshakeResult)(enum SyncHandshakeResult result, SAFEARRAY *identities_sharing);
+	STDMETHOD(LeaveDeviceGroup)();
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)
