@@ -739,12 +739,12 @@ STDMETHODIMP CpEpEngine::KeyResetIdentity(struct pEpIdentity ident, BSTR fpr)
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::KeyResetUser(BSTR userId, BSTR keyId)
+STDMETHODIMP CpEpEngine::KeyResetUser(BSTR userId, BSTR fpr)
 {
 	string _userId = utf8_string(userId);
-	string _keyId = utf8_string(keyId);
+	string _fpr = utf8_string(fpr);
 
-	PEP_STATUS status = ::key_reset_user(session(), _userId.c_str(), _keyId.c_str());
+	PEP_STATUS status = ::key_reset_user(session(), _userId.c_str(), _fpr.c_str());
 
 	if (status == PEP_OUT_OF_MEMORY)
 		return E_OUTOFMEMORY;

@@ -202,8 +202,8 @@ public:
     STDMETHOD(Myself)(struct pEpIdentity *ident, struct pEpIdentity *result);
     STDMETHOD(UpdateIdentity)(struct pEpIdentity *ident, struct pEpIdentity *result);
     STDMETHOD(KeyMistrusted)(struct pEpIdentity *ident);
-	STDMETHOD(KeyResetIdentity)(pEpIdentity ident, BSTR keyId);
-	STDMETHOD(KeyResetUser)(BSTR userId, BSTR keyId);
+	STDMETHOD(KeyResetIdentity)(pEpIdentity ident, BSTR fpr);
+	STDMETHOD(KeyResetUser)(BSTR userId, BSTR fpr);
 	STDMETHOD(KeyResetAllOwnKeys)();
     STDMETHOD(KeyResetTrust)(struct pEpIdentity *ident);
     STDMETHOD(TrustPersonalKey)(struct pEpIdentity *ident, struct pEpIdentity *result);
