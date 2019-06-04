@@ -5,6 +5,7 @@
 #include <mutex>
 #include "GateKeeper.h"
 #include "..\libpEpAdapter\Adapter.hh"
+#include "pEp\status_to_string.h"
 
 using namespace std;
 using namespace pEp::utility;
@@ -1029,8 +1030,8 @@ HRESULT CpEpEngine::error(_bstr_t msg, PEP_STATUS status)
     std::stringstream stream;
     stream << msg;
     stream << ": ";
-    stream << std::hex << status;
-    stream << " (" << statusToString(status) << ")";
+    stream << pEp_status_to_string(status);
+    stream << std::hex << " (" << status << ")";
 
     error(stream.str().c_str());
 
