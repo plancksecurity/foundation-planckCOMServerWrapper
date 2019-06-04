@@ -667,7 +667,7 @@ STDMETHODIMP CpEpEngine::KeyMistrusted(struct pEpIdentity *ident)
         return FAIL(L"key not found");
 
     if (status != PEP_STATUS_OK)
-        return FAIL(L"cannot revoke compromized key", status);
+        return FAIL(L"cannot revoke compromised key", status);
 
     return S_OK;
 }
@@ -1030,6 +1030,7 @@ HRESULT CpEpEngine::error(_bstr_t msg, PEP_STATUS status)
     stream << msg;
     stream << ": ";
     stream << std::hex << status;
+    stream << " (" << statusToString(status) << ")";
 
     error(stream.str().c_str());
 
