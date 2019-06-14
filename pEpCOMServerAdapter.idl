@@ -487,6 +487,9 @@ interface IpEpEngine : IUnknown {
 
 	// Leave the device group
 	[id(51)] HRESULT LeaveDeviceGroup();
+
+	// Get Trustwords for a pair of fprs
+	[id(52)] HRESULT GetTrustwordsForFprs([in] BSTR fpr1, [in] BSTR fpr2, [in, defaultvalue("en")] BSTR lang, [in, defaultvalue(0)] VARIANT_BOOL full, [out, retval] BSTR * words);
 };
 
 [

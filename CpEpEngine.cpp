@@ -243,6 +243,71 @@ STDMETHODIMP CpEpEngine::Trustwords(BSTR fpr, BSTR lang, LONG max_words, BSTR * 
     }
 }
 
+STDMETHODIMP CpEpEngine::GetTrustwordsForFprs(BSTR fpr1, BSTR fpr2, BSTR lang, VARIANT_BOOL full, BSTR *words)
+{
+	assert(fpr1);
+	assert(fpr2);
+	assert(words);
+
+	if (!(fpr1 && fpr2 && words))
+	{
+		return E_INVALIDARG;
+	}
+
+	HRESULT result = S_OK;
+	string _fpr1;
+	string _fpr2;
+	string _lang;
+	*words = NULL;
+
+	try {
+
+		_fpr1 = utf8_string(fpr1);
+		_fpr2 = utf8_string(fpr2);
+		
+		if (lang) {
+			_lang = utf8_string(lang);
+			if (_lang.length() == 0) {
+				_lang = "en";
+			}
+			else if (_lang.length() != 2) {
+				result = E_INVALIDARG;
+			}
+		}
+		else {
+			_lang = "en";
+		}
+	}
+	catch (bad_alloc&) {
+		result = E_OUTOFMEMORY;
+	}
+	catch (exception& ex) {
+		result = FAIL(ex.what());
+	}
+
+	char* _words;
+	size_t _size;
+	if (result == S_OK) {
+		auto status = ::get_trustwords_for_fprs(session(), _fpr1.c_str(), _fpr2.c_str(), _lang.c_str(), &_words, &_size, full != 0 /* convert variant bool to C bool */);
+
+		if (status == PEP_OUT_OF_MEMORY) {
+			result = E_OUTOFMEMORY;
+		}
+		else if (status == PEP_TRUSTWORD_NOT_FOUND) {
+			result = FAIL(L"GetTrustwords: Trustword not found", status);
+		}
+		else if (!words) {
+			result = FAIL(L"GetTrustwords: _words == NULL", status);
+		}
+		else {
+			*words = utf16_bstr(_words);
+			pEp_free(_words);
+		}
+	}
+
+	return result;
+}
+
 STDMETHODIMP CpEpEngine::GetTrustwords(struct pEpIdentity *id1, struct pEpIdentity *id2, BSTR lang, VARIANT_BOOL full, BSTR *words)
 {
     assert(id1);

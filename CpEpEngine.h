@@ -180,6 +180,7 @@ public:
     STDMETHOD(Log)(BSTR title, BSTR entity, BSTR description, BSTR comment);
     STDMETHOD(Trustwords)(BSTR fpr, BSTR lang, LONG max_words, BSTR * words);
     STDMETHOD(GetTrustwords)(struct pEpIdentity *id1, struct pEpIdentity *id2, BSTR lang, VARIANT_BOOL full, BSTR *words);
+    STDMETHOD(GetTrustwordsForFprs)(BSTR fpr1, BSTR fpr2, BSTR lang, VARIANT_BOOL full, BSTR *words);
     STDMETHOD(GetMessageTrustwords)(
         /* [in] */ struct TextMessage *msg,
         /* [in] */ struct pEpIdentity *receivedBy,
