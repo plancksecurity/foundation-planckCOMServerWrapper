@@ -1703,6 +1703,25 @@ STDMETHODIMP CpEpEngine::Startup()
 	return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::GetKeyRating(BSTR fpr, pEpComType *commType)
+{
+	assert(fpr);
+
+	if (!fpr)
+		return E_INVALIDARG;
+
+	string _fpr = utf8_string(fpr);
+
+	PEP_comm_type _commType;
+	PEP_STATUS status = ::get_key_rating(session(), _fpr.c_str(), &_commType);
+	if (status != PEP_STATUS_OK)
+		return FAIL(L"cannot get key rating", status);
+
+	*commType = (pEpComType)_commType;
+
+	return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::GetKeyRatingForUser(BSTR userId, BSTR fpr, pEpRating *rating)
 {
 	assert(userId);

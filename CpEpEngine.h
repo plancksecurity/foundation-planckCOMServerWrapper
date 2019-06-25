@@ -272,6 +272,7 @@ public:
 	STDMETHOD(Startup)();
 
 	STDMETHOD(GetKeyRatingForUser)(BSTR userId, BSTR fpr, pEpRating *rating);
+	STDMETHOD(GetKeyRating)(BSTR fpr, pEpComType *commType);
 
 	// sync API
 	STDMETHOD(DeliverHandshakeResult)(enum SyncHandshakeResult result, SAFEARRAY *identities_sharing);
