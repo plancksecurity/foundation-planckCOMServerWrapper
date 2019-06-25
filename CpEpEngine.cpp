@@ -1413,7 +1413,7 @@ STDMETHODIMP CpEpEngine::ColorFromRating(pEpRating rating, pEpColor * pVal)
     PEP_color _color = ::color_from_rating(engineRating);
 
     *pVal = (pEpColor)_color;
-
+	 
     return S_OK;
 }
 
@@ -1735,6 +1735,25 @@ STDMETHODIMP CpEpEngine::GetKeyRatingForUser(BSTR userId, BSTR fpr, pEpRating *r
 
 	PEP_rating _rating;
 	PEP_STATUS status = ::get_key_rating_for_user(session(), user_id.c_str(), _fpr.c_str(), &_rating);
+	if (status != PEP_STATUS_OK)
+		return FAIL(L"cannot get key rating for user", status);
+
+	*rating = (pEpRating)_rating;
+
+	return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::GetRatingFromBareKey(BSTR fpr, pEpRating *rating)
+{
+	assert(fpr);
+
+	if (!fpr)
+		return E_INVALIDARG;
+
+	string _fpr = utf8_string(fpr);
+
+	PEP_rating _rating;
+	PEP_STATUS status = ::get_rating_from_bare_key(session(), _fpr.c_str(), &_rating);
 	if (status != PEP_STATUS_OK)
 		return FAIL(L"cannot get key rating for user", status);
 

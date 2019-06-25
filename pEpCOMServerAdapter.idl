@@ -491,8 +491,11 @@ interface IpEpEngine : IUnknown {
 	// Get Trustwords for a pair of fprs
 	[id(52)] HRESULT GetTrustwordsForFprs([in] BSTR fpr1, [in] BSTR fpr2, [in, defaultvalue("en")] BSTR lang, [in, defaultvalue(0)] VARIANT_BOOL full, [out, retval] BSTR * words);
 
-	// Get the rating a bare key has
+	// Get the comm type a bare key has
 	[id(53)] HRESULT GetKeyRating([in] BSTR fpr, [out, retval] pEpComType *commType);
+
+	// Get the rating a bare key has
+	[id(54)] HRESULT GetRatingFromBareKey([in] BSTR fpr, [out, retval] pEpRating *rating);
 };
 
 [
