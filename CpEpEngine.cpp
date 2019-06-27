@@ -1743,25 +1743,6 @@ STDMETHODIMP CpEpEngine::GetKeyRatingForUser(BSTR userId, BSTR fpr, pEpRating *r
 	return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::GetRatingFromBareKey(BSTR fpr, pEpRating *rating)
-{
-	assert(fpr);
-
-	if (!fpr)
-		return E_INVALIDARG;
-
-	string _fpr = utf8_string(fpr);
-
-	PEP_rating _rating;
-	PEP_STATUS status = ::get_rating_from_bare_key(session(), _fpr.c_str(), &_rating);
-	if (status != PEP_STATUS_OK)
-		return FAIL(L"cannot get key rating for user", status);
-
-	*rating = (pEpRating)_rating;
-
-	return S_OK;
-}
-
 STDMETHODIMP CpEpEngine::DeliverHandshakeResult(enum SyncHandshakeResult result, SAFEARRAY *identities_sharing)
 {
 	sync_handshake_result _result = (sync_handshake_result)result;
