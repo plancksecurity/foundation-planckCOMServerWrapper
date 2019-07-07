@@ -493,6 +493,9 @@ interface IpEpEngine : IUnknown {
 
 	// Get the comm type a bare key has
 	[id(53)] HRESULT GetKeyRating([in] BSTR fpr, [out, retval] pEpComType *commType);
+
+	// Decode a Sync message from PER into XER
+	[id(54)] HRESULT PERToXERSyncMessage([in] struct TextMessage *msg, [out, retval] BSTR *xer);
 };
 
 [

@@ -1770,3 +1770,26 @@ STDMETHODIMP CpEpEngine::DeliverHandshakeResult(enum SyncHandshakeResult result,
 
 	return S_OK;
 }
+
+STDMETHODIMP CpEpEngine::PERToXERSyncMessage(TextMessage *msg, BSTR * xer)
+{
+	assert(msg);
+
+	if (!msg)
+		return E_INVALIDARG;
+
+	char* text;
+	::message *_msg = text_message_to_C(msg);
+	char* val = _msg->attachments->value;
+
+	PEP_STATUS status = ::PER_to_XER_Sync_msg(val, strlen(val), &text);
+	free_message(_msg);
+
+	if (status != PEP_STATUS_OK)
+		return FAIL(L"cannot get XER", status);
+
+	*xer = utf16_bstr(text);
+	pEp_free(text);
+
+	return S_OK;
+}
