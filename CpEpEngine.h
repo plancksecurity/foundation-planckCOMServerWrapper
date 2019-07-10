@@ -88,6 +88,9 @@ public:
     {
         std::lock_guard<std::mutex> lock(init_mutex);
         try {
+            if (!_messageToSend) {
+                _messageToSend = messageToSend;
+            }
             session();
         }
         catch (pEp::RuntimeError& e) {
