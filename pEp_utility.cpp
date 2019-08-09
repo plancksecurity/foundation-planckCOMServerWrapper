@@ -356,6 +356,7 @@ namespace pEp {
             msg2->Keywords = string_array(msg->keywords);
             msg2->Comments = bstr(msg->comments);
             msg2->OptFields = array_from_C<StringPair, stringpair_list_t>(msg->opt_fields);
+            msg2->SenderFpr = bstr(msg->_sender_fpr);
         }
 
         char * str(BSTR s)

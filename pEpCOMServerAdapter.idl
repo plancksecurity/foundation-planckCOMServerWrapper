@@ -363,6 +363,7 @@ interface IpEpEngine : IUnknown {
 		SAFEARRAY(BSTR) Keywords;
 		BSTR Comments;
 		SAFEARRAY(struct StringPair) OptFields;
+		[readonly] BSTR SenderFpr;
 	};
 
 	[id(28)] HRESULT EncryptMessage(
