@@ -35,6 +35,9 @@ interface IpEpEngineCallbacks : IUnknown {
         // handshake dialog must be closed
         SyncNotifyOvertaken = 9,
 
+		// forming group
+		SyncNotifyFormingGroup = 10,
+
 		// notificaton of actual group status
 		SyncNotifySole = 254,
 		SyncNotifyInGroup = 255
