@@ -1793,3 +1793,71 @@ STDMETHODIMP CpEpEngine::PERToXERSyncMessage(TextMessage *msg, BSTR * xer)
 
 	return S_OK;
 }
+
+STDMETHODIMP CpEpEngine::DisableIdentityForSync(struct pEpIdentity * ident)
+{
+	assert(ident);
+
+	if (!ident)
+		return E_INVALIDARG;
+
+	::pEp_identity *_ident;
+	try {
+		_ident = new_identity(ident);
+	}
+	catch (bad_alloc&) {
+		return E_OUTOFMEMORY;
+	}
+	catch (exception& ex) {
+		return FAIL(ex.what());
+	}
+
+	assert(_ident);
+	if (_ident == NULL)
+		return E_OUTOFMEMORY;
+
+	PEP_STATUS status = ::disable_identity_for_sync(session(), _ident);
+
+	::free_identity(_ident);
+
+	if (status == PEP_STATUS_OK)
+		return S_OK;
+	else if (status == PEP_OUT_OF_MEMORY)
+		return E_OUTOFMEMORY;
+	else
+		return FAIL(L"DisableIdentityForSync", status);
+}
+
+STDMETHODIMP CpEpEngine::EnableIdentityForSync(struct pEpIdentity * ident)
+{
+	assert(ident);
+
+	if (!ident)
+		return E_INVALIDARG;
+
+	::pEp_identity *_ident;
+	try {
+		_ident = new_identity(ident);
+	}
+	catch (bad_alloc&) {
+		return E_OUTOFMEMORY;
+	}
+	catch (exception& ex) {
+		return FAIL(ex.what());
+	}
+
+	assert(_ident);
+	if (_ident == NULL)
+		return E_OUTOFMEMORY;
+
+	PEP_STATUS status = ::enable_identity_for_sync(session(), _ident);
+
+	::free_identity(_ident);
+
+	if (status == PEP_STATUS_OK)
+		return S_OK;
+	else if (status == PEP_OUT_OF_MEMORY)
+		return E_OUTOFMEMORY;
+	else
+		return FAIL(L"EnableIdentityForSync", status);
+}

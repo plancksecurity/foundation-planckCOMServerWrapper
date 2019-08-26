@@ -500,6 +500,12 @@ interface IpEpEngine : IUnknown {
 
 	// Decode a Sync message from PER into XER
 	[id(54)] HRESULT PERToXERSyncMessage([in] struct TextMessage *msg, [out, retval] BSTR *xer);
+
+	// Disable Sync for this identity
+	[id(55)] HRESULT DisableIdentityForSync([in] struct pEpIdentity * ident);
+
+	// Enable Sync for this identity
+	[id(56)] HRESULT EnableIdentityForSync([in] struct pEpIdentity * ident);
 };
 
 [

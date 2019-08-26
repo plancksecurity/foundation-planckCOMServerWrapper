@@ -281,6 +281,8 @@ public:
 	// sync API
 	STDMETHOD(DeliverHandshakeResult)(enum SyncHandshakeResult result, SAFEARRAY *identities_sharing);
 	STDMETHOD(LeaveDeviceGroup)();
+	STDMETHOD(DisableIdentityForSync)(struct pEpIdentity * ident);
+	STDMETHOD(EnableIdentityForSync)(struct pEpIdentity * ident);
 
 	STDMETHOD(PERToXERSyncMessage)(TextMessage *msg, BSTR * xer);
 };
