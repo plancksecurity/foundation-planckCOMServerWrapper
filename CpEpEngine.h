@@ -285,6 +285,9 @@ public:
 	STDMETHOD(EnableIdentityForSync)(struct pEpIdentity * ident);
 
 	STDMETHOD(PERToXERSyncMessage)(TextMessage *msg, BSTR * xer);
+
+	STDMETHOD(PerMachineDirectory)(BSTR * directory);
+	STDMETHOD(PerUserDirectory)(BSTR * directory);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)

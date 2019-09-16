@@ -506,6 +506,12 @@ interface IpEpEngine : IUnknown {
 
 	// Enable Sync for this identity
 	[id(56)] HRESULT EnableIdentityForSync([in] struct pEpIdentity * ident);
+
+	// Gets the directory where shared files are stored
+	[id(57)] HRESULT PerMachineDirectory([out, retval] BSTR *directory);
+
+	// Gets the directory for user files
+	[id(58)] HRESULT PerUserDirectory([out, retval] BSTR *directory);
 };
 
 [

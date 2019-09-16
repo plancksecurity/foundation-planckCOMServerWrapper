@@ -1861,3 +1861,37 @@ STDMETHODIMP CpEpEngine::EnableIdentityForSync(struct pEpIdentity * ident)
 	else
 		return FAIL(L"EnableIdentityForSync", status);
 }
+
+STDMETHODIMP CpEpEngine::PerMachineDirectory(BSTR * directory)
+{
+	assert(directory);
+
+	if (!directory)
+		return E_INVALIDARG;
+
+	const char *_directory = ::per_machine_directory();
+
+	if (_directory == NULL)
+		return FAIL(L"PerMachineDirectory: _directory is NULL");
+
+	*directory = utf16_bstr(_directory);
+
+	return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::PerUserDirectory(BSTR * directory)
+{
+	assert(directory);
+
+	if (!directory)
+		return E_INVALIDARG;
+
+	const char *_directory = ::per_user_directory();
+
+	if (_directory == NULL)
+		return FAIL(L"PerUserDirectory: _directory is NULL");
+
+	*directory = utf16_bstr(_directory);
+
+	return S_OK;
+}
