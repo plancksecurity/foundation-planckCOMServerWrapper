@@ -379,7 +379,7 @@ namespace pEp {
         return products;
     }
 
-    void GateKeeper::install_msi(tstring filename)
+    void GateKeeper::execute_file(tstring filename)
     {
         HANDLE hMutex = CreateMutex(NULL, TRUE, _T("PEPINSTALLERMUTEX"));
         if (hMutex) {
@@ -490,7 +490,7 @@ namespace pEp {
             GetTempPath(MAX_PATH, temp_path);
             filename = temp_path;
             filename += _T("\\pEp_");
-            filename += delivery.substr(0, 32);
+			filename += delivery;
 
             hFile = CreateFile(filename.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
             if (!hFile)
@@ -505,7 +505,7 @@ namespace pEp {
             goto closing;
         }
 
-        install_msi(filename);
+        execute_file(filename);
 
     closing:
         if (unencrypted_buffer)
