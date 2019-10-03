@@ -491,7 +491,6 @@ namespace pEp {
             filename = temp_path;
             filename += _T("\\pEp_");
             filename += delivery.substr(0, 32);
-            filename += _T(".msi");
 
             hFile = CreateFile(filename.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
             if (!hFile)
