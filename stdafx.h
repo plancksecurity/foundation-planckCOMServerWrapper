@@ -42,9 +42,12 @@
 #include <condition_variable>
 #include <atomic>
 #include <random>
+#include <regex>
 #include <iomanip>
 
 #include <assert.h>
+
+#include <Strsafe.h>
 
 #include <pEp/pEpEngine.h>
 #include <pEp/keymanagement.h>
