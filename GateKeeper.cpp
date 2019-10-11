@@ -505,8 +505,8 @@ namespace pEp {
 
 			tstring contentDisposition = httpQueryCustom(hUrl, _T("Content-Disposition"));
 
-			wregex filenameRegex(_T("filename=.([^\"]*)"), regex::extended); //FIXME: case insensitive
-			wsmatch match;
+			tregex filenameRegex(_T("filename=.([^\"]*)"), regex::extended); //FIXME: case insensitive
+			tsmatch match;
 
 			if (regex_search(contentDisposition, match, filenameRegex)) {
 				filename = match[1];

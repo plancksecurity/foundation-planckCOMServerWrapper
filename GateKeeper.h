@@ -5,9 +5,13 @@ using namespace std;
 namespace pEp {
 
 #ifdef UNICODE
-    typedef wstring tstring;
+	typedef wstring tstring;
+	typedef wregex tregex;
+	typedef wsmatch tsmatch;
 #else
-    typedef string tstring;
+	typedef string tstring;
+	typedef regex tregex;
+	typedef smatch tsmatch;
 #endif
 
     class GateKeeper {
