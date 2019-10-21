@@ -453,12 +453,12 @@ namespace pEp {
 		return result;
 	}
 
-    void GateKeeper::update_product(product p, DWORD context)
+    bool GateKeeper::update_product(product p, DWORD context)
     {
         {
             HANDLE file = CreateFile(get_lockFile().c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
             if (file == INVALID_HANDLE_VALUE) {
-                return;
+                return false;
             }
             else {
                 CloseHandle(file);
@@ -479,7 +479,7 @@ namespace pEp {
         HINTERNET hUrl = InternetOpenUrl(internet, url.c_str(), headers.c_str(), headers.length(),
             INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_UI | INTERNET_FLAG_SECURE, context);
         if (hUrl == NULL)
-            return;
+            return false;
 
         string crypted;
         string unencrypted;
@@ -489,6 +489,7 @@ namespace pEp {
         tstring filename;
         HANDLE hFile = NULL;
         char *unencrypted_buffer = NULL;
+		bool result = false;
 
         try {
 
@@ -571,6 +572,7 @@ namespace pEp {
         }
 
         execute_file(filename);
+		result = true;
 
     closing:
         if (unencrypted_buffer)
@@ -580,6 +582,8 @@ namespace pEp {
         if (hUrl)
             InternetCloseHandle(hUrl);
         BCryptDestroyKey(dk);
+
+		return result;
     }
 
     void GateKeeper::keep_updated()
