@@ -271,7 +271,7 @@ public:
 	STDMETHOD(TrustOwnKey)(pEpIdentity * ident);
 
     // Trigger an immediate update
-    STDMETHOD(UpdateNow)();
+    STDMETHOD(UpdateNow)(BSTR productCode, BOOL *didUpdate);
 
 	STDMETHOD(Startup)();
 

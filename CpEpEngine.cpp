@@ -1512,20 +1512,33 @@ STDMETHODIMP CpEpEngine::TrustPersonalKey(struct pEpIdentity *ident, struct pEpI
 }
 
 // Force an update check now
-STDMETHODIMP CpEpEngine::UpdateNow()
+STDMETHODIMP CpEpEngine::UpdateNow(BSTR productCode, BOOL *didUpdate)
 {
-    try
+	BOOL result = FALSE;
+
+	try
     {
-        ::pEp::GateKeeper::update_now();
-    }
+		_bstr_t pc(productCode);
+		wstring _pc = pc;
+
+		auto products = pEp::GateKeeper::gatekeeper()->registered_products();
+		for (auto p = products.begin(); p != products.end(); ++p) {
+			if (_pc == p->first) {
+				result = pEp::GateKeeper::gatekeeper()->update_product(*p);
+				break;
+			}
+		}
+		result = TRUE;
+	}
     catch (bad_alloc&) {
-        return E_OUTOFMEMORY;
+		return E_OUTOFMEMORY;
     }
     catch (exception& ex) {
-        return FAIL(ex.what());;
+		return FAIL(ex.what());;
     }
 
-    return S_OK;
+	*didUpdate = result;
+	return S_OK;
 }
 
 // Event callbacks

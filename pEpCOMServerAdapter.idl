@@ -437,7 +437,7 @@ interface IpEpEngine : IUnknown {
 		[in, defaultvalue(pEpEncPep)] pEpEncFormat encFormat);
 
 	// Trigger an immediate update check.
-	[id(40)] HRESULT UpdateNow();
+	[id(40)] HRESULT UpdateNow([in] BSTR productCode, [out] BOOL *didUpdate);
 
 	// Get a preview of the outgoint message rating
 	[id(41)] HRESULT OutgoingMessageRatingPreview([in] struct TextMessage *msg, [out, retval] pEpRating *rating);

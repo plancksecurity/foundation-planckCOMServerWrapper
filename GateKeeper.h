@@ -34,8 +34,10 @@ namespace pEp {
         }
 
         void keep();
+		product_list registered_products();
+		bool update_product(product p, DWORD context = 0);
 
-        static void update_now();
+		static GateKeeper *gatekeeper() { return the_gatekeeper; }
 
     protected:
         static const LPCTSTR plugin_reg_path;
@@ -55,10 +57,9 @@ namespace pEp {
         BCRYPT_KEY_HANDLE delivery_key();
         string wrapped_delivery_key(BCRYPT_KEY_HANDLE hDeliveryKey);
 
-        bool update_product(product p, DWORD context);
-        product_list registered_products();
         void keep_updated();
         static tstring get_lockFile();
+		static GateKeeper *the_gatekeeper;
 
     private:
         time_t now;
@@ -71,9 +72,5 @@ namespace pEp {
         BCRYPT_ALG_HANDLE hRSA;
 
         CpEpCOMServerAdapterModule * _self;
-
-        static std::mutex update_wait_mtx;
-        static std::condition_variable update_wait_var;
-        static bool update_wait_forced;
     };
 }

@@ -109,10 +109,6 @@ cleanup:
 }
 
 namespace pEp {
-    std::mutex GateKeeper::update_wait_mtx;
-    std::condition_variable GateKeeper::update_wait_var;
-    bool GateKeeper::update_wait_forced = false;
-
     const LPCTSTR GateKeeper::plugin_reg_path = _T("Software\\Microsoft\\Office\\Outlook\\Addins\\pEp");
     const LPCTSTR GateKeeper::plugin_reg_value_name = _T("LoadBehavior");
     const LPCTSTR GateKeeper::updater_reg_path = _T("Software\\pEp\\Updater");
@@ -125,6 +121,9 @@ namespace pEp {
         : _self(self), now(time(NULL)), next(now /*+ time_diff()*/), hkUpdater(NULL),
         internet(NULL), hAES(NULL), hRSA(NULL)
     {
+		if (the_gatekeeper)
+			throw runtime_error("second instance of GateKeeper was initialized");
+
         DeleteFile(get_lockFile().c_str());
 
         LONG lResult = RegOpenCurrentUser(KEY_READ, &cu);
@@ -139,10 +138,14 @@ namespace pEp {
             if (lResult != ERROR_SUCCESS)
                 RegCreateKeyEx(cu, updater_reg_path, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ, NULL, &hkUpdater, NULL);
         }
+
+		the_gatekeeper = this;
     }
 
     GateKeeper::~GateKeeper()
     {
+		the_gatekeeper = nullptr;
+
         if (cu_open) {
             if (hkUpdater)
                 RegCloseKey(hkUpdater);
@@ -177,28 +180,11 @@ namespace pEp {
             now = time(NULL);
             assert(now != -1);
 
-            bool force_check;
-            // We need to sleep, but we should be interruptible by the update_now() method.
-            {
-                std::unique_lock<std::mutex> guard(GateKeeper::update_wait_mtx);
-                GateKeeper::update_wait_var.wait_for(guard, waiting);
-                force_check = GateKeeper::update_wait_forced;
-                GateKeeper::update_wait_forced = false;
-            }
-
-            if (force_check || now > next) {
+            if (now > next) {
                 next = now + GateKeeper::cycle;
                 keep_updated();
             }
         }
-    }
-
-    void GateKeeper::update_now() 
-    {
-        // Signal the GateKeeper thread that we need to check for updates now.
-        std::unique_lock<std::mutex> guard(GateKeeper::update_wait_mtx);
-        GateKeeper::update_wait_forced = true;
-        GateKeeper::update_wait_var.notify_all();
     }
 
     void GateKeeper::keep_plugin()
@@ -630,5 +616,7 @@ namespace pEp {
         hAES = NULL;
         hRSA = NULL;
     }
+
+	GateKeeper *GateKeeper::the_gatekeeper = nullptr;
 
 } // namespace pEp
