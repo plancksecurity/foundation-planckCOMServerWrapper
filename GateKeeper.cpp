@@ -406,52 +406,52 @@ namespace pEp {
         return fileName;
     }
 
-	// Retrieving Headers Using HTTP_QUERY_CUSTOM
-	static tstring httpQueryCustom(HINTERNET hHttp, tstring header)
-	{
-		DWORD dwResult = 0;
-		LPTSTR lpOutBuffer = StrDup(header.c_str());
+    // Retrieving Headers Using HTTP_QUERY_CUSTOM
+    static tstring httpQueryCustom(HINTERNET hHttp, tstring header)
+    {
+        DWORD dwResult = 0;
+        LPTSTR lpOutBuffer = StrDup(header.c_str());
 
-	retry:
+    retry:
 
-		if (!HttpQueryInfo(hHttp, HTTP_QUERY_CUSTOM, (LPVOID)lpOutBuffer, &dwResult, NULL))
-		{
-			if (GetLastError() == ERROR_HTTP_HEADER_NOT_FOUND)
-			{
-				// Code to handle the case where the header isn't available.
-				LocalFree(lpOutBuffer);
-				throw(runtime_error("ERROR_HTTP_HEADER_NOT_FOUND"));
-			}
-			else
-			{
-				// Check for an insufficient buffer.
-				if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
-				{
-					// Allocate the necessary buffer.
-					LocalFree(lpOutBuffer);
-					lpOutBuffer = (LPTSTR)LocalAlloc(LMEM_FIXED, dwResult + 1);
+        if (!HttpQueryInfo(hHttp, HTTP_QUERY_CUSTOM, (LPVOID)lpOutBuffer, &dwResult, NULL))
+        {
+            if (GetLastError() == ERROR_HTTP_HEADER_NOT_FOUND)
+            {
+                // Code to handle the case where the header isn't available.
+                LocalFree(lpOutBuffer);
+                throw(runtime_error("ERROR_HTTP_HEADER_NOT_FOUND"));
+            }
+            else
+            {
+                // Check for an insufficient buffer.
+                if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+                {
+                    // Allocate the necessary buffer.
+                    LocalFree(lpOutBuffer);
+                    lpOutBuffer = (LPTSTR)LocalAlloc(LMEM_FIXED, dwResult + 1);
 
-					// Rewrite the header name in the buffer.
-					StringCchPrintf(lpOutBuffer, dwResult, header.c_str());
+                    // Rewrite the header name in the buffer.
+                    StringCchPrintf(lpOutBuffer, dwResult, header.c_str());
 
-					// Retry the call.
-					goto retry;
-				}
-				else
-				{
-					// Error handling code.
-					LocalFree(lpOutBuffer);
-					// FIXME: Add GetLastError()
-					throw(runtime_error("Unknown"));
-				}
-			}
-		}
+                    // Retry the call.
+                    goto retry;
+                }
+                else
+                {
+                    // Error handling code.
+                    LocalFree(lpOutBuffer);
+                    // FIXME: Add GetLastError()
+                    throw(runtime_error("Unknown"));
+                }
+            }
+        }
 
-		tstring result(lpOutBuffer);
-		LocalFree(lpOutBuffer);
+        tstring result(lpOutBuffer);
+        LocalFree(lpOutBuffer);
 
-		return result;
-	}
+        return result;
+    }
 
     bool GateKeeper::update_product(product p, DWORD context)
     {
@@ -489,7 +489,7 @@ namespace pEp {
         tstring filename;
         HANDLE hFile = NULL;
         char *unencrypted_buffer = NULL;
-		bool result = false;
+        bool result = false;
 
         try {
 
@@ -504,14 +504,14 @@ namespace pEp {
                 crypted += string(buffer, reading);
             } while (1);
 
-			tstring contentDisposition = httpQueryCustom(hUrl, _T("Content-Disposition"));
+            tstring contentDisposition = httpQueryCustom(hUrl, _T("Content-Disposition"));
 
-			tregex filenameRegex(_T("filename=.([^\"]*)"), regex::extended); //FIXME: case insensitive
-			tsmatch match;
+            tregex filenameRegex(_T("filename=.([^\"]*)"), regex::extended); //FIXME: case insensitive
+            tsmatch match;
 
-			if (regex_search(contentDisposition, match, filenameRegex)) {
-				filename = match[1];
-			}
+            if (regex_search(contentDisposition, match, filenameRegex)) {
+                filename = match[1];
+            }
 
             InternetCloseHandle(hUrl);
             hUrl = NULL;
@@ -547,15 +547,15 @@ namespace pEp {
             TCHAR temp_path[MAX_PATH + 1];
             GetTempPath(MAX_PATH, temp_path);
 
-			if (filename == _T("")) {
-				filename = temp_path;
-				filename += _T("\\pEp_");
-				filename += delivery.substr(0, 32);
-				filename += _T(".msi");
-			}
-			else {
-				filename = tstring(temp_path) + _T("\\") + filename;
-			}
+            if (filename == _T("")) {
+                filename = temp_path;
+                filename += _T("\\pEp_");
+                filename += delivery.substr(0, 32);
+                filename += _T(".msi");
+            }
+            else {
+                filename = tstring(temp_path) + _T("\\") + filename;
+            }
 
             hFile = CreateFile(filename.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
             if (!hFile)
@@ -563,7 +563,7 @@ namespace pEp {
             DWORD writing;
             WriteFile(hFile, unencrypted_buffer, unencrypted_size, &writing, NULL);
             CloseHandle(hFile);
-			hFile = NULL;
+            hFile = NULL;
             delete[] unencrypted_buffer;
             unencrypted_buffer = nullptr;
         }
@@ -572,7 +572,7 @@ namespace pEp {
         }
 
         execute_file(filename);
-		result = true;
+        result = true;
 
     closing:
         if (unencrypted_buffer)
@@ -583,7 +583,7 @@ namespace pEp {
             InternetCloseHandle(hUrl);
         BCryptDestroyKey(dk);
 
-		return result;
+        return result;
     }
 
     void GateKeeper::keep_updated()
