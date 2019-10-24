@@ -1969,3 +1969,13 @@ STDMETHODIMP CpEpEngine::PerUserDirectory(BSTR * directory)
 
     return S_OK;
 }
+
+STDMETHODIMP CpEpEngine::RatingFromCommType(pEpComType commType, pEpRating * rating) 
+{
+    PEP_comm_type _comm_type = (PEP_comm_type)commType;
+    PEP_rating _rating = ::rating_from_comm_type(_comm_type);
+
+    *rating = (pEpRating)_rating;
+
+    return S_OK;
+}

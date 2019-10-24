@@ -511,7 +511,10 @@ interface IpEpEngine : IUnknown {
 	[id(57)] HRESULT PerMachineDirectory([out, retval] BSTR *directory);
 
 	// Gets the directory for user files
-	[id(58)] HRESULT PerUserDirectory([out, retval] BSTR *directory);
+    [id(58)] HRESULT PerUserDirectory([out, retval] BSTR *directory);
+
+    // Converts a comm type to a pEp rating
+    [id(59)] HRESULT RatingFromCommType([in] pEpComType commType, [out, retval] pEpRating * rating);
 };
 
 [
