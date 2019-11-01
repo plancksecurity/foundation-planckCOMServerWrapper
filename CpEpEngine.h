@@ -251,6 +251,7 @@ public:
 	STDMETHOD(OutgoingMessageRatingPreview)(TextMessage *msg, pEpRating * pVal);
     STDMETHOD(IdentityRating)(pEpIdentity * ident, pEpRating * pVal);
     STDMETHOD(ColorFromRating)(pEpRating rating, pEpColor * pVal);
+    STDMETHOD(RatingFromCommType)(pEpComType commType, pEpRating * rating);
 
     STDMETHOD(EncryptMessageForSelf)(
         pEpIdentity * targetId,

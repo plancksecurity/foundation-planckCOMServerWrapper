@@ -60,54 +60,54 @@ STDMETHODIMP CpEpEngine::UnencryptedSubject(VARIANT_BOOL enable)
 
 STDMETHODIMP CpEpEngine::ConfigCipherSuite(pEpCipherSuite cipherSuite)
 {
-	PEP_STATUS status = ::config_cipher_suite(session(), (PEP_CIPHER_SUITE)cipherSuite);
+    PEP_STATUS status = ::config_cipher_suite(session(), (PEP_CIPHER_SUITE)cipherSuite);
 
-	if (status)
-		return FAIL(L"config_cipher_suite", status);
-	
-	return S_OK;
+    if (status)
+        return FAIL(L"config_cipher_suite", status);
+    
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::ImportKey(BSTR keyData, LPSAFEARRAY * privateKeys)
 {
-	assert(keyData);
+    assert(keyData);
 
-	if (!keyData)
-		return E_INVALIDARG;
+    if (!keyData)
+        return E_INVALIDARG;
 
-	string key_data = utf8_string(keyData);
-	size_t size = SysStringLen(keyData);
-	::identity_list *private_keys = nullptr;
+    string key_data = utf8_string(keyData);
+    size_t size = SysStringLen(keyData);
+    ::identity_list *private_keys = nullptr;
 
-	PEP_STATUS status = ::import_key(session(), key_data.c_str(), size, &private_keys);
-	assert(status != ::PEP_OUT_OF_MEMORY);
-	if (status == ::PEP_OUT_OF_MEMORY)
-		return E_OUTOFMEMORY;
+    PEP_STATUS status = ::import_key(session(), key_data.c_str(), size, &private_keys);
+    assert(status != ::PEP_OUT_OF_MEMORY);
+    if (status == ::PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
 
-	if ((status != PEP_STATUS_OK) && (status != PEP_KEY_IMPORTED))
-		return FAIL(L"import_key", status);
+    if ((status != PEP_STATUS_OK) && (status != PEP_KEY_IMPORTED))
+        return FAIL(L"import_key", status);
 
-	SAFEARRAY * _privateKeys = nullptr;
-	try {
-		_privateKeys = array_from_C<pEpIdentity, identity_list>(private_keys);
-	}
-	catch (exception& ex)
-	{
-		::free_identity_list(private_keys);
-		try {
-			dynamic_cast<bad_alloc&>(ex);
-		}
-		catch (bad_cast&)
-		{
-			return FAIL(ex.what());
-		}
-		return E_OUTOFMEMORY;
-	}
-	free_identity_list(private_keys);
+    SAFEARRAY * _privateKeys = nullptr;
+    try {
+        _privateKeys = array_from_C<pEpIdentity, identity_list>(private_keys);
+    }
+    catch (exception& ex)
+    {
+        ::free_identity_list(private_keys);
+        try {
+            dynamic_cast<bad_alloc&>(ex);
+        }
+        catch (bad_cast&)
+        {
+            return FAIL(ex.what());
+        }
+        return E_OUTOFMEMORY;
+    }
+    free_identity_list(private_keys);
 
-	*privateKeys = _privateKeys;
+    *privateKeys = _privateKeys;
 
-	return status;
+    return status;
 }
 
 
@@ -140,15 +140,15 @@ STDMETHODIMP CpEpEngine::ExportKey(BSTR fpr, BSTR * keyData)
 
 STDMETHODIMP CpEpEngine::LeaveDeviceGroup()
 {
-	PEP_STATUS status = ::leave_device_group(session());
+    PEP_STATUS status = ::leave_device_group(session());
 
-	if (status == PEP_OUT_OF_MEMORY)
-		return E_OUTOFMEMORY;
+    if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
 
-	if (status != PEP_STATUS_OK)
-		return FAIL(L"cannot leave device group", status);
+    if (status != PEP_STATUS_OK)
+        return FAIL(L"cannot leave device group", status);
 
-	return S_OK;
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::Log(BSTR title, BSTR entity, BSTR description, BSTR comment)
@@ -245,67 +245,67 @@ STDMETHODIMP CpEpEngine::Trustwords(BSTR fpr, BSTR lang, LONG max_words, BSTR * 
 
 STDMETHODIMP CpEpEngine::GetTrustwordsForFprs(BSTR fpr1, BSTR fpr2, BSTR lang, VARIANT_BOOL full, BSTR *words)
 {
-	assert(fpr1);
-	assert(fpr2);
-	assert(words);
+    assert(fpr1);
+    assert(fpr2);
+    assert(words);
 
-	if (!(fpr1 && fpr2 && words))
-	{
-		return E_INVALIDARG;
-	}
+    if (!(fpr1 && fpr2 && words))
+    {
+        return E_INVALIDARG;
+    }
 
-	HRESULT result = S_OK;
-	string _fpr1;
-	string _fpr2;
-	string _lang;
-	*words = NULL;
+    HRESULT result = S_OK;
+    string _fpr1;
+    string _fpr2;
+    string _lang;
+    *words = NULL;
 
-	try {
+    try {
 
-		_fpr1 = utf8_string(fpr1);
-		_fpr2 = utf8_string(fpr2);
-		
-		if (lang) {
-			_lang = utf8_string(lang);
-			if (_lang.length() == 0) {
-				_lang = "en";
-			}
-			else if (_lang.length() != 2) {
-				result = E_INVALIDARG;
-			}
-		}
-		else {
-			_lang = "en";
-		}
-	}
-	catch (bad_alloc&) {
-		result = E_OUTOFMEMORY;
-	}
-	catch (exception& ex) {
-		result = FAIL(ex.what());
-	}
+        _fpr1 = utf8_string(fpr1);
+        _fpr2 = utf8_string(fpr2);
+        
+        if (lang) {
+            _lang = utf8_string(lang);
+            if (_lang.length() == 0) {
+                _lang = "en";
+            }
+            else if (_lang.length() != 2) {
+                result = E_INVALIDARG;
+            }
+        }
+        else {
+            _lang = "en";
+        }
+    }
+    catch (bad_alloc&) {
+        result = E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        result = FAIL(ex.what());
+    }
 
-	char* _words;
-	size_t _size;
-	if (result == S_OK) {
-		auto status = ::get_trustwords_for_fprs(session(), _fpr1.c_str(), _fpr2.c_str(), _lang.c_str(), &_words, &_size, full != 0 /* convert variant bool to C bool */);
+    char* _words;
+    size_t _size;
+    if (result == S_OK) {
+        auto status = ::get_trustwords_for_fprs(session(), _fpr1.c_str(), _fpr2.c_str(), _lang.c_str(), &_words, &_size, full != 0 /* convert variant bool to C bool */);
 
-		if (status == PEP_OUT_OF_MEMORY) {
-			result = E_OUTOFMEMORY;
-		}
-		else if (status == PEP_TRUSTWORD_NOT_FOUND) {
-			result = FAIL(L"GetTrustwords: Trustword not found", status);
-		}
-		else if (!words) {
-			result = FAIL(L"GetTrustwords: _words == NULL", status);
-		}
-		else {
-			*words = utf16_bstr(_words);
-			pEp_free(_words);
-		}
-	}
+        if (status == PEP_OUT_OF_MEMORY) {
+            result = E_OUTOFMEMORY;
+        }
+        else if (status == PEP_TRUSTWORD_NOT_FOUND) {
+            result = FAIL(L"GetTrustwords: Trustword not found", status);
+        }
+        else if (!words) {
+            result = FAIL(L"GetTrustwords: _words == NULL", status);
+        }
+        else {
+            *words = utf16_bstr(_words);
+            pEp_free(_words);
+        }
+    }
 
-	return result;
+    return result;
 }
 
 STDMETHODIMP CpEpEngine::GetTrustwords(struct pEpIdentity *id1, struct pEpIdentity *id2, BSTR lang, VARIANT_BOOL full, BSTR *words)
@@ -775,66 +775,66 @@ STDMETHODIMP CpEpEngine::IspEpUser(/* [in] */ struct pEpIdentity *ident, /* [ret
 
 STDMETHODIMP CpEpEngine::KeyResetIdentity(struct pEpIdentity ident, BSTR fpr)
 {
-	::pEp_identity *_ident;
+    ::pEp_identity *_ident;
 
-	try {
-		_ident = new_identity(&ident);
-	}
-	catch (bad_alloc&) {
-		return E_OUTOFMEMORY;
-	}
-	catch (exception& ex) {
-		return FAIL(ex.what());;
-	}
+    try {
+        _ident = new_identity(&ident);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());;
+    }
 
-	string _fpr = utf8_string(fpr);
+    string _fpr = utf8_string(fpr);
 
-	PEP_STATUS status = ::key_reset_identity(session(), _ident, _fpr.c_str());
+    PEP_STATUS status = ::key_reset_identity(session(), _ident, _fpr.c_str());
 
-	free_identity(_ident);
+    free_identity(_ident);
 
-	if (status == PEP_OUT_OF_MEMORY)
-		return E_OUTOFMEMORY;
+    if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
 
-	if (status == PEP_KEY_NOT_FOUND)
-		return FAIL(L"key not found");
+    if (status == PEP_KEY_NOT_FOUND)
+        return FAIL(L"key not found");
 
-	if (status != PEP_STATUS_OK)
-		return FAIL(L"cannot reset identity", status);
+    if (status != PEP_STATUS_OK)
+        return FAIL(L"cannot reset identity", status);
 
-	return S_OK;
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::KeyResetUser(BSTR userId, BSTR fpr)
 {
-	string _userId = utf8_string(userId);
-	string _fpr = utf8_string(fpr);
+    string _userId = utf8_string(userId);
+    string _fpr = utf8_string(fpr);
 
-	PEP_STATUS status = ::key_reset_user(session(), _userId.c_str(), _fpr.c_str());
+    PEP_STATUS status = ::key_reset_user(session(), _userId.c_str(), _fpr.c_str());
 
-	if (status == PEP_OUT_OF_MEMORY)
-		return E_OUTOFMEMORY;
+    if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
 
-	if (status == PEP_KEY_NOT_FOUND)
-		return FAIL(L"key not found");
+    if (status == PEP_KEY_NOT_FOUND)
+        return FAIL(L"key not found");
 
-	if (status != PEP_STATUS_OK)
-		return FAIL(L"cannot reset user", status);
+    if (status != PEP_STATUS_OK)
+        return FAIL(L"cannot reset user", status);
 
-	return S_OK;
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::KeyResetAllOwnKeys()
 {
-	PEP_STATUS status = ::key_reset_all_own_keys(session());
+    PEP_STATUS status = ::key_reset_all_own_keys(session());
 
-	if (status == PEP_OUT_OF_MEMORY)
-		return E_OUTOFMEMORY;
+    if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
 
-	if (status != PEP_STATUS_OK)
-		return FAIL(L"cannot reset all own keys", status);
+    if (status != PEP_STATUS_OK)
+        return FAIL(L"cannot reset all own keys", status);
 
-	return S_OK;
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::KeyResetTrust(struct pEpIdentity *ident)
@@ -1114,7 +1114,16 @@ STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SA
     if (!(src && dst))
         return E_INVALIDARG;
 
-    ::message *_src = text_message_to_C(src);
+    ::message *_src = NULL;
+    try {
+        _src = text_message_to_C(src);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());
+    }
 
     _PEP_enc_format _encFormat = (_PEP_enc_format)encFormat;
 
@@ -1166,7 +1175,16 @@ STDMETHODIMP CpEpEngine::EncryptMessageAndAddPrivKey(TextMessage * src, TextMess
     if (!(src && dst))
         return E_INVALIDARG;
 
-    ::message *_src = text_message_to_C(src);
+    ::message *_src = NULL;
+    try {
+        _src = text_message_to_C(src);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());
+    }
 
     _PEP_enc_format _encFormat = (_PEP_enc_format)encFormat;
 
@@ -1222,7 +1240,16 @@ STDMETHODIMP CpEpEngine::EncryptMessageForSelf(pEpIdentity * targetId, TextMessa
 
     ::pEp_identity *_target_id = new_identity(targetId);
 
-    ::message *_src = text_message_to_C(src);
+    ::message *_src = NULL;
+    try {
+        _src = text_message_to_C(src);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());
+    }
 
     ::stringlist_t* _extra = NULL;
     HRESULT result = S_OK;
@@ -1279,7 +1306,16 @@ STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SA
 
     *rating = pEpRatingUndefined;
 
-    ::message *_src = text_message_to_C(src);
+    ::message *_src = NULL;
+    try {
+        _src = text_message_to_C(src);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());
+    }
     ::message *msg_dst = NULL;
     ::stringlist_t *_keylist = new_stringlist(*keylist);
     ::PEP_rating _rating;
@@ -1319,7 +1355,17 @@ STDMETHODIMP CpEpEngine::ReEvaluateMessageRating(TextMessage * msg, SAFEARRAY * 
 
     *rating = pEpRatingUndefined;
 
-    ::message *_msg = text_message_to_C(msg);
+    ::message *_msg = NULL;
+    try {
+        _msg = text_message_to_C(msg);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());
+    }
+
     ::stringlist_t *_keylist = new_stringlist(x_KeyList);
     ::PEP_rating _rating = PEP_rating_undefined;
 
@@ -1341,7 +1387,16 @@ STDMETHODIMP CpEpEngine::OutgoingMessageRating(TextMessage *msg, pEpRating * pVa
     if (!(msg  && pVal))
         return E_INVALIDARG;
 
-    ::message *_msg = text_message_to_C(msg);
+    ::message *_msg = NULL;
+    try {
+        _msg = text_message_to_C(msg);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());
+    }
 
     PEP_rating _rating;
     PEP_STATUS status = ::outgoing_message_rating(session(), _msg, &_rating);
@@ -1354,21 +1409,30 @@ STDMETHODIMP CpEpEngine::OutgoingMessageRating(TextMessage *msg, pEpRating * pVa
 
 STDMETHODIMP CpEpEngine::OutgoingMessageRatingPreview(TextMessage *msg, pEpRating * pVal)
 {
-	assert(msg);
-	assert(pVal);
+    assert(msg);
+    assert(pVal);
 
-	if (!(msg  && pVal))
-		return E_INVALIDARG;
+    if (!(msg  && pVal))
+        return E_INVALIDARG;
 
-	::message *_msg = text_message_to_C(msg);
+    ::message *_msg = NULL;
+    try {
+        _msg = text_message_to_C(msg);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());
+    }
 
-	PEP_rating _rating;
-	PEP_STATUS status = ::outgoing_message_rating_preview(session(), _msg, &_rating);
-	if (status != PEP_STATUS_OK)
-		return FAIL(L"cannot get message rating", status);
+    PEP_rating _rating;
+    PEP_STATUS status = ::outgoing_message_rating_preview(session(), _msg, &_rating);
+    if (status != PEP_STATUS_OK)
+        return FAIL(L"cannot get message rating", status);
 
-	*pVal = (pEpRating)_rating;
-	return S_OK;
+    *pVal = (pEpRating)_rating;
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::IdentityRating(struct pEpIdentity *ident, pEpRating * pVal)
@@ -1413,7 +1477,7 @@ STDMETHODIMP CpEpEngine::ColorFromRating(pEpRating rating, pEpColor * pVal)
     PEP_color _color = ::color_from_rating(engineRating);
 
     *pVal = (pEpColor)_color;
-	 
+     
     return S_OK;
 }
 
@@ -1625,286 +1689,306 @@ STDMETHODIMP CpEpEngine::OpenPGPListKeyinfo(BSTR search_pattern, LPSAFEARRAY* ke
 
 STDMETHODIMP CpEpEngine::SetOwnKey(pEpIdentity * ident, BSTR fpr, struct pEpIdentity *result)
 {
-	assert(ident);
-	assert(result);
-	assert(fpr);
+    assert(ident);
+    assert(result);
+    assert(fpr);
 
-	if (!(ident && result))
-		return E_INVALIDARG;
+    if (!(ident && result))
+        return E_INVALIDARG;
 
-	::pEp_identity *_ident;
-	try {
-		_ident = new_identity(ident);
-	}
-	catch (bad_alloc&) {
-		return E_OUTOFMEMORY;
-	}
-	catch (exception& ex) {
-		return FAIL(ex.what());
-	}
+    ::pEp_identity *_ident;
+    try {
+        _ident = new_identity(ident);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());
+    }
 
-	assert(_ident);
-	if (_ident == NULL)
-		return E_OUTOFMEMORY;
+    assert(_ident);
+    if (_ident == NULL)
+        return E_OUTOFMEMORY;
 
-	string _fpr = utf8_string(fpr);
-	PEP_STATUS status = ::set_own_key(session(), _ident, _fpr.c_str());
+    string _fpr = utf8_string(fpr);
+    PEP_STATUS status = ::set_own_key(session(), _ident, _fpr.c_str());
 
-	if (status == PEP_STATUS_OK) {
-		copy_identity(result, _ident);
-		::free_identity(_ident);
-		return S_OK;
-	}
-	else {
-		::free_identity(_ident);
-		if (status == PEP_OUT_OF_MEMORY)
-			return E_OUTOFMEMORY;
-		else
-			return FAIL(L"SetOwnKey", status);
-	}
+    if (status == PEP_STATUS_OK) {
+        copy_identity(result, _ident);
+        ::free_identity(_ident);
+        return S_OK;
+    }
+    else {
+        ::free_identity(_ident);
+        if (status == PEP_OUT_OF_MEMORY)
+            return E_OUTOFMEMORY;
+        else
+            return FAIL(L"SetOwnKey", status);
+    }
 
-	return S_OK;
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::TrustOwnKey(pEpIdentity * ident)
 {
-	assert(ident);
+    assert(ident);
 
-	if (!ident)
-		return E_INVALIDARG;
+    if (!ident)
+        return E_INVALIDARG;
 
-	::pEp_identity *_ident;
-	try {
-		_ident = new_identity(ident);
-	}
-	catch (bad_alloc&) {
-		return E_OUTOFMEMORY;
-	}
-	catch (exception& ex) {
-		return FAIL(ex.what());
-	}
+    ::pEp_identity *_ident;
+    try {
+        _ident = new_identity(ident);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());
+    }
 
-	assert(_ident);
-	if (_ident == NULL)
-		return E_OUTOFMEMORY;
+    assert(_ident);
+    if (_ident == NULL)
+        return E_OUTOFMEMORY;
 
-	PEP_STATUS status = ::trust_own_key(session(), _ident);
+    PEP_STATUS status = ::trust_own_key(session(), _ident);
 
-	::free_identity(_ident);
+    ::free_identity(_ident);
 
-	if (status == PEP_STATUS_OK)
-		return S_OK;
-	else if (status == PEP_OUT_OF_MEMORY)
-		return E_OUTOFMEMORY;
-	else
-		return FAIL(L"TrustOwnKey", status);
+    if (status == PEP_STATUS_OK)
+        return S_OK;
+    else if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+    else
+        return FAIL(L"TrustOwnKey", status);
 }
 
 STDMETHODIMP CpEpEngine::Startup()
 {
-	try
-	{
-		startup<CpEpEngine>(messageToSend, notifyHandshake, this, &CpEpEngine::Startup_sync, &CpEpEngine::Shutdown_sync);
-	}
-	catch (bad_alloc&) {
-		return E_OUTOFMEMORY;
-	}
-	catch (exception& ex) {
-		return FAIL(ex.what());
-	}
+    try
+    {
+        startup<CpEpEngine>(messageToSend, notifyHandshake, this, &CpEpEngine::Startup_sync, &CpEpEngine::Shutdown_sync);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());
+    }
 
-	return S_OK;
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::GetKeyRating(BSTR fpr, pEpComType *commType)
 {
-	assert(fpr);
+    assert(fpr);
 
-	if (!fpr)
-		return E_INVALIDARG;
+    if (!fpr)
+        return E_INVALIDARG;
 
-	string _fpr = utf8_string(fpr);
+    string _fpr = utf8_string(fpr);
 
-	PEP_comm_type _commType;
-	PEP_STATUS status = ::get_key_rating(session(), _fpr.c_str(), &_commType);
-	if (status != PEP_STATUS_OK)
-		return FAIL(L"cannot get key rating", status);
+    PEP_comm_type _commType;
+    PEP_STATUS status = ::get_key_rating(session(), _fpr.c_str(), &_commType);
+    if (status != PEP_STATUS_OK)
+        return FAIL(L"cannot get key rating", status);
 
-	*commType = (pEpComType)_commType;
+    *commType = (pEpComType)_commType;
 
-	return S_OK;
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::GetKeyRatingForUser(BSTR userId, BSTR fpr, pEpRating *rating)
 {
-	assert(userId);
-	assert(fpr);
+    assert(userId);
+    assert(fpr);
 
-	if (!(userId && fpr))
-		return E_INVALIDARG;
+    if (!(userId && fpr))
+        return E_INVALIDARG;
 
-	string user_id = utf8_string(userId);
-	string _fpr = utf8_string(fpr);
+    string user_id = utf8_string(userId);
+    string _fpr = utf8_string(fpr);
 
-	PEP_rating _rating;
-	PEP_STATUS status = ::get_key_rating_for_user(session(), user_id.c_str(), _fpr.c_str(), &_rating);
-	if (status != PEP_STATUS_OK)
-		return FAIL(L"cannot get key rating for user", status);
+    PEP_rating _rating;
+    PEP_STATUS status = ::get_key_rating_for_user(session(), user_id.c_str(), _fpr.c_str(), &_rating);
+    if (status != PEP_STATUS_OK)
+        return FAIL(L"cannot get key rating for user", status);
 
-	*rating = (pEpRating)_rating;
+    *rating = (pEpRating)_rating;
 
-	return S_OK;
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::DeliverHandshakeResult(enum SyncHandshakeResult result, SAFEARRAY *identities_sharing)
 {
-	sync_handshake_result _result = (sync_handshake_result)result;
-	identity_list *_identities_sharing = NULL;
-	if (identities_sharing)
-	{
-		try {
-			_identities_sharing = identities(identities_sharing);
-		}
-		catch (bad_alloc&) {
-			return E_OUTOFMEMORY;
-		}
-	}
+    sync_handshake_result _result = (sync_handshake_result)result;
+    identity_list *_identities_sharing = NULL;
+    if (identities_sharing)
+    {
+        try {
+            _identities_sharing = identities(identities_sharing);
+        }
+        catch (bad_alloc&) {
+            return E_OUTOFMEMORY;
+        }
+    }
 
-	PEP_STATUS status = ::deliverHandshakeResult(session(), _result, _identities_sharing);
-	free_identity_list(_identities_sharing);
-	switch (status) {
-	case PEP_STATUS_OK:
-		break;
-	case PEP_OUT_OF_MEMORY:
-		return E_OUTOFMEMORY;
-	default:
-		return FAIL(L"deliverHandshakeResult is reporting an error", status);
-	}
+    PEP_STATUS status = ::deliverHandshakeResult(session(), _result, _identities_sharing);
+    free_identity_list(_identities_sharing);
+    switch (status) {
+    case PEP_STATUS_OK:
+        break;
+    case PEP_OUT_OF_MEMORY:
+        return E_OUTOFMEMORY;
+    default:
+        return FAIL(L"deliverHandshakeResult is reporting an error", status);
+    }
 
-	return S_OK;
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::PERToXERSyncMessage(TextMessage *msg, BSTR * xer)
 {
-	assert(msg);
+    assert(msg);
 
-	if (!msg)
-		return E_INVALIDARG;
+    if (!msg)
+        return E_INVALIDARG;
 
-	char* text;
-	::message *_msg = text_message_to_C(msg);
-	char* val = _msg->attachments->value;
+    ::message *_msg = NULL;
+    try {
+        _msg = text_message_to_C(msg);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());
+    }
 
-	PEP_STATUS status = ::PER_to_XER_Sync_msg(val, strlen(val), &text);
-	free_message(_msg);
+    char* text;
+    char* val = _msg->attachments->value;
 
-	if (status != PEP_STATUS_OK)
-		return FAIL(L"cannot get XER", status);
+    PEP_STATUS status = ::PER_to_XER_Sync_msg(val, strlen(val), &text);
+    free_message(_msg);
 
-	*xer = utf16_bstr(text);
-	pEp_free(text);
+    if (status != PEP_STATUS_OK)
+        return FAIL(L"cannot get XER", status);
 
-	return S_OK;
+    *xer = utf16_bstr(text);
+    pEp_free(text);
+
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::DisableIdentityForSync(struct pEpIdentity * ident)
 {
-	assert(ident);
+    assert(ident);
 
-	if (!ident)
-		return E_INVALIDARG;
+    if (!ident)
+        return E_INVALIDARG;
 
-	::pEp_identity *_ident;
-	try {
-		_ident = new_identity(ident);
-	}
-	catch (bad_alloc&) {
-		return E_OUTOFMEMORY;
-	}
-	catch (exception& ex) {
-		return FAIL(ex.what());
-	}
+    ::pEp_identity *_ident;
+    try {
+        _ident = new_identity(ident);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());
+    }
 
-	assert(_ident);
-	if (_ident == NULL)
-		return E_OUTOFMEMORY;
+    assert(_ident);
+    if (_ident == NULL)
+        return E_OUTOFMEMORY;
 
-	PEP_STATUS status = ::disable_identity_for_sync(session(), _ident);
+    PEP_STATUS status = ::disable_identity_for_sync(session(), _ident);
 
-	::free_identity(_ident);
+    ::free_identity(_ident);
 
-	if (status == PEP_STATUS_OK)
-		return S_OK;
-	else if (status == PEP_OUT_OF_MEMORY)
-		return E_OUTOFMEMORY;
-	else
-		return FAIL(L"DisableIdentityForSync", status);
+    if (status == PEP_STATUS_OK)
+        return S_OK;
+    else if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+    else
+        return FAIL(L"DisableIdentityForSync", status);
 }
 
 STDMETHODIMP CpEpEngine::EnableIdentityForSync(struct pEpIdentity * ident)
 {
-	assert(ident);
+    assert(ident);
 
-	if (!ident)
-		return E_INVALIDARG;
+    if (!ident)
+        return E_INVALIDARG;
 
-	::pEp_identity *_ident;
-	try {
-		_ident = new_identity(ident);
-	}
-	catch (bad_alloc&) {
-		return E_OUTOFMEMORY;
-	}
-	catch (exception& ex) {
-		return FAIL(ex.what());
-	}
+    ::pEp_identity *_ident;
+    try {
+        _ident = new_identity(ident);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());
+    }
 
-	assert(_ident);
-	if (_ident == NULL)
-		return E_OUTOFMEMORY;
+    assert(_ident);
+    if (_ident == NULL)
+        return E_OUTOFMEMORY;
 
-	PEP_STATUS status = ::enable_identity_for_sync(session(), _ident);
+    PEP_STATUS status = ::enable_identity_for_sync(session(), _ident);
 
-	::free_identity(_ident);
+    ::free_identity(_ident);
 
-	if (status == PEP_STATUS_OK)
-		return S_OK;
-	else if (status == PEP_OUT_OF_MEMORY)
-		return E_OUTOFMEMORY;
-	else
-		return FAIL(L"EnableIdentityForSync", status);
+    if (status == PEP_STATUS_OK)
+        return S_OK;
+    else if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+    else
+        return FAIL(L"EnableIdentityForSync", status);
 }
 
 STDMETHODIMP CpEpEngine::PerMachineDirectory(BSTR * directory)
 {
-	assert(directory);
+    assert(directory);
 
-	if (!directory)
-		return E_INVALIDARG;
+    if (!directory)
+        return E_INVALIDARG;
 
-	const char *_directory = ::per_machine_directory();
+    const char *_directory = ::per_machine_directory();
 
-	if (_directory == NULL)
-		return FAIL(L"PerMachineDirectory: _directory is NULL");
+    if (_directory == NULL)
+        return FAIL(L"PerMachineDirectory: _directory is NULL");
 
-	*directory = utf16_bstr(_directory);
+    *directory = utf16_bstr(_directory);
 
-	return S_OK;
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::PerUserDirectory(BSTR * directory)
 {
-	assert(directory);
+    assert(directory);
 
-	if (!directory)
-		return E_INVALIDARG;
+    if (!directory)
+        return E_INVALIDARG;
 
-	const char *_directory = ::per_user_directory();
+    const char *_directory = ::per_user_directory();
 
-	if (_directory == NULL)
-		return FAIL(L"PerUserDirectory: _directory is NULL");
+    if (_directory == NULL)
+        return FAIL(L"PerUserDirectory: _directory is NULL");
 
-	*directory = utf16_bstr(_directory);
+    *directory = utf16_bstr(_directory);
 
-	return S_OK;
+    return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::RatingFromCommType(pEpComType commType, pEpRating * rating) 
+{
+    PEP_comm_type _comm_type = (PEP_comm_type)commType;
+    PEP_rating _rating = ::rating_from_comm_type(_comm_type);
+
+    *rating = (pEpRating)_rating;
+
+    return S_OK;
 }
