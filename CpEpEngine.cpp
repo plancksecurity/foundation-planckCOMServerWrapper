@@ -1576,7 +1576,7 @@ STDMETHODIMP CpEpEngine::TrustPersonalKey(struct pEpIdentity *ident, struct pEpI
 }
 
 // Force an update check now
-STDMETHODIMP CpEpEngine::UpdateNow(BSTR productCode, BOOL *didUpdate)
+STDMETHODIMP CpEpEngine::UpdateNow(BSTR productCode, VARIANT_BOOL *didUpdate)
 {
 	BOOL result = FALSE;
 
@@ -1592,7 +1592,6 @@ STDMETHODIMP CpEpEngine::UpdateNow(BSTR productCode, BOOL *didUpdate)
 				break;
 			}
 		}
-		result = TRUE;
 	}
     catch (bad_alloc&) {
 		return E_OUTOFMEMORY;
