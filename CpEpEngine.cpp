@@ -1578,30 +1578,30 @@ STDMETHODIMP CpEpEngine::TrustPersonalKey(struct pEpIdentity *ident, struct pEpI
 // Force an update check now
 STDMETHODIMP CpEpEngine::UpdateNow(BSTR productCode, VARIANT_BOOL *didUpdate)
 {
-	BOOL result = FALSE;
+    BOOL result = FALSE;
 
-	try
+    try
     {
-		_bstr_t pc(productCode);
-		wstring _pc = pc;
+        _bstr_t pc(productCode);
+        wstring _pc = pc;
 
-		auto products = pEp::GateKeeper::gatekeeper()->registered_products();
-		for (auto p = products.begin(); p != products.end(); ++p) {
-			if (_pc == p->first) {
-				result = pEp::GateKeeper::gatekeeper()->update_product(*p);
-				break;
-			}
-		}
-	}
+        auto products = pEp::GateKeeper::gatekeeper()->registered_products();
+        for (auto p = products.begin(); p != products.end(); ++p) {
+            if (_pc == p->first) {
+                result = pEp::GateKeeper::gatekeeper()->update_product(*p);
+                break;
+            }
+        }
+    }
     catch (bad_alloc&) {
-		return E_OUTOFMEMORY;
+        return E_OUTOFMEMORY;
     }
     catch (exception& ex) {
-		return FAIL(ex.what());;
+        return FAIL(ex.what());;
     }
 
-	*didUpdate = result;
-	return S_OK;
+    *didUpdate = result;
+    return S_OK;
 }
 
 // Event callbacks
