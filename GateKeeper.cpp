@@ -115,14 +115,14 @@ namespace pEp {
 
     const time_t GateKeeper::cycle = 7200;   // 7200 sec is 2 h
     const time_t GateKeeper::fraction = 10;  // first update is at 10% of cycle
-    const chrono::seconds GateKeeper::waiting = 10s; //  10 sec
+    const DWORD GateKeeper::waiting = 10; //  10 sec
 
     GateKeeper::GateKeeper(CpEpCOMServerAdapterModule * self)
         : _self(self), now(time(NULL)), next(now /*+ time_diff()*/), hkUpdater(NULL),
         internet(NULL), hAES(NULL), hRSA(NULL)
     {
-		if (the_gatekeeper)
-			throw runtime_error("second instance of GateKeeper was initialized");
+        if (the_gatekeeper)
+            throw runtime_error("second instance of GateKeeper was initialized");
 
         DeleteFile(get_lockFile().c_str());
 
@@ -139,12 +139,12 @@ namespace pEp {
                 RegCreateKeyEx(cu, updater_reg_path, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ, NULL, &hkUpdater, NULL);
         }
 
-		the_gatekeeper = this;
+        the_gatekeeper = this;
     }
 
     GateKeeper::~GateKeeper()
     {
-		the_gatekeeper = nullptr;
+        the_gatekeeper = nullptr;
 
         if (cu_open) {
             if (hkUpdater)
@@ -184,6 +184,8 @@ namespace pEp {
                 next = now + GateKeeper::cycle;
                 keep_updated();
             }
+
+            Sleep(waiting);
         }
     }
 
@@ -617,6 +619,6 @@ namespace pEp {
         hRSA = NULL;
     }
 
-	GateKeeper *GateKeeper::the_gatekeeper = nullptr;
+    GateKeeper *GateKeeper::the_gatekeeper = nullptr;
 
 } // namespace pEp

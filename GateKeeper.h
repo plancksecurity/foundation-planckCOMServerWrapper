@@ -46,7 +46,7 @@ namespace pEp {
 
         static const time_t cycle;
         static const time_t fraction;
-        static const std::chrono::seconds waiting;
+        static const DWORD waiting;
 
         static time_t time_diff();
 
