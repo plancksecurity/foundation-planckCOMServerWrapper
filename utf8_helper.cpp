@@ -30,16 +30,18 @@ namespace pEp {
             }
             string result;
 
-            int size = WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS, _wstr_normalized.c_str(), -1, NULL, 0, NULL, NULL);
+            int size = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, _wstr_normalized.c_str(), -1, NULL, 0, NULL, NULL);
             assert(size);
             if (size) {
                 char *buf = new char[size];
-                WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS, _wstr_normalized.c_str(), -1, buf, size, NULL, NULL);
+                WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, _wstr_normalized.c_str(), -1, buf, size, NULL, NULL);
                 result = buf;
                 delete[] buf;
             }
-            else
-                throw out_of_range("input wstring is not valid while converting UTF-16 to UTF-8.");
+            else {
+                DWORD error = GetLastError();
+                throw out_of_range("input wstring is not valid while converting UTF-16 to UTF-8. Error" + error);
+            }
 
             return result;
         }
