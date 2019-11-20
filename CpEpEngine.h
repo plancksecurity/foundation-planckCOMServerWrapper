@@ -197,7 +197,7 @@ public:
     STDMETHOD(GetLanguageList)(BSTR * languages);
     STDMETHOD(SetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
     STDMETHOD(UnsetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
-	STDMETHOD(ImportKey)(BSTR keyData, LPSAFEARRAY *privateKeys);
+    STDMETHOD(ImportKey)(BSTR keyData, LPSAFEARRAY *privateKeys);
 
     // keymanagement API
 
@@ -207,13 +207,13 @@ public:
     STDMETHOD(Myself)(struct pEpIdentity *ident, struct pEpIdentity *result);
     STDMETHOD(UpdateIdentity)(struct pEpIdentity *ident, struct pEpIdentity *result);
     STDMETHOD(KeyMistrusted)(struct pEpIdentity *ident);
-	STDMETHOD(KeyResetIdentity)(pEpIdentity ident, BSTR fpr);
-	STDMETHOD(KeyResetUser)(BSTR userId, BSTR fpr);
-	STDMETHOD(KeyResetAllOwnKeys)();
+    STDMETHOD(KeyResetIdentity)(pEpIdentity ident, BSTR fpr);
+    STDMETHOD(KeyResetUser)(BSTR userId, BSTR fpr);
+    STDMETHOD(KeyResetAllOwnKeys)();
     STDMETHOD(KeyResetTrust)(struct pEpIdentity *ident);
     STDMETHOD(TrustPersonalKey)(struct pEpIdentity *ident, struct pEpIdentity *result);
     STDMETHOD(OwnIdentitiesRetrieve)(LPSAFEARRAY* ownIdentities);
-	STDMETHOD(ConfigCipherSuite)(pEpCipherSuite cipherSuite);
+    STDMETHOD(ConfigCipherSuite)(pEpCipherSuite cipherSuite);
 
     // STDMETHOD(UndoLastMistrust)(); 
     
@@ -247,8 +247,8 @@ public:
 
     STDMETHOD(DecryptMessage)(TextMessage * src, TextMessage * dst, SAFEARRAY ** keylist, pEpDecryptFlags* flags, pEpRating *rating);
     STDMETHOD(ReEvaluateMessageRating)(TextMessage * msg, SAFEARRAY * x_KeyList, pEpRating x_EncStatus, pEpRating *rating);
-	STDMETHOD(OutgoingMessageRating)(TextMessage *msg, pEpRating * pVal);
-	STDMETHOD(OutgoingMessageRatingPreview)(TextMessage *msg, pEpRating * pVal);
+    STDMETHOD(OutgoingMessageRating)(TextMessage *msg, pEpRating * pVal);
+    STDMETHOD(OutgoingMessageRatingPreview)(TextMessage *msg, pEpRating * pVal);
     STDMETHOD(IdentityRating)(pEpIdentity * ident, pEpRating * pVal);
     STDMETHOD(ColorFromRating)(pEpRating rating, pEpColor * pVal);
     STDMETHOD(RatingFromCommType)(pEpComType commType, pEpRating * rating);
@@ -268,27 +268,28 @@ public:
 
     // PGP compatibility functions
     STDMETHOD(OpenPGPListKeyinfo)(BSTR search_pattern, LPSAFEARRAY* keyinfo_list);
-	STDMETHOD(SetOwnKey)(pEpIdentity * ident, BSTR fpr, struct pEpIdentity *result);
-	STDMETHOD(TrustOwnKey)(pEpIdentity * ident);
+    STDMETHOD(SetOwnKey)(pEpIdentity * ident, BSTR fpr, struct pEpIdentity *result);
+    STDMETHOD(TrustOwnKey)(pEpIdentity * ident);
 
     // Trigger an immediate update
     STDMETHOD(UpdateNow)(BSTR productCode, VARIANT_BOOL *didUpdate);
 
-	STDMETHOD(Startup)();
+    STDMETHOD(Startup)();
 
-	STDMETHOD(GetKeyRatingForUser)(BSTR userId, BSTR fpr, pEpRating *rating);
-	STDMETHOD(GetKeyRating)(BSTR fpr, pEpComType *commType);
+    STDMETHOD(GetKeyRatingForUser)(BSTR userId, BSTR fpr, pEpRating *rating);
+    STDMETHOD(GetKeyRating)(BSTR fpr, pEpComType *commType);
 
-	// sync API
-	STDMETHOD(DeliverHandshakeResult)(enum SyncHandshakeResult result, SAFEARRAY *identities_sharing);
-	STDMETHOD(LeaveDeviceGroup)();
-	STDMETHOD(DisableIdentityForSync)(struct pEpIdentity * ident);
-	STDMETHOD(EnableIdentityForSync)(struct pEpIdentity * ident);
+    // sync API
+    STDMETHOD(DeliverHandshakeResult)(enum SyncHandshakeResult result, SAFEARRAY *identities_sharing);
+    STDMETHOD(LeaveDeviceGroup)();
+    STDMETHOD(DisableIdentityForSync)(struct pEpIdentity * ident);
+    STDMETHOD(EnableIdentityForSync)(struct pEpIdentity * ident);
+    STDMETHOD(GetIsSyncRunning)(VARIANT_BOOL *running);
 
-	STDMETHOD(PERToXERSyncMessage)(TextMessage *msg, BSTR * xer);
+    STDMETHOD(PERToXERSyncMessage)(TextMessage *msg, BSTR * xer);
 
-	STDMETHOD(PerMachineDirectory)(BSTR * directory);
-	STDMETHOD(PerUserDirectory)(BSTR * directory);
+    STDMETHOD(PerMachineDirectory)(BSTR * directory);
+    STDMETHOD(PerUserDirectory)(BSTR * directory);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)

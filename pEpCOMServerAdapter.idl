@@ -515,6 +515,9 @@ interface IpEpEngine : IUnknown {
 
     // Converts a comm type to a pEp rating
     [id(59)] HRESULT RatingFromCommType([in] pEpComType commType, [out, retval] pEpRating * rating);
+
+    // Gets if sync is enabled
+    [id(60)] HRESULT GetIsSyncRunning([out, retval] VARIANT_BOOL *running);
 };
 
 [
