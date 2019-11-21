@@ -1994,7 +1994,14 @@ STDMETHODIMP CpEpEngine::RatingFromCommType(pEpComType commType, pEpRating * rat
 
 STDMETHODIMP CpEpEngine::GetIsSyncRunning(VARIANT_BOOL *running)
 {
-    *running = ::is_sync_running();
+    *running = pEp::Adapter::is_sync_running();
+
+    return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::ShutDownSync()
+{
+    pEp::Adapter::shutdown();
 
     return S_OK;
 }

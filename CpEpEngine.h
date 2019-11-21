@@ -285,6 +285,7 @@ public:
     STDMETHOD(DisableIdentityForSync)(struct pEpIdentity * ident);
     STDMETHOD(EnableIdentityForSync)(struct pEpIdentity * ident);
     STDMETHOD(GetIsSyncRunning)(VARIANT_BOOL *running);
+    STDMETHOD(ShutDownSync)();
 
     STDMETHOD(PERToXERSyncMessage)(TextMessage *msg, BSTR * xer);
 

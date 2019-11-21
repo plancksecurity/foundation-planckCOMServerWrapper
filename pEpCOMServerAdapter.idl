@@ -518,6 +518,9 @@ interface IpEpEngine : IUnknown {
 
     // Gets if sync is enabled
     [id(60)] HRESULT GetIsSyncRunning([out, retval] VARIANT_BOOL *running);
+
+    // Shuts down sync
+    [id(61)] HRESULT ShutDownSync();
 };
 
 [
