@@ -826,7 +826,12 @@ STDMETHODIMP CpEpEngine::KeyResetUser(BSTR userId, BSTR fpr)
 
 STDMETHODIMP CpEpEngine::KeyResetAllOwnKeys()
 {
+    // We have to stop sync before resetting all own keys and enable it again afterwards
+    ShutDownSync();
+
     PEP_STATUS status = ::key_reset_all_own_keys(session());
+
+    Startup();
 
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
