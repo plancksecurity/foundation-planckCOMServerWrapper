@@ -20,7 +20,7 @@ namespace pEp {
                 username = _ident->username;
             comm_type = (pEpComType)_ident->comm_type;
             lang = _ident->lang;
-			me = _ident->me;
+            me = _ident->me;
             flags = (int)_ident->flags;
         }
 
@@ -40,7 +40,7 @@ namespace pEp {
             comm_type = _ident->CommType;
             if (_ident->Lang)
                 lang = utf8_string(_ident->Lang);
-			me = _ident->UserName;
+            me = _ident->UserName;
             flags = (int)_ident->Flags;
         }
 
@@ -60,7 +60,7 @@ namespace pEp {
                 _ident->lang[1] = this->lang[1];
             }
 
-			_ident->me = this->me;
+            _ident->me = this->me;
             _ident->flags = (identity_flags) this->flags;
 
             return _ident;
@@ -79,7 +79,7 @@ namespace pEp {
             _ident->Lang = utf16_bstr(this->lang);
             _ident->UserName = utf16_bstr(this->username);
             _ident->UserId = utf16_bstr(this->user_id);
-			_ident->Me = this->me;
+            _ident->Me = this->me;
             _ident->Flags = (pEpIdentityFlags) this->flags;
 
             return _ident;
@@ -104,7 +104,7 @@ namespace pEp {
                 ident_s->CommType = (pEpComType)ident->comm_type;
                 if (ident->lang)
                     ident_s->Lang = utf16_bstr(ident->lang);
-				ident_s->Me = ident->me;
+                ident_s->Me = ident->me;
                 ident_s->Flags = (pEpIdentityFlags)ident->flags;
             }
         }
@@ -165,7 +165,7 @@ namespace pEp {
                 }
             }
 
-			_ident->me = ident->Me;
+            _ident->me = ident->Me;
             _ident->flags = (identity_flags_t)ident->Flags;
 
             return _ident;

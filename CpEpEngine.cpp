@@ -789,7 +789,14 @@ STDMETHODIMP CpEpEngine::KeyResetIdentity(struct pEpIdentity ident, BSTR fpr)
 
     string _fpr = utf8_string(fpr);
 
+    // For an own identity, we have to stop sync before resetting all own keys and enable it again afterwards
+    if (ident.Me)
+        ShutDownSync();
+
     PEP_STATUS status = ::key_reset_identity(session(), _ident, _fpr.c_str());
+
+    if (ident.Me)
+        Startup();
 
     free_identity(_ident);
 
@@ -810,7 +817,16 @@ STDMETHODIMP CpEpEngine::KeyResetUser(BSTR userId, BSTR fpr)
     string _userId = utf8_string(userId);
     string _fpr = utf8_string(fpr);
 
+    // For an own identity, we have to stop sync before resetting all own keys and enable it again afterwards
+    bool ownIdentity = (_userId.compare(PEP_OWN_USERID) == 0);
+
+    if (ownIdentity)
+        ShutDownSync();
+
     PEP_STATUS status = ::key_reset_user(session(), _userId.c_str(), _fpr.c_str());
+
+    if (ownIdentity)
+        Startup();
 
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
