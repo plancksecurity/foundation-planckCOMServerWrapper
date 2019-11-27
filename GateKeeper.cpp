@@ -115,7 +115,7 @@ namespace pEp {
 
     const time_t GateKeeper::cycle = 7200;   // 7200 sec is 2 h
     const time_t GateKeeper::fraction = 10;  // first update is at 10% of cycle
-    const DWORD GateKeeper::waiting = 10; //  10 sec
+    const DWORD GateKeeper::waiting = 10000; //  10 sec
 
     GateKeeper::GateKeeper(CpEpCOMServerAdapterModule * self)
         : _self(self), now(time(NULL)), next(now /*+ time_diff()*/), hkUpdater(NULL),
