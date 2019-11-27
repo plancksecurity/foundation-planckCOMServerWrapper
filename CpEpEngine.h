@@ -148,13 +148,6 @@ private:
 
     void Shutdown_sync()
     {
-        for (auto p = sync_callbacks.begin(); p != sync_callbacks.end(); ++p) {
-            if (p->cdata) {
-                // p->cdata->Release(); FIXME: This occasionally raises an access violation. To be investigated, why => COM-99
-                p->cdata = nullptr;
-            }
-        }
-
         CoUninitialize();
     }
 
