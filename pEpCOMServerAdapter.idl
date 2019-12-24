@@ -521,6 +521,12 @@ interface IpEpEngine : IUnknown {
 
     // Shuts down sync
     [id(61)] HRESULT ShutDownSync();
+
+    // Decodes a MIME message
+    [id(62)] HRESULT MIMEDecodeMessage([in] BSTR mimeText, [out, retval] struct TextMessage *msg);
+
+    // Encodes a MIME message
+    [id(63)] HRESULT MIMEEncodeMessage([in] struct TextMessage *msg, [in] VARIANT_BOOL omitFields, [out, retval] BSTR *mimeText);
 };
 
 [

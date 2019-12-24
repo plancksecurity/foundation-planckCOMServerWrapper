@@ -64,7 +64,7 @@ STDMETHODIMP CpEpEngine::ConfigCipherSuite(pEpCipherSuite cipherSuite)
 
     if (status)
         return FAIL(L"config_cipher_suite", status);
-    
+
     return S_OK;
 }
 
@@ -264,7 +264,7 @@ STDMETHODIMP CpEpEngine::GetTrustwordsForFprs(BSTR fpr1, BSTR fpr2, BSTR lang, V
 
         _fpr1 = utf8_string(fpr1);
         _fpr2 = utf8_string(fpr2);
-        
+
         if (lang) {
             _lang = utf8_string(lang);
             if (_lang.length() == 0) {
@@ -616,6 +616,70 @@ STDMETHODIMP CpEpEngine::StopKeyserverLookup()
     return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::MIMEDecodeMessage(BSTR mimeText, TextMessage *msg)
+{
+    assert(mimeText);
+
+    if (!mimeText)
+        return E_INVALIDARG;
+
+    string _mimeText = utf8_string(mimeText);
+    size_t size = SysStringLen(mimeText);
+    ::message *_msg = NULL;
+
+    PEP_STATUS status = mime_decode_message(_mimeText.c_str(), size, &_msg);
+    assert(status != ::PEP_OUT_OF_MEMORY);
+    if (status == ::PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+
+    if (status != PEP_STATUS_OK)
+        return FAIL(L"mime_decode_message", status);
+
+    if (_msg)
+        text_message_from_C(msg, _msg);
+
+    free_message(_msg);
+
+    return status;
+}
+
+
+STDMETHODIMP CpEpEngine::MIMEEncodeMessage(TextMessage *msg, VARIANT_BOOL omitFields, BSTR *mimeText)
+{
+    assert(msg);
+
+    if (!msg)
+        return E_INVALIDARG;
+
+    ::message *_msg = NULL;
+    try {
+        _msg = text_message_to_C(msg);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());
+    }
+
+    char *_mimeText;
+
+    PEP_STATUS status = mime_encode_message(_msg, omitFields != 0, &_mimeText);
+    free_message(_msg);
+
+    assert(status != ::PEP_OUT_OF_MEMORY);
+    if (status == ::PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+
+    if (status != PEP_STATUS_OK)
+        return FAIL(L"mime_encode_message", status);
+
+    *mimeText = utf16_bstr(_mimeText);
+    pEp_free(_mimeText);
+
+    return status;
+}
+
 STDMETHODIMP CpEpEngine::Myself(struct pEpIdentity *ident, struct pEpIdentity *result)
 {
     assert(ident);
@@ -738,7 +802,7 @@ STDMETHODIMP CpEpEngine::KeyMistrusted(struct pEpIdentity *ident)
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::IspEpUser(/* [in] */ struct pEpIdentity *ident, /* [retval][out] */ VARIANT_BOOL *ispEp) 
+STDMETHODIMP CpEpEngine::IspEpUser(/* [in] */ struct pEpIdentity *ident, /* [retval][out] */ VARIANT_BOOL *ispEp)
 {
     ::pEp_identity *_ident;
 
@@ -943,7 +1007,7 @@ int CpEpEngine::examine_identity(pEp_identity *ident, void *management)
 static IpEpEngineCallbacks * _unmarshaled_consumer(CpEpEngine::callback_container::Container::iterator p)
 {
     if (!p->cdata && p->pdata && p->pdata->marshaled) {
-        HRESULT r = CoGetInterfaceAndReleaseStream(p->pdata->marshaled, IID_IpEpEngineCallbacks, (LPVOID*) &p->cdata);
+        HRESULT r = CoGetInterfaceAndReleaseStream(p->pdata->marshaled, IID_IpEpEngineCallbacks, (LPVOID*)&p->cdata);
         if (!SUCCEEDED(r))
             throw runtime_error("_unmarshaled_consumer(): CoGetInterfaceAndReleaseStream() failed");
         p->pdata->marshaled = nullptr;
@@ -1215,9 +1279,9 @@ STDMETHODIMP CpEpEngine::EncryptMessageAndAddPrivKey(TextMessage * src, TextMess
     ::message *msg_dst = NULL;
 
     string _to_fpr = utf8_string(to_fpr);
-                                                    // _PEP_enc_format used to be intentionally hardcoded to PEP_enc_PEP:
-                                                    // Since COM-74, this has been changed to an explicit parameter, to allow the engine to attach
-                                                    // the keys and headers to outgoing, unencrypted messages.
+    // _PEP_enc_format used to be intentionally hardcoded to PEP_enc_PEP:
+    // Since COM-74, this has been changed to an explicit parameter, to allow the engine to attach
+    // the keys and headers to outgoing, unencrypted messages.
     PEP_encrypt_flags_t engineFlags = (PEP_encrypt_flags_t)flags;
     PEP_STATUS status = ::encrypt_message_and_add_priv_key(session(), _src, &msg_dst, _to_fpr.c_str(), _encFormat, engineFlags);
 
@@ -1291,7 +1355,8 @@ STDMETHODIMP CpEpEngine::EncryptMessageForSelf(pEpIdentity * targetId, TextMessa
             text_message_from_C(dst, msg_dst);
         else
             text_message_from_C(dst, _src);
-    } catch (bad_alloc&) {
+    }
+    catch (bad_alloc&) {
         result = E_OUTOFMEMORY;
     }
     catch (exception& ex) {
@@ -1341,7 +1406,7 @@ STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SA
     ::stringlist_t *_keylist = new_stringlist(*keylist);
     ::PEP_rating _rating;
 
-    PEP_decrypt_flags_t engineflags = (PEP_decrypt_flags_t) *flags;
+    PEP_decrypt_flags_t engineflags = (PEP_decrypt_flags_t)*flags;
     PEP_STATUS status = ::decrypt_message(session(), _src, &msg_dst, &_keylist, &_rating, &engineflags);
 
     *flags = (pEpDecryptFlags)engineflags;
@@ -1498,7 +1563,7 @@ STDMETHODIMP CpEpEngine::ColorFromRating(pEpRating rating, pEpColor * pVal)
     PEP_color _color = ::color_from_rating(engineRating);
 
     *pVal = (pEpColor)_color;
-     
+
     return S_OK;
 }
 
@@ -2003,7 +2068,7 @@ STDMETHODIMP CpEpEngine::PerUserDirectory(BSTR * directory)
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::RatingFromCommType(pEpComType commType, pEpRating * rating) 
+STDMETHODIMP CpEpEngine::RatingFromCommType(pEpComType commType, pEpRating * rating)
 {
     PEP_comm_type _comm_type = (PEP_comm_type)commType;
     PEP_rating _rating = ::rating_from_comm_type(_comm_type);
