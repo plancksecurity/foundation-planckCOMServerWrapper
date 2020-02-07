@@ -319,7 +319,8 @@ interface IpEpEngine : IUnknown {
         pEpDecryptFlagConsume = 0x2,
         pEpDecryptFlagIgnore = 0x4,
         pEpDecryptFlagSrcModified = 0x8,
-        pEpDecryptFlagUntrustedServer = 0x100
+        pEpDecryptFlagUntrustedServer = 0x100,
+        pEpDecryptFlagDontTriggerSync = 0x200
     } pEpDecryptFlags;
 
     typedef [v1_enum] enum pEpMsgDirection {
