@@ -49,7 +49,17 @@ public:
         --count;
         if (!count) {
             StopKeyserverLookup();
-            ::log_event(session(), "Shutdown", "pEp COM Adapter", NULL, NULL);
+            try {
+                // try/catch to avoid freeze when no session could be initialized because a runtime
+                // or other kind of exceptions thrown by engine
+                ::log_event(session(), "Shutdown", "pEp COM Adapter", NULL, NULL);
+            }
+            catch (pEp::RuntimeError& ex) { // runtime
+                error(ex.what());
+            }
+            catch (std::exception& ex) { // bad alloc or invalid argument
+                error(ex.what());
+            }
             session(pEp::Adapter::release);
             shutdown();
 
