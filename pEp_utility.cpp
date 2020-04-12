@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "pEp_utility.h"
+#include "platform.h"
 
 using namespace ATL;
 
@@ -343,9 +344,9 @@ namespace pEp {
             msg2->LongMsgFormatted = bstr(msg->longmsg_formatted);
             msg2->Attachments = array_from_C<Blob, bloblist_t>(msg->attachments);
             if (msg->sent)
-                msg2->Sent = _mkgmtime(msg->sent);
+                msg2->Sent = timegm(msg->sent);
             if (msg->recv)
-                msg2->Recv = _mkgmtime(msg->recv);
+                msg2->Recv = timegm(msg->recv);
             msg2->From = identity_s(msg->from);
             msg2->To = array_from_C<pEpIdentity, identity_list>(msg->to);
             msg2->RecvBy = identity_s(msg->recv_by);
