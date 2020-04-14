@@ -57,3 +57,5 @@
 #include <pEp/blacklist.h>
 #include <pEp/sync_api.h>
 #include <pEp/openpgp_compat.h>
+#include <pEp/platform.h>
+

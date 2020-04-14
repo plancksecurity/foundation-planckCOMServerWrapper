@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "pEp_utility.h"
-#include "platform.h"
 
 using namespace ATL;
 
