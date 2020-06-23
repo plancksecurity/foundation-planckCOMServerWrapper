@@ -20,6 +20,7 @@ namespace pEp {
                 username = _ident->username;
             comm_type = (pEpComType)_ident->comm_type;
             lang = _ident->lang;
+            me = _ident->me;
             flags = (int)_ident->flags;
         }
 
@@ -39,6 +40,7 @@ namespace pEp {
             comm_type = _ident->CommType;
             if (_ident->Lang)
                 lang = utf8_string(_ident->Lang);
+            me = _ident->UserName;
             flags = (int)_ident->Flags;
         }
 
@@ -58,6 +60,7 @@ namespace pEp {
                 _ident->lang[1] = this->lang[1];
             }
 
+            _ident->me = this->me;
             _ident->flags = (identity_flags) this->flags;
 
             return _ident;
@@ -76,6 +79,7 @@ namespace pEp {
             _ident->Lang = utf16_bstr(this->lang);
             _ident->UserName = utf16_bstr(this->username);
             _ident->UserId = utf16_bstr(this->user_id);
+            _ident->Me = this->me;
             _ident->Flags = (pEpIdentityFlags) this->flags;
 
             return _ident;
@@ -100,6 +104,7 @@ namespace pEp {
                 ident_s->CommType = (pEpComType)ident->comm_type;
                 if (ident->lang)
                     ident_s->Lang = utf16_bstr(ident->lang);
+                ident_s->Me = ident->me;
                 ident_s->Flags = (pEpIdentityFlags)ident->flags;
             }
         }
@@ -160,6 +165,7 @@ namespace pEp {
                 }
             }
 
+            _ident->me = ident->Me;
             _ident->flags = (identity_flags_t)ident->Flags;
 
             return _ident;
@@ -217,8 +223,11 @@ namespace pEp {
             SafeArrayGetUBound(sa, 1, &ubound);
 
             T *_tl = tl;
-            for (LONG i = lbound; i <= ubound; _tl = _tl->next, i++)
-                SafeArrayPutElement(sa, &i, from_C<T2 *, T>(_tl));
+            for (LONG i = lbound; i <= ubound; _tl = _tl->next, i++) {
+                HRESULT result = SafeArrayPutElement(sa, &i, from_C<T2 *, T>(_tl));
+                if (!SUCCEEDED(result))
+                    throw bad_alloc();
+            }
 
             return sa;
         }
@@ -334,9 +343,9 @@ namespace pEp {
             msg2->LongMsgFormatted = bstr(msg->longmsg_formatted);
             msg2->Attachments = array_from_C<Blob, bloblist_t>(msg->attachments);
             if (msg->sent)
-                msg2->Sent = _mkgmtime(msg->sent);
+                msg2->Sent = timegm(msg->sent);
             if (msg->recv)
-                msg2->Recv = _mkgmtime(msg->recv);
+                msg2->Recv = timegm(msg->recv);
             msg2->From = identity_s(msg->from);
             msg2->To = array_from_C<pEpIdentity, identity_list>(msg->to);
             msg2->RecvBy = identity_s(msg->recv_by);
@@ -347,6 +356,7 @@ namespace pEp {
             msg2->Keywords = string_array(msg->keywords);
             msg2->Comments = bstr(msg->comments);
             msg2->OptFields = array_from_C<StringPair, stringpair_list_t>(msg->opt_fields);
+            msg2->SenderFpr = bstr(msg->_sender_fpr);
         }
 
         char * str(BSTR s)

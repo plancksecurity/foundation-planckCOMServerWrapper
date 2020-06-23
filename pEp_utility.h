@@ -16,6 +16,7 @@ namespace pEp {
             string username;
             pEpComType comm_type;
             string lang;
+			bool me;
             int flags;
 
             pEp_identity_cpp(
@@ -24,8 +25,9 @@ namespace pEp {
                 string _user_id = string(),
                 string _username = string(),
                 pEpComType _comm_type = pEpCtUnknown,
+				bool _me = false,
                 string _lang = string()
-            ) : address(_address), fpr(_fpr), user_id(_user_id), username(_username), comm_type(_comm_type), lang(_lang)
+            ) : address(_address), fpr(_fpr), user_id(_user_id), username(_username), comm_type(_comm_type), me(_me), lang(_lang)
             { }
 
             pEp_identity_cpp(const ::pEp_identity *_ident);
@@ -52,15 +54,20 @@ namespace pEp {
             LPTYPEINFO pTypeInfo = NULL;
             LPSAFEARRAY psaUDType = NULL;
             IRecordInfo* pRecInfo = NULL;
+            HRESULT hr;
 
             // Fetch the IRecordInfo interface describing the UDT
-            if (pTypelib == NULL)
-                LoadRegTypeLib(LIBID_pEpCOMServerAdapterLib, 1, 0, GetUserDefaultLCID(), &pTypelib);
+            if (pTypelib == NULL) {
+                hr = LoadRegTypeLib(LIBID_pEpCOMServerAdapterLib, 1, 0, GetUserDefaultLCID(), &pTypelib);
+                assert(SUCCEEDED(hr));
+                if (!SUCCEEDED(hr))
+                    throw runtime_error("getRecordInfo(): LoadRegTypeLib cannot load LIBID_pEpCOMServerAdapterLib");
+            }
 
             assert(pTypelib);
 
             GUID guid = __uuidof(UDType);
-            HRESULT hr = pTypelib->GetTypeInfoOfGuid(guid, &pTypeInfo);
+            hr = pTypelib->GetTypeInfoOfGuid(guid, &pTypeInfo);
             assert(SUCCEEDED(hr) && pTypeInfo);
             hr = GetRecordInfoFromTypeInfo(pTypeInfo, &pRecInfo);
             assert(SUCCEEDED(hr) && pRecInfo);
@@ -80,6 +87,7 @@ namespace pEp {
             return psaUDType;
         }
 
+		identity_list *identities(SAFEARRAY * sa);
         ::message * text_message_to_C(TextMessage *msg);
         void text_message_from_C(TextMessage *msg2, const ::message *msg);
     }

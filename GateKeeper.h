@@ -5,9 +5,13 @@ using namespace std;
 namespace pEp {
 
 #ifdef UNICODE
-    typedef wstring tstring;
+	typedef wstring tstring;
+	typedef wregex tregex;
+	typedef wsmatch tsmatch;
 #else
-    typedef string tstring;
+	typedef string tstring;
+	typedef regex tregex;
+	typedef smatch tsmatch;
 #endif
 
     class GateKeeper {
@@ -30,8 +34,10 @@ namespace pEp {
         }
 
         void keep();
+		product_list registered_products();
+		bool update_product(product p, DWORD context = 0);
 
-        static void update_now();
+		static GateKeeper *gatekeeper() { return the_gatekeeper; }
 
     protected:
         static const LPCTSTR plugin_reg_path;
@@ -40,21 +46,20 @@ namespace pEp {
 
         static const time_t cycle;
         static const time_t fraction;
-        static const std::chrono::seconds waiting;
+        static const DWORD waiting;
 
         static time_t time_diff();
 
         void keep_plugin();
 
-        void install_msi(tstring filename);
+        void execute_file(tstring filename);
         string update_key();
         BCRYPT_KEY_HANDLE delivery_key();
         string wrapped_delivery_key(BCRYPT_KEY_HANDLE hDeliveryKey);
 
-        void update_product(product p, DWORD context);
-        product_list registered_products();
         void keep_updated();
         static tstring get_lockFile();
+		static GateKeeper *the_gatekeeper;
 
     private:
         time_t now;
@@ -67,9 +72,5 @@ namespace pEp {
         BCRYPT_ALG_HANDLE hRSA;
 
         CpEpCOMServerAdapterModule * _self;
-
-        static std::mutex update_wait_mtx;
-        static std::condition_variable update_wait_var;
-        static bool update_wait_forced;
     };
 }

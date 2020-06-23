@@ -4,11 +4,16 @@
 #include "resource.h"       // main symbols
 
 #include "pEpComServerAdapter_i.h"
-#include "locked_queue.hh"
+#include "..\libpEpAdapter\locked_queue.hh"
 #include "utf8_helper.h"
 #include "pEp_utility.h"
+#include "..\libpEpAdapter\Adapter.hh"
 #include <queue>
 #include <mutex>
+#include <vector>
+#include "..\libpEpAdapter\pc_container.hh"
+#include "..\pEp\sync_codec.h"
+#include "..\pEp\mime.h"
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
@@ -17,6 +22,7 @@
 using namespace ATL;
 using namespace utility;
 using namespace pEp::utility;
+using namespace pEp::Adapter;
 
 // CpEpEngine
 
@@ -35,17 +41,37 @@ public:
     {
         // See FinalConstruct() below for most initialization work, and an
         // explanation why it had to be moved there...
+        ++count;
     }
 
     ~CpEpEngine()
     {
-        stop_keysync();
-        StopKeyserverLookup();
-        if (m_session) // may be zero when FinalConstruct failed to initialize the engine
-        {
-            ::log_event(m_session, "Shutdown", "pEp COM Adapter", NULL, NULL);
-            std::lock_guard<std::mutex> lock(init_mutex);
-            ::release(m_session);
+        --count;
+        if (!count) {
+            StopKeyserverLookup();
+            try {
+                // try/catch to avoid freeze when no session could be initialized because a runtime
+                // or other kind of exceptions thrown by engine
+                ::log_event(session(), "Shutdown", "pEp COM Adapter", NULL, NULL);
+            }
+            catch (pEp::RuntimeError& ex) { // runtime
+                error(ex.what());
+            }
+            catch (std::exception& ex) { // bad alloc or invalid argument
+                error(ex.what());
+            }
+            session(pEp::Adapter::release);
+            shutdown();
+
+            sync_callbacks.clear([](CpEpEngine::MarshaledCallbacks *p) {
+                if (p) {
+                    if (p->marshaled)
+                        p->marshaled->Release();
+                    if (p->unmarshaled)
+                        p->unmarshaled->Release();
+                    delete p;
+                }
+            });
         }
     }
 
@@ -72,15 +98,20 @@ public:
     HRESULT FinalConstruct()
     {
         std::lock_guard<std::mutex> lock(init_mutex);
-        PEP_STATUS status = ::init(&m_session);
-        assert(status == PEP_STATUS_OK);
-        if (status != PEP_STATUS_OK) {
-            HRESULT res = MAKE_HRESULT(1, FACILITY_ITF, (0xFFFF & status));
-            return res;
+        try {
+            if (!_messageToSend) {
+                _messageToSend = messageToSend;
+            }
+            session();
         }
+        catch (pEp::RuntimeError& e) {
+            HRESULT res = MAKE_HRESULT(1, FACILITY_ITF, (0xFFFF & e.status));
+            return res;
+        }       
 
-        ::register_examine_function(m_session, CpEpEngine::examine_identity, (void *)this);
-        ::log_event(m_session, "Startup", "pEp COM Adapter", NULL, NULL);
+        ::register_examine_function(session(), CpEpEngine::examine_identity, (void *)this);
+        ::log_event(session(), "FinalConstruct", "pEp COM Adapter", NULL, NULL);
+
         return S_OK;
     }
 
@@ -88,41 +119,19 @@ public:
     {
     }
 
-
-protected:
-    class session
-    {
-    private:
-        CpEpEngine *me;
-
-    public:
-        session(CpEpEngine *myself)
-        {
-            me = myself;
-            me->session_mutex.lock();
-        }
-
-        ~session()
-        {
-            me->session_mutex.unlock();
-        }
-
-        operator PEP_SESSION const ()
-        {
-            return me->m_session;
-        }
+    struct MarshaledCallbacks {
+        IpEpEngineCallbacks *unmarshaled;
+        LPSTREAM marshaled;
     };
 
-    session get_session()
-    {
-        return session(this);
-    }
+    typedef pEp::pc_container< MarshaledCallbacks, IpEpEngineCallbacks > callback_container;
 
+protected:
     typedef locked_queue<pEp_identity_cpp> identity_queue_t;
     static ::pEp_identity * retrieve_next_identity(void *management);
-    static PEP_STATUS messageToSend(void * obj, message *msg);
-    static PEP_STATUS notifyHandshake(void * obj, pEp_identity *self, pEp_identity *partner, sync_handshake_signal signal);
 
+    static PEP_STATUS messageToSend(message *msg);
+    static PEP_STATUS notifyHandshake(pEp_identity *self, pEp_identity *partner, sync_handshake_signal signal);
 
     HRESULT error(_bstr_t msg);
     HRESULT error(_bstr_t msg, PEP_STATUS errorcode);
@@ -132,50 +141,36 @@ protected:
         if (verbose_mode) {
             stringstream ss;
             ss << __FILE__ << ":" << __LINE__ << " " << text;
-            ::log_event(get_session(), "verbose", "pEp COM Server Adapter", ss.str().c_str(), NULL);
+            ::log_event(session(), "verbose", "pEp COM Server Adapter", ss.str().c_str(), NULL);
         }
     }
 
 private:
-    PEP_SESSION m_session;
-    mutex session_mutex;
+    // callbacks for sync
+
+    static callback_container sync_callbacks;
+
+    void Startup_sync()
+    {
+        HRESULT r = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+        if (!SUCCEEDED(r))
+            throw runtime_error("CoInitializeEx() failed on sync thread");
+    }
+
+    void Shutdown_sync()
+    {
+        CoUninitialize();
+    }
+
     atomic< identity_queue_t * > identity_queue;
     thread *keymanagement_thread;
     bool verbose_mode;
 
-
     IpEpEngineCallbacks* client_callbacks = NULL;
-    IpEpEngineCallbacks* client_callbacks_on_sync_thread = NULL;
     bool client_last_signalled_polling_state = true;
 
-    // Keysync members
-    static int inject_sync_msg(void *msg, void* management);
-    static void* retrieve_next_sync_msg(void* management, time_t *timeout);
-    void start_keysync();
-    static void do_keysync_in_thread(CpEpEngine* self, LPSTREAM marshaled_callbacks);
-    void stop_keysync();
-
     static std::mutex init_mutex;
-
-    std::recursive_mutex keysync_mutex;
-    std::condition_variable_any keysync_condition;
-    std::thread *keysync_thread = NULL;
-    std::queue<void*> keysync_queue;
-    bool keysync_abort_requested = false;
-    PEP_SESSION keysync_session;
-
-    // Members used for handshake notification dispatch to the background thread.
-    static void notify_handshake_background_thread(CpEpEngine* self, LPSTREAM marshaled_callbacks);
-    void notify_handshake_deliver_result();
-    bool notify_handshake_active = false;
-    bool notify_handshake_finished = false;
-    std::thread *notify_handshake_thread = NULL;
-    pEpIdentity notify_handshake_self;
-    pEpIdentity notify_handshake_partner;
-    SyncHandshakeSignal notify_handshake_signal;
-    SyncHandshakeResult notify_handshake_result;
-    LPSTREAM notify_handshake_error_info = NULL;
-    HRESULT notify_handshake_error;
+    static atomic< int > count;
 
 public:
     // runtime config of the adapter
@@ -193,6 +188,7 @@ public:
     STDMETHOD(Log)(BSTR title, BSTR entity, BSTR description, BSTR comment);
     STDMETHOD(Trustwords)(BSTR fpr, BSTR lang, LONG max_words, BSTR * words);
     STDMETHOD(GetTrustwords)(struct pEpIdentity *id1, struct pEpIdentity *id2, BSTR lang, VARIANT_BOOL full, BSTR *words);
+    STDMETHOD(GetTrustwordsForFprs)(BSTR fpr1, BSTR fpr2, BSTR lang, VARIANT_BOOL full, BSTR *words);
     STDMETHOD(GetMessageTrustwords)(
         /* [in] */ struct TextMessage *msg,
         /* [in] */ struct pEpIdentity *receivedBy,
@@ -205,6 +201,7 @@ public:
     STDMETHOD(GetLanguageList)(BSTR * languages);
     STDMETHOD(SetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
     STDMETHOD(UnsetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
+    STDMETHOD(ImportKey)(BSTR keyData, LPSAFEARRAY *privateKeys);
 
     // keymanagement API
 
@@ -214,15 +211,20 @@ public:
     STDMETHOD(Myself)(struct pEpIdentity *ident, struct pEpIdentity *result);
     STDMETHOD(UpdateIdentity)(struct pEpIdentity *ident, struct pEpIdentity *result);
     STDMETHOD(KeyMistrusted)(struct pEpIdentity *ident);
+    STDMETHOD(KeyResetIdentity)(pEpIdentity ident, BSTR fpr);
+    STDMETHOD(KeyResetUser)(BSTR userId, BSTR fpr);
+    STDMETHOD(KeyResetAllOwnKeys)();
     STDMETHOD(KeyResetTrust)(struct pEpIdentity *ident);
     STDMETHOD(TrustPersonalKey)(struct pEpIdentity *ident, struct pEpIdentity *result);
     STDMETHOD(OwnIdentitiesRetrieve)(LPSAFEARRAY* ownIdentities);
+    STDMETHOD(ConfigCipherSuite)(pEpCipherSuite cipherSuite);
 
-    STDMETHOD(UndoLastMistrust)(); 
+    // STDMETHOD(UndoLastMistrust)(); 
     
-    STDMETHOD(IsPepUser)(
+    STDMETHOD(IspEpUser)(
         /* [in] */ struct pEpIdentity *ident,
         /* [retval][out] */ VARIANT_BOOL *ispEp);
+
 
     // Blacklist API
 
@@ -249,10 +251,11 @@ public:
 
     STDMETHOD(DecryptMessage)(TextMessage * src, TextMessage * dst, SAFEARRAY ** keylist, pEpDecryptFlags* flags, pEpRating *rating);
     STDMETHOD(ReEvaluateMessageRating)(TextMessage * msg, SAFEARRAY * x_KeyList, pEpRating x_EncStatus, pEpRating *rating);
-	STDMETHOD(OutgoingMessageRating)(TextMessage *msg, pEpRating * pVal);
-	STDMETHOD(OutgoingMessageRatingPreview)(TextMessage *msg, pEpRating * pVal);
+    STDMETHOD(OutgoingMessageRating)(TextMessage *msg, pEpRating * pVal);
+    STDMETHOD(OutgoingMessageRatingPreview)(TextMessage *msg, pEpRating * pVal);
     STDMETHOD(IdentityRating)(pEpIdentity * ident, pEpRating * pVal);
     STDMETHOD(ColorFromRating)(pEpRating rating, pEpColor * pVal);
+    STDMETHOD(RatingFromCommType)(pEpComType commType, pEpRating * rating);
 
     STDMETHOD(EncryptMessageForSelf)(
         pEpIdentity * targetId,
@@ -269,14 +272,31 @@ public:
 
     // PGP compatibility functions
     STDMETHOD(OpenPGPListKeyinfo)(BSTR search_pattern, LPSAFEARRAY* keyinfo_list);
-	STDMETHOD(SetOwnKey)(pEpIdentity * ident, BSTR fpr, struct pEpIdentity *result);
-	STDMETHOD(TrustOwnKey)(pEpIdentity * ident);
+    STDMETHOD(SetOwnKey)(pEpIdentity * ident, BSTR fpr, struct pEpIdentity *result);
+    STDMETHOD(TrustOwnKey)(pEpIdentity * ident);
 
     // Trigger an immediate update
-    STDMETHOD(UpdateNow)();
-protected:
-    HRESULT Fire_MessageToSend(
-        /* [in] */ struct TextMessage *msg);
+    STDMETHOD(UpdateNow)(BSTR productCode, VARIANT_BOOL *didUpdate);
+
+    STDMETHOD(Startup)();
+
+    STDMETHOD(GetKeyRatingForUser)(BSTR userId, BSTR fpr, pEpRating *rating);
+    STDMETHOD(GetKeyRating)(BSTR fpr, pEpComType *commType);
+
+    // sync API
+    STDMETHOD(DeliverHandshakeResult)(enum SyncHandshakeResult result, SAFEARRAY *identities_sharing);
+    STDMETHOD(LeaveDeviceGroup)();
+    STDMETHOD(DisableIdentityForSync)(struct pEpIdentity * ident);
+    STDMETHOD(EnableIdentityForSync)(struct pEpIdentity * ident);
+    STDMETHOD(GetIsSyncRunning)(VARIANT_BOOL *running);
+    STDMETHOD(ShutDownSync)();
+
+    STDMETHOD(PERToXERSyncMessage)(TextMessage *msg, BSTR *xer);
+    STDMETHOD(MIMEDecodeMessage)(BSTR mimeText, TextMessage *msg);
+    STDMETHOD(MIMEEncodeMessage)(TextMessage *msg, VARIANT_BOOL omitFields, BSTR *mimeText);
+
+    STDMETHOD(PerMachineDirectory)(BSTR * directory);
+    STDMETHOD(PerUserDirectory)(BSTR * directory);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)

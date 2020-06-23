@@ -38,8 +38,10 @@ namespace pEp {
                 result = buf;
                 delete[] buf;
             }
-            else
-                throw out_of_range("input wstring is not valid while converting UTF-16 to UTF-8.");
+            else {
+                DWORD error = GetLastError();
+                throw out_of_range("input wstring is not valid while converting UTF-16 to UTF-8. Error" + error);
+            }
 
             return result;
         }

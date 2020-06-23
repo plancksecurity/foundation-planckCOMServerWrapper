@@ -109,22 +109,21 @@ cleanup:
 }
 
 namespace pEp {
-    std::mutex GateKeeper::update_wait_mtx;
-    std::condition_variable GateKeeper::update_wait_var;
-    bool GateKeeper::update_wait_forced = false;
-
     const LPCTSTR GateKeeper::plugin_reg_path = _T("Software\\Microsoft\\Office\\Outlook\\Addins\\pEp");
     const LPCTSTR GateKeeper::plugin_reg_value_name = _T("LoadBehavior");
     const LPCTSTR GateKeeper::updater_reg_path = _T("Software\\pEp\\Updater");
 
     const time_t GateKeeper::cycle = 7200;   // 7200 sec is 2 h
     const time_t GateKeeper::fraction = 10;  // first update is at 10% of cycle
-    const chrono::seconds GateKeeper::waiting = 10s; //  10 sec
+    const DWORD GateKeeper::waiting = 10000; //  10 sec
 
     GateKeeper::GateKeeper(CpEpCOMServerAdapterModule * self)
         : _self(self), now(time(NULL)), next(now /*+ time_diff()*/), hkUpdater(NULL),
         internet(NULL), hAES(NULL), hRSA(NULL)
     {
+        if (the_gatekeeper)
+            throw runtime_error("second instance of GateKeeper was initialized");
+
         DeleteFile(get_lockFile().c_str());
 
         LONG lResult = RegOpenCurrentUser(KEY_READ, &cu);
@@ -139,10 +138,14 @@ namespace pEp {
             if (lResult != ERROR_SUCCESS)
                 RegCreateKeyEx(cu, updater_reg_path, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ, NULL, &hkUpdater, NULL);
         }
+
+        the_gatekeeper = this;
     }
 
     GateKeeper::~GateKeeper()
     {
+        the_gatekeeper = nullptr;
+
         if (cu_open) {
             if (hkUpdater)
                 RegCloseKey(hkUpdater);
@@ -177,28 +180,13 @@ namespace pEp {
             now = time(NULL);
             assert(now != -1);
 
-            bool force_check;
-            // We need to sleep, but we should be interruptible by the update_now() method.
-            {
-                std::unique_lock<std::mutex> guard(GateKeeper::update_wait_mtx);
-                GateKeeper::update_wait_var.wait_for(guard, waiting);
-                force_check = GateKeeper::update_wait_forced;
-                GateKeeper::update_wait_forced = false;
-            }
-
-            if (force_check || now > next) {
+            if (now > next) {
                 next = now + GateKeeper::cycle;
                 keep_updated();
             }
-        }
-    }
 
-    void GateKeeper::update_now() 
-    {
-        // Signal the GateKeeper thread that we need to check for updates now.
-        std::unique_lock<std::mutex> guard(GateKeeper::update_wait_mtx);
-        GateKeeper::update_wait_forced = true;
-        GateKeeper::update_wait_var.notify_all();
+            Sleep(waiting);
+        }
     }
 
     void GateKeeper::keep_plugin()
@@ -271,19 +259,19 @@ namespace pEp {
     {
         string result;
 
-        BCRYPT_KEY_HANDLE hUpdateKey;
+        BCRYPT_KEY_HANDLE hUpdateKey = NULL;
         string _update_key = update_key();
 
-        PCERT_PUBLIC_KEY_INFO uk;
-        DWORD uk_size;
+        PCERT_PUBLIC_KEY_INFO uk = NULL;
+        DWORD uk_size = 0;
 
         BOOL bResult = CryptDecodeObjectEx(X509_ASN_ENCODING, X509_PUBLIC_KEY_INFO,
             (const BYTE *)_update_key.data(), _update_key.size(), CRYPT_DECODE_ALLOC_FLAG, NULL, &uk, &uk_size);
         if (!bResult)
             throw runtime_error("CryptDecodeObjectEx: X509_PUBLIC_KEY_INFO");
 
-        PUBLIC_KEY_VALUES *_uk;
-        DWORD _uk_size;
+        PUBLIC_KEY_VALUES *_uk = NULL;
+        DWORD _uk_size = 0;
 
         bResult = CryptDecodeObjectEx(X509_ASN_ENCODING, RSA_CSP_PUBLICKEYBLOB,
             uk->PublicKey.pbData, uk->PublicKey.cbData, CRYPT_DECODE_ALLOC_FLAG, NULL, &_uk, &_uk_size);
@@ -293,14 +281,16 @@ namespace pEp {
 
         HRESULT hResult = ImportRsaPublicKey(hRSA, _uk, &hUpdateKey);
         LocalFree(_uk);
-        if (hResult)
+        if (!hUpdateKey)
             throw runtime_error("ImportRsaPublicKey");
 
         ULONG psize;
         NTSTATUS status = BCryptGetProperty(hUpdateKey, BCRYPT_ALGORITHM_NAME, NULL, 0, &psize, 0);
         char *prop = new char[psize];
         TCHAR *_prop = (TCHAR *)prop;
-        BCryptGetProperty(hUpdateKey, BCRYPT_ALGORITHM_NAME, (PUCHAR)prop, psize, &psize, 0);
+        status = BCryptGetProperty(hUpdateKey, BCRYPT_ALGORITHM_NAME, (PUCHAR)prop, psize, &psize, 0);
+        if (status)
+            throw runtime_error("BCryptGetProperty: BCRYPT_ALGORITHM_NAME");
 
         ULONG export_size;
         status = BCryptExportKey(hDeliveryKey, NULL, BCRYPT_KEY_DATA_BLOB, NULL, NULL,
@@ -321,7 +311,7 @@ namespace pEp {
         memset(&pi, 0, sizeof(BCRYPT_OAEP_PADDING_INFO));
         pi.pszAlgId = BCRYPT_SHA256_ALGORITHM;
 
-        ULONG result_size;
+        ULONG result_size = 0;
         PUCHAR _result = NULL;
         ULONG blob_size = export_size - sizeof(BCRYPT_KEY_DATA_BLOB_HEADER);
         PUCHAR blob = _delivery_key + sizeof(BCRYPT_KEY_DATA_BLOB_HEADER);
@@ -332,7 +322,7 @@ namespace pEp {
             throw runtime_error("BCryptEncrypt: calculating result size");
         }
 
-        _result = new UCHAR[result_size];
+        _result = new UCHAR[result_size + 1];
         status = BCryptEncrypt(hUpdateKey, blob, blob_size, &pi, NULL, 0, _result, result_size, &copied, BCRYPT_PAD_OAEP);
         delete[] _delivery_key;
         if (status) {
@@ -359,9 +349,9 @@ namespace pEp {
         product_list products;
 
         // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724872(v=vs.85).aspx
-        TCHAR value_name[16384];
+        static TCHAR value_name[16384];
         DWORD value_name_size;
-        TCHAR value[L_MAX_URL_LENGTH + 1];
+        static TCHAR value[L_MAX_URL_LENGTH + 1];
         DWORD value_size;
 
         LONG lResult = ERROR_SUCCESS;
@@ -377,7 +367,7 @@ namespace pEp {
         return products;
     }
 
-    void GateKeeper::install_msi(tstring filename)
+    void GateKeeper::execute_file(tstring filename)
     {
         HANDLE hMutex = CreateMutex(NULL, TRUE, _T("PEPINSTALLERMUTEX"));
         if (hMutex) {
@@ -404,12 +394,59 @@ namespace pEp {
         return fileName;
     }
 
-    void GateKeeper::update_product(product p, DWORD context)
+    // Retrieving Headers Using HTTP_QUERY_CUSTOM
+    static tstring httpQueryCustom(HINTERNET hHttp, tstring header)
+    {
+        DWORD dwResult = 0;
+        LPTSTR lpOutBuffer = StrDup(header.c_str());
+
+    retry:
+
+        if (!HttpQueryInfo(hHttp, HTTP_QUERY_CUSTOM, (LPVOID)lpOutBuffer, &dwResult, NULL))
+        {
+            if (GetLastError() == ERROR_HTTP_HEADER_NOT_FOUND)
+            {
+                // Code to handle the case where the header isn't available.
+                LocalFree(lpOutBuffer);
+                throw(runtime_error("ERROR_HTTP_HEADER_NOT_FOUND"));
+            }
+            else
+            {
+                // Check for an insufficient buffer.
+                if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+                {
+                    // Allocate the necessary buffer.
+                    LocalFree(lpOutBuffer);
+                    lpOutBuffer = (LPTSTR)LocalAlloc(LMEM_FIXED, dwResult + 1);
+
+                    // Rewrite the header name in the buffer.
+                    StringCchPrintf(lpOutBuffer, dwResult, header.c_str());
+
+                    // Retry the call.
+                    goto retry;
+                }
+                else
+                {
+                    // Error handling code.
+                    LocalFree(lpOutBuffer);
+                    // FIXME: Add GetLastError()
+                    throw(runtime_error("Unknown"));
+                }
+            }
+        }
+
+        tstring result(lpOutBuffer);
+        LocalFree(lpOutBuffer);
+
+        return result;
+    }
+
+    bool GateKeeper::update_product(product p, DWORD context)
     {
         {
             HANDLE file = CreateFile(get_lockFile().c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
             if (file == INVALID_HANDLE_VALUE) {
-                return;
+                return false;
             }
             else {
                 CloseHandle(file);
@@ -430,7 +467,7 @@ namespace pEp {
         HINTERNET hUrl = InternetOpenUrl(internet, url.c_str(), headers.c_str(), headers.length(),
             INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_UI | INTERNET_FLAG_SECURE, context);
         if (hUrl == NULL)
-            return;
+            return false;
 
         string crypted;
         string unencrypted;
@@ -440,8 +477,10 @@ namespace pEp {
         tstring filename;
         HANDLE hFile = NULL;
         char *unencrypted_buffer = NULL;
+        bool result = false;
 
         try {
+
             DWORD reading;
             InternetReadFile(hUrl, iv, sizeof(iv), &reading);
 
@@ -452,6 +491,15 @@ namespace pEp {
                     break;
                 crypted += string(buffer, reading);
             } while (1);
+
+            tstring contentDisposition = httpQueryCustom(hUrl, _T("Content-Disposition"));
+
+            tregex filenameRegex(_T("filename=.([^\"]*)"), regex::extended); //FIXME: case insensitive
+            tsmatch match;
+
+            if (regex_search(contentDisposition, match, filenameRegex)) {
+                filename = match[1];
+            }
 
             InternetCloseHandle(hUrl);
             hUrl = NULL;
@@ -486,10 +534,16 @@ namespace pEp {
 
             TCHAR temp_path[MAX_PATH + 1];
             GetTempPath(MAX_PATH, temp_path);
-            filename = temp_path;
-            filename += _T("\\pEp_");
-            filename += delivery.substr(0, 32);
-            filename += _T(".msi");
+
+            if (filename == _T("")) {
+                filename = temp_path;
+                filename += _T("\\pEp_");
+                filename += delivery.substr(0, 32);
+                filename += _T(".msi");
+            }
+            else {
+                filename = tstring(temp_path) + _T("\\") + filename;
+            }
 
             hFile = CreateFile(filename.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
             if (!hFile)
@@ -497,6 +551,7 @@ namespace pEp {
             DWORD writing;
             WriteFile(hFile, unencrypted_buffer, unencrypted_size, &writing, NULL);
             CloseHandle(hFile);
+            hFile = NULL;
             delete[] unencrypted_buffer;
             unencrypted_buffer = nullptr;
         }
@@ -504,7 +559,8 @@ namespace pEp {
             goto closing;
         }
 
-        install_msi(filename);
+        execute_file(filename);
+        result = true;
 
     closing:
         if (unencrypted_buffer)
@@ -514,6 +570,8 @@ namespace pEp {
         if (hUrl)
             InternetCloseHandle(hUrl);
         BCryptDestroyKey(dk);
+
+        return result;
     }
 
     void GateKeeper::keep_updated()
@@ -560,5 +618,7 @@ namespace pEp {
         hAES = NULL;
         hRSA = NULL;
     }
+
+    GateKeeper *GateKeeper::the_gatekeeper = nullptr;
 
 } // namespace pEp

@@ -22,7 +22,7 @@ interface IpEpEngineCallbacks : IUnknown {
         SyncNotifyInitAddOurDevice = 1,
         SyncNotifyInitAddOtherDevice = 2,
         SyncNotifyInitFormGroup = 3,
-        SyncNotifyInitMoveOurDevice = 4,
+        // SyncNotifyInitMoveOurDevice = 4,
 
         // handshake process timed out
         SyncNotifyTimeout = 5,
@@ -30,23 +30,22 @@ interface IpEpEngineCallbacks : IUnknown {
         // handshake accepted by user
         SyncNotifyAcceptedDeviceAdded = 6,
         SyncNotifyAcceptedGroupCreated = 7,
-        SyncNotifyAcceptedDeviceMoved = 8,
+        SyncNotifyAcceptedDeviceAccepted = 8,
 
         // handshake dialog must be closed
-        SyncNotifyOvertaken = 9,
-    } SyncHandshakeSignal;
+        // SyncNotifyOvertaken = 9,
 
-    typedef [v1_enum] enum SyncHandshakeResult {
-        SyncHandshakeCancel = -1,
-        SyncHandshakeAccepted = 0,
-        SyncHandshakeRejected = 1
-    } SyncHandshakeResult;
+        // forming group
+        // SyncNotifyFormingGroup = 10,
+
+        // notificaton of actual group status
+        SyncNotifySole = 254,
+        SyncNotifyInGroup = 255
+    } SyncHandshakeSignal;
 
     [id(1)] HRESULT MessageToSend([in] struct TextMessage * msg);
 
-    [id(2)] HRESULT NotifyHandshake([in] struct pEpIdentity * self, [in] struct pEpIdentity * partner, [in] SyncHandshakeSignal signal, [out, retval] SyncHandshakeResult * result);
-
-    [id(3)] HRESULT NeedFastPolling([in] VARIANT_BOOL enableFastPolling);
+    [id(2)] HRESULT NotifyHandshake([in] struct pEpIdentity * self, [in] struct pEpIdentity * partner, [in] SyncHandshakeSignal signal);
 };
 
 [
@@ -239,6 +238,7 @@ interface IpEpEngine : IUnknown {
         BSTR UserName;
         pEpComType CommType;
         BSTR Lang;
+        VARIANT_BOOL Me;
         pEpIdentityFlags Flags;
     };
 
@@ -256,11 +256,11 @@ interface IpEpEngine : IUnknown {
     [id(18)] HRESULT KeyResetTrust([in] struct pEpIdentity *ident);
     [id(19)] HRESULT TrustPersonalKey([in] struct pEpIdentity *ident, [out, retval] struct pEpIdentity *result);
     [id(20)] HRESULT OwnIdentitiesRetrieve([out, retval] SAFEARRAY(struct pEpIdentity)* ownIdentities);
-    [id(21)] HRESULT UndoLastMistrust();
-    [id(22)] HRESULT IsPepUser([in] struct pEpIdentity *ident, [out, retval] VARIANT_BOOL *ispEp);
+    // [id(21)] HRESULT UndoLastMistrust(); NOT IMPLEMENTED ANY MORE - USE KeyResetTrust() instead
+    [id(22)] HRESULT IspEpUser([in] struct pEpIdentity *ident, [out, retval] VARIANT_BOOL *ispEp);
 
     // Blacklist API
-
+    
     [id(23)] HRESULT BlacklistAdd([in] BSTR fpr);
     [id(24)] HRESULT BlacklistDelete([in] BSTR fpr);
     [id(25)] HRESULT BlacklistIsListed([in] BSTR fpr, [out, retval] VARIANT_BOOL *listed);
@@ -308,9 +308,9 @@ interface IpEpEngine : IUnknown {
         // by normal pEp clients!
         pEpEncryptFlagForceNoAttachedKey = 0x4,
 
-		// This is mainly used by pEp clients to send private keys to 
-		// their own PGP-only device
-		pEpEncryptFlagForceVersion1 = 0x16
+        // This is mainly used by pEp clients to send private keys to 
+        // their own PGP-only device
+        pEpEncryptFlagForceVersion1 = 0x16
     } pEpEncryptFlags;
 
     typedef [v1_enum] enum pEpDecryptFlags {
@@ -318,8 +318,9 @@ interface IpEpEngine : IUnknown {
         pEpDecryptFlagOwnPrivateKey = 0x1,
         pEpDecryptFlagConsume = 0x2,
         pEpDecryptFlagIgnore = 0x4,
-		pEpDecryptFlagSrcModified = 0x8,
-		pEpDecryptFlagUntrustedServer = 0x100
+        pEpDecryptFlagSrcModified = 0x8,
+        pEpDecryptFlagUntrustedServer = 0x100,
+        pEpDecryptFlagDontTriggerSync = 0x200
     } pEpDecryptFlags;
 
     typedef [v1_enum] enum pEpMsgDirection {
@@ -366,10 +367,11 @@ interface IpEpEngine : IUnknown {
         SAFEARRAY(BSTR) Keywords;
         BSTR Comments;
         SAFEARRAY(struct StringPair) OptFields;
+        [readonly] BSTR SenderFpr;
     };
 
     [id(28)] HRESULT EncryptMessage(
-        [in,out] struct TextMessage *src,
+        [in, out] struct TextMessage *src,
         [out] struct TextMessage * dst,
         [in] SAFEARRAY(BSTR) extra,
         [in, defaultvalue(pEpEncryptFlagDefault)] pEpEncryptFlags flags,
@@ -417,13 +419,13 @@ interface IpEpEngine : IUnknown {
     [id(36)] HRESULT RegisterCallbacks([in] IpEpEngineCallbacks* newCallback);
     [id(37)] HRESULT UnregisterCallbacks();
 
-	// mark imported keys as trusted
+    // mark imported keys as trusted
 
-	[id(38)] HRESULT SetOwnKey(
-		[in] struct pEpIdentity * ident,
-		[in] BSTR fpr,
-		[out, retval] struct pEpIdentity * result
-	);
+    [id(38)] HRESULT SetOwnKey(
+        [in] struct pEpIdentity * ident,
+        [in] BSTR fpr,
+        [out, retval] struct pEpIdentity * result
+    );
 
     [id(39)] HRESULT EncryptMessageAndAddPrivKey(
         [in] struct TextMessage *src,
@@ -436,12 +438,96 @@ interface IpEpEngine : IUnknown {
         [in, defaultvalue(pEpEncPep)] pEpEncFormat encFormat);
 
     // Trigger an immediate update check.
-    [id(40)] HRESULT UpdateNow();
+    [id(40)] HRESULT UpdateNow([in] BSTR productCode, [out] VARIANT_BOOL *didUpdate);
 
-	// Get a preview of the outgoint message rating
-	[id(41)] HRESULT OutgoingMessageRatingPreview([in] struct TextMessage *msg, [out, retval] pEpRating * pVal);
+    // Get a preview of the outgoint message rating
+    [id(41)] HRESULT OutgoingMessageRatingPreview([in] struct TextMessage *msg, [out, retval] pEpRating *rating);
 
-	[id(42)] HRESULT TrustOwnKey([in] struct pEpIdentity * ident);
+    // Trust own public key. To be used for manual key import.
+    [id(42)] HRESULT TrustOwnKey([in] struct pEpIdentity * ident);
+
+    // Engine startup and shutdown
+    [id(43)] HRESULT Startup();
+
+    // Get the rating for a specific key
+    [id(44)] HRESULT GetKeyRatingForUser([in] BSTR userId, [in] BSTR fpr, [out, retval] pEpRating *rating);
+
+    // Resets the database status for a key
+    [id(45)] HRESULT KeyResetIdentity([in] struct pEpIdentity ident, [in] BSTR fpr);
+
+    // Resets the default database status for the user / keypair provided
+    [id(46)] HRESULT KeyResetUser([in] BSTR userId, [in] BSTR fpr);
+
+    // revoke and mistrust all own keys, generate new keys for all own identities, and opportunistically communicate
+    // key reset information to people we have recently contacted. 
+    [id(47)] HRESULT KeyResetAllOwnKeys();
+
+    // sync API
+
+    typedef [v1_enum] enum SyncHandshakeResult {
+        SyncHandshakeCancel = -1,
+        SyncHandshakeAccepted = 0,
+        SyncHandshakeRejected = 1
+    } SyncHandshakeResult;
+
+    [id(48)] HRESULT DeliverHandshakeResult([in] enum SyncHandshakeResult result, [in] SAFEARRAY(struct pEpIdentity) identities_sharing);
+
+    // Imports keys from data
+    [id(49)] HRESULT ImportKey([in] BSTR keyData, [out] SAFEARRAY(struct pEpIdentity)* privateKeys);
+
+    typedef [v1_enum] enum pEpCipherSuite {
+        pEpCipherSuiteDefault = 0,
+        pEpCipherSuiteCV25519 = 1,
+        pEpCipherSuiteP256 = 2,
+        pEpCipherSuiteP384 = 3,
+        pEpCipherSuiteP521 = 4,
+        pEpCipherSuiteRSA2K = 5,
+        pEpCipherSuiteRSA3K = 6,
+        pEpCipherSuiteRSA4K = 7,
+        pEpCipherSuiteRSA8K = 8
+    } pEpCipherSuite;
+
+    // Sets the cipher suite
+    [id(50)] HRESULT ConfigCipherSuite([in, defaultvalue(pEpCipherSuiteDefault)] pEpCipherSuite cipherSuite);
+
+    // Leave the device group
+    [id(51)] HRESULT LeaveDeviceGroup();
+
+    // Get Trustwords for a pair of fprs
+    [id(52)] HRESULT GetTrustwordsForFprs([in] BSTR fpr1, [in] BSTR fpr2, [in, defaultvalue("en")] BSTR lang, [in, defaultvalue(0)] VARIANT_BOOL full, [out, retval] BSTR * words);
+
+    // Get the comm type a bare key has
+    [id(53)] HRESULT GetKeyRating([in] BSTR fpr, [out, retval] pEpComType *commType);
+
+    // Decode a Sync message from PER into XER
+    [id(54)] HRESULT PERToXERSyncMessage([in] struct TextMessage *msg, [out, retval] BSTR *xer);
+
+    // Disable Sync for this identity
+    [id(55)] HRESULT DisableIdentityForSync([in] struct pEpIdentity * ident);
+
+    // Enable Sync for this identity
+    [id(56)] HRESULT EnableIdentityForSync([in] struct pEpIdentity * ident);
+
+    // Gets the directory where shared files are stored
+    [id(57)] HRESULT PerMachineDirectory([out, retval] BSTR *directory);
+
+    // Gets the directory for user files
+    [id(58)] HRESULT PerUserDirectory([out, retval] BSTR *directory);
+
+    // Converts a comm type to a pEp rating
+    [id(59)] HRESULT RatingFromCommType([in] pEpComType commType, [out, retval] pEpRating * rating);
+
+    // Gets if sync is enabled
+    [id(60)] HRESULT GetIsSyncRunning([out, retval] VARIANT_BOOL *running);
+
+    // Shuts down sync
+    [id(61)] HRESULT ShutDownSync();
+
+    // Decodes a MIME message
+    [id(62)] HRESULT MIMEDecodeMessage([in] BSTR mimeText, [out, retval] struct TextMessage *msg);
+
+    // Encodes a MIME message
+    [id(63)] HRESULT MIMEEncodeMessage([in] struct TextMessage *msg, [in] VARIANT_BOOL omitFields, [out, retval] BSTR *mimeText);
 };
 
 [
