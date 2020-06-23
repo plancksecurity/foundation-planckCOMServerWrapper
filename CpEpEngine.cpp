@@ -627,7 +627,7 @@ STDMETHODIMP CpEpEngine::MIMEDecodeMessage(BSTR mimeText, TextMessage *msg)
     size_t size = SysStringLen(mimeText);
     ::message *_msg = NULL;
 
-    PEP_STATUS status = mime_decode_message(_mimeText.c_str(), size, &_msg);
+    PEP_STATUS status = mime_decode_message(_mimeText.c_str(), size, &_msg, nullptr);
     assert(status != ::PEP_OUT_OF_MEMORY);
     if (status == ::PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
@@ -664,7 +664,7 @@ STDMETHODIMP CpEpEngine::MIMEEncodeMessage(TextMessage *msg, VARIANT_BOOL omitFi
 
     char *_mimeText;
 
-    PEP_STATUS status = mime_encode_message(_msg, omitFields != 0, &_mimeText);
+    PEP_STATUS status = mime_encode_message(_msg, omitFields != 0, &_mimeText, false);
     free_message(_msg);
 
     assert(status != ::PEP_OUT_OF_MEMORY);
