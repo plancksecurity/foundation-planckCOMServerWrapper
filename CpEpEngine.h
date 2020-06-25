@@ -274,6 +274,8 @@ public:
     STDMETHOD(OpenPGPListKeyinfo)(BSTR search_pattern, LPSAFEARRAY* keyinfo_list);
     STDMETHOD(SetOwnKey)(pEpIdentity * ident, BSTR fpr, struct pEpIdentity *result);
     STDMETHOD(TrustOwnKey)(pEpIdentity * ident);
+    STDMETHOD(ConfigPassphrase)(BSTR passphrase);
+    STDMETHOD(ConfigPassphraseForNewKeys)(VARIANT_BOOL enable, BSTR passphrase);
 
     // Trigger an immediate update
     STDMETHOD(UpdateNow)(BSTR productCode, VARIANT_BOOL *didUpdate);

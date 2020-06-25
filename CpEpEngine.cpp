@@ -2070,3 +2070,37 @@ STDMETHODIMP CpEpEngine::ShutDownSync()
 
     return S_OK;
 }
+
+STDMETHODIMP CpEpEngine::ConfigPassphrase(BSTR passphrase)
+{
+    string _passphrase = "";
+
+    if (passphrase)
+        _passphrase = utf8_string(passphrase);
+
+    PEP_STATUS status = ::config_passphrase(session(), _passphrase.c_str());
+
+    if (status == PEP_STATUS_OK)
+        return S_OK;
+    else if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+    else
+        return FAIL(L"ConfigPassphrase", status);
+}
+
+STDMETHODIMP CpEpEngine::ConfigPassphraseForNewKeys(VARIANT_BOOL enable, BSTR passphrase)
+{
+    string _passphrase = "";
+    
+    if (passphrase)
+        _passphrase = utf8_string(passphrase);
+
+    PEP_STATUS status = ::config_passphrase_for_new_keys(session(), enable != 0, _passphrase.c_str());
+
+    if (status == PEP_STATUS_OK)
+        return S_OK;
+    else if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+    else
+        return FAIL(L"ConfigPassphraseForNewKeys", status);
+}

@@ -528,6 +528,12 @@ interface IpEpEngine : IUnknown {
 
     // Encodes a MIME message
     [id(63)] HRESULT MIMEEncodeMessage([in] struct TextMessage *msg, [in] VARIANT_BOOL omitFields, [out, retval] BSTR *mimeText);
+
+    // Configures a key passphrase for the current session
+    [id(64)] HRESULT ConfigPassphrase([in] BSTR passphrase);
+
+    // Passphrase enablement for newly-generated secret keys
+    [id(65)] HRESULT ConfigPassphraseForNewKeys([in] VARIANT_BOOL enable, [in] BSTR passphrase);
 };
 
 [
