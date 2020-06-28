@@ -1021,7 +1021,11 @@ PEP_STATUS CpEpEngine::messageToSend(message *msg)
             ::config_passphrase(session(), _copy.latest_passphrase());
             return PEP_STATUS_OK;
         }
-        catch (std::underflow_error&) {
+        catch (pEp::PassphraseCache::Empty&) {
+            new_copy = true;
+            return PEP_PASSPHRASE_REQUIRED;
+        }
+        catch (pEp::PassphraseCache::Exhausted&) {
             new_copy = true;
             return PEP_WRONG_PASSPHRASE;
         }
