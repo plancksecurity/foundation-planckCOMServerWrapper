@@ -12,6 +12,7 @@
 #include <mutex>
 #include <vector>
 #include "..\libpEpAdapter\pc_container.hh"
+#include "..\libpEpAdapter\passphrase_cache.hh"
 #include "..\pEp\sync_codec.h"
 #include "..\pEp\mime.h"
 
@@ -171,6 +172,9 @@ private:
 
     static std::mutex init_mutex;
     static atomic< int > count;
+
+    pEp::PassphraseCache cache;
+    std::string passphrase_for_new_keys;
 
 public:
     // runtime config of the adapter

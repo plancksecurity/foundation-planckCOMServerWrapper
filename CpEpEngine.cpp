@@ -703,7 +703,12 @@ STDMETHODIMP CpEpEngine::Myself(struct pEpIdentity *ident, struct pEpIdentity *r
         return FAIL(ex.what());;
     }
 
-    PEP_STATUS status = ::myself(session(), _ident);
+    PEP_STATUS status;
+    if (passphrase_for_new_keys != "")
+        status = ::config_passphrase_for_new_keys(session(), true, passphrase_for_new_keys.c_str());
+    else
+        status = ::config_passphrase_for_new_keys(session(), false, passphrase_for_new_keys.c_str());
+    status = ::myself(session(), _ident);
 
     if (status == PEP_STATUS_OK) {
         assert(_ident->fpr);
@@ -1201,7 +1206,7 @@ STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SA
     // Since COM-74, this has been changed to an explicit parameter, to allow the engine to attach
     // the keys and headers to outgoing, unencrypted messages.
     PEP_encrypt_flags_t engineFlags = (PEP_encrypt_flags_t)flags;
-    PEP_STATUS status = ::encrypt_message(session(), _src, _extra, &msg_dst, _encFormat, engineFlags);
+    PEP_STATUS status = cache.api(::encrypt_message, session(), _src, _extra, &msg_dst, _encFormat, engineFlags);
     ::free_stringlist(_extra);
 
     if (status == PEP_STATUS_OK)
@@ -1262,7 +1267,7 @@ STDMETHODIMP CpEpEngine::EncryptMessageAndAddPrivKey(TextMessage * src, TextMess
     // Since COM-74, this has been changed to an explicit parameter, to allow the engine to attach
     // the keys and headers to outgoing, unencrypted messages.
     PEP_encrypt_flags_t engineFlags = (PEP_encrypt_flags_t)flags;
-    PEP_STATUS status = ::encrypt_message_and_add_priv_key(session(), _src, &msg_dst, _to_fpr.c_str(), _encFormat, engineFlags);
+    PEP_STATUS status = cache.api(::encrypt_message_and_add_priv_key, session(), _src, &msg_dst, _to_fpr.c_str(), _encFormat, engineFlags);
 
     if (status == PEP_STATUS_OK)
         text_message_from_C(dst, msg_dst);
@@ -1328,7 +1333,7 @@ STDMETHODIMP CpEpEngine::EncryptMessageForSelf(pEpIdentity * targetId, TextMessa
         // COM-19: Initialize msg_dst to NULL, or we end up calling
         // free_message() below with a pointer to random garbage in
         // case of an error in encrypt_message_for_self().
-        status = ::encrypt_message_for_self(session(), _target_id, _src, _extra, &msg_dst, PEP_enc_PEP, engineFlags);
+        status = cache.api(::encrypt_message_for_self, session(), _target_id, _src, _extra, &msg_dst, PEP_enc_PEP, engineFlags);
 
         if (status == PEP_STATUS_OK)
             text_message_from_C(dst, msg_dst);
@@ -1386,7 +1391,7 @@ STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SA
     ::PEP_rating _rating;
 
     PEP_decrypt_flags_t engineflags = (PEP_decrypt_flags_t)*flags;
-    PEP_STATUS status = ::decrypt_message(session(), _src, &msg_dst, &_keylist, &_rating, &engineflags);
+    PEP_STATUS status = cache.api(::decrypt_message, session(), _src, &msg_dst, &_keylist, &_rating, &engineflags);
 
     *flags = (pEpDecryptFlags)engineflags;
 
@@ -2078,7 +2083,7 @@ STDMETHODIMP CpEpEngine::ConfigPassphrase(BSTR passphrase)
     if (passphrase)
         _passphrase = utf8_string(passphrase);
 
-    PEP_STATUS status = ::config_passphrase(session(), _passphrase.c_str());
+    PEP_STATUS status = ::config_passphrase(session(), cache.add(_passphrase));
 
     if (status == PEP_STATUS_OK)
         return S_OK;
@@ -2095,7 +2100,8 @@ STDMETHODIMP CpEpEngine::ConfigPassphraseForNewKeys(VARIANT_BOOL enable, BSTR pa
     if (passphrase)
         _passphrase = utf8_string(passphrase);
 
-    PEP_STATUS status = ::config_passphrase_for_new_keys(session(), enable != 0, _passphrase.c_str());
+    passphrase_for_new_keys = _passphrase;
+    PEP_STATUS status = ::config_passphrase_for_new_keys(session(), enable && _passphrase != "", _passphrase.c_str());
 
     if (status == PEP_STATUS_OK)
         return S_OK;
