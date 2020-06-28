@@ -1008,28 +1008,8 @@ PEP_STATUS CpEpEngine::messageToSend(message *msg)
 {
     bool in_sync = on_sync_thread();
 
-    if (in_sync && !msg) {
-        // https://dev.pep.foundation/Adapter/MessageToSendPassphrase
-
-        static pEp::PassphraseCache _copy;
-        static bool new_copy = true;
-        if (new_copy) {
-            _copy = cache;
-            new_copy = false;
-        }
-        try {
-            ::config_passphrase(session(), _copy.latest_passphrase());
-            return PEP_STATUS_OK;
-        }
-        catch (pEp::PassphraseCache::Empty&) {
-            new_copy = true;
-            return PEP_PASSPHRASE_REQUIRED;
-        }
-        catch (pEp::PassphraseCache::Exhausted&) {
-            new_copy = true;
-            return PEP_WRONG_PASSPHRASE;
-        }
-    }
+    if (in_sync && !msg)
+        return pEp::PassphraseCache::messageToSend(cache, session());
 
     for (auto p = sync_callbacks.begin(); p != sync_callbacks.end(); ++p) {
         IpEpEngineCallbacks *cb = in_sync ? _unmarshaled_consumer(p) : p->pdata->unmarshaled;
