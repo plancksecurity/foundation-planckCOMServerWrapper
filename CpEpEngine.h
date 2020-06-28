@@ -25,6 +25,8 @@ using namespace utility;
 using namespace pEp::utility;
 using namespace pEp::Adapter;
 
+static pEp::PassphraseCache cache;
+
 // CpEpEngine
 
 class ATL_NO_VTABLE CpEpEngine :
@@ -173,7 +175,6 @@ private:
     static std::mutex init_mutex;
     static atomic< int > count;
 
-    pEp::PassphraseCache cache;
     std::string passphrase_for_new_keys;
 
 public:

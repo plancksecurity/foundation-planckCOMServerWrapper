@@ -1006,11 +1006,26 @@ static IpEpEngineCallbacks * _unmarshaled_consumer(CpEpEngine::callback_containe
 
 PEP_STATUS CpEpEngine::messageToSend(message *msg)
 {
-    assert(msg);
-    if (!msg)
-        return PEP_ILLEGAL_VALUE;
-
     bool in_sync = on_sync_thread();
+
+    if (in_sync && !msg) {
+        // https://dev.pep.foundation/Adapter/MessageToSendPassphrase
+
+        static pEp::PassphraseCache _copy;
+        static bool new_copy = true;
+        if (new_copy) {
+            _copy = cache;
+            new_copy = false;
+        }
+        try {
+            ::config_passphrase(session(), _copy.latest_passphrase());
+            return PEP_STATUS_OK;
+        }
+        catch (std::underflow_error&) {
+            new_copy = true;
+            return PEP_WRONG_PASSPHRASE;
+        }
+    }
 
     for (auto p = sync_callbacks.begin(); p != sync_callbacks.end(); ++p) {
         IpEpEngineCallbacks *cb = in_sync ? _unmarshaled_consumer(p) : p->pdata->unmarshaled;
