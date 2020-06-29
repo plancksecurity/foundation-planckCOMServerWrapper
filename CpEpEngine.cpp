@@ -1036,8 +1036,8 @@ PEP_STATUS CpEpEngine::messageToSend(message *msg)
 
 PEP_STATUS CpEpEngine::notifyHandshake(::pEp_identity *self, ::pEp_identity *partner, sync_handshake_signal signal)
 {
-    assert(self && partner);
-    if (!(self && partner))
+    assert((self && partner) || (signal == SYNC_PASSPHRASE_REQUIRED));
+    if (!((self && partner) || (signal == SYNC_PASSPHRASE_REQUIRED)))
         return PEP_ILLEGAL_VALUE;
 
     bool in_sync = on_sync_thread();
