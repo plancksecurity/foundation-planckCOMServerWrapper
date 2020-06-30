@@ -2100,7 +2100,7 @@ STDMETHODIMP CpEpEngine::ConfigPassphraseForNewKeys(VARIANT_BOOL enable, BSTR pa
         _passphrase = utf8_string(passphrase);
 
     passphrase_for_new_keys = _passphrase;
-    PEP_STATUS status = ::config_passphrase_for_new_keys(session(), enable && _passphrase != "", _passphrase.c_str());
+    PEP_STATUS status = ::config_passphrase_for_new_keys(session(), enable, cache.add(_passphrase));
 
     if (status == PEP_STATUS_OK)
         return S_OK;

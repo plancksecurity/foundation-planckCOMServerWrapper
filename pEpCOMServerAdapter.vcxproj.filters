@@ -43,6 +43,9 @@
     <ClCompile Include="GateKeeper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LocalJSONAdapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -75,6 +78,12 @@
     <ClInclude Include="pEpCOMServerAdapter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LocalJSONAdapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pEpJSONServerAdapter\server\adapter-library.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="pEpCOMServerAdapter.rc">
@@ -96,10 +105,15 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\pEpForOutlook\pep_test.snk" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="pEpCOMServerAdapter.idl">
       <Filter>Source Files</Filter>
     </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\Debug\pEpJSONServerAdapterLibrary.lib" />
+    <Library Include="..\Debug\libpEpWebserver.lib" />
   </ItemGroup>
 </Project>

@@ -59,3 +59,4 @@
 #include <pEp/openpgp_compat.h>
 #include <pEp/platform.h>
 
+#include <boost/algorithm/string/predicate.hpp>
