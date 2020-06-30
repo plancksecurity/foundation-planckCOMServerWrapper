@@ -19,8 +19,8 @@ void CpEpCOMServerAdapterModule::gatekeeper(CpEpCOMServerAdapterModule * self)
 }
 
 CpEpCOMServerAdapterModule _AtlModule;
+LocalJSONAdapter* ljs = nullptr;
 
-//
 extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, 
                                 LPTSTR lpCmdLine, int nShowCmd)
 {
@@ -30,19 +30,16 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
     PEP_SESSION first_session;
     PEP_STATUS status = ::init(&first_session, NULL, NULL);
 
-    LocalJSONAdapter* ljs = nullptr;
-    SessionRegistry* sr = nullptr;
-
-    if (!boost::algorithm::iequals(lpCmdLine, "/regserver"))
-        ljs= &LocalJSONAdapter::createInstance();
-    
-    if (ljs)
-        ljs->startup();
+    if (!boost::algorithm::iequals(lpCmdLine, "/regserver")) {
+        ljs = &LocalJSONAdapter::createInstance();
+        ljs->startup(pEp::Adapter::_messageToSend);
+    }
 
     auto rv = _AtlModule.WinMain(nShowCmd);
 
-    if (ljs)
+    if (ljs) {
         ljs->shutdown_now();
+    }
 
     ::release(first_session);
     return rv;

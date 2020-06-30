@@ -5,6 +5,7 @@
 #include <mutex>
 #include "GateKeeper.h"
 #include "..\libpEpAdapter\Adapter.hh"
+#include "LocalJSONAdapter.h"
 #include "pEp\status_to_string.h"
 
 using namespace std;
@@ -21,6 +22,8 @@ CpEpEngine::callback_container CpEpEngine::sync_callbacks;
 
 std::mutex CpEpEngine::init_mutex;
 atomic< int > CpEpEngine::count = 0;
+
+extern LocalJSONAdapter* ljs;
 
 STDMETHODIMP CpEpEngine::InterfaceSupportsErrorInfo(REFIID riid)
 {
@@ -1031,6 +1034,9 @@ PEP_STATUS CpEpEngine::messageToSend(message *msg)
 
     sync_callbacks.compact();
 
+    if (ljs)
+        ljs->messageToSend(msg);
+
     return PEP_STATUS_OK;
 }
 
@@ -1836,7 +1842,7 @@ STDMETHODIMP CpEpEngine::Startup()
 {
     try
     {
-        startup<CpEpEngine>(messageToSend, notifyHandshake, this, &CpEpEngine::Startup_sync, &CpEpEngine::Shutdown_sync);
+        pEp::Adapter::startup<CpEpEngine>(CpEpEngine::messageToSend, CpEpEngine::notifyHandshake, this, &CpEpEngine::Startup_sync, &CpEpEngine::Shutdown_sync);
     }
     catch (bad_alloc&) {
         return E_OUTOFMEMORY;
