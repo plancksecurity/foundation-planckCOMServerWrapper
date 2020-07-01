@@ -91,7 +91,7 @@ public:
     {
         std::lock_guard<std::mutex> lock(init_mutex);
         try {
-            callback_dispatcher.add(CpEpEngine::messageToSend, CpEpEngine::notifyHandshake);
+            callback_dispatcher.add(CpEpEngine::messageToSend, CpEpEngine::notifyHandshake, CpEpEngine::on_sync_startup, CpEpEngine::on_sync_shutdown);
         }
         catch (pEp::RuntimeError& e) {
             HRESULT res = MAKE_HRESULT(1, FACILITY_ITF, (0xFFFF & e.status));
@@ -139,14 +139,14 @@ private:
 
     static callback_container sync_callbacks;
 
-    void Startup_sync()
+    static void on_sync_startup()
     {
         HRESULT r = CoInitializeEx(NULL, COINIT_MULTITHREADED);
         if (!SUCCEEDED(r))
             throw runtime_error("CoInitializeEx() failed on sync thread");
     }
 
-    void Shutdown_sync()
+    static void on_sync_shutdown()
     {
         CoUninitialize();
     }
