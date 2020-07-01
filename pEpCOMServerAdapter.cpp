@@ -45,5 +45,6 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
     }
 
     ::release(first_session);
+    ExitProcess(rv);
     return rv;
 }
