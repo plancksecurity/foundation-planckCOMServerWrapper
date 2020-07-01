@@ -64,7 +64,6 @@ public:
                 error(ex.what());
             }
             session(pEp::Adapter::release);
-            shutdown();
 
             sync_callbacks.clear([](CpEpEngine::MarshaledCallbacks *p) {
                 if (p) {

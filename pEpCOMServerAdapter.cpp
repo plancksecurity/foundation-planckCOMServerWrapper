@@ -8,6 +8,7 @@
 #include "GateKeeper.h"
 #include "pEpCOMServerAdapter.h"
 #include "LocalJSONAdapter.h"
+#include "../libpEpAdapter/callback_dispatcher.hh"
 
 using namespace ATL;
 using namespace std;
@@ -20,6 +21,7 @@ void CpEpCOMServerAdapterModule::gatekeeper(CpEpCOMServerAdapterModule * self)
 
 CpEpCOMServerAdapterModule _AtlModule;
 LocalJSONAdapter* ljs = nullptr;
+extern pEp::CallbackDispatcher callback_dispatcher;
 
 extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, 
                                 LPTSTR lpCmdLine, int nShowCmd)
@@ -32,7 +34,7 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
 
     if (!boost::algorithm::iequals(lpCmdLine, "/regserver")) {
         ljs = &LocalJSONAdapter::createInstance();
-        ljs->startup(pEp::Adapter::_messageToSend);
+        ljs->startup(pEp::CallbackDispatcher::messageToSend);
     }
 
     auto rv = _AtlModule.WinMain(nShowCmd);

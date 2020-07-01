@@ -38,6 +38,9 @@ interface IpEpEngineCallbacks : IUnknown {
         // forming group
         // SyncNotifyFormingGroup = 10,
 
+        SyncNotifyStart = 126,
+        SyncNotifyStop = 127,
+
         // message cannot be sent, need passphrase
         SyncNotifyPassphraseRequired = 128,
 

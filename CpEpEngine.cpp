@@ -1032,10 +1032,10 @@ PEP_STATUS CpEpEngine::messageToSend(message *msg)
         }
     }
 
-    sync_callbacks.compact();
-
     if (ljs)
         ljs->messageToSend(msg);
+
+    sync_callbacks.compact();
 
     return PEP_STATUS_OK;
 }
