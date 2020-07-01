@@ -51,6 +51,7 @@
 
 #include <Strsafe.h>
 
+#include <pEp/platform.h>
 #include <pEp/sync_api.h>
 #include <pEp/keymanagement.h>
 #include <pEp/key_reset.h>
