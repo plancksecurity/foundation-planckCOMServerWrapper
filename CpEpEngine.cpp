@@ -1838,7 +1838,7 @@ STDMETHODIMP CpEpEngine::Startup()
 {
     try
     {
-        callback_dispatcher.start_sync();
+        pEp::CallbackDispatcher::start_sync();
     }
     catch (bad_alloc&) {
         return E_OUTOFMEMORY;
@@ -2071,7 +2071,7 @@ STDMETHODIMP CpEpEngine::GetIsSyncRunning(VARIANT_BOOL *running)
 
 STDMETHODIMP CpEpEngine::ShutDownSync()
 {
-    callback_dispatcher.stop_sync();
+    pEp::callback_dispatcher.stop_sync();
     return S_OK;
 }
 

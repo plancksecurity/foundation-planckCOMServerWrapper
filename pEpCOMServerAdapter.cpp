@@ -34,11 +34,13 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
     if (!boost::algorithm::iequals(lpCmdLine, "/regserver")) {
         ljs = &LocalJSONAdapter::createInstance();
         ljs->startup(pEp::CallbackDispatcher::messageToSend);
+        pEp::callback_dispatcher.add(JsonAdapter::messageToSend, JsonAdapter::notifyHandshake);
     }
 
     auto rv = _AtlModule.WinMain(nShowCmd);
 
     if (ljs) {
+        pEp::callback_dispatcher.remove(JsonAdapter::messageToSend);
         ljs->shutdown_now();
     }
 

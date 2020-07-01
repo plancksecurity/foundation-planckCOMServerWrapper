@@ -15,7 +15,6 @@ using namespace pEp::utility;
 using namespace pEp::Adapter;
 
 extern pEp::PassphraseCache cache;
-extern pEp::CallbackDispatcher callback_dispatcher;
 
 // CpEpEngine
 
@@ -64,7 +63,7 @@ public:
                     delete p;
                 }
             });
-            callback_dispatcher.remove(CpEpEngine::messageToSend);
+            pEp::callback_dispatcher.remove(CpEpEngine::messageToSend);
         }
     }
 
@@ -92,7 +91,7 @@ public:
     {
         std::lock_guard<std::mutex> lock(init_mutex);
         try {
-            callback_dispatcher.add(CpEpEngine::messageToSend, CpEpEngine::notifyHandshake, CpEpEngine::on_sync_startup, CpEpEngine::on_sync_shutdown);
+            pEp::callback_dispatcher.add(CpEpEngine::messageToSend, CpEpEngine::notifyHandshake, CpEpEngine::on_sync_startup, CpEpEngine::on_sync_shutdown);
         }
         catch (pEp::RuntimeError& e) {
             HRESULT res = MAKE_HRESULT(1, FACILITY_ITF, (0xFFFF & e.status));
