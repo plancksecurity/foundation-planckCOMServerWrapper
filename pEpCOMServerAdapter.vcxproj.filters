@@ -112,9 +112,4 @@
       <Filter>Source Files</Filter>
     </Midl>
   </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\Debug\pEpJSONServerAdapterLibrary.lib" />
-    <Library Include="..\Debug\libpEpWebserver.lib" />
-    <Library Include="..\Debug\libpEpAdapter.lib" />
-  </ItemGroup>
 </Project>
