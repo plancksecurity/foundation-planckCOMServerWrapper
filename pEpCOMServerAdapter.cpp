@@ -21,7 +21,6 @@ void CpEpCOMServerAdapterModule::gatekeeper(CpEpCOMServerAdapterModule * self)
 CpEpCOMServerAdapterModule _AtlModule;
 LocalJSONAdapter* ljs = nullptr;
 pEp::PassphraseCache cache;
-extern pEp::CallbackDispatcher callback_dispatcher;
 
 extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, 
                                 LPTSTR lpCmdLine, int nShowCmd)
