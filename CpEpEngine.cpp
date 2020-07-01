@@ -1036,10 +1036,10 @@ PEP_STATUS CpEpEngine::messageToSend(message *msg)
     return PEP_STATUS_OK;
 }
 
-PEP_STATUS CpEpEngine::notifyHandshake(::pEp_identity *self, ::pEp_identity *partner, sync_handshake_signal signal)
+PEP_STATUS CpEpEngine::notifyHandshake(::pEp_identity *self, ::pEp_identity *partner, ::sync_handshake_signal signal)
 {
-    assert((self && partner) || (signal == SYNC_PASSPHRASE_REQUIRED));
-    if (!((self && partner) || (signal == SYNC_PASSPHRASE_REQUIRED)))
+    assert(signal);
+    if (!signal)
         return PEP_ILLEGAL_VALUE;
 
     bool in_sync = on_sync_thread();
