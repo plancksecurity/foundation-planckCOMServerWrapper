@@ -1,7 +1,6 @@
 #pragma once
 #include "stdafx.h"
 #include "json-adapter.hh"
-#include "..\libpEpAdapter\Adapter.hh""
 
 class LocalJSONAdapter :
     public JsonAdapter

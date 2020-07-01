@@ -8,7 +8,6 @@
 #include "GateKeeper.h"
 #include "pEpCOMServerAdapter.h"
 #include "LocalJSONAdapter.h"
-#include "../libpEpAdapter/callback_dispatcher.hh"
 
 using namespace ATL;
 using namespace std;
@@ -21,6 +20,7 @@ void CpEpCOMServerAdapterModule::gatekeeper(CpEpCOMServerAdapterModule * self)
 
 CpEpCOMServerAdapterModule _AtlModule;
 LocalJSONAdapter* ljs = nullptr;
+pEp::PassphraseCache cache;
 extern pEp::CallbackDispatcher callback_dispatcher;
 
 extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, 

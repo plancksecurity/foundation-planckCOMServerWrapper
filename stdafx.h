@@ -20,6 +20,7 @@
 #define ATL_NO_ASSERT_ON_DESTROY_NONEXISTENT_WINDOW
 
 #include "resource.h"
+
 #include <atlbase.h>
 #include <atlcom.h>
 #include <atlctl.h>
@@ -37,6 +38,7 @@
 #include <string>
 #include <stdexcept>
 #include <list>
+#include <queue>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -49,14 +51,21 @@
 
 #include <Strsafe.h>
 
-#include <pEp/pEpEngine.h>
+#include <pEp/sync_api.h>
 #include <pEp/keymanagement.h>
 #include <pEp/key_reset.h>
-#include <pEp/message_api.h>
-#include <pEp/stringpair.h>
-#include <pEp/blacklist.h>
-#include <pEp/sync_api.h>
 #include <pEp/openpgp_compat.h>
-#include <pEp/platform.h>
+#include <pEp/sync_codec.h>
+#include <pEp/mime.h>
+#include <pEp/blacklist.h>
+
+#include <pEp/locked_queue.hh>
+#include <pEp/pc_container.hh>
+#include <pEp/passphrase_cache.hh>
+#include <pEp/callback_dispatcher.hh>
+#include <pEp/status_to_string.hh>
+
+#include "utf8_helper.h"
+#include "pEp_utility.h"
 
 #include <boost/algorithm/string/predicate.hpp>

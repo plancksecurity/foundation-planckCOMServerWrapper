@@ -2,11 +2,8 @@
 
 #include "stdafx.h"
 #include "CpEpEngine.h"
-#include <mutex>
 #include "GateKeeper.h"
-#include "..\libpEpAdapter\Adapter.hh"
 #include "LocalJSONAdapter.h"
-#include "pEp\status_to_string.h"
 
 using namespace std;
 using namespace pEp::utility;

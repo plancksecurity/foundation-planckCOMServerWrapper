@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 class CpEpCOMServerAdapterModule;
 
 using namespace std;
