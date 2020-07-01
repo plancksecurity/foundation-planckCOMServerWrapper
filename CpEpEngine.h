@@ -64,6 +64,7 @@ public:
                     delete p;
                 }
             });
+            callback_dispatcher.remove(CpEpEngine::messageToSend);
         }
     }
 

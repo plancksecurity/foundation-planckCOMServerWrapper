@@ -7,7 +7,6 @@
 
 using namespace std;
 using namespace pEp::utility;
-using namespace pEp::Adapter;
 
 // CpEpEngine
 
@@ -1839,7 +1838,7 @@ STDMETHODIMP CpEpEngine::Startup()
 {
     try
     {
-        pEp::Adapter::startup<CpEpEngine>(CpEpEngine::messageToSend, CpEpEngine::notifyHandshake, this, &CpEpEngine::Startup_sync, &CpEpEngine::Shutdown_sync);
+        callback_dispatcher.start_sync();
     }
     catch (bad_alloc&) {
         return E_OUTOFMEMORY;
@@ -2067,14 +2066,12 @@ STDMETHODIMP CpEpEngine::RatingFromCommType(pEpComType commType, pEpRating * rat
 STDMETHODIMP CpEpEngine::GetIsSyncRunning(VARIANT_BOOL *running)
 {
     *running = pEp::Adapter::is_sync_running();
-
     return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::ShutDownSync()
 {
-    pEp::Adapter::shutdown();
-
+    callback_dispatcher.stop_sync();
     return S_OK;
 }
 
