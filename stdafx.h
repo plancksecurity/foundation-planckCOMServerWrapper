@@ -25,6 +25,7 @@
 #include <atlcom.h>
 #include <atlctl.h>
 #include <atlsafe.h>
+#include <atlwin.h>
 
 #include <comutil.h>
 #include <comdef.h>

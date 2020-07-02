@@ -8,6 +8,7 @@
 #include "GateKeeper.h"
 #include "pEpCOMServerAdapter.h"
 #include "LocalJSONAdapter.h"
+#include "CMainWindow.h"
 
 using namespace ATL;
 using namespace std;
@@ -21,6 +22,7 @@ void CpEpCOMServerAdapterModule::gatekeeper(CpEpCOMServerAdapterModule * self)
 CpEpCOMServerAdapterModule _AtlModule;
 LocalJSONAdapter* ljs = nullptr;
 pEp::PassphraseCache cache;
+CMainWindow mainWindow;
 
 extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, 
                                 LPTSTR lpCmdLine, int nShowCmd)
@@ -35,11 +37,15 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
         ljs = &LocalJSONAdapter::createInstance();
         ljs->startup(pEp::CallbackDispatcher::messageToSend);
         pEp::callback_dispatcher.add(JsonAdapter::messageToSend, JsonAdapter::notifyHandshake);
+        auto mw = mainWindow.Create(HWND_MESSAGE);
+        assert(mw);
     }
 
     auto rv = _AtlModule.WinMain(nShowCmd);
 
     if (ljs) {
+        BOOL r = true;
+        mainWindow.OnDestroy(0, 0, 0, r);
         pEp::callback_dispatcher.remove(JsonAdapter::messageToSend);
         ljs->shutdown_now();
     }

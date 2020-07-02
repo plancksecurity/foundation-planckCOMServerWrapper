@@ -135,6 +135,7 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CMainWindow.cpp" />
     <ClCompile Include="CpEpEngine.cpp" />
     <ClCompile Include="GateKeeper.cpp" />
     <ClCompile Include="LocalJSONAdapter.cpp" />
@@ -164,6 +165,7 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\pEpJSONServerAdapter\server\adapter-library.hh" />
+    <ClInclude Include="CMainWindow.h" />
     <ClInclude Include="CpEpEngine.h" />
     <ClInclude Include="GateKeeper.h" />
     <ClInclude Include="LocalJSONAdapter.h" />
@@ -205,6 +207,9 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
     <Library Include="..\Debug\libpEpAdapter.lib" />
     <Library Include="..\Debug\libpEpWebserver.lib" />
     <Library Include="..\Debug\pEpJSONServerAdapterLibrary.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="logo.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
