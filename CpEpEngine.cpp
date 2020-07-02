@@ -429,7 +429,7 @@ STDMETHODIMP CpEpEngine::GetMessageTrustwords(
 
     char* _words = NULL;
     if (result == S_OK) {
-        auto status = ::get_message_trustwords(
+        auto status = cache.api(::get_message_trustwords,
             session(),
             _msg,
             _keylist,
@@ -857,7 +857,7 @@ STDMETHODIMP CpEpEngine::KeyResetIdentity(struct pEpIdentity ident, BSTR fpr)
 
     string _fpr = utf8_string(fpr);
 
-    PEP_STATUS status = ::key_reset_identity(session(), _ident, _fpr.c_str());
+    PEP_STATUS status = cache.api(::key_reset_identity, session(), _ident, _fpr.c_str());
 
     free_identity(_ident);
 
@@ -878,7 +878,7 @@ STDMETHODIMP CpEpEngine::KeyResetUser(BSTR userId, BSTR fpr)
     string _userId = utf8_string(userId);
     string _fpr = utf8_string(fpr);
 
-    PEP_STATUS status = ::key_reset_user(session(), _userId.c_str(), _fpr.c_str());
+    PEP_STATUS status = cache.api(::key_reset_user, session(), _userId.c_str(), _fpr.c_str());
 
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
@@ -894,7 +894,7 @@ STDMETHODIMP CpEpEngine::KeyResetUser(BSTR userId, BSTR fpr)
 
 STDMETHODIMP CpEpEngine::KeyResetAllOwnKeys()
 {
-    PEP_STATUS status = ::key_reset_all_own_keys(session());
+    PEP_STATUS status = cache.api(::key_reset_all_own_keys, session());
 
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
@@ -924,7 +924,7 @@ STDMETHODIMP CpEpEngine::KeyResetTrust(struct pEpIdentity *ident)
         return FAIL(ex.what());;
     }
 
-    PEP_STATUS status = ::key_reset_trust(session(), _ident);
+    PEP_STATUS status = cache.api(::key_reset_trust, session(), _ident);
     free_identity(_ident);
 
     if (status == PEP_OUT_OF_MEMORY)
@@ -1973,7 +1973,7 @@ STDMETHODIMP CpEpEngine::DisableIdentityForSync(struct pEpIdentity * ident)
     if (_ident == NULL)
         return E_OUTOFMEMORY;
 
-    PEP_STATUS status = ::disable_identity_for_sync(session(), _ident);
+    PEP_STATUS status = cache.api(::disable_identity_for_sync, session(), _ident);
 
     ::free_identity(_ident);
 
@@ -2100,7 +2100,7 @@ STDMETHODIMP CpEpEngine::ConfigPassphraseForNewKeys(VARIANT_BOOL enable, BSTR pa
         _passphrase = utf8_string(passphrase);
 
     passphrase_for_new_keys = _passphrase;
-    PEP_STATUS status = ::config_passphrase_for_new_keys(session(), enable, cache.add(_passphrase));
+    PEP_STATUS status = ::config_passphrase_for_new_keys(session(), enable, cache.add_stored(_passphrase));
 
     if (status == PEP_STATUS_OK)
         return S_OK;
