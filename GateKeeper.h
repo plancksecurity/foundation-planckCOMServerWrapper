@@ -39,6 +39,10 @@ namespace pEp {
 		product_list registered_products();
 		bool update_product(product p, DWORD context = 0);
 
+        bool update_enabled();
+        void enable_update();
+        void disable_update();
+
 		static GateKeeper *gatekeeper() { return the_gatekeeper; }
 
     protected:

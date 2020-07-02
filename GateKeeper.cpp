@@ -182,7 +182,8 @@ namespace pEp {
 
             if (now > next) {
                 next = now + GateKeeper::cycle;
-                keep_updated();
+                if (update_enabled())
+                    keep_updated();
             }
 
             Sleep(waiting);
@@ -342,6 +343,41 @@ namespace pEp {
         s >> result;
 
         return result;
+    }
+
+    void GateKeeper::enable_update()
+    {
+        LONG lResult = RegOpenKeyEx(cu, updater_reg_path, 0, KEY_WRITE, &hkUpdater);
+        if (lResult != ERROR_SUCCESS)
+            return;
+
+        lResult = RegSetValueExW(hkUpdater, NULL, 0, REG_SZ, (const BYTE *) _T("1"), sizeof(TCHAR)*2);
+    }
+
+    void GateKeeper::disable_update()
+    {
+        LONG lResult = RegOpenKeyEx(cu, updater_reg_path, 0, KEY_WRITE, &hkUpdater);
+        if (lResult != ERROR_SUCCESS)
+            return;
+
+        lResult = RegSetValueEx(hkUpdater, NULL, 0, REG_SZ, (const BYTE *) _T("0"), sizeof(TCHAR) * 2);
+    }
+
+    bool GateKeeper::update_enabled()
+    {
+        bool enabled = true;
+
+        DWORD esize;
+        RegGetValue(cu, updater_reg_path, NULL, RRF_RT_REG_SZ, NULL, NULL, &esize);
+        if (esize) {
+            TCHAR* edata = new TCHAR[esize];
+            RegGetValue(cu, updater_reg_path, NULL, RRF_RT_REG_SZ, NULL, edata, &esize);
+            if (tstring(edata) == _T("0"))
+                enabled = false;
+            delete[] edata;
+        }
+
+        return enabled;
     }
 
     GateKeeper::product_list GateKeeper::registered_products()

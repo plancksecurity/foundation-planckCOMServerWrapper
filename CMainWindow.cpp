@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "CMainWindow.h"
+#include "GateKeeper.h"
 
 static const GUID nidGUID =
 { 0xa4dbdbe1, 0x4051, 0x4d89, { 0xb1, 0x17, 0x62, 0x82, 0x18, 0x5a, 0x61, 0x5c } };
@@ -40,8 +41,6 @@ LRESULT CMainWindow::OnDestroy(UINT, WPARAM, LPARAM, BOOL&)
     return S_OK;
 }
 
-HMENU _menuContext = NULL;
-
 LRESULT CMainWindow::OnNotification(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
     auto event = LOWORD(lParam);
@@ -50,7 +49,10 @@ LRESULT CMainWindow::OnNotification(UINT nMsg, WPARAM wParam, LPARAM lParam, BOO
     auto y = GET_Y_LPARAM(wParam);
 
     HMENU menuContext;
+    HMENU _menuContext = NULL;
+
     MENUINFO info;
+    BOOL enabled;
 
     switch (event) {
     case WM_CONTEXTMENU:
@@ -62,11 +64,16 @@ LRESULT CMainWindow::OnNotification(UINT nMsg, WPARAM wParam, LPARAM lParam, BOO
         info.dwStyle = MNS_AUTODISMISS | MNS_NOTIFYBYPOS;
         SetMenuInfo(menuContext, &info);
         _menuContext = GetSubMenu(menuContext, 0);
+
+        enabled = pEp::GateKeeper::gatekeeper()->update_enabled();
+        CheckMenuItem(_menuContext, ID_POPUP_SCHEDULEUPDATES, enabled ? MF_CHECKED : MF_UNCHECKED);
+
         SetForegroundWindow(m_hWnd); // this is utter nonsense, but required by TrackPopupMenuEx
         POINT point;
         GetCursorPos(&point);
         TrackPopupMenuEx(_menuContext, TPM_LEFTALIGN | TPM_BOTTOMALIGN, point.x, point.y, m_hWnd, NULL);
         PostMessage(WM_NULL, 0, 0); // this is utter nonsense, but required by TrackPopupMenuEx
+
         DestroyMenu(menuContext);
         bHandled = true;
         break;
@@ -79,17 +86,27 @@ LRESULT CMainWindow::OnNotification(UINT nMsg, WPARAM wParam, LPARAM lParam, BOO
 }
 
 static const auto UPDATE_NOW = 1;
+static const auto SCHEDULE_UPDATES = 3;
 
 LRESULT CMainWindow::OnMenuCommand(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
     auto index = wParam;
     HMENU hMenu = (HMENU)lParam;
+    BOOL enabled;
 
     switch (index) {
     case UPDATE_NOW:
         ::MessageBox(NULL, _T("update now"), _T("update now"), MB_ICONINFORMATION);
         bHandled = true;
         break;
+
+    case SCHEDULE_UPDATES:
+        enabled = !pEp::GateKeeper::gatekeeper()->update_enabled();
+        if (enabled)
+            pEp::GateKeeper::gatekeeper()->enable_update();
+        else
+            pEp::GateKeeper::gatekeeper()->disable_update();
+        CheckMenuItem(hMenu, ID_POPUP_SCHEDULEUPDATES, enabled ? MF_CHECKED : MF_UNCHECKED);
 
     default:
         bHandled = false;
