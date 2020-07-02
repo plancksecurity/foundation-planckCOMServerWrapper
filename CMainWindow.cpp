@@ -85,8 +85,8 @@ LRESULT CMainWindow::OnNotification(UINT nMsg, WPARAM wParam, LPARAM lParam, BOO
     return S_OK;
 }
 
-static const auto UPDATE_NOW = 1;
-static const auto SCHEDULE_UPDATES = 3;
+static const auto UPDATE_NOW = 0;
+static const auto SCHEDULE_UPDATES = 2;
 
 LRESULT CMainWindow::OnMenuCommand(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
@@ -96,7 +96,8 @@ LRESULT CMainWindow::OnMenuCommand(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL
 
     switch (index) {
     case UPDATE_NOW:
-        ::MessageBox(NULL, _T("update now"), _T("update now"), MB_ICONINFORMATION);
+        ShowNotificationInfo(_T("Searching for updates"), _T("p≡p is searching for updates. When an update is available p≡p will start an installer."));
+        pEp::GateKeeper::gatekeeper()->update_now();
         bHandled = true;
         break;
 
@@ -107,9 +108,26 @@ LRESULT CMainWindow::OnMenuCommand(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL
         else
             pEp::GateKeeper::gatekeeper()->disable_update();
         CheckMenuItem(hMenu, ID_POPUP_SCHEDULEUPDATES, enabled ? MF_CHECKED : MF_UNCHECKED);
+        bHandled = true;
+        break;
 
     default:
         bHandled = false;
     }
     return S_OK;
+}
+
+void CMainWindow::ShowNotificationInfo(tstring title, tstring text)
+{
+    NOTIFYICONDATA nid = {};
+    nid.cbSize = sizeof(nid);
+    nid.uFlags = NIF_GUID | NIF_MESSAGE | NIF_INFO;
+    nid.dwInfoFlags = NIIF_LARGE_ICON;
+    nid.hWnd = m_hWnd;
+    nid.guidItem = nidGUID;
+    nid.hBalloonIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_LOGO));
+    StringCchCopy(nid.szInfoTitle, ARRAYSIZE(nid.szInfoTitle), title.substr(0, ARRAYSIZE(nid.szInfoTitle)-1).c_str());
+    StringCchCopy(nid.szInfo, ARRAYSIZE(nid.szInfo), text.substr(0, ARRAYSIZE(nid.szInfo) - 1).c_str());
+    nid.uCallbackMessage = WM_PEP_NOTIFICATION;
+    Shell_NotifyIcon(NIM_MODIFY, &nid);
 }

@@ -42,6 +42,7 @@ namespace pEp {
         bool update_enabled();
         void enable_update();
         void disable_update();
+        void update_now();
 
 		static GateKeeper *gatekeeper() { return the_gatekeeper; }
 
@@ -63,7 +64,6 @@ namespace pEp {
         BCRYPT_KEY_HANDLE delivery_key();
         string wrapped_delivery_key(BCRYPT_KEY_HANDLE hDeliveryKey);
 
-        void keep_updated();
         static tstring get_lockFile();
 		static GateKeeper *the_gatekeeper;
 

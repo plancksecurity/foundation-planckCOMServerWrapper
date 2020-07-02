@@ -2,7 +2,6 @@
 
 #include "GateKeeper.h"
 #include "pEpCOMServerAdapter.h"
-#include "utf8_helper.h"
 
 using namespace std;
 
@@ -183,7 +182,7 @@ namespace pEp {
             if (now > next) {
                 next = now + GateKeeper::cycle;
                 if (update_enabled())
-                    keep_updated();
+                    update_now();
             }
 
             Sleep(waiting);
@@ -610,7 +609,7 @@ namespace pEp {
         return result;
     }
 
-    void GateKeeper::keep_updated()
+    void GateKeeper::update_now()
     {
         NTSTATUS status = BCryptOpenAlgorithmProvider(&hAES, BCRYPT_AES_ALGORITHM, MS_PRIMITIVE_PROVIDER, 0);
         assert(status == 0);

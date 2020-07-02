@@ -71,3 +71,5 @@
 #include "pEp_utility.h"
 
 #include <boost/algorithm/string/predicate.hpp>
+
+#include "utf8_helper.h"
