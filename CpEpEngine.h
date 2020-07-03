@@ -2,18 +2,8 @@
 
 #pragma once
 #include "resource.h"       // main symbols
-
+#include "stdafx.h"
 #include "pEpComServerAdapter_i.h"
-#include "..\libpEpAdapter\locked_queue.hh"
-#include "utf8_helper.h"
-#include "pEp_utility.h"
-#include "..\libpEpAdapter\Adapter.hh"
-#include <queue>
-#include <mutex>
-#include <vector>
-#include "..\libpEpAdapter\pc_container.hh"
-#include "..\pEp\sync_codec.h"
-#include "..\pEp\mime.h"
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
@@ -23,6 +13,8 @@ using namespace ATL;
 using namespace utility;
 using namespace pEp::utility;
 using namespace pEp::Adapter;
+
+extern pEp::PassphraseCache passphrase_cache;
 
 // CpEpEngine
 
@@ -61,7 +53,6 @@ public:
                 error(ex.what());
             }
             session(pEp::Adapter::release);
-            shutdown();
 
             sync_callbacks.clear([](CpEpEngine::MarshaledCallbacks *p) {
                 if (p) {
@@ -72,6 +63,7 @@ public:
                     delete p;
                 }
             });
+            pEp::callback_dispatcher.remove(CpEpEngine::messageToSend);
         }
     }
 
@@ -99,10 +91,7 @@ public:
     {
         std::lock_guard<std::mutex> lock(init_mutex);
         try {
-            if (!_messageToSend) {
-                _messageToSend = messageToSend;
-            }
-            session();
+            pEp::callback_dispatcher.add(CpEpEngine::messageToSend, CpEpEngine::notifyHandshake, CpEpEngine::on_sync_startup, CpEpEngine::on_sync_shutdown);
         }
         catch (pEp::RuntimeError& e) {
             HRESULT res = MAKE_HRESULT(1, FACILITY_ITF, (0xFFFF & e.status));
@@ -150,14 +139,14 @@ private:
 
     static callback_container sync_callbacks;
 
-    void Startup_sync()
+    static void on_sync_startup()
     {
         HRESULT r = CoInitializeEx(NULL, COINIT_MULTITHREADED);
         if (!SUCCEEDED(r))
             throw runtime_error("CoInitializeEx() failed on sync thread");
     }
 
-    void Shutdown_sync()
+    static void on_sync_shutdown()
     {
         CoUninitialize();
     }
@@ -171,6 +160,8 @@ private:
 
     static std::mutex init_mutex;
     static atomic< int > count;
+
+    std::string passphrase_for_new_keys;
 
 public:
     // runtime config of the adapter
@@ -274,6 +265,8 @@ public:
     STDMETHOD(OpenPGPListKeyinfo)(BSTR search_pattern, LPSAFEARRAY* keyinfo_list);
     STDMETHOD(SetOwnKey)(pEpIdentity * ident, BSTR fpr, struct pEpIdentity *result);
     STDMETHOD(TrustOwnKey)(pEpIdentity * ident);
+    STDMETHOD(ConfigPassphrase)(BSTR passphrase);
+    STDMETHOD(ConfigPassphraseForNewKeys)(VARIANT_BOOL enable, BSTR passphrase);
 
     // Trigger an immediate update
     STDMETHOD(UpdateNow)(BSTR productCode, VARIANT_BOOL *didUpdate);

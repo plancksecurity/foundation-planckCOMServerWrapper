@@ -38,6 +38,12 @@ interface IpEpEngineCallbacks : IUnknown {
         // forming group
         // SyncNotifyFormingGroup = 10,
 
+        SyncNotifyStart = 126,
+        SyncNotifyStop = 127,
+
+        // message cannot be sent, need passphrase
+        SyncNotifyPassphraseRequired = 128,
+
         // notificaton of actual group status
         SyncNotifySole = 254,
         SyncNotifyInGroup = 255
@@ -528,6 +534,12 @@ interface IpEpEngine : IUnknown {
 
     // Encodes a MIME message
     [id(63)] HRESULT MIMEEncodeMessage([in] struct TextMessage *msg, [in] VARIANT_BOOL omitFields, [out, retval] BSTR *mimeText);
+
+    // Configures a key passphrase for the current session
+    [id(64)] HRESULT ConfigPassphrase([in] BSTR passphrase);
+
+    // Passphrase enablement for newly-generated secret keys
+    [id(65)] HRESULT ConfigPassphraseForNewKeys([in] VARIANT_BOOL enable, [in] BSTR passphrase);
 };
 
 [

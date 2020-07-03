@@ -1,10 +1,13 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include "GateKeeper.h"
 #include "pEpCOMServerAdapter.h"
-#include "utf8_helper.h"
+#include "CMainWindow.h"
 
 using namespace std;
+
+extern CMainWindow mainWindow;
+auto r = CMainWindow::r;
 
 // from https://msdn.microsoft.com/en-us/library/windows/desktop/dd388945(v=vs.85).aspx
 
@@ -182,7 +185,8 @@ namespace pEp {
 
             if (now > next) {
                 next = now + GateKeeper::cycle;
-                keep_updated();
+                if (update_enabled())
+                    update_now();
             }
 
             Sleep(waiting);
@@ -344,6 +348,41 @@ namespace pEp {
         return result;
     }
 
+    void GateKeeper::enable_update()
+    {
+        LONG lResult = RegOpenKeyEx(cu, updater_reg_path, 0, KEY_WRITE, &hkUpdater);
+        if (lResult != ERROR_SUCCESS)
+            return;
+
+        lResult = RegSetValueExW(hkUpdater, NULL, 0, REG_SZ, (const BYTE *) _T("1"), sizeof(TCHAR)*2);
+    }
+
+    void GateKeeper::disable_update()
+    {
+        LONG lResult = RegOpenKeyEx(cu, updater_reg_path, 0, KEY_WRITE, &hkUpdater);
+        if (lResult != ERROR_SUCCESS)
+            return;
+
+        lResult = RegSetValueEx(hkUpdater, NULL, 0, REG_SZ, (const BYTE *) _T("0"), sizeof(TCHAR) * 2);
+    }
+
+    bool GateKeeper::update_enabled()
+    {
+        bool enabled = true;
+
+        DWORD esize;
+        RegGetValue(cu, updater_reg_path, NULL, RRF_RT_REG_SZ, NULL, NULL, &esize);
+        if (esize) {
+            TCHAR* edata = new TCHAR[esize];
+            RegGetValue(cu, updater_reg_path, NULL, RRF_RT_REG_SZ, NULL, edata, &esize);
+            if (tstring(edata) == _T("0"))
+                enabled = false;
+            delete[] edata;
+        }
+
+        return enabled;
+    }
+
     GateKeeper::product_list GateKeeper::registered_products()
     {
         product_list products;
@@ -484,6 +523,9 @@ namespace pEp {
             DWORD reading;
             InternetReadFile(hUrl, iv, sizeof(iv), &reading);
 
+            if (reading)
+                mainWindow.ShowNotificationInfo(r(IDS_DOWNLOADTITLE), r(IDS_DOWNLOADTEXT));
+
             if (reading) do {
                 static char buffer[1024 * 1024];
                 BOOL bResult = InternetReadFile(hUrl, buffer, 1024 * 1024, &reading);
@@ -532,17 +574,22 @@ namespace pEp {
 
             BCryptDestroyKey(dk);
 
-            TCHAR temp_path[MAX_PATH + 1];
-            GetTempPath(MAX_PATH, temp_path);
+            TCHAR download_path[MAX_PATH + 1];
+            PWSTR _downloads;
+            SHGetKnownFolderPath(FOLDERID_Downloads, 0, NULL, &_downloads);
+            StringCchCopy(download_path, MAX_PATH, _downloads);
+            CoTaskMemFree(_downloads);
+
+            GetTempPath(MAX_PATH, download_path);
 
             if (filename == _T("")) {
-                filename = temp_path;
+                filename = download_path;
                 filename += _T("\\pEp_");
                 filename += delivery.substr(0, 32);
                 filename += _T(".msi");
             }
             else {
-                filename = tstring(temp_path) + _T("\\") + filename;
+                filename = tstring(download_path) + _T("\\") + filename;
             }
 
             hFile = CreateFile(filename.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -574,7 +621,7 @@ namespace pEp {
         return result;
     }
 
-    void GateKeeper::keep_updated()
+    void GateKeeper::update_now()
     {
         NTSTATUS status = BCryptOpenAlgorithmProvider(&hAES, BCRYPT_AES_ALGORITHM, MS_PRIMITIVE_PROVIDER, 0);
         assert(status == 0);

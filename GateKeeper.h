@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 class CpEpCOMServerAdapterModule;
 
 using namespace std;
@@ -37,6 +39,11 @@ namespace pEp {
 		product_list registered_products();
 		bool update_product(product p, DWORD context = 0);
 
+        bool update_enabled();
+        void enable_update();
+        void disable_update();
+        void update_now();
+
 		static GateKeeper *gatekeeper() { return the_gatekeeper; }
 
     protected:
@@ -57,7 +64,6 @@ namespace pEp {
         BCRYPT_KEY_HANDLE delivery_key();
         string wrapped_delivery_key(BCRYPT_KEY_HANDLE hDeliveryKey);
 
-        void keep_updated();
         static tstring get_lockFile();
 		static GateKeeper *the_gatekeeper;
 

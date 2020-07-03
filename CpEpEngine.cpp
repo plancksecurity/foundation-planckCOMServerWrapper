@@ -2,14 +2,11 @@
 
 #include "stdafx.h"
 #include "CpEpEngine.h"
-#include <mutex>
 #include "GateKeeper.h"
-#include "..\libpEpAdapter\Adapter.hh"
-#include "pEp\status_to_string.h"
+#include "LocalJSONAdapter.h"
 
 using namespace std;
 using namespace pEp::utility;
-using namespace pEp::Adapter;
 
 // CpEpEngine
 
@@ -21,6 +18,8 @@ CpEpEngine::callback_container CpEpEngine::sync_callbacks;
 
 std::mutex CpEpEngine::init_mutex;
 atomic< int > CpEpEngine::count = 0;
+
+extern LocalJSONAdapter* ljs;
 
 STDMETHODIMP CpEpEngine::InterfaceSupportsErrorInfo(REFIID riid)
 {
@@ -430,7 +429,7 @@ STDMETHODIMP CpEpEngine::GetMessageTrustwords(
 
     char* _words = NULL;
     if (result == S_OK) {
-        auto status = ::get_message_trustwords(
+        auto status = passphrase_cache.api(::get_message_trustwords,
             session(),
             _msg,
             _keylist,
@@ -703,7 +702,12 @@ STDMETHODIMP CpEpEngine::Myself(struct pEpIdentity *ident, struct pEpIdentity *r
         return FAIL(ex.what());;
     }
 
-    PEP_STATUS status = ::myself(session(), _ident);
+    PEP_STATUS status;
+    if (passphrase_for_new_keys != "")
+        status = ::config_passphrase_for_new_keys(session(), true, passphrase_for_new_keys.c_str());
+    else
+        status = ::config_passphrase_for_new_keys(session(), false, passphrase_for_new_keys.c_str());
+    status = ::myself(session(), _ident);
 
     if (status == PEP_STATUS_OK) {
         assert(_ident->fpr);
@@ -853,7 +857,7 @@ STDMETHODIMP CpEpEngine::KeyResetIdentity(struct pEpIdentity ident, BSTR fpr)
 
     string _fpr = utf8_string(fpr);
 
-    PEP_STATUS status = ::key_reset_identity(session(), _ident, _fpr.c_str());
+    PEP_STATUS status = passphrase_cache.api(::key_reset_identity, session(), _ident, _fpr.c_str());
 
     free_identity(_ident);
 
@@ -874,7 +878,7 @@ STDMETHODIMP CpEpEngine::KeyResetUser(BSTR userId, BSTR fpr)
     string _userId = utf8_string(userId);
     string _fpr = utf8_string(fpr);
 
-    PEP_STATUS status = ::key_reset_user(session(), _userId.c_str(), _fpr.c_str());
+    PEP_STATUS status = passphrase_cache.api(::key_reset_user, session(), _userId.c_str(), _fpr.c_str());
 
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
@@ -890,7 +894,7 @@ STDMETHODIMP CpEpEngine::KeyResetUser(BSTR userId, BSTR fpr)
 
 STDMETHODIMP CpEpEngine::KeyResetAllOwnKeys()
 {
-    PEP_STATUS status = ::key_reset_all_own_keys(session());
+    PEP_STATUS status = passphrase_cache.api(::key_reset_all_own_keys, session());
 
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
@@ -920,7 +924,7 @@ STDMETHODIMP CpEpEngine::KeyResetTrust(struct pEpIdentity *ident)
         return FAIL(ex.what());;
     }
 
-    PEP_STATUS status = ::key_reset_trust(session(), _ident);
+    PEP_STATUS status = passphrase_cache.api(::key_reset_trust, session(), _ident);
     free_identity(_ident);
 
     if (status == PEP_OUT_OF_MEMORY)
@@ -1001,11 +1005,10 @@ static IpEpEngineCallbacks * _unmarshaled_consumer(CpEpEngine::callback_containe
 
 PEP_STATUS CpEpEngine::messageToSend(message *msg)
 {
-    assert(msg);
-    if (!msg)
-        return PEP_ILLEGAL_VALUE;
-
     bool in_sync = on_sync_thread();
+
+    if (in_sync && !msg)
+        return pEp::PassphraseCache::messageToSend(passphrase_cache, session());
 
     for (auto p = sync_callbacks.begin(); p != sync_callbacks.end(); ++p) {
         IpEpEngineCallbacks *cb = in_sync ? _unmarshaled_consumer(p) : p->pdata->unmarshaled;
@@ -1025,15 +1028,18 @@ PEP_STATUS CpEpEngine::messageToSend(message *msg)
         }
     }
 
+    if (ljs)
+        ljs->messageToSend(msg);
+
     sync_callbacks.compact();
 
     return PEP_STATUS_OK;
 }
 
-PEP_STATUS CpEpEngine::notifyHandshake(::pEp_identity *self, ::pEp_identity *partner, sync_handshake_signal signal)
+PEP_STATUS CpEpEngine::notifyHandshake(::pEp_identity *self, ::pEp_identity *partner, ::sync_handshake_signal signal)
 {
-    assert(self && partner);
-    if (!(self && partner))
+    assert(signal);
+    if (!signal)
         return PEP_ILLEGAL_VALUE;
 
     bool in_sync = on_sync_thread();
@@ -1201,7 +1207,7 @@ STDMETHODIMP CpEpEngine::EncryptMessage(TextMessage * src, TextMessage * dst, SA
     // Since COM-74, this has been changed to an explicit parameter, to allow the engine to attach
     // the keys and headers to outgoing, unencrypted messages.
     PEP_encrypt_flags_t engineFlags = (PEP_encrypt_flags_t)flags;
-    PEP_STATUS status = ::encrypt_message(session(), _src, _extra, &msg_dst, _encFormat, engineFlags);
+    PEP_STATUS status = passphrase_cache.api(::encrypt_message, session(), _src, _extra, &msg_dst, _encFormat, engineFlags);
     ::free_stringlist(_extra);
 
     if (status == PEP_STATUS_OK)
@@ -1262,7 +1268,7 @@ STDMETHODIMP CpEpEngine::EncryptMessageAndAddPrivKey(TextMessage * src, TextMess
     // Since COM-74, this has been changed to an explicit parameter, to allow the engine to attach
     // the keys and headers to outgoing, unencrypted messages.
     PEP_encrypt_flags_t engineFlags = (PEP_encrypt_flags_t)flags;
-    PEP_STATUS status = ::encrypt_message_and_add_priv_key(session(), _src, &msg_dst, _to_fpr.c_str(), _encFormat, engineFlags);
+    PEP_STATUS status = passphrase_cache.api(::encrypt_message_and_add_priv_key, session(), _src, &msg_dst, _to_fpr.c_str(), _encFormat, engineFlags);
 
     if (status == PEP_STATUS_OK)
         text_message_from_C(dst, msg_dst);
@@ -1328,7 +1334,7 @@ STDMETHODIMP CpEpEngine::EncryptMessageForSelf(pEpIdentity * targetId, TextMessa
         // COM-19: Initialize msg_dst to NULL, or we end up calling
         // free_message() below with a pointer to random garbage in
         // case of an error in encrypt_message_for_self().
-        status = ::encrypt_message_for_self(session(), _target_id, _src, _extra, &msg_dst, PEP_enc_PEP, engineFlags);
+        status = passphrase_cache.api(::encrypt_message_for_self, session(), _target_id, _src, _extra, &msg_dst, PEP_enc_PEP, engineFlags);
 
         if (status == PEP_STATUS_OK)
             text_message_from_C(dst, msg_dst);
@@ -1386,7 +1392,7 @@ STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SA
     ::PEP_rating _rating;
 
     PEP_decrypt_flags_t engineflags = (PEP_decrypt_flags_t)*flags;
-    PEP_STATUS status = ::decrypt_message(session(), _src, &msg_dst, &_keylist, &_rating, &engineflags);
+    PEP_STATUS status = passphrase_cache.api(::decrypt_message, session(), _src, &msg_dst, &_keylist, &_rating, &engineflags);
 
     *flags = (pEpDecryptFlags)engineflags;
 
@@ -1832,7 +1838,7 @@ STDMETHODIMP CpEpEngine::Startup()
 {
     try
     {
-        startup<CpEpEngine>(messageToSend, notifyHandshake, this, &CpEpEngine::Startup_sync, &CpEpEngine::Shutdown_sync);
+        pEp::CallbackDispatcher::start_sync();
     }
     catch (bad_alloc&) {
         return E_OUTOFMEMORY;
@@ -1967,7 +1973,7 @@ STDMETHODIMP CpEpEngine::DisableIdentityForSync(struct pEpIdentity * ident)
     if (_ident == NULL)
         return E_OUTOFMEMORY;
 
-    PEP_STATUS status = ::disable_identity_for_sync(session(), _ident);
+    PEP_STATUS status = passphrase_cache.api(::disable_identity_for_sync, session(), _ident);
 
     ::free_identity(_ident);
 
@@ -2060,13 +2066,46 @@ STDMETHODIMP CpEpEngine::RatingFromCommType(pEpComType commType, pEpRating * rat
 STDMETHODIMP CpEpEngine::GetIsSyncRunning(VARIANT_BOOL *running)
 {
     *running = pEp::Adapter::is_sync_running();
-
     return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::ShutDownSync()
 {
-    pEp::Adapter::shutdown();
-
+    pEp::callback_dispatcher.stop_sync();
     return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::ConfigPassphrase(BSTR passphrase)
+{
+    string _passphrase = "";
+
+    if (passphrase)
+        _passphrase = utf8_string(passphrase);
+
+    PEP_STATUS status = ::config_passphrase(session(), passphrase_cache.add(_passphrase));
+
+    if (status == PEP_STATUS_OK)
+        return S_OK;
+    else if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+    else
+        return FAIL(L"ConfigPassphrase", status);
+}
+
+STDMETHODIMP CpEpEngine::ConfigPassphraseForNewKeys(VARIANT_BOOL enable, BSTR passphrase)
+{
+    string _passphrase = "";
+    
+    if (passphrase)
+        _passphrase = utf8_string(passphrase);
+
+    passphrase_for_new_keys = _passphrase;
+    PEP_STATUS status = ::config_passphrase_for_new_keys(session(), enable, passphrase_cache.add_stored(_passphrase));
+
+    if (status == PEP_STATUS_OK)
+        return S_OK;
+    else if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+    else
+        return FAIL(L"ConfigPassphraseForNewKeys", status);
 }

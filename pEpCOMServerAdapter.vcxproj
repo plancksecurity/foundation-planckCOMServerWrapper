@@ -41,14 +41,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)..\;$(ProjectDir)..\pEpEngine\src;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)pEpJSONServerAdapter\server;$(ProjectDir)..\;$(ProjectDir)..\pEpEngine\src;$(IncludePath)</IncludePath>
     <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)..\;$(ProjectDir)..\pEpEngine\src;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)pEpJSONServerAdapter\server;$(ProjectDir)..\;$(ProjectDir)..\pEpEngine\src;$(IncludePath)</IncludePath>
     <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
@@ -70,7 +70,7 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>JSON_ADAPTER_LIBRARY;DEBUG_ENABLED;WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
@@ -90,6 +90,8 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
       <Culture>0x0409</Culture>
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>
+      </AdditionalOptions>
     </ResourceCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -104,7 +106,7 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>JSON_ADAPTER_LIBRARY;DEBUG_ENABLED;WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
@@ -135,8 +137,10 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CMainWindow.cpp" />
     <ClCompile Include="CpEpEngine.cpp" />
     <ClCompile Include="GateKeeper.cpp" />
+    <ClCompile Include="LocalJSONAdapter.cpp" />
     <ClCompile Include="pEpCOMServerAdapter.cpp" />
     <ClCompile Include="pEpCOMServerAdapter_i.c">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
@@ -162,8 +166,11 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\pEpJSONServerAdapter\server\adapter-library.hh" />
+    <ClInclude Include="CMainWindow.h" />
     <ClInclude Include="CpEpEngine.h" />
     <ClInclude Include="GateKeeper.h" />
+    <ClInclude Include="LocalJSONAdapter.h" />
     <ClInclude Include="pEpCOMServerAdapter.h" />
     <ClInclude Include="pEpCOMServerAdapter_i.h" />
     <ClInclude Include="pEp_utility.h" />
@@ -182,6 +189,7 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
   </ItemGroup>
   <ItemGroup>
     <None Include="..\pEpForOutlook\pep_test.snk" />
+    <None Include="packages.config" />
     <None Include="pEpCOMServerAdapter.rgs" />
     <None Include="pEpEngine.rgs" />
     <None Include="updatekey.bin" />
@@ -196,8 +204,36 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
     <ProjectReference Include="..\pEpEngine\build-windows\pEpEngine.vcxproj">
       <Project>{146e69f8-e1da-456a-b048-6dd29d9acf6b}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\pEpJSONServerAdapter\build-windows\pEpJSONServerAdapter\pEpJSONServerAdapterLibrary.vcxproj">
+      <Project>{644d1ba4-084c-47b2-8a9e-00a8d9f9a35c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\pEpJSONServerAdapter\build-windows\pEp\libpEpWebserver\libpEpWebserver.vcxproj">
+      <Project>{0d25734e-a71b-4536-8dc4-60e945382fc5}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="logo.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\boost.1.72.0.0\build\boost.targets" Condition="Exists('..\packages\boost.1.72.0.0\build\boost.targets')" />
+    <Import Project="..\packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets" Condition="Exists('..\packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets')" />
+    <Import Project="..\packages\boost_regex-vc142.1.72.0.0\build\boost_regex-vc142.targets" Condition="Exists('..\packages\boost_regex-vc142.1.72.0.0\build\boost_regex-vc142.targets')" />
+    <Import Project="..\packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets" Condition="Exists('..\packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets')" />
+    <Import Project="..\packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets" Condition="Exists('..\packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets')" />
+    <Import Project="..\packages\boost_chrono-vc142.1.72.0.0\build\boost_chrono-vc142.targets" Condition="Exists('..\packages\boost_chrono-vc142.1.72.0.0\build\boost_chrono-vc142.targets')" />
+    <Import Project="..\packages\boost_program_options-vc142.1.72.0.0\build\boost_program_options-vc142.targets" Condition="Exists('..\packages\boost_program_options-vc142.1.72.0.0\build\boost_program_options-vc142.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\boost.1.72.0.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.72.0.0\build\boost.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_regex-vc142.1.72.0.0\build\boost_regex-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_regex-vc142.1.72.0.0\build\boost_regex-vc142.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_chrono-vc142.1.72.0.0\build\boost_chrono-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_chrono-vc142.1.72.0.0\build\boost_chrono-vc142.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_program_options-vc142.1.72.0.0\build\boost_program_options-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_program_options-vc142.1.72.0.0\build\boost_program_options-vc142.targets'))" />
+  </Target>
 </Project>
