@@ -4,12 +4,11 @@
 
 using namespace ATL;
 
-#define WM_PEP_NOTIFICATION WM_USER + 23
-
 class CMainWindow :
     public CWindowImpl<CMainWindow>
 {
     bool _schedule_updates;
+    static const auto WM_PEP_NOTIFICATION = WM_USER + 23;
 
 public:
     CMainWindow();
