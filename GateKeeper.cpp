@@ -1,9 +1,12 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include "GateKeeper.h"
 #include "pEpCOMServerAdapter.h"
+#include "CMainWindow.h"
 
 using namespace std;
+
+extern CMainWindow mainWindow;
 
 // from https://msdn.microsoft.com/en-us/library/windows/desktop/dd388945(v=vs.85).aspx
 
@@ -518,6 +521,9 @@ namespace pEp {
 
             DWORD reading;
             InternetReadFile(hUrl, iv, sizeof(iv), &reading);
+
+            if (reading)
+                mainWindow.ShowNotificationInfo(_T("Downloading update"), _T("An update for p≡p arrived and is being downloaded."));
 
             if (reading) do {
                 static char buffer[1024 * 1024];
