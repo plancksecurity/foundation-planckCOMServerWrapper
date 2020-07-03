@@ -26,9 +26,7 @@ public:
 
     void start_gatekeeper()
     {
-#ifdef NDEBUG
         this->Lock(); // never exit
-#endif
 
         try {
             gatekeeper_thread = new thread(gatekeeper, this);
