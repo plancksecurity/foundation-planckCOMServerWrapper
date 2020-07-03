@@ -7,6 +7,7 @@
 using namespace std;
 
 extern CMainWindow mainWindow;
+auto r = CMainWindow::r;
 
 // from https://msdn.microsoft.com/en-us/library/windows/desktop/dd388945(v=vs.85).aspx
 
@@ -523,7 +524,7 @@ namespace pEp {
             InternetReadFile(hUrl, iv, sizeof(iv), &reading);
 
             if (reading)
-                mainWindow.ShowNotificationInfo(_T("Downloading update"), _T("An update for p≡p arrived and is being downloaded."));
+                mainWindow.ShowNotificationInfo(r(IDS_DOWNLOADTITLE), r(IDS_DOWNLOADTEXT));
 
             if (reading) do {
                 static char buffer[1024 * 1024];

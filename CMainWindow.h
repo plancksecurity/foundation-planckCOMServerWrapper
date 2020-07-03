@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include "resource.h"
 
 using namespace ATL;
 
@@ -28,5 +29,6 @@ public:
     LRESULT OnMenuCommand(UINT /*nMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 
     typedef std::basic_string<TCHAR> tstring;
+    static tstring r(UINT resid);
     void ShowNotificationInfo(tstring title, tstring text);
 };

@@ -16,7 +16,7 @@ LRESULT CMainWindow::OnCreate(UINT, WPARAM, LPARAM, BOOL&)
     nid.uFlags = NIF_ICON | NIF_TIP | NIF_GUID | NIF_MESSAGE;
     nid.hWnd = m_hWnd;
     nid.guidItem = nidGUID;
-    StringCchCopy(nid.szTip, ARRAYSIZE(nid.szTip), _T("p≡p Updates"));
+    StringCchCopy(nid.szTip, ARRAYSIZE(nid.szTip), r(IDS_PROJNAME).c_str());
     nid.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_LOGO));
     nid.uCallbackMessage = WM_PEP_NOTIFICATION;
     Shell_NotifyIcon(NIM_ADD, &nid);
@@ -96,7 +96,7 @@ LRESULT CMainWindow::OnMenuCommand(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL
 
     switch (index) {
     case UPDATE_NOW:
-        ShowNotificationInfo(_T("Searching for updates"), _T("p≡p is searching for updates. When an update is available p≡p will start an installer."));
+        ShowNotificationInfo(r(IDS_UPDATESTITLE), r(IDS_UPDATESTEXT));
         pEp::GateKeeper::gatekeeper()->update_now();
         bHandled = true;
         break;
@@ -115,6 +115,14 @@ LRESULT CMainWindow::OnMenuCommand(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL
         bHandled = false;
     }
     return S_OK;
+}
+
+CMainWindow::tstring CMainWindow::r(UINT resid)
+{
+    LPCTSTR rstr;
+    size_t rsize = LoadString(GetModuleHandle(NULL), resid, (LPWSTR) &rstr, 0);
+    tstring str = tstring(rstr, rsize);
+    return str;
 }
 
 void CMainWindow::ShowNotificationInfo(tstring title, tstring text)
