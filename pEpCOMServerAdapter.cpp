@@ -29,7 +29,7 @@ void CpEpCOMServerAdapterModule::gatekeeper(CpEpCOMServerAdapterModule * self)
 
 CpEpCOMServerAdapterModule _AtlModule;
 LocalJSONAdapter* ljs = nullptr;
-pEp::PassphraseCache cache;
+pEp::PassphraseCache passphrase_cache;
 CMainWindow mainWindow;
 
 extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, 
