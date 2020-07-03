@@ -12,8 +12,7 @@ class CMainWindow :
     bool _schedule_updates;
 
 public:
-    CMainWindow() :
-        _schedule_updates(true), CWindowImpl<CMainWindow>() { }
+    CMainWindow();
 
     DECLARE_WND_CLASS(_T("pEpCOMServerAdapterMainWndClass"))
     BEGIN_MSG_MAP(CMainWindow)

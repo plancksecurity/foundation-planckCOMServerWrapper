@@ -5,6 +5,22 @@
 static const GUID nidGUID =
 { 0xa4dbdbe1, 0x4051, 0x4d89, { 0xb1, 0x17, 0x62, 0x82, 0x18, 0x5a, 0x61, 0x5c } };
 
+CMainWindow::CMainWindow() :
+    _schedule_updates(true), CWindowImpl<CMainWindow>()
+{
+    ULONG ulNumLanguages = 0;
+    PZZWSTR pwszLanguagesBuffer = NULL;
+    ULONG pcchLanguagesBuffer = 0;
+    BOOL bResult = GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &ulNumLanguages, NULL, &pcchLanguagesBuffer);
+    assert(bResult);
+    pwszLanguagesBuffer = new WCHAR[pcchLanguagesBuffer];
+    bResult = GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &ulNumLanguages, pwszLanguagesBuffer, &pcchLanguagesBuffer);
+    assert(bResult);
+    bResult = SetProcessPreferredUILanguages(MUI_LANGUAGE_NAME, pwszLanguagesBuffer, &ulNumLanguages);
+    assert(bResult);
+    delete[] pwszLanguagesBuffer;
+}
+
 LRESULT CMainWindow::OnCreate(UINT, WPARAM, LPARAM, BOOL&)
 {
     // remove leftoff before creating a new one
