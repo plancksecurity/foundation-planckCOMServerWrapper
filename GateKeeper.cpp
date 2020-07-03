@@ -567,17 +567,22 @@ namespace pEp {
 
             BCryptDestroyKey(dk);
 
-            TCHAR temp_path[MAX_PATH + 1];
-            GetTempPath(MAX_PATH, temp_path);
+            TCHAR download_path[MAX_PATH + 1];
+            PWSTR _downloads;
+            SHGetKnownFolderPath(FOLDERID_Downloads, 0, NULL, &_downloads);
+            StringCchCopy(download_path, MAX_PATH, _downloads);
+            CoTaskMemFree(_downloads);
+
+            GetTempPath(MAX_PATH, download_path);
 
             if (filename == _T("")) {
-                filename = temp_path;
+                filename = download_path;
                 filename += _T("\\pEp_");
                 filename += delivery.substr(0, 32);
                 filename += _T(".msi");
             }
             else {
-                filename = tstring(temp_path) + _T("\\") + filename;
+                filename = tstring(download_path) + _T("\\") + filename;
             }
 
             hFile = CreateFile(filename.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);

@@ -29,6 +29,7 @@
 
 #include <comutil.h>
 #include <comdef.h>
+#include <Shlobj.h>
 
 #include <Wininet.h>
 #include <intsafe.h>

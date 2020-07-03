@@ -27,7 +27,6 @@ public:
     LRESULT OnNotification(UINT /*nMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
     LRESULT OnMenuCommand(UINT /*nMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 
-protected:
     typedef std::basic_string<TCHAR> tstring;
     void ShowNotificationInfo(tstring title, tstring text);
 };
