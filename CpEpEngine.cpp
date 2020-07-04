@@ -1007,9 +1007,6 @@ PEP_STATUS CpEpEngine::messageToSend(message *msg)
 {
     bool in_sync = on_sync_thread();
 
-    if (in_sync && !msg)
-        return pEp::PassphraseCache::messageToSend(passphrase_cache, session());
-
     for (auto p = sync_callbacks.begin(); p != sync_callbacks.end(); ++p) {
         IpEpEngineCallbacks *cb = in_sync ? _unmarshaled_consumer(p) : p->pdata->unmarshaled;
 

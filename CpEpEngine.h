@@ -14,7 +14,7 @@ using namespace utility;
 using namespace pEp::utility;
 using namespace pEp::Adapter;
 
-extern pEp::PassphraseCache passphrase_cache;
+pEp::PassphraseCache& passphrase_cache = pEp::passphrase_cache;
 
 // CpEpEngine
 
