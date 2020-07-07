@@ -1835,7 +1835,13 @@ STDMETHODIMP CpEpEngine::Startup()
 {
     try
     {
-        pEp::CallbackDispatcher::start_sync();
+        // this must be unblocked, because it's not possible to have two API calls in parallel
+        // start_sync() may send notifyHandshake() to ask for a passphrase; when this happens
+        // the client needs to call ConfigPassphrase() while the startup process is being executed
+        // so we need to return from Startup() immediately to make this possible
+
+        auto sync_starter_thread = std::thread(pEp::CallbackDispatcher::start_sync);
+        sync_starter_thread.detach();
     }
     catch (bad_alloc&) {
         return E_OUTOFMEMORY;
