@@ -666,6 +666,11 @@ namespace pEp {
         hRSA = NULL;
     }
 
+    void GateKeeper::show_notification(tstring title, tstring text) 
+    {
+        mainWindow.ShowNotificationInfo(title, text);
+    }
+
     GateKeeper *GateKeeper::the_gatekeeper = nullptr;
 
 } // namespace pEp

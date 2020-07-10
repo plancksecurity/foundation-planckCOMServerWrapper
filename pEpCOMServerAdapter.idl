@@ -540,6 +540,9 @@ interface IpEpEngine : IUnknown {
 
     // Passphrase enablement for newly-generated secret keys
     [id(65)] HRESULT ConfigPassphraseForNewKeys([in] VARIANT_BOOL enable, [in] BSTR passphrase);
+
+    // Shows a notification in the notification tray
+    [id(66)] HRESULT ShowNotification([in] BSTR title, [in] BSTR message);
 };
 
 [

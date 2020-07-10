@@ -44,6 +44,8 @@ namespace pEp {
         void disable_update();
         void update_now();
 
+        void show_notification(tstring title, tstring text);
+
 		static GateKeeper *gatekeeper() { return the_gatekeeper; }
 
     protected:

@@ -2112,3 +2112,9 @@ STDMETHODIMP CpEpEngine::ConfigPassphraseForNewKeys(VARIANT_BOOL enable, BSTR pa
     else
         return FAIL(L"ConfigPassphraseForNewKeys", status);
 }
+
+STDMETHODIMP CpEpEngine::ShowNotification(BSTR title, BSTR message) 
+{
+    pEp::GateKeeper::gatekeeper()->show_notification(title, message);
+    return S_OK;
+}

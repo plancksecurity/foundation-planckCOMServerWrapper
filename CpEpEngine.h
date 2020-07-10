@@ -290,6 +290,8 @@ public:
 
     STDMETHOD(PerMachineDirectory)(BSTR * directory);
     STDMETHOD(PerUserDirectory)(BSTR * directory);
+
+    STDMETHOD(ShowNotification)(BSTR title, BSTR message);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)
