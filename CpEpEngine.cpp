@@ -78,7 +78,7 @@ STDMETHODIMP CpEpEngine::ImportKey(BSTR keyData, LPSAFEARRAY * privateKeys)
     size_t size = SysStringLen(keyData);
     ::identity_list *private_keys = nullptr;
 
-    PEP_STATUS status = ::import_key(session(), key_data.c_str(), size, &private_keys);
+    PEP_STATUS status = passphrase_cache.api(::import_key, session(), key_data.c_str(), size, &private_keys);
     assert(status != ::PEP_OUT_OF_MEMORY);
     if (status == ::PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
@@ -122,7 +122,7 @@ STDMETHODIMP CpEpEngine::ExportKey(BSTR fpr, BSTR * keyData)
     char *_key_data = NULL;
     size_t _size = 0;
 
-    PEP_STATUS status = ::export_key(session(), _fpr.c_str(), &_key_data, &_size);
+    PEP_STATUS status = passphrase_cache.api(::export_key, session(), _fpr.c_str(), &_key_data, &_size);
     assert(status != ::PEP_OUT_OF_MEMORY);
     if (status == ::PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
@@ -139,7 +139,7 @@ STDMETHODIMP CpEpEngine::ExportKey(BSTR fpr, BSTR * keyData)
 
 STDMETHODIMP CpEpEngine::LeaveDeviceGroup()
 {
-    PEP_STATUS status = ::leave_device_group(session());
+    PEP_STATUS status = passphrase_cache.api(::leave_device_group, session());
 
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
@@ -547,7 +547,7 @@ STDMETHODIMP CpEpEngine::SetIdentityFlags(struct pEpIdentity *identity, pEpIdent
         return FAIL(ex.what());;
     }
 
-    PEP_STATUS status = ::set_identity_flags(session(), _ident, (identity_flags_t)flags);
+    PEP_STATUS status = passphrase_cache.api(::set_identity_flags, session(), _ident, (identity_flags_t)flags);
     ::free_identity(_ident);
     if (status != PEP_STATUS_OK)
         return FAIL(_T("SetIdentityFlags"), status);
@@ -576,7 +576,7 @@ STDMETHODIMP CpEpEngine::UnsetIdentityFlags(struct pEpIdentity *identity, pEpIde
         return FAIL(ex.what());;
     }
 
-    PEP_STATUS status = ::unset_identity_flags(session(), _ident, (identity_flags_t)flags);
+    PEP_STATUS status = passphrase_cache.api(::unset_identity_flags, session(), _ident, (identity_flags_t)flags);
     ::free_identity(_ident);
     if (status != PEP_STATUS_OK)
         return FAIL(_T("UnsetIdentityFlags"), status);
@@ -707,7 +707,7 @@ STDMETHODIMP CpEpEngine::Myself(struct pEpIdentity *ident, struct pEpIdentity *r
         status = ::config_passphrase_for_new_keys(session(), true, passphrase_for_new_keys.c_str());
     else
         status = ::config_passphrase_for_new_keys(session(), false, passphrase_for_new_keys.c_str());
-    status = ::myself(session(), _ident);
+    status = passphrase_cache.api(::myself, session(), _ident);
 
     if (status == PEP_STATUS_OK) {
         assert(_ident->fpr);
@@ -747,7 +747,7 @@ STDMETHODIMP CpEpEngine::UpdateIdentity(struct pEpIdentity *ident, struct pEpIde
     if (_ident == NULL)
         return E_OUTOFMEMORY;
 
-    PEP_STATUS status = ::update_identity(session(), _ident);
+    PEP_STATUS status = passphrase_cache.api(::update_identity, session(), _ident);
 
     if (status == PEP_STATUS_OK) {
         copy_identity(result, _ident);
@@ -791,7 +791,7 @@ STDMETHODIMP CpEpEngine::KeyMistrusted(struct pEpIdentity *ident)
         return FAIL(ex.what());;
     }
 
-    PEP_STATUS status = ::key_mistrusted(session(), _ident);
+    PEP_STATUS status = passphrase_cache.api(::key_mistrusted, session(), _ident);
     free_identity(_ident);
 
     if (status == PEP_OUT_OF_MEMORY)
@@ -825,7 +825,7 @@ STDMETHODIMP CpEpEngine::IspEpUser(/* [in] */ struct pEpIdentity *ident, /* [ret
     }
 
     bool is_pep = FALSE;
-    PEP_STATUS status = ::is_pEp_user(session(), _ident, &is_pep);
+    PEP_STATUS status = passphrase_cache.api(::is_pEp_user, session(), _ident, &is_pep);
 
     *ispEp = is_pep;
 
@@ -1073,7 +1073,7 @@ STDMETHODIMP CpEpEngine::BlacklistAdd(BSTR fpr)
         return E_INVALIDARG;
 
     string _fpr = utf8_string(fpr);
-    PEP_STATUS status = ::blacklist_add(session(), _fpr.c_str());
+    PEP_STATUS status = passphrase_cache.api(::blacklist_add, session(), _fpr.c_str());
     assert(status == PEP_STATUS_OK);
     if (status != PEP_STATUS_OK)
         return FAIL(L"blacklist_add failed in pEp engine", status);
@@ -1088,7 +1088,7 @@ STDMETHODIMP CpEpEngine::BlacklistDelete(BSTR fpr)
         return E_INVALIDARG;
 
     string _fpr = utf8_string(fpr);
-    PEP_STATUS status = ::blacklist_delete(session(), _fpr.c_str());
+    PEP_STATUS status = passphrase_cache.api(::blacklist_delete, session(), _fpr.c_str());
     assert(status == PEP_STATUS_OK);
     if (status != PEP_STATUS_OK)
         return FAIL(L"blacklist_delete failed in pEp engine", status);
@@ -1106,7 +1106,7 @@ STDMETHODIMP CpEpEngine::BlacklistIsListed(BSTR fpr, VARIANT_BOOL *listed)
 
     string _fpr = utf8_string(fpr);
     bool result;
-    PEP_STATUS status = ::blacklist_is_listed(session(), _fpr.c_str(), &result);
+    PEP_STATUS status = passphrase_cache.api(::blacklist_is_listed, session(), _fpr.c_str(), &result);
     assert(status == PEP_STATUS_OK);
     if (status != PEP_STATUS_OK)
         return FAIL(L"blacklist_is_listed failed in pEp engine", status);
@@ -1123,7 +1123,7 @@ STDMETHODIMP CpEpEngine::BlacklistRetrieve(SAFEARRAY **blacklist)
         return E_INVALIDARG;
 
     ::stringlist_t *_blacklist = NULL;
-    PEP_STATUS status = ::blacklist_retrieve(session(), &_blacklist);
+    PEP_STATUS status = passphrase_cache.api(::blacklist_retrieve, session(), &_blacklist);
     assert(status == PEP_STATUS_OK);
     if (status != PEP_STATUS_OK)
         return FAIL(L"blacklist_retrieve failed in pEp engine", status);
@@ -1437,7 +1437,7 @@ STDMETHODIMP CpEpEngine::ReEvaluateMessageRating(TextMessage * msg, SAFEARRAY * 
     ::stringlist_t *_keylist = new_stringlist(x_KeyList);
     ::PEP_rating _rating = PEP_rating_undefined;
 
-    PEP_STATUS status = ::re_evaluate_message_rating(session(), _msg, _keylist, (PEP_rating)x_EncStatus, &_rating);
+    PEP_STATUS status = passphrase_cache.api(::re_evaluate_message_rating, session(), _msg, _keylist, (PEP_rating)x_EncStatus, &_rating);
 
     ::free_stringlist(_keylist);
     ::free_message(_msg);
@@ -1467,7 +1467,7 @@ STDMETHODIMP CpEpEngine::OutgoingMessageRating(TextMessage *msg, pEpRating * pVa
     }
 
     PEP_rating _rating;
-    PEP_STATUS status = ::outgoing_message_rating(session(), _msg, &_rating);
+    PEP_STATUS status = passphrase_cache.api(::outgoing_message_rating, session(), _msg, &_rating);
     if (status != PEP_STATUS_OK)
         return FAIL(L"cannot get message rating", status);
 
@@ -1524,7 +1524,7 @@ STDMETHODIMP CpEpEngine::IdentityRating(struct pEpIdentity *ident, pEpRating * p
     }
 
     PEP_rating _rating;
-    PEP_STATUS status = ::identity_rating(session(), _ident, &_rating);
+    PEP_STATUS status = passphrase_cache.api(::identity_rating, session(), _ident, &_rating);
     free_identity(_ident);
 
     if (status != PEP_STATUS_OK)
@@ -1558,7 +1558,7 @@ STDMETHODIMP CpEpEngine::OwnIdentitiesRetrieve(LPSAFEARRAY* ownIdentities)
     *ownIdentities = nullptr;
 
     ::identity_list *il = nullptr;
-    PEP_STATUS status = ::own_identities_retrieve(session(), &il);
+    PEP_STATUS status = passphrase_cache.api(::own_identities_retrieve, session(), &il);
     if (status == PEP_OUT_OF_MEMORY) {
         return E_OUTOFMEMORY;
     }
@@ -1618,7 +1618,7 @@ STDMETHODIMP CpEpEngine::TrustPersonalKey(struct pEpIdentity *ident, struct pEpI
         verbose(ss.str());
     }
 
-    PEP_STATUS status = ::trust_personal_key(session(), _ident);
+    PEP_STATUS status = passphrase_cache.api(::trust_personal_key, session(), _ident);
 
     if (verbose_mode) {
         stringstream ss;
@@ -1733,7 +1733,7 @@ STDMETHODIMP CpEpEngine::OpenPGPListKeyinfo(BSTR search_pattern, LPSAFEARRAY* ke
         _pattern = utf8_string(search_pattern);
     ::stringpair_list_t* _keyinfo_list = NULL;
 
-    PEP_STATUS status = ::OpenPGP_list_keyinfo(session(), _pattern.c_str(), &_keyinfo_list);
+    PEP_STATUS status = passphrase_cache.api(::OpenPGP_list_keyinfo, session(), _pattern.c_str(), &_keyinfo_list);
     assert(status != PEP_OUT_OF_MEMORY);
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
@@ -1779,7 +1779,7 @@ STDMETHODIMP CpEpEngine::SetOwnKey(pEpIdentity * ident, BSTR fpr, struct pEpIden
         return E_OUTOFMEMORY;
 
     string _fpr = utf8_string(fpr);
-    PEP_STATUS status = ::set_own_key(session(), _ident, _fpr.c_str());
+    PEP_STATUS status = passphrase_cache.api(::set_own_key, session(), _ident, _fpr.c_str());
 
     if (status == PEP_STATUS_OK) {
         copy_identity(result, _ident);
@@ -1819,7 +1819,7 @@ STDMETHODIMP CpEpEngine::TrustOwnKey(pEpIdentity * ident)
     if (_ident == NULL)
         return E_OUTOFMEMORY;
 
-    PEP_STATUS status = ::trust_own_key(session(), _ident);
+    PEP_STATUS status = passphrase_cache.api(::trust_own_key, session(), _ident);
 
     ::free_identity(_ident);
 
@@ -1863,7 +1863,7 @@ STDMETHODIMP CpEpEngine::GetKeyRating(BSTR fpr, pEpComType *commType)
     string _fpr = utf8_string(fpr);
 
     PEP_comm_type _commType;
-    PEP_STATUS status = ::get_key_rating(session(), _fpr.c_str(), &_commType);
+    PEP_STATUS status = passphrase_cache.api(::get_key_rating, session(), _fpr.c_str(), &_commType);
     if (status != PEP_STATUS_OK)
         return FAIL(L"cannot get key rating", status);
 
@@ -1884,7 +1884,7 @@ STDMETHODIMP CpEpEngine::GetKeyRatingForUser(BSTR userId, BSTR fpr, pEpRating *r
     string _fpr = utf8_string(fpr);
 
     PEP_rating _rating;
-    PEP_STATUS status = ::get_key_rating_for_user(session(), user_id.c_str(), _fpr.c_str(), &_rating);
+    PEP_STATUS status = passphrase_cache.api(::get_key_rating_for_user, session(), user_id.c_str(), _fpr.c_str(), &_rating);
     if (status != PEP_STATUS_OK)
         return FAIL(L"cannot get key rating for user", status);
 
@@ -2010,7 +2010,7 @@ STDMETHODIMP CpEpEngine::EnableIdentityForSync(struct pEpIdentity * ident)
     if (_ident == NULL)
         return E_OUTOFMEMORY;
 
-    PEP_STATUS status = ::enable_identity_for_sync(session(), _ident);
+    PEP_STATUS status = passphrase_cache.api(::enable_identity_for_sync, session(), _ident);
 
     ::free_identity(_ident);
 
