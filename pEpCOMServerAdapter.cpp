@@ -85,7 +85,7 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
     _AtlModule.start_gatekeeper();
 
     PEP_SESSION first_session;
-    PEP_STATUS status = ::init(&first_session, NULL, NULL);
+    PEP_STATUS status = ::init(&first_session, NULL, NULL, pEp::Adapter::_ensure_passphrase);
 
     if (!boost::algorithm::iequals(lpCmdLine, "/regserver")) {
         ljs = &LocalJSONAdapter::createInstance();
