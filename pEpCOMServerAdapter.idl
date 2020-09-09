@@ -415,7 +415,7 @@ interface IpEpEngine : IUnknown {
     );
 
     [id(35)] HRESULT ReEvaluateMessageRating(
-        [in] struct TextMessage *src,
+        [in, out] struct TextMessage *src,
         [in] SAFEARRAY(BSTR) x_KeyList, // referring to X-KeyList mail header
         [in] pEpRating x_EncStatus, // referring to X-EncStatus mail header
         [out, retval] pEpRating *rating
