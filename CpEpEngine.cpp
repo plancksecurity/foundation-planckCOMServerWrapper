@@ -1439,6 +1439,9 @@ STDMETHODIMP CpEpEngine::ReEvaluateMessageRating(TextMessage * msg, SAFEARRAY * 
 
     PEP_STATUS status = passphrase_cache.api(::re_evaluate_message_rating, session(), _msg, _keylist, (PEP_rating)x_EncStatus, &_rating);
 
+    if (_msg)
+        text_message_from_C(msg, _msg);
+
     ::free_stringlist(_keylist);
     ::free_message(_msg);
 
