@@ -58,7 +58,7 @@
 "$(TargetPath)" /Regserver
 
 echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
-"$(SDK40ToolsPath)x64\TlbImp.exe" "$(TargetPath)" /out:"$(TargetDir)pEpCOMServerAdapter.Interop.dll" /namespace:pEpCOMServerAdapterLib /primary /keyfile:"$(SolutionDir)pEpForOutlook\pEp_test.snk" /machine:Agnostic
+"$(SDK40ToolsPath)x64\TlbImp.exe" "$(TargetPath)" /out:"$(TargetDir)pEpCOMServerAdapter.Interop.dll" /namespace:pEpCOMServerAdapterLib /primary /keyfile:"$(ProjectDir)pEp_test.snk" /machine:Agnostic
 
 echo "copying required .dll file(s) to output directory"
 xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
@@ -188,10 +188,10 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\pEpForOutlook\pep_test.snk" />
     <None Include="packages.config" />
     <None Include="pEpCOMServerAdapter.rgs" />
     <None Include="pEpEngine.rgs" />
+    <None Include="pep_test.snk" />
     <None Include="updatekey.bin" />
   </ItemGroup>
   <ItemGroup>
