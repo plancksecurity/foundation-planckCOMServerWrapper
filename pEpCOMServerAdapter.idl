@@ -373,6 +373,7 @@ interface IpEpEngine : IUnknown {
         SAFEARRAY(BSTR) Keywords;
         BSTR Comments;
         SAFEARRAY(struct StringPair) OptFields;
+        pEpEncFormat EncFormat;
         [readonly] BSTR SenderFpr;
     };
 

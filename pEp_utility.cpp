@@ -356,6 +356,7 @@ namespace pEp {
             msg2->Keywords = string_array(msg->keywords);
             msg2->Comments = bstr(msg->comments);
             msg2->OptFields = array_from_C<StringPair, stringpair_list_t>(msg->opt_fields);
+            msg2->EncFormat = (pEpEncFormat)msg->enc_format;
             msg2->SenderFpr = bstr(msg->_sender_fpr);
         }
 
@@ -572,6 +573,7 @@ namespace pEp {
             msg2->keywords = new_stringlist(msg->Keywords);
             msg2->comments = str(msg->Comments);
             msg2->opt_fields = stringpair_list(msg->OptFields);
+            msg2->enc_format = (PEP_enc_format)msg->EncFormat;
 
             return msg2;
         }
