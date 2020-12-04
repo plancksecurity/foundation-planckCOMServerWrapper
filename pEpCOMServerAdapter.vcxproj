@@ -54,10 +54,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'">
     <PostBuildEvent>
-      <Command>echo "registering server $(TargetPath)"
-"$(TargetPath)" /Regserver
-
-echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
+      <Command>echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
 "$(SDK40ToolsPath)x64\TlbImp.exe" "$(TargetPath)" /out:"$(TargetDir)pEpCOMServerAdapter.Interop.dll" /namespace:pEpCOMServerAdapterLib /primary /keyfile:"$(ProjectDir)pEp_test.snk" /machine:Agnostic
 
 echo "copying required .dll file(s) to output directory"
