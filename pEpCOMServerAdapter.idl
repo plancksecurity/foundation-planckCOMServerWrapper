@@ -544,6 +544,9 @@ interface IpEpEngine : IUnknown {
 
     // Shows a notification in the notification tray
     [id(66)] HRESULT ShowNotification([in] BSTR title, [in] BSTR message);
+
+    // Exports a private key
+    [id(67)] HRESULT ExportSecretKey([in] BSTR fpr, [out, retval] BSTR* keyData);
 };
 
 [

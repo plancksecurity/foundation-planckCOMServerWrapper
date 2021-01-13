@@ -137,6 +137,33 @@ STDMETHODIMP CpEpEngine::ExportKey(BSTR fpr, BSTR * keyData)
     return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::ExportSecretKey(BSTR fpr, BSTR* keyData)
+{
+    assert(fpr);
+    assert(keyData);
+
+    if (!(fpr && keyData))
+        return E_INVALIDARG;
+
+    string _fpr = utf8_string(fpr);
+    char* _key_data = NULL;
+    size_t _size = 0;
+
+    PEP_STATUS status = passphrase_cache.api(::export_secret_key, session(), _fpr.c_str(), &_key_data, &_size);
+    assert(status != ::PEP_OUT_OF_MEMORY);
+    if (status == ::PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+
+    if (status != PEP_STATUS_OK)
+        return FAIL(L"export_secret_key", status);
+
+    _bstr_t b_key_data(utf16_string(_key_data).c_str());
+    pEp_free(_key_data);
+    *keyData = b_key_data.Detach();
+
+    return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::LeaveDeviceGroup()
 {
     PEP_STATUS status = passphrase_cache.api(::leave_device_group, session());

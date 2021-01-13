@@ -176,6 +176,7 @@ public:
     // basic API
 
     STDMETHOD(ExportKey)(BSTR fpr, BSTR * keyData);
+    STDMETHOD(ExportSecretKey)(BSTR fpr, BSTR * keyData);
     STDMETHOD(Log)(BSTR title, BSTR entity, BSTR description, BSTR comment);
     STDMETHOD(Trustwords)(BSTR fpr, BSTR lang, LONG max_words, BSTR * words);
     STDMETHOD(GetTrustwords)(struct pEpIdentity *id1, struct pEpIdentity *id2, BSTR lang, VARIANT_BOOL full, BSTR *words);
