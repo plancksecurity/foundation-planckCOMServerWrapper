@@ -92,14 +92,14 @@ public:
         std::lock_guard<std::mutex> lock(init_mutex);
         try {
             pEp::callback_dispatcher.add(CpEpEngine::messageToSend, CpEpEngine::notifyHandshake, CpEpEngine::on_sync_startup, CpEpEngine::on_sync_shutdown);
+
+            ::register_examine_function(session(), CpEpEngine::examine_identity, (void *)this);
+            ::log_event(session(), "FinalConstruct", "pEp COM Adapter", NULL, NULL);
         }
         catch (pEp::RuntimeError& e) {
             HRESULT res = MAKE_HRESULT(1, FACILITY_ITF, (0xFFFF & e.status));
             return res;
-        }       
-
-        ::register_examine_function(session(), CpEpEngine::examine_identity, (void *)this);
-        ::log_event(session(), "FinalConstruct", "pEp COM Adapter", NULL, NULL);
+        }
 
         return S_OK;
     }
