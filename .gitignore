@@ -1,0 +1,8 @@
+Debug/
+Release/
+pEpCOMServerAdapter_i.c
+pEpCOMServerAdapter_i.h
+pEpCOMServerAdapter_p.c
+*.orig
+*.user
+stderr.log
