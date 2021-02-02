@@ -3,6 +3,7 @@ Release/
 pEpCOMServerAdapter_i.c
 pEpCOMServerAdapter_i.h
 pEpCOMServerAdapter_p.c
+pEpCOMServerAdapter.aps
 *.orig
 *.user
 stderr.log
