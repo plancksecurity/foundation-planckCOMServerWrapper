@@ -10,6 +10,9 @@
 #include "LocalJSONAdapter.h"
 #include "CMainWindow.h"
 
+#include <iostream>
+
+
 using namespace ATL;
 using namespace std;
 
