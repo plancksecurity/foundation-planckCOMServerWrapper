@@ -506,8 +506,6 @@ namespace pEp {
         }
 
         UCHAR iv[12];
-        UCHAR nonce[sizeof(iv)];
-        UCHAR tag[16];
         HANDLE hFile = NULL;
         char* unencrypted_buffer = NULL;
         bool result = false;
@@ -573,7 +571,7 @@ namespace pEp {
         already_updating = true;
 
         if (user_requested)
-            mainWindow.ShowNotificationInfo(r(IDS_DOWNLOADTITLE), r(IDS_CHECKUPDATE));
+            mainWindow.ShowNotificationInfo(r(IDS_UPDATESTITLE), r(IDS_CHECKUPDATE));
 
         NTSTATUS status = BCryptOpenAlgorithmProvider(&hAES, BCRYPT_AES_ALGORITHM, MS_PRIMITIVE_PROVIDER, 0);
         assert(status == 0);
@@ -591,7 +589,7 @@ namespace pEp {
         internet = InternetOpen(_T("pEp"), INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
         if (!internet)
         {
-            mainWindow.ShowNotificationInfo(r(IDS_DOWNLOADTITLE), r(IDS_ERRORCONNECTING));
+            mainWindow.ShowNotificationInfo(r(IDS_UPDATESTITLE), r(IDS_ERRORCONNECTING));
             goto closing;
         }
 
@@ -611,14 +609,14 @@ namespace pEp {
                         else
                         {
                             if (user_requested)
-                                mainWindow.ShowNotificationInfo(r(IDS_DOWNLOADTITLE), r(IDS_NOUPDATEAVAILABLE));
+                                mainWindow.ShowNotificationInfo(r(IDS_UPDATESTITLE), r(IDS_NOUPDATEAVAILABLE));
                         }
                         ++context;
                     }
                 }
                 catch (exception&) 
                 {
-                    mainWindow.ShowNotificationInfo(r(IDS_DOWNLOADTITLE), r(IDS_ERRORDOWNLOADING));
+                    mainWindow.ShowNotificationInfo(r(IDS_UPDATESTITLE), r(IDS_ERRORDOWNLOADING));
                 }
             }
         }
