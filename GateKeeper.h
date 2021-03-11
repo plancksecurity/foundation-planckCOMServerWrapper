@@ -38,14 +38,11 @@ namespace pEp {
         void keep();
 		product_list registered_products();
 		bool update_product(product p, DWORD context = 0);
-        bool check_product(product p, DWORD context = 0);
 
         bool update_enabled();
         void enable_update();
         void disable_update();
         void update_now();
-        void check_update(bool user_requested = false);
-
 
         void show_notification(tstring title, tstring text);
 
@@ -81,7 +78,6 @@ namespace pEp {
         HINTERNET internet;
         BCRYPT_ALG_HANDLE hAES;
         BCRYPT_ALG_HANDLE hRSA;
-        std::atomic_bool already_updating;
 
         CpEpCOMServerAdapterModule * _self;
     };

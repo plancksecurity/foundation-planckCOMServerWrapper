@@ -3,8 +3,7 @@
 #include "GateKeeper.h"
 
 static const GUID nidGUID =
-{ 0xa4dbdbe1, 0x4051, 0x4d89, { 0xb1, 0x17, 0x62, 0x82, 0x18, 0x5a, 0x61, 0x5c } }; 
-
+{ 0xa4dbdbe1, 0x4051, 0x4d89, { 0xb1, 0x17, 0x62, 0x82, 0x18, 0x5a, 0x61, 0x5c } };
 
 CMainWindow::CMainWindow() :
     _schedule_updates(true), CWindowImpl<CMainWindow>()
@@ -37,6 +36,7 @@ LRESULT CMainWindow::OnCreate(UINT, WPARAM, LPARAM, BOOL&)
     nid.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_LOGO));
     nid.uCallbackMessage = WM_PEP_NOTIFICATION;
     Shell_NotifyIcon(NIM_ADD, &nid);
+
     nid = {};
     nid.cbSize = sizeof(nid);
     nid.uVersion = NOTIFYICON_VERSION_4;
@@ -112,15 +112,12 @@ LRESULT CMainWindow::OnMenuCommand(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL
 
     switch (index) {
     case UPDATE_NOW:
-    {
-        const bool user_requested = true;
-        pEp::GateKeeper::gatekeeper()->check_update(user_requested);
+        ShowNotificationInfo(r(IDS_UPDATESTITLE), r(IDS_UPDATESTEXT));
+        pEp::GateKeeper::gatekeeper()->update_now();
         bHandled = true;
-    }
-    break;
+        break;
 
     case SCHEDULE_UPDATES:
-    {
         enabled = !pEp::GateKeeper::gatekeeper()->update_enabled();
         if (enabled)
             pEp::GateKeeper::gatekeeper()->enable_update();
@@ -128,8 +125,7 @@ LRESULT CMainWindow::OnMenuCommand(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL
             pEp::GateKeeper::gatekeeper()->disable_update();
         CheckMenuItem(hMenu, ID_POPUP_SCHEDULEUPDATES, enabled ? MF_CHECKED : MF_UNCHECKED);
         bHandled = true;
-    }
-    break;
+        break;
 
     default:
         bHandled = false;

@@ -118,7 +118,7 @@ namespace pEp {
 
     const time_t GateKeeper::cycle = 7200;   // 7200 sec is 2 h
     const time_t GateKeeper::fraction = 10;  // first update is at 10% of cycle
-    const DWORD GateKeeper::waiting = 10000; //  10 sec 
+    const DWORD GateKeeper::waiting = 10000; //  10 sec
 
     GateKeeper::GateKeeper(CpEpCOMServerAdapterModule * self)
         : _self(self), now(time(NULL)), next(now /*+ time_diff()*/), hkUpdater(NULL),
@@ -143,7 +143,6 @@ namespace pEp {
         }
 
         the_gatekeeper = this;
-        already_updating = false;
     }
 
     GateKeeper::~GateKeeper()
@@ -187,7 +186,7 @@ namespace pEp {
             if (now > next) {
                 next = now + GateKeeper::cycle;
                 if (update_enabled())
-                    check_update();
+                    update_now();
             }
 
             Sleep(waiting);
@@ -481,161 +480,6 @@ namespace pEp {
         return result;
     }
 
-
-    bool GateKeeper::check_product(product p, DWORD context)
-    {
-        bool retval = false;
-        DWORD error = 0;
-        BCRYPT_KEY_HANDLE dk = delivery_key();
-#ifdef UNICODE
-        tstring delivery = utility::utf16_string(wrapped_delivery_key(dk));
-#else
-        tstring delivery = wrapped_delivery_key(delivery_key());
-#endif
-        tstring url = p.second;
-        url += _T("&challenge=");
-        url += delivery;
-        tstring headers;
-        HINTERNET hUrl = InternetOpenUrl(internet, url.c_str(), headers.c_str(), headers.length(),
-            INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_UI | INTERNET_FLAG_SECURE, context);
-        
-        if (hUrl == NULL)
-        {
-            error = GetLastError();
-            goto closing;
-        }
-
-        UCHAR iv[12];
-        UCHAR nonce[sizeof(iv)];
-        UCHAR tag[16];
-        HANDLE hFile = NULL;
-        char* unencrypted_buffer = NULL;
-        bool result = false;
-
-        DWORD reading;
-        if (InternetReadFile(hUrl, iv, sizeof(iv), &reading))
-        {
-            if (reading)
-            {
-                string crypted;
-                do {
-                    static char buffer[1024 * 1024];
-                    BOOL bResult = InternetReadFile(hUrl, buffer, 1024 * 1024, &reading);
-                    if (!bResult || !reading)
-                        break;
-                    crypted += string(buffer, reading);
-                } while (1);
-
-                tstring contentDisposition;
-                try
-                {
-                    contentDisposition = httpQueryCustom(hUrl, _T("Content-Disposition"));
-                    retval = true;
-                    goto closing;
-                }
-                catch (runtime_error&)
-                {
-                    mainWindow.ShowNotificationInfo(r(IDS_DOWNLOADTITLE), r(IDS_NOUPDATEAVAILABLE));
-                    retval = false;
-                    goto closing;
-                }
-            }
-        }
-        else
-        {
-            error = GetLastError();
-        }
-
-
-    closing:
-        if (error)
-        {
-            if (internet)
-                InternetCloseHandle(internet);
-            if (hAES)
-                BCryptCloseAlgorithmProvider(hAES, 0);
-            if (hRSA)
-                BCryptCloseAlgorithmProvider(hRSA, 0);
-            internet = NULL;
-            hAES = NULL;
-            hRSA = NULL;
-            throw std::exception("", error);
-        }
-        return retval;
-    }
-
-
-    void GateKeeper::check_update(bool user_requested)
-    {
-        if (already_updating)
-            return;
-
-        already_updating = true;
-
-        if (user_requested)
-            mainWindow.ShowNotificationInfo(r(IDS_DOWNLOADTITLE), r(IDS_CHECKUPDATE));
-
-        NTSTATUS status = BCryptOpenAlgorithmProvider(&hAES, BCRYPT_AES_ALGORITHM, MS_PRIMITIVE_PROVIDER, 0);
-        assert(status == 0);
-        if (status)
-            goto closing;
-        status = BCryptSetProperty(hAES, BCRYPT_CHAINING_MODE, (PUCHAR)BCRYPT_CHAIN_MODE_GCM, sizeof(BCRYPT_CHAIN_MODE_GCM), 0);
-        if (status)
-            goto closing;
-
-        status = BCryptOpenAlgorithmProvider(&hRSA, BCRYPT_RSA_ALGORITHM, MS_PRIMITIVE_PROVIDER, 0);
-        assert(status == 0);
-        if (status)
-            goto closing;
-
-        internet = InternetOpen(_T("pEp"), INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
-        if (!internet)
-        {
-            mainWindow.ShowNotificationInfo(r(IDS_DOWNLOADTITLE), r(IDS_ERRORCONNECTING));
-            goto closing;
-        }
-
-
-        {
-            product_list products = registered_products();
-            DWORD context = 0;
-
-            for (auto i = products.begin(); i != products.end(); i++) {
-                try {
-                    if (!i->first.empty())
-                    {
-                        if (check_product(*i, context))
-                        {
-                            update_product(*i, context);
-                        }
-                        else
-                        {
-                            if (user_requested)
-                                mainWindow.ShowNotificationInfo(r(IDS_DOWNLOADTITLE), r(IDS_NOUPDATEAVAILABLE));
-                        }
-                        ++context;
-                    }
-                }
-                catch (exception&) 
-                {
-                    mainWindow.ShowNotificationInfo(r(IDS_DOWNLOADTITLE), r(IDS_ERRORDOWNLOADING));
-                }
-            }
-        }
-
-    closing:
-        if (internet)
-            InternetCloseHandle(internet);
-        if (hAES)
-            BCryptCloseAlgorithmProvider(hAES, 0);
-        if (hRSA)
-            BCryptCloseAlgorithmProvider(hRSA, 0);
-        internet = NULL;
-        hAES = NULL;
-        hRSA = NULL;
-        already_updating = false;
-    }
-
     bool GateKeeper::update_product(product p, DWORD context)
     {
         {
@@ -690,16 +534,7 @@ namespace pEp {
                 crypted += string(buffer, reading);
             } while (1);
 
-            tstring contentDisposition;
-            try
-            {
-                contentDisposition = httpQueryCustom(hUrl, _T("Content-Disposition"));
-            }
-            catch (runtime_error&)
-            {
-                mainWindow.ShowNotificationInfo(r(IDS_DOWNLOADTITLE), r(IDS_NOUPDATEAVAILABLE));
-                goto closing;
-            }
+            tstring contentDisposition = httpQueryCustom(hUrl, _T("Content-Disposition"));
 
             tregex filenameRegex(_T("filename=.([^\"]*)"), regex::extended); //FIXME: case insensitive
             tsmatch match;
