@@ -82,6 +82,10 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
     }
 
     Logger::start("JsonAdapter", logfile);
+#else
+    // Start the logger even for non-debug builds, see JSON-187.
+    Logger::setDefaultTarget(Logger::Target::None);
+    Logger::start("JsonAdapter", "");
 #endif
 
     _AtlModule.hModule(hInstance);
