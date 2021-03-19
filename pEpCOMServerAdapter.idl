@@ -547,6 +547,9 @@ interface IpEpEngine : IUnknown {
 
     // Exports a private key
     [id(67)] HRESULT ExportSecretKey([in] BSTR fpr, [out, retval] BSTR* keyData);
+
+    // Disables sync for all identities
+    [id(68)] HRESULT DisableAllSyncChannels();
 };
 
 [

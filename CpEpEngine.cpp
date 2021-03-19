@@ -2148,3 +2148,15 @@ STDMETHODIMP CpEpEngine::ShowNotification(BSTR title, BSTR message)
     pEp::GateKeeper::gatekeeper()->show_notification(title, message);
     return S_OK;
 }
+
+STDMETHODIMP CpEpEngine::DisableAllSyncChannels() 
+{
+    PEP_STATUS status = passphrase_cache.api(::disable_all_sync_channels, session());
+
+    if (status == PEP_STATUS_OK)
+        return S_OK;
+    else if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+    else
+        return FAIL(L"DisableAllSyncChannels", status);
+}
