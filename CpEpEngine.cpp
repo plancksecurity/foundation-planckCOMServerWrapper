@@ -2160,3 +2160,155 @@ STDMETHODIMP CpEpEngine::DisableAllSyncChannels()
     else
         return FAIL(L"DisableAllSyncChannels", status);
 }
+
+
+
+STDMETHODIMP CpEpEngine::GroupCreate(pEpIdentity* group_identity, pEpIdentity* manager, SAFEARRAY* memberlist, pEpGroup* group)
+{
+    assert(group_identity);
+    assert(group);
+    assert(manager);
+
+    if (!group_identity || !group || !manager)
+        return E_INVALIDARG;
+
+    try
+    {
+        IdentityPtr _group_identity(new_identity(group_identity), free_identity);
+        if (!_group_identity)
+            return E_OUTOFMEMORY;
+        IdentityPtr _manager_identity(new_identity(manager), free_identity);
+        if (!_manager_identity)
+            return E_OUTOFMEMORY;
+        IdentityListPtr _member_ident_list(identities(memberlist), free_identity_list);
+        if (!_member_ident_list)
+            return E_OUTOFMEMORY;
+        pEp_group* _group;
+    
+        const PEP_STATUS status = ::group_create(session(), _group_identity.get(), _manager_identity.get(), _member_ident_list.get(), &_group);
+
+        switch (status) {
+        case PEP_STATUS_OK:
+            break;
+        case PEP_OUT_OF_MEMORY:
+            return E_OUTOFMEMORY;
+        default:
+            return FAIL(L"group_create is reporting an error", status);
+        }
+
+        *group = pEpGroup_from_C(_group);
+        free_group(_group);
+
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (const exception& ex) {
+        return FAIL(ex.what());
+    }
+
+    return ERROR_SUCCESS;
+}
+template<typename FUNCTION>
+STDMETHODIMP CpEpEngine::group_operation(pEpIdentity* param1, pEpIdentity* param2, FUNCTION f, const wchar_t* f_name )
+{
+    assert(param1);
+    assert(param2);
+
+    if (!param1 || !param2)
+        return E_INVALIDARG;
+
+    try
+    {
+        IdentityPtr _group_identity(new_identity(param1), free_identity);
+        if (!_group_identity)
+            return E_OUTOFMEMORY;
+        IdentityPtr _as_member(new_identity(param2), free_identity);
+        if (!_as_member)
+            return E_OUTOFMEMORY;
+
+        const PEP_STATUS status = f(session(), _group_identity.get(), _as_member.get());
+
+        switch (status) {
+        case PEP_STATUS_OK:
+            break;
+        case PEP_OUT_OF_MEMORY:
+            return E_OUTOFMEMORY;
+        default:
+            {
+                std::wstringstream ss;
+                ss << f_name << " is reporting an error";
+                return FAIL(ss.str().c_str(), status);
+            }
+        }
+
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (const exception& ex) {
+        return FAIL(ex.what());
+    }
+
+    return ERROR_SUCCESS;
+}
+
+
+
+STDMETHODIMP CpEpEngine::GroupJoin(pEpIdentity* group_identity, pEpIdentity* as_member) 
+{
+    return group_operation(group_identity, as_member, group_join, L"group_join");
+}
+STDMETHODIMP CpEpEngine::GroupDissolve(pEpIdentity* group_identity, pEpIdentity* manager)
+{
+    return group_operation(group_identity, manager, group_dissolve, L"group_dissolve");
+}
+STDMETHODIMP CpEpEngine::GroupInviteMember(pEpIdentity* group_identity, pEpIdentity* group_member)
+{
+    return group_operation(group_identity, group_member, group_invite_member, L"group_invite_member");
+}
+STDMETHODIMP CpEpEngine::GroupRemoveMember(pEpIdentity* group_identity, pEpIdentity* group_member)
+{
+    return group_operation(group_identity, group_member, group_remove_member, L"group_remove_member");
+}
+STDMETHODIMP CpEpEngine::GroupRating(pEpIdentity* group_identity, pEpIdentity* manager, pEpRating* rating)
+{
+    assert(group_identity);
+    assert(manager);
+
+    if (!group_identity || !manager)
+        return E_INVALIDARG;
+
+    try
+    {
+        IdentityPtr _group_identity(new_identity(group_identity), free_identity);
+        if (!_group_identity)
+            return E_OUTOFMEMORY;
+        IdentityPtr _as_member(new_identity(manager), free_identity);
+        if (!_as_member)
+            return E_OUTOFMEMORY;
+        PEP_rating _rating;
+
+        const PEP_STATUS status = group_rating(session(), _group_identity.get(), _as_member.get(), &_rating);
+        *rating = (pEpRating)_rating;
+
+        switch (status) {
+        case PEP_STATUS_OK:
+            break;
+        case PEP_OUT_OF_MEMORY:
+            return E_OUTOFMEMORY;
+        default:
+            return FAIL(L"group_create is reporting an error", status);
+        }
+
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (const exception& ex) {
+        return FAIL(ex.what());
+    }
+
+    return ERROR_SUCCESS;
+}
+

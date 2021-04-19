@@ -16,6 +16,12 @@ using namespace pEp::Adapter;
 
 pEp::PassphraseCache& passphrase_cache = pEp::passphrase_cache;
 
+typedef std::unique_ptr<pEp_identity, std::function<void(pEp_identity*)>> IdentityPtr;
+typedef std::unique_ptr<identity_list, std::function<void(identity_list*)>> IdentityListPtr;
+typedef std::unique_ptr<pEp_group, std::function<void(pEp_group*)>> pEpGroupPtr;
+typedef std::unique_ptr<pEpRating, std::function<void(pEpRating*)>> pEpRatingPtr;
+typedef std::unique_ptr<member_list, std::function<void(member_list*)>> MemberListPtr;
+
 // CpEpEngine
 
 class ATL_NO_VTABLE CpEpEngine :
@@ -163,6 +169,10 @@ private:
 
     std::string passphrase_for_new_keys;
 
+    template<typename FUNCTION>
+    STDMETHODIMP group_operation(pEpIdentity* param1, pEpIdentity* param2, FUNCTION f, const wchar_t* f_name);
+
+
 public:
     // runtime config of the adapter
 
@@ -294,6 +304,17 @@ public:
     STDMETHOD(PerUserDirectory)(BSTR * directory);
 
     STDMETHOD(ShowNotification)(BSTR title, BSTR message);
+
+
+    // Group management methods
+    STDMETHOD(GroupCreate)( pEpIdentity* group_identity, pEpIdentity* manager, SAFEARRAY* memberlist, pEpGroup* group );
+    STDMETHOD(GroupJoin)( pEpIdentity* group_identity, pEpIdentity* as_member );
+    STDMETHOD(GroupDissolve)(pEpIdentity* group_identity, pEpIdentity* manager );
+    STDMETHOD(GroupInviteMember)( pEpIdentity* group_identity, pEpIdentity* group_member);
+    STDMETHOD(GroupRemoveMember)( pEpIdentity* group_identity, pEpIdentity* group_member );
+    STDMETHOD(GroupRating)( pEpIdentity* group_identity, pEpIdentity* manager, pEpRating* rating );
+
+    
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)

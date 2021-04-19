@@ -41,9 +41,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)pEpJSONServerAdapter\server;$(ProjectDir)..\;$(ProjectDir)..\pEpEngine\src;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)pEpJSONServerAdapter\server;$(ProjectDir)..\;$(ProjectDir)..\pEpEngine\src;$(ProjectDir)..\pEpEngine\asn.1;$(IncludePath)</IncludePath>
     <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
+    <LibraryPath>$(SolutionDir)$(ConfigurationName)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
@@ -73,6 +74,7 @@
       <PreprocessorDefinitions>JSON_ADAPTER_LIBRARY;DEBUG_ENABLED;WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <EnablePREfast>false</EnablePREfast>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -97,8 +99,9 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <RegisterOutput>false</RegisterOutput>
-      <AdditionalDependencies>comsuppwd.lib;%(AdditionalDependencies);Wininet.lib;bcrypt.lib;Crypt32.lib</AdditionalDependencies>
+      <AdditionalDependencies>comsuppwd.lib;%(AdditionalDependencies);Wininet.lib;bcrypt.lib;Crypt32.lib;libpEpAdapter.lib</AdditionalDependencies>
       <PerUserRedirection>true</PerUserRedirection>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(ConfigurationName)\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -198,9 +201,6 @@
     <Midl Include="pEpCOMServerAdapter.idl" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\libpEpAdapter\build-windows\libpEpAdapter.vcxproj">
-      <Project>{ec44fec9-2f3a-4a0c-b60e-0f22aa43ef58}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\pEpEngine\build-windows\pEpEngine.vcxproj">
       <Project>{146e69f8-e1da-456a-b048-6dd29d9acf6b}</Project>
     </ProjectReference>
@@ -217,23 +217,23 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\boost.1.72.0.0\build\boost.targets" Condition="Exists('..\packages\boost.1.72.0.0\build\boost.targets')" />
-    <Import Project="..\packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets" Condition="Exists('..\packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets')" />
-    <Import Project="..\packages\boost_regex-vc142.1.72.0.0\build\boost_regex-vc142.targets" Condition="Exists('..\packages\boost_regex-vc142.1.72.0.0\build\boost_regex-vc142.targets')" />
-    <Import Project="..\packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets" Condition="Exists('..\packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets')" />
-    <Import Project="..\packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets" Condition="Exists('..\packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets')" />
     <Import Project="..\packages\boost_chrono-vc142.1.72.0.0\build\boost_chrono-vc142.targets" Condition="Exists('..\packages\boost_chrono-vc142.1.72.0.0\build\boost_chrono-vc142.targets')" />
+    <Import Project="..\packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets" Condition="Exists('..\packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets')" />
     <Import Project="..\packages\boost_program_options-vc142.1.72.0.0\build\boost_program_options-vc142.targets" Condition="Exists('..\packages\boost_program_options-vc142.1.72.0.0\build\boost_program_options-vc142.targets')" />
+    <Import Project="..\packages\boost_regex-vc142.1.72.0.0\build\boost_regex-vc142.targets" Condition="Exists('..\packages\boost_regex-vc142.1.72.0.0\build\boost_regex-vc142.targets')" />
+    <Import Project="..\packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets" Condition="Exists('..\packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets')" />
+    <Import Project="..\packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets" Condition="Exists('..\packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\boost.1.72.0.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.72.0.0\build\boost.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_regex-vc142.1.72.0.0\build\boost_regex-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_regex-vc142.1.72.0.0\build\boost_regex-vc142.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets'))" />
     <Error Condition="!Exists('..\packages\boost_chrono-vc142.1.72.0.0\build\boost_chrono-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_chrono-vc142.1.72.0.0\build\boost_chrono-vc142.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_filesystem-vc142.1.72.0.0\build\boost_filesystem-vc142.targets'))" />
     <Error Condition="!Exists('..\packages\boost_program_options-vc142.1.72.0.0\build\boost_program_options-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_program_options-vc142.1.72.0.0\build\boost_program_options-vc142.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_regex-vc142.1.72.0.0\build\boost_regex-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_regex-vc142.1.72.0.0\build\boost_regex-vc142.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_thread-vc142.1.72.0.0\build\boost_thread-vc142.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_date_time-vc142.1.72.0.0\build\boost_date_time-vc142.targets'))" />
   </Target>
 </Project>

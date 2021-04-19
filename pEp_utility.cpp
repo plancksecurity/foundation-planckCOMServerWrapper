@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "pEp_utility.h"
 
+
 using namespace ATL;
 
 namespace pEp {
@@ -278,7 +279,18 @@ namespace pEp {
             return fld;
         }
 
-        template<> int length<identity_list>(identity_list *tl)
+        template<typename T> int linkedlist_length(T* list) 
+        {
+            int ret = 0;
+            member_list* curr = list;
+            while (curr) {
+                curr = curr->next;
+                ++ret;
+            }
+            return ret;
+        }
+
+        template<> int length<identity_list>(identity_list *tl) // TODO ASP: make a test to test empty and 1 element list
         {
             return identity_list_length(tl);
         }
@@ -288,10 +300,16 @@ namespace pEp {
             return bloblist_length(tl);
         }
 
-        template<> int length<stringpair_list_t>(stringpair_list_t *tl)
+        template<> int length<stringpair_list_t>(stringpair_list_t* tl)
         {
             return stringpair_list_length(tl);
         }
+
+        template<> int length<member_list>(member_list* tl)
+        {
+            return linkedlist_length< member_list>(tl);
+        }
+
 
         void clear_text_message(TextMessage *msg)
         {
@@ -594,5 +612,89 @@ namespace pEp {
                 *opt_field_array = NULL;
             }
         }
+
+
+        void copy_member(pEpMember* member_s, const pEp_member* member)
+        {
+            assert(member_s);
+            if (!member_s)
+                throw invalid_argument("ident_s");
+
+            ::memset(member_s, 0, sizeof(pEpIdentity));
+            if (member) {
+                if (member->ident)
+                    copy_identity(&member_s->ident, member->ident);
+                member_s->joined = member->joined;
+            }
+        }
+
+
+        template<> pEpMember* from_C< pEpMember*, member_list>(member_list* il)
+        {
+            pEpMember* ident = new pEpMember();
+            memset(ident, 0, sizeof(pEpMember));
+
+            if (il)
+                copy_member(ident, il->member);
+            return ident;
+        }
+
+
+        pEpGroup pEpGroup_from_C(pEp_group* group)
+        {
+            pEpGroup retval;
+            retval.groupIdentity = identity_s(group->group_identity);
+            retval.manager = identity_s(group->manager);
+            retval.members = array_from_C<pEpMember, member_list>(group->members);
+            retval.active = group->active;
+            return retval;
+        }
+
+
+
+        member_list* members(SAFEARRAY* sa)
+        {
+            if (sa == NULL)
+                return NULL;
+
+            LONG lbound, ubound;
+            SafeArrayGetLBound(sa, 1, &lbound);
+            SafeArrayGetUBound(sa, 1, &ubound);
+
+            size_t size = ubound - lbound + 1;
+            if (size <= 0)
+                return NULL;
+
+            member_list* il = new_memberlist(NULL);
+
+            member_list* _il = il;
+            for (LONG i = lbound; i <= ubound; i++) {
+                pEpMember s;
+                memset(&s, 0, sizeof(pEpMember));
+                SafeArrayGetElement(sa, &i, &s);
+
+                pEp_member* member;
+                pEpIdentity ident = s.ident;
+                pEp_identity *id = new_identity(&ident); 
+                try {
+                    member = new_member(id);
+                }
+                catch (bad_alloc&) {
+                    clear_identity_s(ident); 
+                    throw bad_alloc();
+                }
+
+                clear_identity_s(ident); 
+
+                _il = memberlist_add(_il, member);
+                if (_il == NULL) {
+                    free_memberlist(il);
+                    throw bad_alloc();
+                }
+            }
+
+            return il;
+        }
+
     }
 }

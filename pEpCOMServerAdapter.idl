@@ -550,6 +550,37 @@ interface IpEpEngine : IUnknown {
 
     // Disables sync for all identities
     [id(68)] HRESULT DisableAllSyncChannels();
+
+
+    // group API
+
+
+    [uuid(42d42194-f158-4ec5-b75d-c924d4d485a0)] struct pEpMember {
+        struct pEpIdentity ident;
+        VARIANT_BOOL joined;
+    };
+    
+
+    [uuid(f20407f5-3cf7-4945-b8e1-2b5dd831c113)] struct pEpGroup {
+        struct pEpIdentity groupIdentity;
+        struct pEpIdentity manager;
+        SAFEARRAY(struct pEpMember) members;
+        VARIANT_BOOL active;
+    };
+
+    // Creates a group
+    [id(69)] HRESULT GroupCreate([in] struct pEpIdentity* group_identity, [in] struct pEpIdentity* manager, [in] SAFEARRAY(struct pEpIdentity) memberlist, [out, retval] struct pEpGroup* group);
+    // Join a user to a grou
+    [id(70)] HRESULT GroupJoin([in] struct pEpIdentity* group_identity, [in] struct pEpIdentity* as_member);
+    // Removes a group
+    [id(71)] HRESULT GroupDissolve([in] struct pEpIdentity* group_identity, [in] struct pEpIdentity* manager);
+    // Invites a user to a group
+    [id(72)] HRESULT GroupInviteMember([in] struct pEpIdentity* group_identity, [in] struct pEpIdentity* group_member);
+    // Removes a user from a group
+    [id(73)] HRESULT GroupRemoveMember([in] struct pEpIdentity* group_identity, [in] struct pEpIdentity* group_member);
+    // Gets the rating for a group
+    [id(74)] HRESULT GroupRating([in] struct pEpIdentity* group_identity, [in] struct pEpIdentity* manager, [out] struct pEpRating* rating);
+
 };
 
 [
