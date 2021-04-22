@@ -307,12 +307,12 @@ public:
 
 
     // Group management methods
-    STDMETHOD(GroupCreate)( pEpIdentity* group_identity, pEpIdentity* manager, SAFEARRAY* memberlist, pEpGroup* group );
-    STDMETHOD(GroupJoin)( pEpIdentity* group_identity, pEpIdentity* as_member );
-    STDMETHOD(GroupDissolve)(pEpIdentity* group_identity, pEpIdentity* manager );
-    STDMETHOD(GroupInviteMember)( pEpIdentity* group_identity, pEpIdentity* group_member);
-    STDMETHOD(GroupRemoveMember)( pEpIdentity* group_identity, pEpIdentity* group_member );
-    STDMETHOD(GroupRating)( pEpIdentity* group_identity, pEpIdentity* manager, pEpRating* rating );
+    STDMETHOD(GroupCreate)(pEpIdentity* groupIdentity, pEpIdentity* manager, SAFEARRAY* memberlist, pEpGroup* group);
+    STDMETHOD(GroupJoin)(pEpIdentity* groupIdentity, pEpIdentity* asMember);
+    STDMETHOD(GroupDissolve)(pEpIdentity* groupIdentity, pEpIdentity* manager);
+    STDMETHOD(GroupInviteMember)(pEpIdentity* groupIdentity, pEpIdentity* groupMember);
+    STDMETHOD(GroupRemoveMember)(pEpIdentity* groupIdentity, pEpIdentity* groupMember);
+    STDMETHOD(GroupRating)(pEpIdentity* groupIdentity, pEpIdentity* manager, pEpRating* ratings);
 
     
 };

@@ -2161,20 +2161,18 @@ STDMETHODIMP CpEpEngine::DisableAllSyncChannels()
         return FAIL(L"DisableAllSyncChannels", status);
 }
 
-
-
-STDMETHODIMP CpEpEngine::GroupCreate(pEpIdentity* group_identity, pEpIdentity* manager, SAFEARRAY* memberlist, pEpGroup* group)
+STDMETHODIMP CpEpEngine::GroupCreate(pEpIdentity* groupIdentity, pEpIdentity* manager, SAFEARRAY* memberlist, pEpGroup* group)
 {
-    assert(group_identity);
+    assert(groupIdentity);
     assert(group);
     assert(manager);
 
-    if (!group_identity || !group || !manager)
+    if (!groupIdentity || !group || !manager)
         return E_INVALIDARG;
 
     try
     {
-        IdentityPtr _group_identity(new_identity(group_identity), free_identity);
+        IdentityPtr _group_identity(new_identity(groupIdentity), free_identity);
         if (!_group_identity)
             return E_OUTOFMEMORY;
         IdentityPtr _manager_identity(new_identity(manager), free_identity);
@@ -2209,6 +2207,7 @@ STDMETHODIMP CpEpEngine::GroupCreate(pEpIdentity* group_identity, pEpIdentity* m
 
     return ERROR_SUCCESS;
 }
+
 template<typename FUNCTION>
 STDMETHODIMP CpEpEngine::group_operation(pEpIdentity* param1, pEpIdentity* param2, FUNCTION f, const wchar_t* f_name )
 {
@@ -2241,7 +2240,6 @@ STDMETHODIMP CpEpEngine::group_operation(pEpIdentity* param1, pEpIdentity* param
                 return FAIL(ss.str().c_str(), status);
             }
         }
-
     }
     catch (bad_alloc&) {
         return E_OUTOFMEMORY;
@@ -2253,35 +2251,37 @@ STDMETHODIMP CpEpEngine::group_operation(pEpIdentity* param1, pEpIdentity* param
     return ERROR_SUCCESS;
 }
 
+STDMETHODIMP CpEpEngine::GroupJoin(pEpIdentity* groupIdentity, pEpIdentity* asMember)
+{
+    return group_operation(groupIdentity, asMember, group_join, L"group_join");
+}
 
+STDMETHODIMP CpEpEngine::GroupDissolve(pEpIdentity* groupIdentity, pEpIdentity* manager)
+{
+    return group_operation(groupIdentity, manager, group_dissolve, L"group_dissolve");
+}
 
-STDMETHODIMP CpEpEngine::GroupJoin(pEpIdentity* group_identity, pEpIdentity* as_member) 
+STDMETHODIMP CpEpEngine::GroupInviteMember(pEpIdentity* groupIdentity, pEpIdentity* groupMember)
 {
-    return group_operation(group_identity, as_member, group_join, L"group_join");
+    return group_operation(groupIdentity, groupMember, group_invite_member, L"group_invite_member");
 }
-STDMETHODIMP CpEpEngine::GroupDissolve(pEpIdentity* group_identity, pEpIdentity* manager)
+
+STDMETHODIMP CpEpEngine::GroupRemoveMember(pEpIdentity* groupIdentity, pEpIdentity* groupMember)
 {
-    return group_operation(group_identity, manager, group_dissolve, L"group_dissolve");
+    return group_operation(groupIdentity, groupMember, group_remove_member, L"group_remove_member");
 }
-STDMETHODIMP CpEpEngine::GroupInviteMember(pEpIdentity* group_identity, pEpIdentity* group_member)
+
+STDMETHODIMP CpEpEngine::GroupRating(pEpIdentity* groupIdentity, pEpIdentity* manager, pEpRating* rating)
 {
-    return group_operation(group_identity, group_member, group_invite_member, L"group_invite_member");
-}
-STDMETHODIMP CpEpEngine::GroupRemoveMember(pEpIdentity* group_identity, pEpIdentity* group_member)
-{
-    return group_operation(group_identity, group_member, group_remove_member, L"group_remove_member");
-}
-STDMETHODIMP CpEpEngine::GroupRating(pEpIdentity* group_identity, pEpIdentity* manager, pEpRating* rating)
-{
-    assert(group_identity);
+    assert(groupIdentity);
     assert(manager);
 
-    if (!group_identity || !manager)
+    if (!groupIdentity || !manager)
         return E_INVALIDARG;
 
     try
     {
-        IdentityPtr _group_identity(new_identity(group_identity), free_identity);
+        IdentityPtr _group_identity(new_identity(groupIdentity), free_identity);
         if (!_group_identity)
             return E_OUTOFMEMORY;
         IdentityPtr _as_member(new_identity(manager), free_identity);
@@ -2289,7 +2289,7 @@ STDMETHODIMP CpEpEngine::GroupRating(pEpIdentity* group_identity, pEpIdentity* m
             return E_OUTOFMEMORY;
         PEP_rating _rating;
 
-        const PEP_STATUS status = group_rating(session(), _group_identity.get(), _as_member.get(), &_rating);
+        const PEP_STATUS status = ::group_rating(session(), _group_identity.get(), _as_member.get(), &_rating);
         *rating = (pEpRating)_rating;
 
         switch (status) {
@@ -2300,7 +2300,6 @@ STDMETHODIMP CpEpEngine::GroupRating(pEpIdentity* group_identity, pEpIdentity* m
         default:
             return FAIL(L"group_create is reporting an error", status);
         }
-
     }
     catch (bad_alloc&) {
         return E_OUTOFMEMORY;
@@ -2311,4 +2310,3 @@ STDMETHODIMP CpEpEngine::GroupRating(pEpIdentity* group_identity, pEpIdentity* m
 
     return ERROR_SUCCESS;
 }
-
