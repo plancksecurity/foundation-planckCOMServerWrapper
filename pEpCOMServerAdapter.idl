@@ -550,6 +550,9 @@ interface IpEpEngine : IUnknown {
 
     // Disables sync for all identities
     [id(68)] HRESULT DisableAllSyncChannels();
+
+    // Sets the identity
+    [id(69)] HRESULT SetIdentity([in] struct pEpIdentity* identity);
 };
 
 [
