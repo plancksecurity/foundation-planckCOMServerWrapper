@@ -781,7 +781,7 @@ STDMETHODIMP CpEpEngine::UpdateIdentity(struct pEpIdentity *ident, struct pEpIde
         ::free_identity(_ident);
         return S_OK;
     }
-    else if (status == PEP_GET_KEY_FAILED || status == PEP_KEY_NOT_FOUND) {
+    else if (status == PEP_GET_KEY_FAILED || status == PEP_KEY_NOT_FOUND || status == PEP_KEY_UNSUITABLE) {
         if (_ident->fpr) {
             pEp_free(_ident->fpr);
             _ident->fpr = NULL;
@@ -824,7 +824,7 @@ STDMETHODIMP CpEpEngine::KeyMistrusted(struct pEpIdentity *ident)
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
 
-    if (status == PEP_KEY_NOT_FOUND)
+    if (status == PEP_GET_KEY_FAILED || status == PEP_KEY_NOT_FOUND || status == PEP_KEY_UNSUITABLE)
         return FAIL(L"key not found");
 
     if (status != PEP_STATUS_OK)
@@ -891,7 +891,7 @@ STDMETHODIMP CpEpEngine::KeyResetIdentity(struct pEpIdentity ident, BSTR fpr)
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
 
-    if (status == PEP_KEY_NOT_FOUND)
+    if (status == PEP_GET_KEY_FAILED || status == PEP_KEY_NOT_FOUND || status == PEP_KEY_UNSUITABLE)
         return FAIL(L"key not found");
 
     if (status != PEP_STATUS_OK)
@@ -910,7 +910,7 @@ STDMETHODIMP CpEpEngine::KeyResetUser(BSTR userId, BSTR fpr)
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
 
-    if (status == PEP_KEY_NOT_FOUND)
+    if (status == PEP_GET_KEY_FAILED || status == PEP_KEY_NOT_FOUND || status == PEP_KEY_UNSUITABLE)
         return FAIL(L"key not found");
 
     if (status != PEP_STATUS_OK)
@@ -957,7 +957,7 @@ STDMETHODIMP CpEpEngine::KeyResetTrust(struct pEpIdentity *ident)
     if (status == PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
 
-    if (status == PEP_KEY_NOT_FOUND)
+    if (status == PEP_GET_KEY_FAILED || status == PEP_KEY_NOT_FOUND || status == PEP_KEY_UNSUITABLE)
         return FAIL(L"key not found");
 
     if (status != PEP_STATUS_OK)
