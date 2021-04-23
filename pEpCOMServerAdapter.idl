@@ -581,6 +581,8 @@ interface IpEpEngine : IUnknown {
     // Gets the rating for a group
     [id(74)] HRESULT GroupRating([in] struct pEpIdentity* group_identity, [in] struct pEpIdentity* manager, [out] struct pEpRating* rating);
 
+    // Sets the identity
+    [id(75)] HRESULT SetIdentity([in] struct pEpIdentity* identity);
 };
 
 [

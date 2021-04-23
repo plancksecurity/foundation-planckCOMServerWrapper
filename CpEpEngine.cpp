@@ -2310,3 +2310,32 @@ STDMETHODIMP CpEpEngine::GroupRating(pEpIdentity* groupIdentity, pEpIdentity* ma
 
     return ERROR_SUCCESS;
 }
+
+STDMETHODIMP CpEpEngine::SetIdentity(struct pEpIdentity* identity) {
+    
+    assert(identity);
+    if (!identity)
+        return E_INVALIDARG;
+
+    ::pEp_identity* _ident = nullptr;
+
+    try {
+        _ident = new_identity(identity);
+        assert(_ident);
+        if (_ident == NULL)
+            return E_OUTOFMEMORY;
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());;
+    }
+
+    PEP_STATUS status = ::set_identity(session(), _ident);
+    ::free_identity(_ident);
+    if (status != PEP_STATUS_OK)
+        return FAIL(_T("SetIdentity"), status);
+
+    return S_OK;
+}

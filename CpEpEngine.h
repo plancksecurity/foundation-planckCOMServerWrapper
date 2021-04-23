@@ -201,9 +201,10 @@ public:
     STDMETHOD(GetCrashdumpLog)(LONG maxlines, BSTR * log);
     STDMETHOD(GetEngineVersion)(BSTR * engineVersion);
     STDMETHOD(GetLanguageList)(BSTR * languages);
-    STDMETHOD(SetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
+    STDMETHOD(SetIdentityFlags)(struct pEpIdentity* identity, pEpIdentityFlags flags);
     STDMETHOD(UnsetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
     STDMETHOD(ImportKey)(BSTR keyData, LPSAFEARRAY *privateKeys);
+    STDMETHOD(SetIdentity)(struct pEpIdentity *identity);
 
     // keymanagement API
 
