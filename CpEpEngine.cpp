@@ -2179,13 +2179,45 @@ STDMETHODIMP CpEpEngine::SetIdentity(struct pEpIdentity* identity) {
         return E_OUTOFMEMORY;
     }
     catch (exception& ex) {
-        return FAIL(ex.what());;
+        return FAIL(ex.what());
     }
 
     PEP_STATUS status = ::set_identity(session(), _ident);
     ::free_identity(_ident);
     if (status != PEP_STATUS_OK)
         return FAIL(_T("SetIdentity"), status);
+
+    return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::SetCommPartnerKey(pEpIdentity* identity, BSTR fpr) {
+    
+    assert(identity);
+    assert(fpr);
+    if (!(identity && fpr))
+        return E_INVALIDARG;
+
+    ::pEp_identity* _ident = nullptr;
+
+    try {
+        _ident = new_identity(identity);
+        assert(_ident);
+        if (_ident == NULL)
+            return E_OUTOFMEMORY;
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());;
+    }
+
+    string _fpr = utf8_string(fpr);
+
+    PEP_STATUS status = passphrase_cache.api(::set_comm_partner_key, session(), _ident, _fpr.c_str());
+    ::free_identity(_ident);
+    if (status != PEP_STATUS_OK)
+        return FAIL(_T("SetCommPartnerKey"), status);
 
     return S_OK;
 }

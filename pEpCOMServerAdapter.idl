@@ -553,6 +553,9 @@ interface IpEpEngine : IUnknown {
 
     // Sets the identity
     [id(69)] HRESULT SetIdentity([in] struct pEpIdentity* identity);
+
+    // Sets the identity
+    [id(70)] HRESULT SetCommPartnerKey([in] struct pEpIdentity* identity, [in] BSTR fpr);
 };
 
 [

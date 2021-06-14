@@ -269,6 +269,7 @@ public:
     STDMETHOD(TrustOwnKey)(pEpIdentity * ident);
     STDMETHOD(ConfigPassphrase)(BSTR passphrase);
     STDMETHOD(ConfigPassphraseForNewKeys)(VARIANT_BOOL enable, BSTR passphrase);
+    STDMETHOD(SetCommPartnerKey)(pEpIdentity* identity, BSTR fpr);
 
     // Trigger an immediate update
     STDMETHOD(UpdateNow)(BSTR productCode, VARIANT_BOOL *didUpdate);
