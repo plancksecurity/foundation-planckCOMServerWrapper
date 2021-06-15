@@ -194,6 +194,7 @@ public:
     STDMETHOD(SetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
     STDMETHOD(UnsetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
     STDMETHOD(ImportKey)(BSTR keyData, LPSAFEARRAY *privateKeys);
+    STDMETHOD(ImportKeyWithFprReturn)(BSTR keyData, LPSAFEARRAY* privateKeys, LPSAFEARRAY* importedKeys);
 
     // keymanagement API
 
