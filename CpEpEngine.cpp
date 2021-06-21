@@ -69,44 +69,7 @@ STDMETHODIMP CpEpEngine::ConfigCipherSuite(pEpCipherSuite cipherSuite)
 
 STDMETHODIMP CpEpEngine::ImportKey(BSTR keyData, LPSAFEARRAY * privateKeys)
 {
-    assert(keyData);
-
-    if (!keyData)
-        return E_INVALIDARG;
-
-    string key_data = utf8_string(keyData);
-    size_t size = SysStringLen(keyData);
-    ::identity_list *private_keys = nullptr;
-
-    PEP_STATUS status = passphrase_cache.api(::import_key, session(), key_data.c_str(), size, &private_keys);
-    assert(status != ::PEP_OUT_OF_MEMORY);
-    if (status == ::PEP_OUT_OF_MEMORY)
-        return E_OUTOFMEMORY;
-
-    if ((status != PEP_STATUS_OK) && (status != PEP_KEY_IMPORTED))
-        return FAIL(L"import_key", status);
-
-    SAFEARRAY * _privateKeys = nullptr;
-    try {
-        _privateKeys = array_from_C<pEpIdentity, identity_list>(private_keys);
-    }
-    catch (exception& ex)
-    {
-        ::free_identity_list(private_keys);
-        try {
-            dynamic_cast<bad_alloc&>(ex);
-        }
-        catch (bad_cast&)
-        {
-            return FAIL(ex.what());
-        }
-        return E_OUTOFMEMORY;
-    }
-    free_identity_list(private_keys);
-
-    *privateKeys = _privateKeys;
-
-    return status;
+    return ImportKeyWithFprReturn(keyData, privateKeys, NULL);
 }
 
 
@@ -2329,13 +2292,97 @@ STDMETHODIMP CpEpEngine::SetIdentity(struct pEpIdentity* identity) {
         return E_OUTOFMEMORY;
     }
     catch (exception& ex) {
-        return FAIL(ex.what());;
+        return FAIL(ex.what());
     }
 
-    PEP_STATUS status = ::set_identity(session(), _ident);
+    PEP_STATUS status = passphrase_cache.api(::set_identity, session(), (const ::pEp_identity*)_ident);
     ::free_identity(_ident);
     if (status != PEP_STATUS_OK)
         return FAIL(_T("SetIdentity"), status);
 
     return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::SetCommPartnerKey(pEpIdentity* identity, BSTR fpr) {
+    
+    assert(identity);
+    assert(fpr);
+    if (!(identity && fpr))
+        return E_INVALIDARG;
+
+    ::pEp_identity* _ident = nullptr;
+
+    try {
+        _ident = new_identity(identity);
+        assert(_ident);
+        if (_ident == NULL)
+            return E_OUTOFMEMORY;
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());;
+    }
+
+    string _fpr = utf8_string(fpr);
+
+    PEP_STATUS status = passphrase_cache.api(::set_comm_partner_key, session(), _ident, _fpr.c_str());
+    ::free_identity(_ident);
+    if (status != PEP_STATUS_OK)
+        return FAIL(_T("SetCommPartnerKey"), status);
+
+    return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::ImportKeyWithFprReturn(BSTR keyData, LPSAFEARRAY* privateKeys, LPSAFEARRAY* importedKeys)
+{
+    assert(keyData);
+
+    if (!keyData)
+        return E_INVALIDARG;
+
+    string key_data = utf8_string(keyData);
+    size_t size = SysStringLen(keyData);
+    ::identity_list* private_keys = nullptr;
+    ::stringlist_t* imported_keys = nullptr;
+    if (importedKeys) {
+        imported_keys = new_stringlist(*importedKeys);
+    }
+
+    PEP_STATUS status = passphrase_cache.api(::import_key_with_fpr_return, session(), key_data.c_str(), size, &private_keys, &imported_keys, (uint64_t*)nullptr);
+    assert(status != ::PEP_OUT_OF_MEMORY);
+    if (status == ::PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+
+    if ((status != PEP_STATUS_OK) && (status != PEP_KEY_IMPORTED))
+        return FAIL(L"ImportKeyWithFprReturn", status);
+
+    SAFEARRAY* _privateKeys = nullptr;
+    try {
+        _privateKeys = array_from_C<pEpIdentity, identity_list>(private_keys);
+    }
+    catch (exception& ex)
+    {
+        ::free_identity_list(private_keys);
+        try {
+            dynamic_cast<bad_alloc&>(ex);
+        }
+        catch (bad_cast&)
+        {
+            return FAIL(ex.what());
+        }
+        return E_OUTOFMEMORY;
+    }
+    free_identity_list(private_keys);
+    *privateKeys = _privateKeys;
+
+    if (imported_keys) {
+        if (importedKeys) {
+            *importedKeys = string_array(imported_keys);
+        }
+        free_stringlist(imported_keys);
+    }
+
+    return status;
 }

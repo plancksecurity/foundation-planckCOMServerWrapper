@@ -204,6 +204,7 @@ public:
     STDMETHOD(SetIdentityFlags)(struct pEpIdentity* identity, pEpIdentityFlags flags);
     STDMETHOD(UnsetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
     STDMETHOD(ImportKey)(BSTR keyData, LPSAFEARRAY *privateKeys);
+    STDMETHOD(ImportKeyWithFprReturn)(BSTR keyData, LPSAFEARRAY* privateKeys, LPSAFEARRAY* importedKeys);
     STDMETHOD(SetIdentity)(struct pEpIdentity *identity);
 
     // keymanagement API
@@ -279,6 +280,7 @@ public:
     STDMETHOD(TrustOwnKey)(pEpIdentity * ident);
     STDMETHOD(ConfigPassphrase)(BSTR passphrase);
     STDMETHOD(ConfigPassphraseForNewKeys)(VARIANT_BOOL enable, BSTR passphrase);
+    STDMETHOD(SetCommPartnerKey)(pEpIdentity* identity, BSTR fpr);
 
     // Trigger an immediate update
     STDMETHOD(UpdateNow)(BSTR productCode, VARIANT_BOOL *didUpdate);
