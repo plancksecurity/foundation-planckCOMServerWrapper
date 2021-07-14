@@ -1765,7 +1765,7 @@ STDMETHODIMP CpEpEngine::Startup()
         // the client needs to call ConfigPassphrase() while the startup process is being executed
         // so we need to return from Startup() immediately to make this possible
 
-        auto sync_starter_thread = std::thread(pEp::CallbackDispatcher::start_sync);
+        auto sync_starter_thread = std::thread(pEp::Adapter::start_sync);
         sync_starter_thread.detach();
     }
     catch (bad_alloc&) {
@@ -1999,7 +1999,7 @@ STDMETHODIMP CpEpEngine::GetIsSyncRunning(VARIANT_BOOL *running)
 
 STDMETHODIMP CpEpEngine::ShutDownSync()
 {
-    pEp::callback_dispatcher.stop_sync();
+    pEp::Adapter::stop_sync();
     return S_OK;
 }
 

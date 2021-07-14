@@ -68,6 +68,7 @@
 #include <pEp/status_to_string.hh>
 
 #include <pEp/group.h>
+#include <pEp/Adapter.hh>
 
 #include "utf8_helper.h"
 #include "pEp_utility.h"

@@ -58,7 +58,7 @@ public:
             catch (std::exception& ex) { // bad alloc or invalid argument
                 error(ex.what());
             }
-            session(pEp::Adapter::release);
+            session.release();
 
             sync_callbacks.clear([](CpEpEngine::MarshaledCallbacks *p) {
                 if (p) {
