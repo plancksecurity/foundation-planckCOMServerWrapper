@@ -75,7 +75,7 @@
       <SDLCheck>true</SDLCheck>
       <EnablePREfast>false</EnablePREfast>
       <LanguageStandard>Default</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)pEpJSONServerAdapter\server;$(SolutionDir);$(SolutionDir)pEp;$(SolutionDir)pEpEngine\asn.1;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)pEpJSONServerAdapter\server;$(SolutionDir);$(SolutionDir)pEp;$(SolutionDir)pEpEngine\asn.1;$(SolutionDir)\libpEpAdapter\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -113,7 +113,7 @@
       <PreprocessorDefinitions>JSON_ADAPTER_LIBRARY;DEBUG_ENABLED;WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <EnablePREfast>false</EnablePREfast>
-      <AdditionalIncludeDirectories>$(SolutionDir)pEpJSONServerAdapter\server;$(SolutionDir);$(SolutionDir)pEp;$(SolutionDir)pEpEngine\asn.1;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)pEpJSONServerAdapter\server;$(SolutionDir);$(SolutionDir)pEp;$(SolutionDir)pEpEngine\asn.1;$(SolutionDir)\libpEpAdapter\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>

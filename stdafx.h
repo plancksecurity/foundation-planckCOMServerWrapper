@@ -69,6 +69,7 @@
 
 #include <pEp/group.h>
 #include <pEp/Adapter.hh>
+#include <pEp/pEpSQLite.hh>
 
 #include "utf8_helper.h"
 #include "pEp_utility.h"
