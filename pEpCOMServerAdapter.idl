@@ -265,13 +265,6 @@ interface IpEpEngine : IUnknown {
     // [id(21)] HRESULT UndoLastMistrust(); NOT IMPLEMENTED ANY MORE - USE KeyResetTrust() instead
     [id(22)] HRESULT IspEpUser([in] struct pEpIdentity *ident, [out, retval] VARIANT_BOOL *ispEp);
 
-    // Blacklist API
-    
-    [id(23)] HRESULT BlacklistAdd([in] BSTR fpr);
-    [id(24)] HRESULT BlacklistDelete([in] BSTR fpr);
-    [id(25)] HRESULT BlacklistIsListed([in] BSTR fpr, [out, retval] VARIANT_BOOL *listed);
-    [id(26)] HRESULT BlacklistRetrieve([out, retval] SAFEARRAY(BSTR) *blacklist);
-
     // PGP compatibility functions
 
     [id(27)] HRESULT OpenPGPListKeyinfo([in] BSTR searchPattern, [out, retval] SAFEARRAY(struct StringPair)* keyinfoList);

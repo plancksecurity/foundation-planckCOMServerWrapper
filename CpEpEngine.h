@@ -229,14 +229,6 @@ public:
         /* [in] */ struct pEpIdentity *ident,
         /* [retval][out] */ VARIANT_BOOL *ispEp);
 
-
-    // Blacklist API
-
-    STDMETHOD(BlacklistAdd)(BSTR fpr);
-    STDMETHOD(BlacklistDelete)(BSTR fpr);
-    STDMETHOD(BlacklistIsListed)(BSTR fpr, VARIANT_BOOL *listed);
-    STDMETHOD(BlacklistRetrieve)(SAFEARRAY **blacklist);
-
     // Message API
 
     STDMETHOD(EncryptMessage)(

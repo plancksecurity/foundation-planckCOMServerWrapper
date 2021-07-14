@@ -60,7 +60,6 @@
 #include <pEp/openpgp_compat.h>
 #include <pEp/sync_codec.h>
 #include <pEp/mime.h>
-#include <pEp/blacklist.h>
 
 #include <pEp/locked_queue.hh>
 #include <pEp/pc_container.hh>
