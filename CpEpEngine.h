@@ -100,15 +100,8 @@ public:
         std::lock_guard<std::mutex> lock(init_mutex);
         try {
             pEp::callback_dispatcher.add(CpEpEngine::messageToSend, CpEpEngine::notifyHandshake, CpEpEngine::on_sync_startup, CpEpEngine::on_sync_shutdown);
-
-            session.initialize(); // AQUI
-
+            session.initialize();
             ::register_examine_function(session(), CpEpEngine::examine_identity, (void *)this);
-
-            //PEP_STATUS status = ::adapter_group_init();
-            //if (status != PEP_STATUS_OK)
-            //    throw pEp::RuntimeError("Error initializing group management", status);
-
             ::log_event(session(), "FinalConstruct", "pEp COM Adapter", NULL, NULL);
         }
         catch (pEp::RuntimeError& e) {
@@ -310,7 +303,7 @@ public:
     STDMETHOD(ShowNotification)(BSTR title, BSTR message);
 
     // Group management methods
-    STDMETHOD(GroupCreate)(pEpIdentity* groupIdentity, pEpIdentity* manager, SAFEARRAY* memberlist); // AQUI quitar memberlist
+    STDMETHOD(GroupCreate)(pEpIdentity* groupIdentity, pEpIdentity* manager, SAFEARRAY* memberlist); 
     STDMETHOD(GroupJoin)(pEpIdentity* groupIdentity, pEpIdentity* asMember);
     STDMETHOD(GroupDissolve)(pEpIdentity* groupIdentity, pEpIdentity* manager);
     STDMETHOD(GroupInviteMember)(pEpIdentity* groupIdentity, pEpIdentity* groupMember);
