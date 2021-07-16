@@ -553,50 +553,34 @@ interface IpEpEngine : IUnknown {
 
     // group API
 
-
-    [uuid(42d42194-f158-4ec5-b75d-c924d4d485a0)] struct pEpMember {
-        struct pEpIdentity ident;
-        VARIANT_BOOL joined;
-    };
-    
-
-    [uuid(f20407f5-3cf7-4945-b8e1-2b5dd831c113)] struct pEpGroup {
-        struct pEpIdentity groupIdentity;
-        struct pEpIdentity manager;
-        SAFEARRAY(struct pEpMember) members;
-        VARIANT_BOOL active;
-    };
-
     // Creates a group
-    [id(69)] HRESULT GroupCreate([in] struct pEpIdentity* group_identity, [in] struct pEpIdentity* manager, [in] SAFEARRAY(struct pEpIdentity) memberlist);
-    // Join a user to a grou
-    [id(70)] HRESULT GroupJoin([in] struct pEpIdentity* group_identity, [in] struct pEpIdentity* as_member);
+    [id(69)] HRESULT GroupCreate([in] struct pEpIdentity* groupIdentity, [in] struct pEpIdentity* manager, [in] SAFEARRAY(struct pEpIdentity) memberlist);
+    // Adds a user to a group
+    [id(70)] HRESULT GroupJoin([in] struct pEpIdentity* groupIdentity, [in] struct pEpIdentity* asMember);
     // Removes a group
-    [id(71)] HRESULT GroupDissolve([in] struct pEpIdentity* group_identity, [in] struct pEpIdentity* manager);
+    [id(71)] HRESULT GroupDissolve([in] struct pEpIdentity* groupIdentity, [in] struct pEpIdentity* manager);
     // Invites a user to a group
-    [id(72)] HRESULT GroupInviteMember([in] struct pEpIdentity* group_identity, [in] struct pEpIdentity* group_member);
+    [id(72)] HRESULT GroupInviteMember([in] struct pEpIdentity* groupIdentity, [in] struct pEpIdentity* groupMember);
     // Removes a user from a group
-    [id(73)] HRESULT GroupRemoveMember([in] struct pEpIdentity* group_identity, [in] struct pEpIdentity* group_member);
+    [id(73)] HRESULT GroupRemoveMember([in] struct pEpIdentity* groupIdentity, [in] struct pEpIdentity* groupMember);
     // Gets the rating for a group
-    [id(74)] HRESULT GroupRating([in] struct pEpIdentity* group_identity, [in] struct pEpIdentity* manager, [out] struct pEpRating* rating);
+    [id(74)] HRESULT GroupRating([in] struct pEpIdentity* groupIdentity, [in] struct pEpIdentity* manager, [out, retval] struct pEpRating* rating);
     // Gets all the groups
-    [id(78)] HRESULT GroupQueryGroups([in] struct pEpIdentity* group_identity, [out] SAFEARRAY(struct pEpIdentity)* groupList);
+    [id(75)] HRESULT GroupQueryGroups([in] struct pEpIdentity* groupIdentity, [out, retval] SAFEARRAY(struct pEpIdentity)* groupList);
     // Gets the manager of a group
-    [id(79)] HRESULT GroupQueryManager([in] struct pEpIdentity* group_identity, [out] struct pEpIdentity* manager);
+    [id(76)] HRESULT GroupQueryManager([in] struct pEpIdentity* groupIdentity, [out, retval] struct pEpIdentity* manager);
     // Gets the members of a group
-    [id(80)] HRESULT GroupQueryMembers([in] struct pEpIdentity* group_identity, [out] SAFEARRAY(struct pEpIdentity)* members);
-
-
+    [id(77)] HRESULT GroupQueryMembers([in] struct pEpIdentity* groupIdentity, [out, retval] SAFEARRAY(struct pEpIdentity)* members);
 
 
     // Sets the identity
-    [id(75)] HRESULT SetIdentity([in] struct pEpIdentity* identity);
+    [id(78)] HRESULT SetIdentity([in] struct pEpIdentity* identity);
 
     // Sets the default key fingerprint for the identity
-    [id(76)] HRESULT SetCommPartnerKey([in] struct pEpIdentity* identity, [in] BSTR fpr);
+    [id(79)] HRESULT SetCommPartnerKey([in] struct pEpIdentity* identity, [in] BSTR fpr);
 
     // Imports keys from data, return optional list of fprs imported
-    [id(77)] HRESULT ImportKeyWithFprReturn([in] BSTR keyData, [out] SAFEARRAY(struct pEpIdentity)* privateKeys, [out] SAFEARRAY(BSTR)* importedKeys);
+    [id(80)] HRESULT ImportKeyWithFprReturn([in] BSTR keyData, [out] SAFEARRAY(struct pEpIdentity)* privateKeys, [out] SAFEARRAY(BSTR)* importedKeys);
 };
 
 [
