@@ -39,7 +39,6 @@ namespace pEp {
         };
 
         void copy_identity(pEpIdentity * ident_s, const pEp_identity * ident);
-        void free_identity_strings(pEpIdentity * ident_s);
         void clear_identity_s(pEpIdentity& ident);
         void clear_text_message(TextMessage *msg);
         ::pEp_identity *new_identity(const pEpIdentity * ident);
