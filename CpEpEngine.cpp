@@ -4,6 +4,7 @@
 #include "CpEpEngine.h"
 #include "GateKeeper.h"
 #include "LocalJSONAdapter.h"
+#include "../libpEpAdapter/src/group_manager_api.h"
 
 using namespace std;
 using namespace pEp::utility;
@@ -1765,8 +1766,9 @@ STDMETHODIMP CpEpEngine::Startup()
         // the client needs to call ConfigPassphrase() while the startup process is being executed
         // so we need to return from Startup() immediately to make this possible
 
-        auto sync_starter_thread = std::thread(pEp::Adapter::start_sync);
-        sync_starter_thread.detach();
+        //auto sync_starter_thread = std::thread(pEp::Adapter::start_sync);
+        //sync_starter_thread.detach();
+        pEp::Adapter::start_sync(); // AQUI
     }
     catch (bad_alloc&) {
         return E_OUTOFMEMORY;
@@ -2056,13 +2058,14 @@ STDMETHODIMP CpEpEngine::DisableAllSyncChannels()
         return FAIL(L"DisableAllSyncChannels", status);
 }
 
-STDMETHODIMP CpEpEngine::GroupCreate(pEpIdentity* groupIdentity, pEpIdentity* manager, SAFEARRAY* memberlist, pEpGroup* group)
+// Group Management methods
+
+STDMETHODIMP CpEpEngine::GroupCreate(pEpIdentity* groupIdentity, pEpIdentity* manager, SAFEARRAY* memberlist)
 {
     assert(groupIdentity);
-    assert(group);
     assert(manager);
 
-    if (!groupIdentity || !group || !manager)
+    if (!groupIdentity || !manager)
         return E_INVALIDARG;
 
     try
@@ -2076,9 +2079,8 @@ STDMETHODIMP CpEpEngine::GroupCreate(pEpIdentity* groupIdentity, pEpIdentity* ma
         IdentityListPtr _member_ident_list(identities(memberlist), free_identity_list);
         if (!_member_ident_list)
             return E_OUTOFMEMORY;
-        pEp_group* _group;
     
-        const PEP_STATUS status = ::group_create(session(), _group_identity.get(), _manager_identity.get(), _member_ident_list.get(), &_group);
+        const PEP_STATUS status = ::adapter_group_create(session(), _group_identity.get(), _manager_identity.get(), _member_ident_list.get());
 
         switch (status) {
         case PEP_STATUS_OK:
@@ -2088,10 +2090,6 @@ STDMETHODIMP CpEpEngine::GroupCreate(pEpIdentity* groupIdentity, pEpIdentity* ma
         default:
             return FAIL(L"group_create is reporting an error", status);
         }
-
-        *group = pEpGroup_from_C(_group);
-        free_group(_group);
-
     }
     catch (bad_alloc&) {
         return E_OUTOFMEMORY;
@@ -2148,22 +2146,22 @@ STDMETHODIMP CpEpEngine::group_operation(pEpIdentity* param1, pEpIdentity* param
 
 STDMETHODIMP CpEpEngine::GroupJoin(pEpIdentity* groupIdentity, pEpIdentity* asMember)
 {
-    return group_operation(groupIdentity, asMember, group_join, L"group_join");
+    return group_operation(groupIdentity, asMember, adapter_group_join, L"adapter_group_join");
 }
 
 STDMETHODIMP CpEpEngine::GroupDissolve(pEpIdentity* groupIdentity, pEpIdentity* manager)
 {
-    return group_operation(groupIdentity, manager, group_dissolve, L"group_dissolve");
+    return group_operation(groupIdentity, manager, adapter_group_dissolve, L"adapter_group_dissolve");
 }
 
 STDMETHODIMP CpEpEngine::GroupInviteMember(pEpIdentity* groupIdentity, pEpIdentity* groupMember)
 {
-    return group_operation(groupIdentity, groupMember, group_invite_member, L"group_invite_member");
+    return group_operation(groupIdentity, groupMember, adapter_group_invite_member, L"adapter_group_invite_member");
 }
 
 STDMETHODIMP CpEpEngine::GroupRemoveMember(pEpIdentity* groupIdentity, pEpIdentity* groupMember)
 {
-    return group_operation(groupIdentity, groupMember, group_remove_member, L"group_remove_member");
+    return group_operation(groupIdentity, groupMember, adapter_group_remove_member, L"adapter_group_remove_member");
 }
 
 STDMETHODIMP CpEpEngine::GroupRating(pEpIdentity* groupIdentity, pEpIdentity* manager, pEpRating* rating)
@@ -2171,7 +2169,7 @@ STDMETHODIMP CpEpEngine::GroupRating(pEpIdentity* groupIdentity, pEpIdentity* ma
     assert(groupIdentity);
     assert(manager);
 
-    if (!groupIdentity || !manager)
+    if (!groupIdentity || !manager || !rating)
         return E_INVALIDARG;
 
     try
@@ -2204,6 +2202,107 @@ STDMETHODIMP CpEpEngine::GroupRating(pEpIdentity* groupIdentity, pEpIdentity* ma
     }
 
     return ERROR_SUCCESS;
+}
+
+STDMETHODIMP CpEpEngine::GroupQueryGroups(pEpIdentity* groupIdentity, LPSAFEARRAY* groupList)
+{
+    if (!groupList)
+        return E_INVALIDARG;
+
+    ::identity_list* il = nullptr;
+    PEP_STATUS status = ::adapter_group_query_groups(session(), &il);
+    if (status == PEP_OUT_OF_MEMORY) {
+        return E_OUTOFMEMORY;
+    }
+    else if (status != PEP_STATUS_OK)
+    {
+        return FAIL(_T("GroupQueryGroups"), status);
+    }
+
+    SAFEARRAY* _group_list = nullptr;
+    try {
+        _group_list = array_from_C<pEpIdentity, identity_list>(il);
+    }
+    catch (exception& ex)
+    {
+        ::free_identity_list(il);
+        try {
+            dynamic_cast<bad_alloc&>(ex);
+        }
+        catch (bad_cast&)
+        {
+            return FAIL(ex.what());
+        }
+        return E_OUTOFMEMORY;
+    }
+    free_identity_list(il);
+
+    *groupList = _group_list;
+    return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::GroupQueryManager(pEpIdentity* groupIdentity, pEpIdentity* manager)
+{
+    IdentityPtr _group_identity(new_identity(groupIdentity), free_identity);
+    if (!_group_identity)
+        return E_OUTOFMEMORY;
+
+    ::pEp_identity* _ident;
+    PEP_STATUS const status = ::adapter_group_query_manager(session(), _group_identity.get(), &_ident);
+    if (status == PEP_OUT_OF_MEMORY) {
+        return E_OUTOFMEMORY;
+    }
+    else if (status != PEP_STATUS_OK)
+    {
+        return FAIL(_T("GroupQueryManager"), status);
+    }
+
+    copy_identity(manager, _ident);
+    ::free_identity(_ident);
+    return S_OK;
+
+}
+
+STDMETHODIMP CpEpEngine::GroupQueryMembers(pEpIdentity* groupIdentity, LPSAFEARRAY* members)
+{
+    if (!members)
+        return E_INVALIDARG;
+
+    IdentityPtr _group_identity(new_identity(groupIdentity), free_identity);
+    if (!_group_identity)
+        return E_OUTOFMEMORY;
+
+    ::identity_list* il = nullptr;
+    PEP_STATUS const status = adapter_group_query_members(session(), _group_identity.get(), &il);
+
+    if (status == PEP_OUT_OF_MEMORY) {
+        return E_OUTOFMEMORY;
+    }
+    else if (status != PEP_STATUS_OK)
+    {
+        return FAIL(_T("GroupQueryMembers"), status);
+    }
+
+    SAFEARRAY* _members_list = nullptr;
+    try {
+        _members_list = array_from_C<pEpIdentity, identity_list>(il);
+    }
+    catch (exception& ex)
+    {
+        ::free_identity_list(il);
+        try {
+            dynamic_cast<bad_alloc&>(ex);
+        }
+        catch (bad_cast&)
+        {
+            return FAIL(ex.what());
+        }
+        return E_OUTOFMEMORY;
+    }
+
+    free_identity_list(il);
+    *members = _members_list;
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::SetIdentity(struct pEpIdentity* identity) {

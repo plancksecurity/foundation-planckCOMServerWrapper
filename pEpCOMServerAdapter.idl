@@ -562,7 +562,7 @@ interface IpEpEngine : IUnknown {
     };
 
     // Creates a group
-    [id(69)] HRESULT GroupCreate([in] struct pEpIdentity* group_identity, [in] struct pEpIdentity* manager, [in] SAFEARRAY(struct pEpIdentity) memberlist, [out, retval] struct pEpGroup* group);
+    [id(69)] HRESULT GroupCreate([in] struct pEpIdentity* group_identity, [in] struct pEpIdentity* manager, [in] SAFEARRAY(struct pEpIdentity) memberlist);
     // Join a user to a grou
     [id(70)] HRESULT GroupJoin([in] struct pEpIdentity* group_identity, [in] struct pEpIdentity* as_member);
     // Removes a group
@@ -573,6 +573,15 @@ interface IpEpEngine : IUnknown {
     [id(73)] HRESULT GroupRemoveMember([in] struct pEpIdentity* group_identity, [in] struct pEpIdentity* group_member);
     // Gets the rating for a group
     [id(74)] HRESULT GroupRating([in] struct pEpIdentity* group_identity, [in] struct pEpIdentity* manager, [out] struct pEpRating* rating);
+    // Gets all the groups
+    [id(78)] HRESULT GroupQueryGroups([in] struct pEpIdentity* group_identity, [out] SAFEARRAY(struct pEpIdentity)* groupList);
+    // Gets the manager of a group
+    [id(79)] HRESULT GroupQueryManager([in] struct pEpIdentity* group_identity, [out] struct pEpIdentity* manager);
+    // Gets the members of a group
+    [id(80)] HRESULT GroupQueryMembers([in] struct pEpIdentity* group_identity, [out] SAFEARRAY(struct pEpIdentity)* members);
+
+
+
 
     // Sets the identity
     [id(75)] HRESULT SetIdentity([in] struct pEpIdentity* identity);

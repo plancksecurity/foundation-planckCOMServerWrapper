@@ -4,6 +4,8 @@
 #include "resource.h"       // main symbols
 #include "stdafx.h"
 #include "pEpComServerAdapter_i.h"
+#include "../libpEpAdapter/src/group_manager_api.h"
+
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
@@ -99,7 +101,14 @@ public:
         try {
             pEp::callback_dispatcher.add(CpEpEngine::messageToSend, CpEpEngine::notifyHandshake, CpEpEngine::on_sync_startup, CpEpEngine::on_sync_shutdown);
 
+            session.initialize(); // AQUI
+
             ::register_examine_function(session(), CpEpEngine::examine_identity, (void *)this);
+
+            //PEP_STATUS status = ::adapter_group_init();
+            //if (status != PEP_STATUS_OK)
+            //    throw pEp::RuntimeError("Error initializing group management", status);
+
             ::log_event(session(), "FinalConstruct", "pEp COM Adapter", NULL, NULL);
         }
         catch (pEp::RuntimeError& e) {
@@ -300,14 +309,16 @@ public:
 
     STDMETHOD(ShowNotification)(BSTR title, BSTR message);
 
-
     // Group management methods
-    STDMETHOD(GroupCreate)(pEpIdentity* groupIdentity, pEpIdentity* manager, SAFEARRAY* memberlist, pEpGroup* group);
+    STDMETHOD(GroupCreate)(pEpIdentity* groupIdentity, pEpIdentity* manager, SAFEARRAY* memberlist); // AQUI quitar memberlist
     STDMETHOD(GroupJoin)(pEpIdentity* groupIdentity, pEpIdentity* asMember);
     STDMETHOD(GroupDissolve)(pEpIdentity* groupIdentity, pEpIdentity* manager);
     STDMETHOD(GroupInviteMember)(pEpIdentity* groupIdentity, pEpIdentity* groupMember);
     STDMETHOD(GroupRemoveMember)(pEpIdentity* groupIdentity, pEpIdentity* groupMember);
     STDMETHOD(GroupRating)(pEpIdentity* groupIdentity, pEpIdentity* manager, pEpRating* ratings);
+    STDMETHOD(GroupQueryGroups)(pEpIdentity* groupIdentity, LPSAFEARRAY* groupList);
+    STDMETHOD(GroupQueryManager)(pEpIdentity* groupIdentity, pEpIdentity* manager);
+    STDMETHOD(GroupQueryMembers)(pEpIdentity* groupIdentity, LPSAFEARRAY* members);
 
     
 };
