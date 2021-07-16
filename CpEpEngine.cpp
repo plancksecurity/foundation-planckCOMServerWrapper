@@ -1766,9 +1766,7 @@ STDMETHODIMP CpEpEngine::Startup()
         // the client needs to call ConfigPassphrase() while the startup process is being executed
         // so we need to return from Startup() immediately to make this possible
 
-        //auto sync_starter_thread = std::thread(pEp::Adapter::start_sync);
-        //sync_starter_thread.detach();
-        pEp::Adapter::start_sync(); // AQUI
+        pEp::Adapter::start_sync();
     }
     catch (bad_alloc&) {
         return E_OUTOFMEMORY;
