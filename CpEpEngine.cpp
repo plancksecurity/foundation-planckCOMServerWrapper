@@ -2210,7 +2210,7 @@ STDMETHODIMP CpEpEngine::GroupRating(pEpIdentity* groupIdentity, pEpIdentity* ma
     return ERROR_SUCCESS;
 }
 
-STDMETHODIMP CpEpEngine::GroupQueryGroups(pEpIdentity* groupIdentity, LPSAFEARRAY* groupList)
+STDMETHODIMP CpEpEngine::GroupQueryGroups(LPSAFEARRAY* groupList)
 {
     if (!groupList)
         return E_INVALIDARG;
