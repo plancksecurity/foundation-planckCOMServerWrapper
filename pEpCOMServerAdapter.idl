@@ -566,7 +566,7 @@ interface IpEpEngine : IUnknown {
     // Gets the rating for a group
     [id(74)] HRESULT GroupRating([in] struct pEpIdentity* groupIdentity, [in] struct pEpIdentity* manager, [out, retval] struct pEpRating* rating);
     // Gets all the groups
-    [id(75)] HRESULT GroupQueryGroups([in] struct pEpIdentity* groupIdentity, [out, retval] SAFEARRAY(struct pEpIdentity)* groupList);
+    [id(75)] HRESULT GroupQueryGroups([out, retval] SAFEARRAY(struct pEpIdentity)* groupList);
     // Gets the manager of a group
     [id(76)] HRESULT GroupQueryManager([in] struct pEpIdentity* groupIdentity, [out, retval] struct pEpIdentity* manager);
     // Gets the members of a group

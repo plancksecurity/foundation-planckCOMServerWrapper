@@ -309,7 +309,7 @@ public:
     STDMETHOD(GroupInviteMember)(pEpIdentity* groupIdentity, pEpIdentity* groupMember);
     STDMETHOD(GroupRemoveMember)(pEpIdentity* groupIdentity, pEpIdentity* groupMember);
     STDMETHOD(GroupRating)(pEpIdentity* groupIdentity, pEpIdentity* manager, pEpRating* ratings);
-    STDMETHOD(GroupQueryGroups)(pEpIdentity* groupIdentity, LPSAFEARRAY* groupList);
+    STDMETHOD(GroupQueryGroups)(LPSAFEARRAY* groupList);
     STDMETHOD(GroupQueryManager)(pEpIdentity* groupIdentity, pEpIdentity* manager);
     STDMETHOD(GroupQueryMembers)(pEpIdentity* groupIdentity, LPSAFEARRAY* members);
 
