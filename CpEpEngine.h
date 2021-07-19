@@ -37,6 +37,9 @@ protected:
     static int examine_identity(pEp_identity *ident, void *management);
 
 public:
+
+    void StartSyncThread();
+
     CpEpEngine() : keymanagement_thread(NULL), identity_queue(NULL), verbose_mode(false)
     {
         // See FinalConstruct() below for most initialization work, and an

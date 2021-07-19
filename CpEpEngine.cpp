@@ -1757,6 +1757,14 @@ STDMETHODIMP CpEpEngine::TrustOwnKey(pEpIdentity * ident)
         return FAIL(L"TrustOwnKey", status);
 }
 
+
+void CpEpEngine::StartSyncThread()
+{
+    pEp::callback_dispatcher.add(CpEpEngine::messageToSend, CpEpEngine::notifyHandshake, CpEpEngine::on_sync_startup, CpEpEngine::on_sync_shutdown);
+    session.initialize();
+    pEp::Adapter::start_sync();
+}
+
 STDMETHODIMP CpEpEngine::Startup()
 {
     try
@@ -1765,8 +1773,8 @@ STDMETHODIMP CpEpEngine::Startup()
         // start_sync() may send notifyHandshake() to ask for a passphrase; when this happens
         // the client needs to call ConfigPassphrase() while the startup process is being executed
         // so we need to return from Startup() immediately to make this possible
-
-        pEp::Adapter::start_sync();
+        auto sync_starter_thread = std::thread(&CpEpEngine::StartSyncThread, this);
+        sync_starter_thread.detach();
     }
     catch (bad_alloc&) {
         return E_OUTOFMEMORY;
