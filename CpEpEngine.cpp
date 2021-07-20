@@ -1760,6 +1760,9 @@ STDMETHODIMP CpEpEngine::TrustOwnKey(pEpIdentity * ident)
 
 void CpEpEngine::StartSyncThread()
 {
+    HRESULT r = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    if (!SUCCEEDED(r))
+        throw runtime_error("CoInitializeEx() failed on sync thread");
     pEp::callback_dispatcher.add(CpEpEngine::messageToSend, CpEpEngine::notifyHandshake, CpEpEngine::on_sync_startup, CpEpEngine::on_sync_shutdown);
     session.initialize();
     pEp::Adapter::start_sync();
