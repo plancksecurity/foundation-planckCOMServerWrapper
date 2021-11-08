@@ -1253,18 +1253,15 @@ STDMETHODIMP CpEpEngine::EncryptMessageForSelf(pEpIdentity * targetId, TextMessa
     return result;
 }
 
-STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SAFEARRAY ** keylist, pEpDecryptFlags *flags, pEpRating *rating)
+STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SAFEARRAY ** keylist, pEpDecryptFlags *flags)
 {
     assert(src);
     assert(dst);
     assert(keylist);
     assert(flags);
-    assert(rating);
 
-    if (!(src && dst && keylist && flags && rating))
+    if (!(src && dst && keylist && flags))
         return E_INVALIDARG;
-
-    *rating = pEpRatingUndefined;
 
     ::message *_src = NULL;
     try {
@@ -1278,10 +1275,9 @@ STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SA
     }
     ::message *msg_dst = NULL;
     ::stringlist_t *_keylist = new_stringlist(*keylist);
-    ::PEP_rating _rating;
 
     PEP_decrypt_flags_t engineflags = (PEP_decrypt_flags_t)*flags;
-    PEP_STATUS status = passphrase_cache.api(::decrypt_message, session(), _src, &msg_dst, &_keylist, &_rating, &engineflags);
+    PEP_STATUS status = passphrase_cache.api(::decrypt_message, session(), _src, &msg_dst, &_keylist, &engineflags);
 
     *flags = (pEpDecryptFlags)engineflags;
 
@@ -1298,8 +1294,6 @@ STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SA
         *keylist = string_array(_keylist);
         free_stringlist(_keylist);
     }
-
-    *rating = (pEpRating)_rating;
 
     return S_OK;
 }

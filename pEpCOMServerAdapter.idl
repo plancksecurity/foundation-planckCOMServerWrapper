@@ -374,6 +374,7 @@ interface IpEpEngine : IUnknown {
         SAFEARRAY(struct StringPair) OptFields;
         pEpEncFormat EncFormat;
         [readonly] BSTR SenderFpr;
+        pEpRating Rating;
     };
 
     [id(28)] HRESULT EncryptMessage(
@@ -390,8 +391,7 @@ interface IpEpEngine : IUnknown {
         [in, out] struct TextMessage *src,
         [out] struct TextMessage * dst,
         [in, out] SAFEARRAY(BSTR) *keylist,
-        [in, out] pEpDecryptFlags* flags,
-        [out, retval] pEpRating *rating);
+        [in, out] pEpDecryptFlags* flags);
 
     [id(30)] HRESULT OutgoingMessageRating([in] struct TextMessage *msg, [out, retval] pEpRating * pVal);
     [id(31)] HRESULT IdentityRating([in] struct pEpIdentity * ident, [out, retval] pEpRating * pVal);

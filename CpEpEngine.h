@@ -242,7 +242,7 @@ public:
         /* [defaultvalue][in] */ pEpEncryptFlags flags = pEpEncryptFlagDefault,
         /* [defaultvalue][in] */ pEpEncFormat encFormat = pEpEncPep);
 
-    STDMETHOD(DecryptMessage)(TextMessage * src, TextMessage * dst, SAFEARRAY ** keylist, pEpDecryptFlags* flags, pEpRating *rating);
+    STDMETHOD(DecryptMessage)(TextMessage * src, TextMessage * dst, SAFEARRAY ** keylist, pEpDecryptFlags* flags);
     STDMETHOD(ReEvaluateMessageRating)(TextMessage * msg, SAFEARRAY * x_KeyList, pEpRating x_EncStatus, pEpRating *rating);
     STDMETHOD(OutgoingMessageRating)(TextMessage *msg, pEpRating * pVal);
     STDMETHOD(OutgoingMessageRatingPreview)(TextMessage *msg, pEpRating * pVal);

@@ -376,6 +376,7 @@ namespace pEp {
             msg2->OptFields = array_from_C<StringPair, stringpair_list_t>(msg->opt_fields);
             msg2->EncFormat = (pEpEncFormat)msg->enc_format;
             msg2->SenderFpr = bstr(msg->_sender_fpr);
+            msg2->Rating = (pEpRating)msg->rating;
         }
 
         char * str(BSTR s)
@@ -592,6 +593,7 @@ namespace pEp {
             msg2->comments = str(msg->Comments);
             msg2->opt_fields = stringpair_list(msg->OptFields);
             msg2->enc_format = (PEP_enc_format)msg->EncFormat;
+            msg2->rating = (PEP_rating)msg->Rating;
 
             return msg2;
         }
