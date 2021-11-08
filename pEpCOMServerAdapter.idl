@@ -259,8 +259,8 @@ interface IpEpEngine : IUnknown {
 
     // Keymanagement API
 
-    [id(13)] HRESULT StartKeyserverLookup();
-    [id(14)] HRESULT StopKeyserverLookup();
+    //[id(13)] HRESULT StartKeyserverLookup();
+    //[id(14)] HRESULT StopKeyserverLookup();
 
     [id(15)] HRESULT Myself([in] struct pEpIdentity *ident, [out, retval] struct pEpIdentity *result);
     [id(16)] HRESULT UpdateIdentity([in] struct pEpIdentity *ident, [out, retval] struct pEpIdentity *result);

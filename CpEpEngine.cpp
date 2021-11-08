@@ -575,37 +575,6 @@ STDMETHODIMP CpEpEngine::UnsetIdentityFlags(struct pEpIdentity *identity, pEpIde
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::StartKeyserverLookup()
-{
-    if (identity_queue.load())
-        return S_OK;
-
-    identity_queue.store(new identity_queue_t());
-    keymanagement_thread = new thread(::do_keymanagement, retrieve_next_identity, (void *)identity_queue.load());
-
-    return S_OK;
-}
-
-STDMETHODIMP CpEpEngine::StopKeyserverLookup()
-{
-    if (identity_queue.load() == NULL)
-        return S_OK;
-
-    identity_queue_t *_iq = identity_queue.load();
-    identity_queue.store(NULL);
-
-    pEp_identity_cpp shutdown;
-    _iq->push_front(shutdown);
-
-    keymanagement_thread->join();
-    delete keymanagement_thread;
-    keymanagement_thread = NULL;
-
-    delete _iq;
-
-    return S_OK;
-}
-
 STDMETHODIMP CpEpEngine::MIMEDecodeMessage(BSTR mimeText, TextMessage *msg)
 {
     assert(mimeText);

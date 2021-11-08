@@ -48,7 +48,6 @@ public:
     {
         --count;
         if (!count) {
-            StopKeyserverLookup();
             try {
                 // try/catch to avoid freeze when no session could be initialized because a runtime
                 // or other kind of exceptions thrown by engine
@@ -101,7 +100,6 @@ public:
         try {
             pEp::callback_dispatcher.add(CpEpEngine::messageToSend, CpEpEngine::notifyHandshake, CpEpEngine::on_sync_startup, CpEpEngine::on_sync_shutdown);
             session.initialize();
-            ::register_examine_function(session(), CpEpEngine::examine_identity, (void *)this);
             ::log_event(session(), "FinalConstruct", "pEp COM Adapter", NULL, NULL);
         }
         catch (pEp::RuntimeError& e) {
@@ -210,9 +208,6 @@ public:
     STDMETHOD(SetIdentity)(struct pEpIdentity *identity);
 
     // keymanagement API
-
-    STDMETHOD(StartKeyserverLookup)();
-    STDMETHOD(StopKeyserverLookup)();
 
     STDMETHOD(Myself)(struct pEpIdentity *ident, struct pEpIdentity *result);
     STDMETHOD(UpdateIdentity)(struct pEpIdentity *ident, struct pEpIdentity *result);
