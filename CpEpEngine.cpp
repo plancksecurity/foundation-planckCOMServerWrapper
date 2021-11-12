@@ -899,28 +899,6 @@ STDMETHODIMP CpEpEngine::KeyResetTrust(struct pEpIdentity *ident)
     return S_OK;
 }
 
-int CpEpEngine::examine_identity(pEp_identity *ident, void *management)
-{
-    assert(ident);
-    assert(management);
-    if (!(ident && management))
-        return -1;
-
-    CpEpEngine *me = (CpEpEngine *)management;
-
-    if (me->identity_queue.load() == NULL)
-        return 0;
-
-    try {
-        me->identity_queue.load()->push_back(ident);
-    }
-    catch (exception&) {
-        return -1;
-    }
-
-    return 0;
-}
-
 ::pEp_identity * CpEpEngine::retrieve_next_identity(void *management)
 {
     assert(management);
