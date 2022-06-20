@@ -73,6 +73,7 @@
       <PreprocessorDefinitions>JSON_ADAPTER_LIBRARY;DEBUG_ENABLED;WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <EnablePREfast>false</EnablePREfast>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -109,6 +110,7 @@
       <PreprocessorDefinitions>JSON_ADAPTER_LIBRARY;DEBUG_ENABLED;WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <EnablePREfast>false</EnablePREfast>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -151,10 +153,12 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="pEp_utility.cpp" />
+    <ClCompile Include="LocalProvisioning.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="unpack.cc" />
     <ClCompile Include="utf8_helper.cpp" />
     <ClCompile Include="xdlldata.c">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
@@ -171,12 +175,14 @@
     <ClInclude Include="CpEpEngine.h" />
     <ClInclude Include="GateKeeper.h" />
     <ClInclude Include="LocalJSONAdapter.h" />
+    <ClInclude Include="LocalProvisioning.h" />
     <ClInclude Include="pEpCOMServerAdapter.h" />
     <ClInclude Include="pEpCOMServerAdapter_i.h" />
     <ClInclude Include="pEp_utility.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="unpack.hh" />
     <ClInclude Include="utf8_helper.h" />
     <ClInclude Include="xdlldata.h" />
   </ItemGroup>

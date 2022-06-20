@@ -90,5 +90,48 @@ namespace pEp {
 		identity_list *identities(SAFEARRAY * sa);
         ::message * text_message_to_C(TextMessage *msg);
         void text_message_from_C(TextMessage *msg2, const ::message *msg);
+
+		/// <summary>
+		/// Little utility class to read/write from the windows registry
+		/// </summary>
+		class RegistryKey
+		{
+			HKEY cu;
+			bool opened = false;
+			HKEY hkKeyPath = NULL;
+			LONG lResult;
+			std::wstring key_path;
+
+			LONG create_key(HKEY hk, const std::wstring& key, HKEY& hkKey) noexcept;
+
+		public:
+
+			/// <summary>
+			///
+			/// </summary>
+			/// <param name="keyPath">Key were the settings are to be used (e.g."Software\\pEp\\Something")</param>
+			RegistryKey(const std::wstring& keyPath) noexcept;
+
+			/// <summary>
+			/// Gets a value from a key. 
+			/// </summary>
+			/// <param name="key">Relative (to the initialized one in constructor) key name </param>
+			/// <param name="default_value">
+			/// Value that will be returned in case the key 
+			/// does not exist or any error is produced
+			/// </param>
+			/// <returns>The value retrieved</returns>
+            std::wstring GetValue(const std::wstring& key, const std::wstring& default_value) noexcept;
+
+			/// <summary>
+			/// Sets a value for a key
+			/// </summary>
+			/// <param name="key">Relative (to the initialized one in constructor) key name </param>
+			/// <param name="value">The value to be set</param>
+            bool SetValue(const std::wstring& key, const std::wstring& value) noexcept;
+		};
+
+
+
     }
 }
