@@ -92,12 +92,9 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
     _AtlModule.hModule(hInstance);
     _AtlModule.start_gatekeeper();
 
-    // AQUI provisioning
-
+    // Provisioning
     pEp::LocalProvisioning provisioning;
     provisioning.Run();
-
-    // AQUI provisioning
 
     PEP_SESSION first_session;
     PEP_STATUS status = ::init(&first_session, NULL, NULL, pEp::Adapter::_ensure_passphrase);

@@ -603,8 +603,10 @@ namespace pEp {
                 REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hkKey, NULL);
         }
 
-        RegistryKey::RegistryKey(const std::wstring& keyPath) noexcept
+        RegistryKey::RegistryKey(const std::wstring& keyPath) noexcept : 
+            cu(nullptr), hkKeyPath(nullptr)
         {
+            LONG lResult;
             key_path = keyPath;
             if (RegOpenCurrentUser(KEY_ALL_ACCESS, &cu) == ERROR_SUCCESS)
             {
@@ -621,8 +623,17 @@ namespace pEp {
             }
         }
 
+        RegistryKey::~RegistryKey() noexcept
+        {
+            if (cu != nullptr)
+                RegCloseKey(cu);
+            if (hkKeyPath != nullptr)
+                RegCloseKey(hkKeyPath);
+        }
+
         std::wstring RegistryKey::GetValue(const std::wstring& key, const std::wstring& default_value) noexcept
         {
+            LONG lResult;
             if (opened)
             {
                 DWORD size;

@@ -98,8 +98,7 @@ namespace pEp {
 		{
 			HKEY cu;
 			bool opened = false;
-			HKEY hkKeyPath = NULL;
-			LONG lResult;
+			HKEY hkKeyPath;
 			std::wstring key_path;
 
 			LONG create_key(HKEY hk, const std::wstring& key, HKEY& hkKey) noexcept;
@@ -111,6 +110,7 @@ namespace pEp {
 			/// </summary>
 			/// <param name="keyPath">Key were the settings are to be used (e.g."Software\\pEp\\Something")</param>
 			RegistryKey(const std::wstring& keyPath) noexcept;
+            ~RegistryKey() noexcept;
 
 			/// <summary>
 			/// Gets a value from a key. 

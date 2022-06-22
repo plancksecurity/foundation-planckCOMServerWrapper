@@ -193,7 +193,7 @@ namespace SignedPackage {
         bool valid = verifier.VerifyStream(_archive,
                 (unsigned char*) signature, size);
         if (!valid)
-            throw std::runtime_error("signature does not match"); // AQUI
+            throw std::runtime_error("signature does not match"); 
     }
 
     std::filesystem::path decrypt_distribution_archive(
@@ -257,7 +257,8 @@ namespace SignedPackage {
                 decrypt_distribution_archive(tmp_path / "DIST.A",
                         tmp_path / "DIST.KEY", provisioning_key);
 
-            extract_archive(decrypted_archive, tmp_path);
+            ensure_target_path(tmp_path / location);
+            extract_archive(decrypted_archive, tmp_path / location);
 
             ensure_target_path(target_path);
             for (auto const& direntry : std::filesystem::directory_iterator{tmp_path / location}) {

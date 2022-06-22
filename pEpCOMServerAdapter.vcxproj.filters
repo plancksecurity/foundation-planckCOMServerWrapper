@@ -122,8 +122,8 @@
     <None Include="updatekey.bin">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="packages.config" />
     <None Include="pep_test.snk" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="pEpCOMServerAdapter.idl">
