@@ -49,6 +49,12 @@
     <ClCompile Include="CMainWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="unpack.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LocalProvisioning.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -90,6 +96,12 @@
     <ClInclude Include="CMainWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="unpack.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LocalProvisioning.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="pEpCOMServerAdapter.rc">
@@ -110,8 +122,8 @@
     <None Include="updatekey.bin">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="packages.config" />
     <None Include="pep_test.snk" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="pEpCOMServerAdapter.idl">

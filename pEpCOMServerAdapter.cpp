@@ -9,6 +9,7 @@
 #include "pEpCOMServerAdapter.h"
 #include "LocalJSONAdapter.h"
 #include "CMainWindow.h"
+#include "LocalProvisioning.h"
 
 #include <iostream>
 
@@ -90,6 +91,10 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
 
     _AtlModule.hModule(hInstance);
     _AtlModule.start_gatekeeper();
+
+    // Provisioning
+    pEp::LocalProvisioning provisioning;
+    provisioning.Run();
 
     PEP_SESSION first_session;
     PEP_STATUS status = ::init(&first_session, NULL, NULL, pEp::Adapter::_ensure_passphrase);
