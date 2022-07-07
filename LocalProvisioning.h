@@ -16,7 +16,7 @@ namespace pEp
 
 	#define DeploymentKeyFile L"deployment_key-pub.der"
 	#define ProvisioningKeyFile L"provisioning_key.der"
-	#define DefaultProvisionPackage L"pEp.pkk"
+	#define DefaultProvisionPackage L"pEp.ppk"
 
 
 	class LocalProvisioning
