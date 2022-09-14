@@ -559,6 +559,11 @@ interface IpEpEngine : IUnknown {
 
     // Imports keys from data, return optional list of fprs imported
     [id(71)] HRESULT ImportKeyWithFprReturn([in] BSTR keyData, [out] SAFEARRAY(struct pEpIdentity)* privateKeys, [out] SAFEARRAY(BSTR)* importedKeys);
+
+    // Enable Echo protocol
+    [id(72)] HRESULT EnableEchoProtocol([in] VARIANT_BOOL enable);
+    [id(73)] HRESULT EnableEchoProtocolInOutgoingMessageRatingPreview([in] VARIANT_BOOL enable);
+
 };
 
 [

@@ -297,6 +297,11 @@ public:
     STDMETHOD(PerUserDirectory)(BSTR * directory);
 
     STDMETHOD(ShowNotification)(BSTR title, BSTR message);
+
+    // Echo protocol & Media key
+    STDMETHOD(EnableEchoProtocol)(VARIANT_BOOL enable);
+    STDMETHOD(EnableEchoProtocolInOutgoingMessageRatingPreview)(VARIANT_BOOL enable);
+
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)
