@@ -37,6 +37,9 @@ interface IpEpEngineCallbacks : IUnknown {
 
         // forming group
         // SyncNotifyFormingGroup = 10,
+        
+        // echo protocol rating change
+        SyncNotifyOutgoingRatingChange = 64,
 
         SyncNotifyStart = 126,
         SyncNotifyStop = 127,
