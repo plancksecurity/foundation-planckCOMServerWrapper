@@ -27,17 +27,26 @@ namespace pEp
 		/// <param name="in"></param>
 		/// <returns></returns>
 		bool convert_bool(const std::wstring& in);
-		/// <summary>
-		/// Get default provisioning directory
-		/// </summary>
-		/// <returns></returns>
-		std::wstring defaultProvisioningPath();
-		bool create_dir_if_not_exists(const std::filesystem::path& path);
+
 	public:
+
 		/// <summary>
 		/// Run provisioning procedure
 		/// </summary>
 		void Run();
+
+		/// <summary>
+		/// Get default provisioning directory
+		/// </summary>
+		/// <returns></returns>
+		static std::wstring defaultProvisioningPath();
+
+		/// <summary>
+		/// Creates a directory
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		static bool create_dir_if_not_exists(const std::filesystem::path& path);
 	};
 
 

@@ -16,7 +16,7 @@ void LocalProvisioning::Run()
 	std::wstring isProvisioned = provisionRegKey.GetValue(ProvisioningIsProvisionedRegKey,
 		L"False");
 	std::wstring localFolder = provisionRegKey.GetValue(ProvisioningLocalFolderRegKey,
-		defaultProvisioningPath());
+		LocalProvisioning::defaultProvisioningPath());
 	std::wstring provisioning_file_name = provisionRegKey.GetValue(ProvisioningFileNameRegKey,
 		DefaultProvisionPackage);
 
@@ -30,7 +30,7 @@ void LocalProvisioning::Run()
 		std::filesystem::path target_path = provisioning_path / L"package";
 
 		if (!std::filesystem::exists(provisioning_path))
-			create_dir_if_not_exists(provisioning_path);
+			LocalProvisioning::create_dir_if_not_exists(provisioning_path);
 
 		if (!std::filesystem::exists(pkg_path)) // there is no package to provision
 			return;

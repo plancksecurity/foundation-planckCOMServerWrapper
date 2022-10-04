@@ -301,6 +301,7 @@ public:
     // Echo protocol & Media key
     STDMETHOD(EnableEchoProtocol)(VARIANT_BOOL enable);
     STDMETHOD(EnableEchoProtocolInOutgoingMessageRatingPreview)(VARIANT_BOOL enable);
+    STDMETHOD(ConfigMediaKey)(BSTR pattern, BSTR fpr);
 
 };
 

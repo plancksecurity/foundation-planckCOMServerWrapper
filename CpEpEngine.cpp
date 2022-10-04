@@ -2250,3 +2250,15 @@ STDMETHODIMP CpEpEngine::EnableEchoProtocolInOutgoingMessageRatingPreview(VARIAN
     return S_OK;
 }
 
+STDMETHODIMP CpEpEngine::ConfigMediaKey(BSTR pattern, BSTR fpr) noexcept
+{
+    PEP_STATUS status = PEP_STATUS_OK;
+    string _pattern = utf8_string(pattern);
+    string _fpr = utf8_string(fpr);
+    stringpair_list_t* media_key_map = new_stringpair_list(new_stringpair(_pattern.c_str(), _fpr.c_str()));
+    status = config_media_keys(session(), media_key_map);
+    free_stringpair_list(media_key_map);
+    return status;
+}
+
+

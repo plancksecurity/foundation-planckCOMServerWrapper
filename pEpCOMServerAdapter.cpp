@@ -10,7 +10,7 @@
 #include "LocalJSONAdapter.h"
 #include "CMainWindow.h"
 #include "LocalProvisioning.h"
-
+#include "MediaKeyManager.h"
 #include <iostream>
 
 
@@ -106,6 +106,10 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
         auto mw = mainWindow.Create(HWND_MESSAGE);
         assert(mw);
     }
+
+    pEp::MediaKeyManager media_key_manager(first_session);
+    media_key_manager.ImportKeys();
+    media_key_manager.ConfigureMediaKeyMap();
 
     auto rv = _AtlModule.WinMain(nShowCmd);
 
