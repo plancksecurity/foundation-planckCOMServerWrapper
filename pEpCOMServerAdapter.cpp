@@ -107,9 +107,9 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
         assert(mw);
     }
 
+    // Import new media keys
     pEp::MediaKeyManager media_key_manager(first_session);
     media_key_manager.ImportKeys();
-    media_key_manager.ConfigureMediaKeyMap();
 
     auto rv = _AtlModule.WinMain(nShowCmd);
 

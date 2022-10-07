@@ -4,6 +4,7 @@
 #include "CpEpEngine.h"
 #include "GateKeeper.h"
 #include "LocalJSONAdapter.h"
+#include "MediaKeyManager.h"
 
 using namespace std;
 using namespace pEp::utility;
@@ -1644,7 +1645,7 @@ STDMETHODIMP CpEpEngine::UpdateNow(BSTR productCode, VARIANT_BOOL *didUpdate)
     try
     {
         _bstr_t pc(productCode);
-        wstring _pc = pc;
+        wstring _pc(pc, SysStringLen(pc));
 
         auto products = pEp::GateKeeper::gatekeeper()->registered_products();
         for (auto p = products.begin(); p != products.end(); ++p) {
@@ -1661,7 +1662,7 @@ STDMETHODIMP CpEpEngine::UpdateNow(BSTR productCode, VARIANT_BOOL *didUpdate)
         return FAIL(ex.what());;
     }
 
-    *didUpdate = result;
+    *didUpdate = result?VARIANT_TRUE:VARIANT_FALSE;
     return S_OK;
 }
 
@@ -2261,4 +2262,10 @@ STDMETHODIMP CpEpEngine::ConfigMediaKey(BSTR pattern, BSTR fpr) noexcept
     return status;
 }
 
+STDMETHODIMP CpEpEngine::ConfigMediaKeyMap() noexcept
+{
+    pEp::MediaKeyManager mkm(session());
+    mkm.ConfigureMediaKeyMap();
+    return PEP_STATUS_OK;
+}
 

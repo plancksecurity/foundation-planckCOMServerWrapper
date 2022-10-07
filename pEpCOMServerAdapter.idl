@@ -567,6 +567,8 @@ interface IpEpEngine : IUnknown {
     [id(72)] HRESULT EnableEchoProtocol([in] VARIANT_BOOL enable);
     [id(73)] HRESULT EnableEchoProtocolInOutgoingMessageRatingPreview([in] VARIANT_BOOL enable);
     [id(74)] HRESULT ConfigMediaKey([in] BSTR pattern, [in] BSTR fpr);
+    [id(75)] HRESULT ConfigMediaKeyMap();
+    
 };
 
 [

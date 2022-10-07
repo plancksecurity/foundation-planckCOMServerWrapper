@@ -1,14 +1,15 @@
 #include "stdafx.h"
 #include "MediaKeyManager.h"
 #include <fstream>
-#include <pEp/media_key.h>
+#include "pEp_utility.h"
 
 namespace pEp
 {
 
 namespace fs = std::filesystem;
 
-std::string MediaKeyManager::trim_chars(const std::string& in, const std::string& chars)
+
+std::string MediaKeyManager::trim_chars(const std::string& in, const std::string& chars) const
 {   
     std::string part;
     size_t start = in.find_first_not_of(chars);
@@ -18,7 +19,7 @@ std::string MediaKeyManager::trim_chars(const std::string& in, const std::string
 }
 
 
-std::string MediaKeyManager::load_text_file_contents(const std::filesystem::path& p)
+std::string MediaKeyManager::load_text_file_contents(const std::filesystem::path& p) const
 {
     std::ifstream t(p);
     std::stringstream buffer;
@@ -26,31 +27,59 @@ std::string MediaKeyManager::load_text_file_contents(const std::filesystem::path
     return buffer.str();
 }
 
-void MediaKeyManager::save_fpr_stamp(const std::filesystem::path& p, const std::string& fpr)
+void MediaKeyManager::save_fpr_stamp(const std::filesystem::path& p, const std::string& fpr) const
 {
     std::ofstream outfile;
     outfile.open(p / stamp_filename, std::ios_base::trunc);
     outfile << fpr;
 }
 
-void MediaKeyManager::add_registry_pattern(const std::string& pattern, const std::string& fpr)
-{
 
+void MediaKeyManager::ConfigureMediaKeyMap() const
+{
+    HKEY key;
+    LONG status;
+    status = RegOpenKeyEx(HKEY_CURRENT_USER, MediaKeyRegKey, 0, KEY_QUERY_VALUE, &key);
+    if (status == ERROR_FILE_NOT_FOUND)
+    {
+        status = RegCreateKeyEx(HKEY_CURRENT_USER, MediaKeyRegKey, 0, REG_NONE,
+            REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &key, NULL);
+
+    }
+    if (status == ERROR_SUCCESS)
+    {
+        TCHAR lpValname[2048];
+        DWORD dwValSize = 2048;
+        BYTE lpData[2048];
+        DWORD dwDataSize = 2048;
+        DWORD type;
+        stringpair_list_t* media_key_map = new_stringpair_list(nullptr);
+
+
+        int i = 0;
+        while ((status = RegEnumValue(key, i++, lpValname, &dwValSize, NULL, &type, lpData, &dwDataSize)) == 0)
+        {
+            if (type == REG_SZ)
+            {
+                std::string fpr = utility::utf8_string((LPWSTR)lpData);
+                std::string pattern = utility::utf8_string((LPWSTR)lpValname);
+                stringpair_list_add(media_key_map, new_stringpair(pattern.c_str(), fpr.c_str()));
+            }
+            dwValSize = 2048;
+            dwDataSize = 2048;
+        }
+        PEP_STATUS pep_status = config_media_keys(session, media_key_map);
+        if (pep_status != PEP_STATUS_OK)
+        {
+            provisioning_log_error << "Error configuring media keys: " << pep_status;
+        }
+        free_stringpair_list(media_key_map);
+    }
 }
 
 
-PEP_STATUS MediaKeyManager::config_media_key(const std::string& pattern, const std::string& fpr)
-{
-    PEP_STATUS status = PEP_STATUS_OK;
-    stringpair_list_t* media_key_map = new_stringpair_list(new_stringpair(pattern.c_str(), fpr.c_str()));
-    status = config_media_keys(session, media_key_map);
-    free_stringpair_list(media_key_map);
-    return status;
-}
 
-
-
-std::string MediaKeyManager::import_media_key(const std::filesystem::path& p)
+std::string MediaKeyManager::import_media_key(const std::filesystem::path& p) const
 {
     std::string k = load_text_file_contents(p);
     identity_list *l;
@@ -66,30 +95,47 @@ void MediaKeyManager::load_keys_in_dir(const std::filesystem::path& p)
     fs::path privkey_path = p / privkey_filename;
     fs::path pubkey_path = p / pubkey_filename;
     fs::path pattern_path = p / pattern_filename;
+    fs::path stamp_path = p / stamp_filename;
 
     if (fs::exists(privkey_path) && fs::exists(pubkey_path) && fs::exists(pattern_path))
     {
+        // check stamp datetime against privkey, pubkey and pattern
+        // and return if it stamp_path greater or equal than all of them
+        if (fs::exists(stamp_path))
+        {
+            const auto time_stamp = fs::last_write_time(stamp_path);
+            const auto time_privkey = fs::last_write_time(privkey_path);
+            const auto time_pubkey = fs::last_write_time(pubkey_path);
+            const auto time_pattern = fs::last_write_time(stamp_path);
+            if (time_stamp >= time_privkey && time_stamp >= time_pubkey && time_stamp >= time_pattern)
+            {
+                return;
+            }
+        }
+
+        // import keys and configure media key registry keys 
         std::string fpr_pri = import_media_key(privkey_path);
         std::string fpr_pub = import_media_key(pubkey_path);
         if (fpr_pri.compare(fpr_pub) != 0)
         {
-            // TODO log
-            std::cout << "FPRs do not match\n";
+            provisioning_log_error << "Error importing keys from " << p.c_str() << 
+                                      ": FPRs do not match. This could mean that there " << 
+                                      "is some mismatch between private an public keys.";
             delete_keypair(session, fpr_pri.c_str());
             delete_keypair(session, fpr_pub.c_str());
         }
         else
         {
             std::string pattern = trim_chars(load_text_file_contents(pattern_path));
-            PEP_STATUS status = config_media_key(pattern, fpr_pri);
-            if (status != PEP_STATUS_OK)
+            if (pattern.size() > 0)
             {
-                // TODO log
-                std::cout << "Error in config_media_key: " << status << "\n";
+                save_fpr_stamp(p, fpr_pri);
+                rk.SetValue(utility::utf16_string(pattern), utility::utf16_string(fpr_pri));
+                provisioning_log_info << "Imported media key for pattern: " << pattern;
             }
             else
             {
-                save_fpr_stamp(p, fpr_pri);
+                provisioning_log_info << "Found a void pattern in " << p.c_str() << ". Ignoring.";
             }
         }
     }
@@ -105,7 +151,6 @@ void MediaKeyManager::ImportKeys()
    
     for (const fs::directory_entry& dir_entry : fs::directory_iterator(media_key_path))
     {
-        std::cerr << dir_entry << '\n';
         if (dir_entry.is_directory())
         {
             load_keys_in_dir(dir_entry);
@@ -113,10 +158,5 @@ void MediaKeyManager::ImportKeys()
     }
 
 }
-
-void MediaKeyManager::ConfigureMediaKeyMap()
-{
-}
-
 
 } // namespace pEp
