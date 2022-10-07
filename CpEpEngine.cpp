@@ -4,6 +4,7 @@
 #include "CpEpEngine.h"
 #include "GateKeeper.h"
 #include "LocalJSONAdapter.h"
+#include "MediaKeyManager.h"
 
 using namespace std;
 using namespace pEp::utility;
@@ -1644,7 +1645,7 @@ STDMETHODIMP CpEpEngine::UpdateNow(BSTR productCode, VARIANT_BOOL *didUpdate)
     try
     {
         _bstr_t pc(productCode);
-        wstring _pc = pc;
+        wstring _pc(pc, SysStringLen(pc));
 
         auto products = pEp::GateKeeper::gatekeeper()->registered_products();
         for (auto p = products.begin(); p != products.end(); ++p) {
@@ -1661,7 +1662,7 @@ STDMETHODIMP CpEpEngine::UpdateNow(BSTR productCode, VARIANT_BOOL *didUpdate)
         return FAIL(ex.what());;
     }
 
-    *didUpdate = result;
+    *didUpdate = result?VARIANT_TRUE:VARIANT_FALSE;
     return S_OK;
 }
 
@@ -2248,5 +2249,23 @@ STDMETHODIMP CpEpEngine::EnableEchoProtocolInOutgoingMessageRatingPreview(VARIAN
 {
     config_enable_echo_in_outgoing_message_rating_preview(session(), enable);
     return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::ConfigMediaKey(BSTR pattern, BSTR fpr) noexcept
+{
+    PEP_STATUS status = PEP_STATUS_OK;
+    string _pattern = utf8_string(pattern);
+    string _fpr = utf8_string(fpr);
+    stringpair_list_t* media_key_map = new_stringpair_list(new_stringpair(_pattern.c_str(), _fpr.c_str()));
+    status = config_media_keys(session(), media_key_map);
+    free_stringpair_list(media_key_map);
+    return status;
+}
+
+STDMETHODIMP CpEpEngine::ConfigMediaKeyMap() noexcept
+{
+    pEp::MediaKeyManager mkm(session());
+    mkm.ConfigureMediaKeyMap();
+    return PEP_STATUS_OK;
 }
 

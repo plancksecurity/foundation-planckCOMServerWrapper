@@ -144,6 +144,7 @@
     <ClCompile Include="CpEpEngine.cpp" />
     <ClCompile Include="GateKeeper.cpp" />
     <ClCompile Include="LocalJSONAdapter.cpp" />
+    <ClCompile Include="MediaKeyManager.cpp" />
     <ClCompile Include="pEpCOMServerAdapter.cpp" />
     <ClCompile Include="pEpCOMServerAdapter_i.c">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
@@ -177,6 +178,7 @@
     <ClInclude Include="GateKeeper.h" />
     <ClInclude Include="LocalJSONAdapter.h" />
     <ClInclude Include="LocalProvisioning.h" />
+    <ClInclude Include="MediaKeyManager.h" />
     <ClInclude Include="pEpCOMServerAdapter.h" />
     <ClInclude Include="pEpCOMServerAdapter_i.h" />
     <ClInclude Include="pEp_utility.h" />

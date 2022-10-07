@@ -67,6 +67,7 @@
 #include <pEp/passphrase_cache.hh>
 #include <pEp/callback_dispatcher.hh>
 #include <pEp/status_to_string.hh>
+#include <pEp/media_key.h>
 
 #include "utf8_helper.h"
 #include "pEp_utility.h"
