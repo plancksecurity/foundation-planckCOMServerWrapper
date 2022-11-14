@@ -68,10 +68,13 @@ void MediaKeyManager::ConfigureMediaKeyMap() const
             dwValSize = 2048;
             dwDataSize = 2048;
         }
-        PEP_STATUS pep_status = config_media_keys(session, media_key_map);
-        if (pep_status != PEP_STATUS_OK)
+        if (media_key_map->value != nullptr)
         {
-            provisioning_log_error << "Error configuring media keys: " << pep_status;
+            PEP_STATUS pep_status = config_media_keys(session, media_key_map);
+            if (pep_status != PEP_STATUS_OK)
+            {
+                provisioning_log_error << "Error configuring media keys: " << pep_status;
+            }
         }
         free_stringpair_list(media_key_map);
     }
