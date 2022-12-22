@@ -84,10 +84,21 @@ void MediaKeyManager::ConfigureMediaKeyMap() const
 
 std::string MediaKeyManager::import_media_key(const std::filesystem::path& p) const
 {
+    std::string ret;
     std::string k = load_text_file_contents(p);
     identity_list *l;
-    import_key(session, k.c_str(), k.size(), &l);
-    return l->ident->fpr;
+    stringlist_t* imported_keys = new_stringlist(NULL);
+    PEP_STATUS status = import_key_with_fpr_return(session, k.c_str(), k.size(), &l, &imported_keys, NULL);
+    if (status != PEP_KEY_IMPORTED)
+    {
+        provisioning_log_error << "Error configuring media key " << p.c_str() << ": " << status;
+    }
+    else
+    {
+        ret = imported_keys->value;
+    }
+    free_stringlist(imported_keys);
+    return ret;
 }
 
 
@@ -95,45 +106,81 @@ std::string MediaKeyManager::import_media_key(const std::filesystem::path& p) co
 
 void MediaKeyManager::load_keys_in_dir(const std::filesystem::path& p)
 {
+    fs::path allkeys_path = p / allkeys_filename;
     fs::path privkey_path = p / privkey_filename;
     fs::path pubkey_path = p / pubkey_filename;
     fs::path pattern_path = p / pattern_filename;
     fs::path stamp_path = p / stamp_filename;
 
-    if (fs::exists(privkey_path) && fs::exists(pubkey_path) && fs::exists(pattern_path))
+    if ( ((fs::exists(privkey_path) && fs::exists(pubkey_path)) || fs::exists(allkeys_path)) && fs::exists(pattern_path))
     {
+        // check stamp datetime against allkeys and pattern
+        // and return if it stamp_path greater or equal than all of them
+        if (fs::exists(stamp_path) && fs::exists(allkeys_path))
+        {
+            const auto time_pattern = fs::last_write_time(stamp_path);
+            const auto time_stamp = fs::last_write_time(stamp_path);
+            const auto time_allkeys = fs::last_write_time(allkeys_path);
+            if (time_stamp >= time_allkeys && time_stamp >= time_pattern)
+            {
+                return;
+            }
+        }
+
         // check stamp datetime against privkey, pubkey and pattern
         // and return if it stamp_path greater or equal than all of them
-        if (fs::exists(stamp_path))
+        if (fs::exists(stamp_path) && fs::exists(privkey_path) && fs::exists(pubkey_path))
         {
+            const auto time_pattern = fs::last_write_time(stamp_path);
             const auto time_stamp = fs::last_write_time(stamp_path);
             const auto time_privkey = fs::last_write_time(privkey_path);
             const auto time_pubkey = fs::last_write_time(pubkey_path);
-            const auto time_pattern = fs::last_write_time(stamp_path);
             if (time_stamp >= time_privkey && time_stamp >= time_pubkey && time_stamp >= time_pattern)
             {
                 return;
             }
         }
 
-        // import keys and configure media key registry keys 
-        std::string fpr_pri = import_media_key(privkey_path);
-        std::string fpr_pub = import_media_key(pubkey_path);
-        if (fpr_pri.compare(fpr_pub) != 0)
+        // import keys
+        bool keys_are_imported = false;
+        std::string fpr = "";
+        if (fs::exists(privkey_path) && fs::exists(pubkey_path))
         {
-            provisioning_log_error << "Error importing keys from " << p.c_str() << 
-                                      ": FPRs do not match. This could mean that there " << 
-                                      "is some mismatch between private an public keys.";
-            delete_keypair(session, fpr_pri.c_str());
-            delete_keypair(session, fpr_pub.c_str());
+            // import keys and configure media key registry keys 
+            std::string fpr_pri = import_media_key(privkey_path);
+            std::string fpr_pub = import_media_key(pubkey_path);
+            if (!fpr_pri.empty() && !fpr_pub.empty())
+            {
+                if (fpr_pri.compare(fpr_pub) != 0)
+                {
+                    provisioning_log_error << "Error importing keys from " << p.c_str() <<
+                        ": FPRs do not match. This could mean that there " <<
+                        "is some mismatch between private an public keys.";
+                    delete_keypair(session, fpr_pri.c_str());
+                    delete_keypair(session, fpr_pub.c_str());
+                }
+                else
+                {
+                    keys_are_imported = true;
+                    fpr = fpr_pri;
+                }
+            }
         }
-        else
+        else if (fs::exists(allkeys_path))
+        {
+            fpr = import_media_key(allkeys_path);
+            if (!fpr.empty())
+                keys_are_imported = true;
+        }
+
+        // update registry
+        if (keys_are_imported && !fpr.empty())
         {
             std::string pattern = trim_chars(load_text_file_contents(pattern_path));
             if (pattern.size() > 0)
             {
-                save_fpr_stamp(p, fpr_pri);
-                rk.SetValue(utility::utf16_string(pattern), utility::utf16_string(fpr_pri));
+                save_fpr_stamp(p, fpr);
+                rk.SetValue(utility::utf16_string(pattern), utility::utf16_string(fpr));
                 provisioning_log_info << "Imported media key for pattern: " << pattern;
             }
             else

@@ -16,6 +16,7 @@ namespace pEp
 
 		inline static const std::wstring pubkey_filename = L"public_key.asc";
 		inline static const std::wstring privkey_filename = L"private_key.asc";
+		inline static const std::wstring allkeys_filename = L"keys.asc";
 		inline static const std::wstring pattern_filename = L"pattern.txt";
 		inline static const std::wstring stamp_filename = L"stamp.txt";
 
