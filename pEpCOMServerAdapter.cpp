@@ -9,7 +9,8 @@
 #include "pEpCOMServerAdapter.h"
 #include "LocalJSONAdapter.h"
 #include "CMainWindow.h"
-
+#include "LocalProvisioning.h"
+#include "MediaKeyManager.h"
 #include <iostream>
 
 
@@ -91,6 +92,10 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
     _AtlModule.hModule(hInstance);
     _AtlModule.start_gatekeeper();
 
+    // Provisioning
+    pEp::LocalProvisioning provisioning;
+    provisioning.Run();
+
     PEP_SESSION first_session;
     PEP_STATUS status = ::init(&first_session, NULL, NULL, pEp::Adapter::_ensure_passphrase);
 
@@ -100,6 +105,12 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
         pEp::callback_dispatcher.add(JsonAdapter::messageToSend, JsonAdapter::notifyHandshake);
         auto mw = mainWindow.Create(HWND_MESSAGE);
         assert(mw);
+    }
+
+    // Import new media keys
+    {
+        pEp::MediaKeyManager media_key_manager(first_session);
+        media_key_manager.ImportKeys();
     }
 
     auto rv = _AtlModule.WinMain(nShowCmd);

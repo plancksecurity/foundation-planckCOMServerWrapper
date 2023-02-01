@@ -614,5 +614,81 @@ namespace pEp {
                 *opt_field_array = NULL;
             }
         }
+
+        /** RegistryKey class **/
+
+        LONG RegistryKey::create_key(HKEY hk, const std::wstring& key, HKEY& hkKey) noexcept
+        {
+            return RegCreateKeyEx(hk, key.c_str(), 0, REG_NONE,
+                REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hkKey, NULL);
+        }
+
+        RegistryKey::RegistryKey(const std::wstring& keyPath) noexcept : 
+            cu(nullptr), hkKeyPath(nullptr)
+        {
+            LONG lResult;
+            key_path = keyPath;
+            if (RegOpenCurrentUser(KEY_ALL_ACCESS, &cu) == ERROR_SUCCESS)
+            {
+                lResult = RegOpenKeyEx(cu, key_path.c_str(), 0, KEY_ALL_ACCESS, &hkKeyPath);
+                if (lResult == ERROR_SUCCESS)
+                {
+                    opened = true;
+                }
+                else if (lResult == ERROR_FILE_NOT_FOUND)
+                {
+                    if (create_key(cu, key_path, hkKeyPath) == ERROR_SUCCESS)
+                        opened = true;
+                }
+            }
+        }
+
+        RegistryKey::~RegistryKey() noexcept
+        {
+            if (cu != nullptr)
+                RegCloseKey(cu);
+            if (hkKeyPath != nullptr)
+                RegCloseKey(hkKeyPath);
+        }
+
+        std::wstring RegistryKey::GetValue(const std::wstring& key, const std::wstring& default_value) noexcept
+        {
+            LONG lResult;
+            if (opened)
+            {
+                DWORD size;
+                lResult = RegGetValue(cu, key_path.c_str(), key.c_str(), RRF_RT_REG_SZ, NULL, NULL, &size);
+                if (lResult == ERROR_SUCCESS && size)
+                {
+                    std::wstring ret;
+                    std::unique_ptr<wchar_t[]> value(new wchar_t[size]);
+                    lResult = RegGetValue(cu, key_path.c_str(), key.c_str(), RRF_RT_REG_SZ, NULL, value.get(), &size);
+                    ret = value.get();
+                    if (lResult == ERROR_SUCCESS)
+                        return ret;
+                    else
+                        return default_value;
+                }
+                else if (lResult == ERROR_FILE_NOT_FOUND)
+                {
+                    SetValue(key, default_value);
+                    return default_value;
+                }
+                else
+                {
+                    return default_value;
+                }
+            }
+            else
+            {
+                return default_value;
+            }
+        }
+
+        bool RegistryKey::SetValue(const std::wstring& key, const std::wstring& value) noexcept
+        {
+            return RegSetValueEx(hkKeyPath, key.c_str(), 0, REG_SZ, (BYTE*)value.c_str(), value.size() * 2) == ERROR_SUCCESS;
+        }
+
     }
 }

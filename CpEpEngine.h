@@ -4,6 +4,7 @@
 #include "resource.h"       // main symbols
 #include "stdafx.h"
 #include "pEpComServerAdapter_i.h"
+#include "pEp/Adapter.hxx"
 #include <group_manager_api.h>
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
@@ -47,7 +48,7 @@ public:
             try {
                 // try/catch to avoid freeze when no session could be initialized because a runtime
                 // or other kind of exceptions thrown by engine
-                ::log_event(session(), "Shutdown", "pEp COM Adapter", NULL, NULL);
+                pEpLog("pEp COM Adapter shutdown");
             }
             catch (pEp::RuntimeError& ex) { // runtime
                 error(ex.what());
@@ -94,8 +95,10 @@ public:
     {
         std::lock_guard<std::mutex> lock(init_mutex);
         try {
-            session.initialize();
-            ::log_event(session(), "FinalConstruct", "pEp COM Adapter", NULL, NULL);
+            
+			pEp::callback_dispatcher.add(CpEpEngine::messageToSend, CpEpEngine::notifyHandshake, CpEpEngine::on_sync_startup, CpEpEngine::on_sync_shutdown); 	// TODO: review
+			session.initialize();
+            pEpLog("pEp COM Adapter FinalConstruct");
         }
         catch (pEp::RuntimeError& e) {
             HRESULT res = MAKE_HRESULT(1, FACILITY_ITF, (0xFFFF & e.status));
@@ -131,7 +134,7 @@ protected:
         if (verbose_mode) {
             stringstream ss;
             ss << __FILE__ << ":" << __LINE__ << " " << text;
-            ::log_event(session(), "verbose", "pEp COM Server Adapter", ss.str().c_str(), NULL);
+            pEpLog(ss.str().c_str());
         }
     }
 
@@ -290,7 +293,11 @@ public:
     STDMETHOD(PerUserDirectory)(BSTR * directory);
 
     STDMETHOD(ShowNotification)(BSTR title, BSTR message);
-
+    // Echo protocol & Media key
+    STDMETHOD(EnableEchoProtocol)(VARIANT_BOOL enable);
+    STDMETHOD(EnableEchoProtocolInOutgoingMessageRatingPreview)(VARIANT_BOOL enable);
+    STDMETHOD(ConfigMediaKey)(BSTR pattern, BSTR fpr);
+    STDMETHOD(ConfigMediaKeyMap)();
     // Group management methods
     STDMETHOD(GroupCreate)(pEpIdentity* groupIdentity, pEpIdentity* manager, SAFEARRAY* memberlist); 
     STDMETHOD(GroupJoin)(pEpIdentity* groupIdentity, pEpIdentity* asMember);
@@ -301,8 +308,6 @@ public:
     STDMETHOD(GroupQueryGroups)(LPSAFEARRAY* groupList);
     STDMETHOD(GroupQueryManager)(pEpIdentity* groupIdentity, pEpIdentity* manager);
     STDMETHOD(GroupQueryMembers)(pEpIdentity* groupIdentity, LPSAFEARRAY* members);
-
-    
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)

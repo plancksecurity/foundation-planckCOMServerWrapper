@@ -49,6 +49,15 @@
     <ClCompile Include="CMainWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="unpack.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LocalProvisioning.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaKeyManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -88,6 +97,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CMainWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="unpack.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LocalProvisioning.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaKeyManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

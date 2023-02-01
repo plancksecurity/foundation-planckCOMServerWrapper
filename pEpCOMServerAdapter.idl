@@ -37,6 +37,9 @@ interface IpEpEngineCallbacks : IUnknown {
 
         // forming group
         // SyncNotifyFormingGroup = 10,
+        
+        // echo protocol rating change
+        SyncNotifyOutgoingRatingChange = 64,
 
         SyncNotifyStart = 126,
         SyncNotifyStop = 127,
@@ -582,6 +585,14 @@ interface IpEpEngine : IUnknown {
 
     // Imports keys from data, return optional list of fprs imported
     [id(80)] HRESULT ImportKeyWithFprReturn([in] BSTR keyData, [out] SAFEARRAY(struct pEpIdentity)* privateKeys, [out] SAFEARRAY(BSTR)* importedKeys);
+
+    // Enable Echo protocol
+    [id(81)] HRESULT EnableEchoProtocol([in] VARIANT_BOOL enable);
+    [id(82)] HRESULT EnableEchoProtocolInOutgoingMessageRatingPreview([in] VARIANT_BOOL enable);
+    [id(83)] HRESULT ConfigMediaKey([in] BSTR pattern, [in] BSTR fpr);
+    [id(84)] HRESULT ConfigMediaKeyMap();
+    
+
 };
 
 [

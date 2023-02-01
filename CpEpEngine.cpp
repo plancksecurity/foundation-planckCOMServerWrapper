@@ -5,6 +5,11 @@
 #include "GateKeeper.h"
 #include "LocalJSONAdapter.h"
 #include "../libpEpAdapter/src/group_manager_api.h"
+#include "MediaKeyManager.h"
+
+
+
+
 
 using namespace std;
 using namespace pEp::utility;
@@ -164,18 +169,13 @@ STDMETHODIMP CpEpEngine::Log(BSTR title, BSTR entity, BSTR description, BSTR com
     if (description)
         _description = utf8_string(description);
 
-    if (comment)
-        _comment = utf8_string(comment);
-
     if (result != S_OK)
         return result;
 
-    PEP_STATUS _status = ::log_event(session(), _title.c_str(), _entity.c_str(), _description.c_str(), _comment.c_str());
-    assert(_status == PEP_STATUS_OK);
-    if (_status != PEP_STATUS_OK)
-        return FAIL(L"log_event", _status);
-    else
-        return S_OK;
+    std::stringstream ss;
+    ss << _title.c_str() << " - " << _entity.c_str() << ": " << _description.c_str();
+    pEpLog(ss.str().c_str());
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::Trustwords(BSTR fpr, BSTR lang, LONG max_words, BSTR * words)
@@ -278,7 +278,7 @@ STDMETHODIMP CpEpEngine::GetTrustwordsForFprs(BSTR fpr1, BSTR fpr2, BSTR lang, V
     char* _words;
     size_t _size;
     if (result == S_OK) {
-        auto status = ::get_trustwords_for_fprs(session(), _fpr1.c_str(), _fpr2.c_str(), _lang.c_str(), &_words, &_size, full != 0 /* convert variant bool to C bool */);
+        auto status = ::get_xor_trustwords_for_fprs(session(), _fpr1.c_str(), _fpr2.c_str(), _lang.c_str(), &_words, &_size, full != 0 /* convert variant bool to C bool */);
 
         if (status == PEP_OUT_OF_MEMORY) {
             result = E_OUTOFMEMORY;
@@ -1524,7 +1524,7 @@ STDMETHODIMP CpEpEngine::UpdateNow(BSTR productCode, VARIANT_BOOL *didUpdate)
     try
     {
         _bstr_t pc(productCode);
-        wstring _pc = pc;
+        wstring _pc(pc, SysStringLen(pc));
 
         auto products = pEp::GateKeeper::gatekeeper()->registered_products();
         for (auto p = products.begin(); p != products.end(); ++p) {
@@ -1541,7 +1541,7 @@ STDMETHODIMP CpEpEngine::UpdateNow(BSTR productCode, VARIANT_BOOL *didUpdate)
         return FAIL(ex.what());;
     }
 
-    *didUpdate = result;
+    *didUpdate = result?VARIANT_TRUE:VARIANT_FALSE;
     return S_OK;
 }
 
@@ -2362,3 +2362,35 @@ STDMETHODIMP CpEpEngine::ImportKeyWithFprReturn(BSTR keyData, LPSAFEARRAY* priva
 
     return status;
 }
+
+
+STDMETHODIMP CpEpEngine::EnableEchoProtocol(VARIANT_BOOL enable)
+{
+    config_enable_echo_protocol(session(), enable);
+    return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::EnableEchoProtocolInOutgoingMessageRatingPreview(VARIANT_BOOL enable)
+{
+    config_enable_echo_in_outgoing_message_rating_preview(session(), enable);
+    return S_OK;
+}
+
+STDMETHODIMP CpEpEngine::ConfigMediaKey(BSTR pattern, BSTR fpr) noexcept
+{
+    PEP_STATUS status = PEP_STATUS_OK;
+    string _pattern = utf8_string(pattern);
+    string _fpr = utf8_string(fpr);
+    stringpair_list_t* media_key_map = new_stringpair_list(new_stringpair(_pattern.c_str(), _fpr.c_str()));
+    status = config_media_keys(session(), media_key_map);
+    free_stringpair_list(media_key_map);
+    return status;
+}
+
+STDMETHODIMP CpEpEngine::ConfigMediaKeyMap() noexcept
+{
+    pEp::MediaKeyManager mkm(session());
+    mkm.ConfigureMediaKeyMap();
+    return PEP_STATUS_OK;
+}
+
