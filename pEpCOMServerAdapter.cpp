@@ -12,6 +12,8 @@
 #include "LocalProvisioning.h"
 #include "MediaKeyManager.h"
 #include <iostream>
+#include <sddl.h>
+#include <Lmcons.h>
 
 
 using namespace ATL;
@@ -24,6 +26,82 @@ using namespace std;
 namespace po = boost::program_options;
 std::string logfile = "";
 #endif
+
+
+// Check that this is the only instance.
+// It uses a named mutex to see if one instance of this binary is being executed
+// by the current user. 
+namespace CheckInstance
+{
+    HANDLE hMutexHandle = nullptr;
+
+    std::string getCurrentUserName()
+    {
+        CHAR username[UNLEN + 1];
+        DWORD username_len = UNLEN + 1;
+
+        if (!GetUserNameA(username, &username_len))
+            return "";
+        else
+            return username;
+    }
+
+    std::string getSID()
+    {
+        std::string ret;
+        std::string user_name = getCurrentUserName();
+        LPCSTR username = user_name.c_str();
+
+        PSID user_sid;
+        DWORD sid_size = SECURITY_MAX_SID_SIZE;
+        CHAR domain_name[256];
+        DWORD domain_size = 256;
+        SID_NAME_USE sid_use;
+
+        user_sid = (PSID)GlobalAlloc(GPTR, sid_size);
+        if (!LookupAccountNameA(NULL, username, user_sid, &sid_size, domain_name, &domain_size, &sid_use))
+            return user_name;
+
+        CHAR* sid_string;
+        if (!ConvertSidToStringSidA(user_sid, &sid_string))
+        {
+            GlobalFree(user_sid);
+            return user_name;
+        }
+
+        ret = sid_string;
+
+        GlobalFree(user_sid);
+        LocalFree(sid_string);
+
+        return ret;
+    }
+
+    // returns true if this is the first instance of this adapter.
+    // one adapter is allowed per user.
+    bool isFirst()
+    {
+        std::stringstream instance_name;
+        instance_name << "pEpComServerAdapter." << getSID();
+        // create a mutex with unique name for every user
+        hMutexHandle = CreateMutexA(NULL, TRUE, instance_name.str().c_str());
+        if (GetLastError() == ERROR_ALREADY_EXISTS) // a mutex with the same name exists?
+            return false;
+        else
+            return true;
+    }
+
+    void release() noexcept
+    {
+        if (hMutexHandle)
+        {
+            ReleaseMutex(hMutexHandle);
+            CloseHandle(hMutexHandle);
+        }
+    }
+
+};
+
 
 void CpEpCOMServerAdapterModule::gatekeeper(CpEpCOMServerAdapterModule * self)
 {
@@ -40,6 +118,9 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
 {
 #ifndef NDEBUG
     std::ios::sync_with_stdio(false);
+
+    if (!CheckInstance::isFirst())
+        return 0;
 
     // Command line options and console output are for debug only.
 
@@ -122,6 +203,7 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
         ljs->shutdown_now();
     }
 
+    CheckInstance::release();
     ::release(first_session);
     ExitProcess(rv);
     return rv;
