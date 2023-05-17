@@ -114,7 +114,7 @@ cleanup:
 namespace pEp {
     const LPCTSTR GateKeeper::plugin_reg_path = _T("Software\\Microsoft\\Office\\Outlook\\Addins\\pEp");
     const LPCTSTR GateKeeper::plugin_reg_value_name = _T("LoadBehavior");
-    const LPCTSTR GateKeeper::updater_reg_path = _T("Software\\pEp\\Updater");
+    const LPCTSTR GateKeeper::updater_reg_path = _T("Software\\planck\\Updater");
 
     const time_t GateKeeper::cycle = 7200;   // 7200 sec is 2 h
     const time_t GateKeeper::fraction = 10;  // first update is at 10% of cycle
