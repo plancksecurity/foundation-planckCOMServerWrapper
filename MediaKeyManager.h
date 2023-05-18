@@ -4,7 +4,7 @@
 
 namespace pEp
 {
-	#define MediaKeyRegKey	_T("Software\\pEp\\Provisioning\\Mediakeys")
+	#define MediaKeyRegKey	_T("Software\\planck\\Provisioning\\Mediakeys")
 	#define MediaKeyDir		_T("Mediakeys")
 
 	/// <summary>

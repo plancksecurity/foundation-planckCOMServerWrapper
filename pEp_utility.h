@@ -108,7 +108,7 @@ namespace pEp {
 			/// <summary>
 			///
 			/// </summary>
-			/// <param name="keyPath">Key were the settings are to be used (e.g."Software\\pEp\\Something")</param>
+			/// <param name="keyPath">Key were the settings are to be used (e.g."Software\\planck\\Something")</param>
 			RegistryKey(const std::wstring& keyPath) noexcept;
             ~RegistryKey() noexcept;
 
