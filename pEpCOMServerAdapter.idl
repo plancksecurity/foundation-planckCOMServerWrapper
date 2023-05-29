@@ -286,7 +286,7 @@ interface IpEpEngine : IUnknown {
         pEpRatingHaveNoKey,
         pEpRatingUnencrypted,
         pEpRatingUnreliable,
-        pEpMediaKeyProtected, 
+        pEpMediaKeyProtected,
         pEpRatingReliable,
         pEpRatingTrusted,
         pEpRatingTrustedAndAnonymized,

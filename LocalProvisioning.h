@@ -11,7 +11,7 @@
 namespace pEp
 {
 
-	#define ProvisioningRegKey				_T("Software\\pEp\\Provisioning")
+	#define ProvisioningRegKey				_T("Software\\planck\\Provisioning")
 	#define ProvisioningLocalFolderRegKey	_T("LocalFolder")
 	#define ProvisioningIsProvisionedRegKey _T("IsProvisioned")
 	#define ProvisioningFileNameRegKey		_T("FileName")
