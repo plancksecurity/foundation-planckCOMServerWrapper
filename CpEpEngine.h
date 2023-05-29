@@ -98,6 +98,7 @@ public:
             
 			pEp::callback_dispatcher.add(CpEpEngine::messageToSend, CpEpEngine::notifyHandshake, CpEpEngine::on_sync_startup, CpEpEngine::on_sync_shutdown); 	// TODO: review
 			session.initialize();
+            config_cipher_suite(session(), PEP_CIPHER_SUITE_RSA4K);
             pEpLog("pEp COM Adapter FinalConstruct");
         }
         catch (pEp::RuntimeError& e) {
