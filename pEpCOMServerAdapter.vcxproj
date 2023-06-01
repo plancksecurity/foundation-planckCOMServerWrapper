@@ -74,7 +74,7 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
       <SDLCheck>true</SDLCheck>
       <EnablePREfast>false</EnablePREfast>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)pEpJSONServerAdapter\server;$(SolutionDir);$(SolutionDir)pEp;$(SolutionDir)pEpEngine\asn.1;$(SolutionDir)\libpEpAdapter\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)pEpJSONServerAdapter\server;$(SolutionDir);$(SolutionDir)pEp;$(SolutionDir)PlanckCoreV3\asn.1;$(SolutionDir)\libpEpAdapter\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -113,7 +113,7 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
       <SDLCheck>true</SDLCheck>
       <EnablePREfast>false</EnablePREfast>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)pEpJSONServerAdapter\server;$(SolutionDir);$(SolutionDir)pEp;$(SolutionDir)pEpEngine\asn.1;$(SolutionDir)\libpEpAdapter\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)pEpJSONServerAdapter\server;$(SolutionDir);$(SolutionDir)pEp;$(SolutionDir)PlanckCoreV3\asn.1;$(SolutionDir)\libpEpAdapter\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -213,7 +213,7 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
     <ProjectReference Include="..\libpEpAdapter\build-windows\libpEpAdapter.vcxproj">
       <Project>{ec44fec9-2f3a-4a0c-b60e-0f22aa43ef58}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\pEpEngine\build-windows\pEpEngine.vcxproj">
+    <ProjectReference Include="..\PlanckCoreV3\build-windows\pEpEngine.vcxproj">
       <Project>{146e69f8-e1da-456a-b048-6dd29d9acf6b}</Project>
     </ProjectReference>
     <ProjectReference Include="..\pEpJSONServerAdapter\build-windows\pEpJSONServerAdapter\pEpJSONServerAdapterLibrary.vcxproj">
