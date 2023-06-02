@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "pEpCOMServerAdapter_i.h"
+#include "planckCOMServerWrapper_i.h"
 
 using namespace ATL;
 using namespace std;

@@ -6,7 +6,7 @@
 #include "xdlldata.h"
 
 #include "GateKeeper.h"
-#include "pEpCOMServerAdapter.h"
+#include "planckCOMServerWrapper.h"
 #include "LocalJSONAdapter.h"
 #include "CMainWindow.h"
 #include "LocalProvisioning.h"

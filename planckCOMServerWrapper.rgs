@@ -2,8 +2,8 @@ HKCR
 {
        NoRemove AppID
        {
-              '%APPID%' = s 'pEpCOMServerAdapter'
-              'pEpCOMServerAdapter.EXE'
+              '%APPID%' = s 'planckCOMServerWrapper'
+              'planckCOMServerWrapper.EXE'
               {
                      val AppID = s '%APPID%'
               }
