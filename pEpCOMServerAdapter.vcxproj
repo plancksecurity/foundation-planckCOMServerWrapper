@@ -15,6 +15,7 @@
     <Keyword>AtlProj</Keyword>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows-static-md</VcpkgTriplet>
+    <ProjectName>planckCOMServerWrapper</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -58,8 +59,8 @@
     <PostBuildEvent>
       <Command>echo "registering server $(TargetPath)"
 "$(TargetPath)" /Regserver
-echo "generating interop assembly $(TargetDir)pEpCOMServerAdapter.Interop.dll"
-"$(SDK40ToolsPath)x64\TlbImp.exe" "$(TargetPath)" /out:"$(TargetDir)pEpCOMServerAdapter.Interop.dll" /namespace:pEpCOMServerAdapterLib /primary /keyfile:"$(ProjectDir)pEp_test.snk" /machine:Agnostic
+echo "generating interop assembly $(TargetDir)planckCOMServerWrapper.Interop.dll"
+"$(SDK40ToolsPath)x64\TlbImp.exe" "$(TargetPath)" /out:"$(TargetDir)planckCOMServerWrapper.Interop.dll" /namespace:planckCOMServerWrapperLib /primary /keyfile:"$(ProjectDir)pEp_test.snk" /machine:Agnostic
 echo "copying required .dll file(s) to output directory"
 xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
 </Command>
@@ -80,11 +81,11 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
       <MkTypLibCompatible>false</MkTypLibCompatible>
       <TargetEnvironment>Win32</TargetEnvironment>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <HeaderFileName>pEpCOMServerAdapter_i.h</HeaderFileName>
-      <InterfaceIdentifierFileName>pEpCOMServerAdapter_i.c</InterfaceIdentifierFileName>
-      <ProxyFileName>pEpCOMServerAdapter_p.c</ProxyFileName>
+      <HeaderFileName>planckCOMServerWrapper_i.h</HeaderFileName>
+      <InterfaceIdentifierFileName>planckCOMServerWrapper_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>planckCOMServerWrapper_p.c</ProxyFileName>
       <GenerateStublessProxies>true</GenerateStublessProxies>
-      <TypeLibraryName>$(IntDir)pEpCOMServerAdapter.tlb</TypeLibraryName>
+      <TypeLibraryName>$(IntDir)planckCOMServerWrapper.tlb</TypeLibraryName>
       <DllDataFileName />
       <ValidateAllParameters>true</ValidateAllParameters>
     </Midl>
@@ -119,11 +120,11 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
       <MkTypLibCompatible>false</MkTypLibCompatible>
       <TargetEnvironment>Win32</TargetEnvironment>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <HeaderFileName>pEpCOMServerAdapter_i.h</HeaderFileName>
-      <InterfaceIdentifierFileName>pEpCOMServerAdapter_i.c</InterfaceIdentifierFileName>
-      <ProxyFileName>pEpCOMServerAdapter_p.c</ProxyFileName>
+      <HeaderFileName>planckCOMServerWrapper_i.h</HeaderFileName>
+      <InterfaceIdentifierFileName>planckCOMServerWrapper_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>planckCOMServerWrapper_p.c</ProxyFileName>
       <GenerateStublessProxies>true</GenerateStublessProxies>
-      <TypeLibraryName>$(IntDir)pEpCOMServerAdapter.tlb</TypeLibraryName>
+      <TypeLibraryName>$(IntDir)planckCOMServerWrapper.tlb</TypeLibraryName>
       <DllDataFileName />
       <ValidateAllParameters>true</ValidateAllParameters>
     </Midl>
@@ -148,8 +149,8 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
     <ClCompile Include="GateKeeper.cpp" />
     <ClCompile Include="LocalJSONAdapter.cpp" />
     <ClCompile Include="MediaKeyManager.cpp" />
-    <ClCompile Include="pEpCOMServerAdapter.cpp" />
-    <ClCompile Include="pEpCOMServerAdapter_i.c">
+    <ClCompile Include="planckCOMServerWrapper.cpp" />
+    <ClCompile Include="planckCOMServerWrapper_i.c">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
@@ -182,8 +183,8 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
     <ClInclude Include="LocalJSONAdapter.h" />
     <ClInclude Include="LocalProvisioning.h" />
     <ClInclude Include="MediaKeyManager.h" />
-    <ClInclude Include="pEpCOMServerAdapter.h" />
-    <ClInclude Include="pEpCOMServerAdapter_i.h" />
+    <ClInclude Include="planckCOMServerWrapper.h" />
+    <ClInclude Include="planckCOMServerWrapper_i.h" />
     <ClInclude Include="pEp_utility.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -193,7 +194,7 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
     <ClInclude Include="xdlldata.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="pEpCOMServerAdapter.rc" />
+    <ResourceCompile Include="planckCOMServerWrapper.rc" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="LICENSE.txt" />
@@ -201,13 +202,13 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="pEpCOMServerAdapter.rgs" />
+    <None Include="planckCOMServerWrapper.rgs" />
     <None Include="pEpEngine.rgs" />
     <None Include="pep_test.snk" />
     <None Include="updatekey.bin" />
   </ItemGroup>
   <ItemGroup>
-    <Midl Include="pEpCOMServerAdapter.idl" />
+    <Midl Include="planckCOMServerWrapper.idl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libpEpAdapter\build-windows\libpEpAdapter.vcxproj">

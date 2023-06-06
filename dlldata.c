@@ -19,13 +19,13 @@ extern "C"   {
 #endif
 
 EXTERN_PROXY_FILE( MessageAPI )
-EXTERN_PROXY_FILE( pEpCOMServerAdapter )
+EXTERN_PROXY_FILE( planckCOMServerWrapper )
 
 
 PROXYFILE_LIST_START
 /* Start of list */
   REFERENCE_PROXY_FILE( MessageAPI ),
-  REFERENCE_PROXY_FILE( pEpCOMServerAdapter ),
+  REFERENCE_PROXY_FILE( planckCOMServerWrapper ),
 /* End of list */
 PROXYFILE_LIST_END
 
