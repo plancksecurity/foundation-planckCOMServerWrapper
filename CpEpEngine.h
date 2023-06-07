@@ -3,7 +3,7 @@
 #pragma once
 #include "resource.h"       // main symbols
 #include "stdafx.h"
-#include "pEpComServerAdapter_i.h"
+#include "planckCOMServerWrapper_i.h"
 #include "pEp/Adapter.hxx"
 #include <group_manager_api.h>
 
