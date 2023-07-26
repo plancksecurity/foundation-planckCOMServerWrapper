@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 
 #include "GateKeeper.h"
-#include "pEpCOMServerAdapter.h"
+#include "planckCOMServerWrapper.h"
 #include "CMainWindow.h"
 
 using namespace std;

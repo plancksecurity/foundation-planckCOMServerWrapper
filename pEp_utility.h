@@ -1,7 +1,7 @@
 #pragma once
 
 #include "stdafx.h"
-#include "pEpComServerAdapter_i.h"
+#include "planckCOMServerWrapper_i.h"
 #include "utf8_helper.h"
 
 
