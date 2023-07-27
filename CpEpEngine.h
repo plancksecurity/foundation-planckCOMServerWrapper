@@ -301,7 +301,7 @@ public:
     STDMETHOD(ConfigMediaKeyMap)();
     // Group management methods
     STDMETHOD(GroupCreate)(pEpIdentity* groupIdentity, pEpIdentity* manager, SAFEARRAY* memberlist); 
-    STDMETHOD(GroupJoin)(pEpIdentity* groupIdentity, pEpIdentity* asMember);
+    STDMETHOD(GroupJoin)(pEpIdentity* groupIdentity, pEpIdentity* asMember, pEpIdentity* manager);
     STDMETHOD(GroupDissolve)(pEpIdentity* groupIdentity, pEpIdentity* manager);
     STDMETHOD(GroupInviteMember)(pEpIdentity* groupIdentity, pEpIdentity* groupMember);
     STDMETHOD(GroupRemoveMember)(pEpIdentity* groupIdentity, pEpIdentity* groupMember);

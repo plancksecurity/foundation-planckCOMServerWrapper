@@ -4,7 +4,7 @@
 #include "CpEpEngine.h"
 #include "GateKeeper.h"
 #include "LocalJSONAdapter.h"
-#include "../libpEpAdapter/src/group_manager_api.h"
+#include "../libPlanckWrapper/src/group_manager_api.h"
 #include "MediaKeyManager.h"
 
 
@@ -2046,6 +2046,48 @@ STDMETHODIMP CpEpEngine::GroupCreate(pEpIdentity* groupIdentity, pEpIdentity* ma
     return ERROR_SUCCESS;
 }
 
+STDMETHODIMP CpEpEngine::GroupJoin(pEpIdentity* groupIdentity, pEpIdentity* asMember, pEpIdentity* manager)
+{
+	assert(groupIdentity);
+	assert(asMember);
+    assert(manager);
+
+    if (!groupIdentity || !asMember || !manager)
+        return E_INVALIDARG;
+
+    try
+    {
+        IdentityPtr _group_identity(new_identity(groupIdentity), free_identity);
+        if (!_group_identity)
+            return E_OUTOFMEMORY;
+		IdentityPtr _asMember_identity(new_identity(asMember), free_identity);
+        if (!_asMember_identity)
+            return E_OUTOFMEMORY;
+        IdentityPtr _manager_identity(new_identity(manager), free_identity);
+        if (!_manager_identity)
+            return E_OUTOFMEMORY;
+    
+        const PEP_STATUS status = ::adapter_group_join(session(), _group_identity.get(), _asMember_identity.get(), _manager_identity.get());
+
+        switch (status) {
+        case PEP_STATUS_OK:
+            break;
+        case PEP_OUT_OF_MEMORY:
+            return E_OUTOFMEMORY;
+        default:
+            return FAIL(L"adapter_group_join is reporting an error", status);
+        }
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (const exception& ex) {
+        return FAIL(ex.what());
+    }
+
+    return ERROR_SUCCESS;
+}
+
 template<typename FUNCTION>
 STDMETHODIMP CpEpEngine::group_operation(pEpIdentity* param1, pEpIdentity* param2, FUNCTION f, const wchar_t* f_name )
 {
@@ -2087,11 +2129,6 @@ STDMETHODIMP CpEpEngine::group_operation(pEpIdentity* param1, pEpIdentity* param
     }
 
     return ERROR_SUCCESS;
-}
-
-STDMETHODIMP CpEpEngine::GroupJoin(pEpIdentity* groupIdentity, pEpIdentity* asMember)
-{
-    return group_operation(groupIdentity, asMember, adapter_group_join, L"adapter_group_join");
 }
 
 STDMETHODIMP CpEpEngine::GroupDissolve(pEpIdentity* groupIdentity, pEpIdentity* manager)

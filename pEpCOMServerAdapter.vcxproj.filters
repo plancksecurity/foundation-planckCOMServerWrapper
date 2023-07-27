@@ -90,7 +90,7 @@
     <ClInclude Include="LocalJSONAdapter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\pEpJSONServerAdapter\server\adapter-library.hh">
+    <ClInclude Include="..\planckJSONServerWrapper\server\adapter-library.hh">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CMainWindow.h">

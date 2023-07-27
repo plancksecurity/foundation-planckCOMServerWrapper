@@ -560,7 +560,7 @@ interface IpEpEngine : IUnknown {
     // Creates a group
     [id(69)] HRESULT GroupCreate([in] struct pEpIdentity* groupIdentity, [in] struct pEpIdentity* manager, [in] SAFEARRAY(struct pEpIdentity) memberlist);
     // Adds a user to a group
-    [id(70)] HRESULT GroupJoin([in] struct pEpIdentity* groupIdentity, [in] struct pEpIdentity* asMember);
+    [id(70)] HRESULT GroupJoin([in] struct pEpIdentity* groupIdentity, [in] struct pEpIdentity* asMember, [in] struct pEpIdentity* manager);
     // Removes a group
     [id(71)] HRESULT GroupDissolve([in] struct pEpIdentity* groupIdentity, [in] struct pEpIdentity* manager);
     // Invites a user to a group

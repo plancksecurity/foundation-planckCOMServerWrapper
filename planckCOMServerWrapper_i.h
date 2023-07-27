@@ -720,7 +720,8 @@ EXTERN_C const IID IID_IpEpEngine;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE GroupJoin( 
             /* [in] */ struct pEpIdentity *groupIdentity,
-            /* [in] */ struct pEpIdentity *asMember) = 0;
+            /* [in] */ struct pEpIdentity *asMember,
+			/* [in] */ struct pEpIdentity *manager) = 0;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE GroupDissolve( 
             /* [in] */ struct pEpIdentity *groupIdentity,
@@ -1111,7 +1112,8 @@ EXTERN_C const IID IID_IpEpEngine;
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *GroupJoin )( 
             IpEpEngine * This,
             /* [in] */ struct pEpIdentity *groupIdentity,
-            /* [in] */ struct pEpIdentity *asMember);
+            /* [in] */ struct pEpIdentity *asMember, 
+			/* [in] */ struct pEpIdentity *manager);
         
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *GroupDissolve )( 
             IpEpEngine * This,
@@ -1388,8 +1390,8 @@ EXTERN_C const IID IID_IpEpEngine;
 #define IpEpEngine_GroupCreate(This,groupIdentity,manager,memberlist)	\
     ( (This)->lpVtbl -> GroupCreate(This,groupIdentity,manager,memberlist) ) 
 
-#define IpEpEngine_GroupJoin(This,groupIdentity,asMember)	\
-    ( (This)->lpVtbl -> GroupJoin(This,groupIdentity,asMember) ) 
+#define IpEpEngine_GroupJoin(This,groupIdentity,asMember,manager)	\
+    ( (This)->lpVtbl -> GroupJoin(This,groupIdentity,asMember,manager) ) 
 
 #define IpEpEngine_GroupDissolve(This,groupIdentity,manager)	\
     ( (This)->lpVtbl -> GroupDissolve(This,groupIdentity,manager) ) 
