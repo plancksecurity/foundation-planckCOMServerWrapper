@@ -2046,10 +2046,11 @@ STDMETHODIMP CpEpEngine::GroupCreate(pEpIdentity* groupIdentity, pEpIdentity* ma
     return ERROR_SUCCESS;
 }
 
+
 STDMETHODIMP CpEpEngine::GroupJoin(pEpIdentity* groupIdentity, pEpIdentity* asMember, pEpIdentity* manager)
 {
-	assert(groupIdentity);
-	assert(asMember);
+    assert(groupIdentity);
+    assert(asMember);
     assert(manager);
 
     if (!groupIdentity || !asMember || !manager)
@@ -2060,14 +2061,14 @@ STDMETHODIMP CpEpEngine::GroupJoin(pEpIdentity* groupIdentity, pEpIdentity* asMe
         IdentityPtr _group_identity(new_identity(groupIdentity), free_identity);
         if (!_group_identity)
             return E_OUTOFMEMORY;
-		IdentityPtr _asMember_identity(new_identity(asMember), free_identity);
-        if (!_asMember_identity)
+        IdentityPtr _as_member_identity(new_identity(asMember), free_identity);
+        if (!_as_member_identity)
             return E_OUTOFMEMORY;
         IdentityPtr _manager_identity(new_identity(manager), free_identity);
         if (!_manager_identity)
             return E_OUTOFMEMORY;
-    
-        const PEP_STATUS status = ::adapter_group_join(session(), _group_identity.get(), _asMember_identity.get(), _manager_identity.get());
+
+        const PEP_STATUS status = ::adapter_group_join(session(), _group_identity.get(), _as_member_identity.get(), _manager_identity.get());
 
         switch (status) {
         case PEP_STATUS_OK:
@@ -2075,7 +2076,7 @@ STDMETHODIMP CpEpEngine::GroupJoin(pEpIdentity* groupIdentity, pEpIdentity* asMe
         case PEP_OUT_OF_MEMORY:
             return E_OUTOFMEMORY;
         default:
-            return FAIL(L"adapter_group_join is reporting an error", status);
+            return FAIL(L"group_join is reporting an error", status);
         }
     }
     catch (bad_alloc&) {
@@ -2087,6 +2088,8 @@ STDMETHODIMP CpEpEngine::GroupJoin(pEpIdentity* groupIdentity, pEpIdentity* asMe
 
     return ERROR_SUCCESS;
 }
+
+
 
 template<typename FUNCTION>
 STDMETHODIMP CpEpEngine::group_operation(pEpIdentity* param1, pEpIdentity* param2, FUNCTION f, const wchar_t* f_name )
@@ -2130,6 +2133,7 @@ STDMETHODIMP CpEpEngine::group_operation(pEpIdentity* param1, pEpIdentity* param
 
     return ERROR_SUCCESS;
 }
+
 
 STDMETHODIMP CpEpEngine::GroupDissolve(pEpIdentity* groupIdentity, pEpIdentity* manager)
 {
