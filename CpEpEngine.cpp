@@ -4,7 +4,7 @@
 #include "CpEpEngine.h"
 #include "GateKeeper.h"
 #include "LocalJSONAdapter.h"
-#include "../libpEpAdapter/src/group_manager_api.h"
+#include "../libPlanckWrapper/src/group_manager_api.h"
 #include "MediaKeyManager.h"
 
 
