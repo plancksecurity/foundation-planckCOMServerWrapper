@@ -1,5 +1,4 @@
 
-
 /* this ALWAYS GENERATED file contains the definitions for the interfaces */
 
 
@@ -721,11 +720,7 @@ EXTERN_C const IID IID_IpEpEngine;
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE GroupJoin( 
             /* [in] */ struct pEpIdentity *groupIdentity,
             /* [in] */ struct pEpIdentity *asMember,
-<<<<<<< planckCOMServerWrapper_i.h
 			/* [in] */ struct pEpIdentity *manager) = 0;
-=======
-            /* [in] */ struct pEpIdentity *manager) = 0;
->>>>>>> planckCOMServerWrapper_i.h
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE GroupDissolve( 
             /* [in] */ struct pEpIdentity *groupIdentity,
@@ -1116,13 +1111,8 @@ EXTERN_C const IID IID_IpEpEngine;
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *GroupJoin )( 
             IpEpEngine * This,
             /* [in] */ struct pEpIdentity *groupIdentity,
-<<<<<<< planckCOMServerWrapper_i.h
-            /* [in] */ struct pEpIdentity *asMember, 
-			/* [in] */ struct pEpIdentity *manager);
-=======
             /* [in] */ struct pEpIdentity *asMember,
             /* [in] */ struct pEpIdentity *manager);
->>>>>>> planckCOMServerWrapper_i.h
         
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *GroupDissolve )( 
             IpEpEngine * This,
