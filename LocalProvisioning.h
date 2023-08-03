@@ -11,15 +11,18 @@
 namespace pEp
 {
 
+	// define the registry keys
 	#define ProvisioningRegKey				_T("Software\\planck\\Provisioning")
 	#define ProvisioningLocalFolderRegKey	_T("LocalFolder")
 	#define ProvisioningIsProvisionedRegKey _T("IsProvisioned")
 	#define ProvisioningFileNameRegKey		_T("FileName")
+	
 
+	// define the file names to be used during provisonoing
 	#define DeploymentKeyFile L"deployment_key-pub.der"
 	#define ProvisioningKeyFile L"provisioning_key.der"
 	#define DefaultProvisionPackage L"pEp.ppk"
-
+	
 
 	class LocalProvisioning
 	{
@@ -28,7 +31,7 @@ namespace pEp
 		/// </summary>
 		/// <param name="in"></param>
 		/// <returns></returns>
-		bool convert_bool(const std::wstring& in);
+		bool convertBool(const std::wstring& in);
 
 	public:
 
@@ -48,25 +51,6 @@ namespace pEp
 		/// </summary>
 		/// <param name="path"></param>
 		/// <returns></returns>
-		static bool create_dir_if_not_exists(const std::filesystem::path& path);
+		static bool createDirIfNotExists(const std::filesystem::path& path);
 	};
-
-
-/// Provisioning Log
-
-#define LOG_LOCATION(LEVEL) \
-BOOST_LOG_SEV(::boost::log::trivial::logger::get(), LEVEL) \
-<< boost::log::add_value("Line", __LINE__)                 \
-<< boost::log::add_value("File", __FILE__)                 \
-<< boost::log::add_value("Function", __FUNCTION__) \
-
-#define provisioning_log_debug LOG_LOCATION(::boost::log::trivial::debug)
-#define provisioning_log_info BOOST_LOG_TRIVIAL(info)
-#define provisioning_log_warning BOOST_LOG_TRIVIAL(warning)
-#define provisioning_log_error BOOST_LOG_TRIVIAL(error)
-
-
-
 }
-
-
