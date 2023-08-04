@@ -4,38 +4,62 @@
 
 namespace pEp
 {
-	#define ExtraKeyRegKey	_T("Software\\planck\\Provisioning\\Extrakeys")
-	#define ExtraKeyDir		_T("Extrakeys")
+#define ExtraKeyRegKey					_T("Software\\planck\\Provisioning\\Extrakeys")
+#define ExtraKeyLocalFolderRegKey		_T("LocalFolder")
+#define ExtraKeyDir						_T("Extrakeys")
+
+#define ALWAYS_IMPORT true
 
 	class ExtraKeyManager
 	{
-		inline static const std::wstring pubkey_filename = L"extra_key.asc";
-		inline static const std::wstring stamp_filename = L"stamp.txt";
-
 		PEP_SESSION session;
 		pEp::utility::RegistryKey rk;
+		std::wstring localFolder;
+		std::wstring provisioningFileName;
 
+		/// <summary>
 		// Loads keys in a particular directory
-		void load_keys_in_dir(const std::filesystem::path& p);
+		void loadKeyFile(const std::filesystem::path& p);
+		/// </summary>
+		/// <returns></returns>
+		
+		/// <summary>
 		// imports a PGP key
-		std::string import_extra_key(const std::filesystem::path& p) const;
+		std::string importExtraKey(const std::filesystem::path& p) const;
+		/// </summary>
+		/// <returns></returns>
 
-		// trims space-characters from string
-		std::string trim_chars(const std::string& in, const std::string& chars = " \n\r\t\f\v") const;
+		/// <summary>
 		// loads a text file into a string
-		std::string load_text_file_contents(const std::filesystem::path& p) const;
-		// saves stamp.txt for a particular key
-		void save_fpr_stamp(const std::filesystem::path& p, const std::string& fpr) const;
+		std::string loadTextFileContent(const std::filesystem::path& p) const;
+		/// </summary>
+		/// <returns></returns>
+		
+		/// <summary>
+		// saves .stamp file for a particular key
+		void saveFprToStamp(const std::filesystem::path& p, const std::string& fpr) const;
+		/// </summary>
+		/// <returns></returns>
+
+		/// <summary>
+		/// Get default provisioning directory
+		/// </summary>
+		/// <returns></returns>
+		static std::wstring defaultExtrakeyPath();
+
+		/// <summary>
+		/// Checks if a file contains a PGP public Key
+		/// </summary>
+		/// <returns></returns>
+		bool containsPGPPublicKey(const std::wstring& filename);
 
 	public:
-		ExtraKeyManager(PEP_SESSION session) noexcept : session(session), rk(ExtraKeyRegKey)
-		{
-		}
+		ExtraKeyManager(PEP_SESSION session) noexcept : session(session), rk(ExtraKeyRegKey) {};
 
 		/// <summary>
 		/// Imports keys found in %LOCALAPPDATA%\pEp\Provisioning\Extrakeys and adds necessary registry
 		/// keys in HKEY_CURRENT_USER\Software\pEp\Provisioning\Extrakeys
 		/// </summary>
 		void ImportKeys();
-	};	
-}
+	};
+};

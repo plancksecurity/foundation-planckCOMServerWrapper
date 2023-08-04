@@ -13,7 +13,6 @@ namespace pEp
 		std::wstring localFolder = provisionRegKey.GetValue(ProvisioningLocalFolderRegKey,LocalProvisioning::defaultProvisioningPath());
 		std::wstring provisioningFileName = provisionRegKey.GetValue(ProvisioningFileNameRegKey,DefaultProvisionPackage);	
 
-
 		if (!convertBool(isProvisioned))
 		{
 			provisioning_log_info << "Preparing provisioning routine.";
