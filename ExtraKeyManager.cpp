@@ -99,7 +99,7 @@ namespace pEp
         std::string k = loadTextFileContent(p);
         identity_list* l;
         stringlist_t* imported_keys = new_stringlist(NULL);
-        PEP_STATUS status = import_key_with_fpr_return(session, k.c_str(), k.size(), &l, &imported_keys, NULL);
+        PEP_STATUS status = import_extrakey_with_fpr_return(session, k.c_str(), k.size(), &l, &imported_keys, NULL);
         if (status != PEP_KEY_IMPORTED)
         {
             provisioning_log_error << "Error configuring extra key " << p.c_str() << ": " << status;
@@ -107,8 +107,6 @@ namespace pEp
         }
         else
         {
-            //pEp_identity identity;
-            //status = set_person(session, &identity, true);
             ret = imported_keys->value;
         }
         free_stringlist(imported_keys);

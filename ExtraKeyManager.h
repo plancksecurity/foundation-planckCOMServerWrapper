@@ -8,7 +8,7 @@ namespace pEp
 #define ExtraKeyLocalFolderRegKey		_T("LocalFolder")
 #define ExtraKeyDir						_T("Extrakeys")
 
-#define ALWAYS_IMPORT true
+#define ALWAYS_IMPORT false
 
 	class ExtraKeyManager
 	{
