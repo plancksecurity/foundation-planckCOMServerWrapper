@@ -4,28 +4,31 @@
 
 namespace pEp
 {
+#define OutlookRegKey		_T("Software\\planck\\Outlook")
+#define OutlookExtrakeyRegKey		_T("Extrakeys")
+#define ExtrakeyKeyDefaultValue			_T("")
 #define ExtraKeyRegKey					_T("Software\\planck\\Provisioning\\Extrakeys")
 #define ExtraKeyLocalFolderRegKey		_T("LocalFolder")
 #define ExtraKeyDir						_T("Extrakeys")
 
-#define ALWAYS_IMPORT false
+#define ALWAYS_IMPORT true
 
 	class ExtraKeyManager
 	{
 		PEP_SESSION session;
-		pEp::utility::RegistryKey rk;
-		std::wstring localFolder;
-		std::wstring provisioningFileName;
+		pEp::utility::RegistryKey rkExtrakeyImporter;	// references the config for managing the extrakey importer
+		pEp::utility::RegistryKey rkSettingOutlook;		// references the registry node for Outlook configs
+		std::wstring localFolder;						// holds the reference to the folder to look for extrakey import files
 
 		/// <summary>
-		// Loads keys in a particular directory
-		void loadKeyFile(const std::filesystem::path& p);
+		// Loads a key from a file in a particular directory
+		void loadKeyFromFile(const std::filesystem::path& p);
 		/// </summary>
 		/// <returns></returns>
 		
 		/// <summary>
 		// imports a PGP key
-		std::string importExtraKey(const std::filesystem::path& p) const;
+		std::wstring importExtraKey(const std::filesystem::path& p) const;
 		/// </summary>
 		/// <returns></returns>
 
@@ -53,8 +56,17 @@ namespace pEp
 		/// <returns></returns>
 		bool containsPGPPublicKey(const std::wstring& filename);
 
+		/// <summary>
+		/// Builds the string with extrakey values to be put for Outlook
+		/// </summary>
+		/// <returns></returns>
+		std::wstring ExtraKeyManager::buildExtraKeysRegistryValueForOutlook(std::wstring fpr);
+
+		bool comparei(wstring stringA, wstring stringB);
+		std::string wstringToString(std::wstring ws);
+
 	public:
-		ExtraKeyManager(PEP_SESSION session) noexcept : session(session), rk(ExtraKeyRegKey) {};
+		ExtraKeyManager(PEP_SESSION session): session(session), rkExtrakeyImporter(ExtraKeyRegKey), rkSettingOutlook(OutlookRegKey) {};
 
 		/// <summary>
 		/// Imports keys found in %LOCALAPPDATA%\pEp\Provisioning\Extrakeys and adds necessary registry

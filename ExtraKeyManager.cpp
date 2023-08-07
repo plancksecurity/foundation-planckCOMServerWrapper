@@ -6,6 +6,12 @@
 #include "LocalProvisioning.h"
 #include <planckCoreV3/src/pEpEngine_internal.h>
 
+#include <vector>
+#include <sstream>
+#include <algorithm>
+#include <cwctype>
+#include <boost/locale.hpp>
+
 namespace pEp
 {
     std::string ExtraKeyManager::loadTextFileContent(const std::filesystem::path& p) const
@@ -31,27 +37,26 @@ namespace pEp
         provisioning_log_info << "Processing extrakeys for import.";  
 
         // either take the value specified in the registry, or fall back to the default value
-        localFolder = rk.GetValue(ExtraKeyLocalFolderRegKey, ExtraKeyManager::defaultExtrakeyPath());
-        //provisioningFileName = rk.GetValue(ExtraKeyFileNameRegKey, ExtraKeyDefaultFileName);
+        localFolder = rkExtrakeyImporter.GetValue(ExtraKeyLocalFolderRegKey, ExtraKeyManager::defaultExtrakeyPath());
 
         provisioning_log_debug << "Creating " << localFolder << " if it does not exist.";
         LocalProvisioning::createDirIfNotExists(localFolder);
 
         for (const std::filesystem::directory_entry& dir_entry : std::filesystem::directory_iterator(localFolder))
         {
-           ExtraKeyManager::loadKeyFile(dir_entry);
+           ExtraKeyManager::loadKeyFromFile(dir_entry);
         }
     }
 
-    void ExtraKeyManager::loadKeyFile(const std::filesystem::path& p)
+    void ExtraKeyManager::loadKeyFromFile(const std::filesystem::path& p)
     {
         std::filesystem::path pubkey_path = p;
         std::filesystem::path stamp_path = p;
         stamp_path += ".stamp";
-        std::string fpr = "";
+        std::wstring fpr = L"";
 
         if (!containsPGPPublicKey(p.c_str())) {
-            //provisioning_log_debug << p.c_str() << " does not contain a public key";
+            provisioning_log_debug << p.c_str() << " does not contain a public key";
             return;
         }
 
@@ -81,9 +86,17 @@ namespace pEp
                     fpr = importExtraKey(pubkey_path);
                     if (!fpr.empty())
                     {
-                        saveFprToStamp(p, fpr);
-                        //rk.SetValue(utility::utf16_string(pattern), utility::utf16_string(fpr));
-                        provisioning_log_info << "Imported extra key.";
+                        saveFprToStamp(p, ExtraKeyManager::wstringToString(fpr));
+
+                        std::wstring targetListOfExtrakeys = buildExtraKeysRegistryValueForOutlook(fpr);
+
+                        if (rkSettingOutlook.SetValue(OutlookExtrakeyRegKey, targetListOfExtrakeys)) {
+                            provisioning_log_info << "Set registry value for extrakey: " << fpr;
+                        }
+                        else {
+                            provisioning_log_error << "Cannot set registry value for extrakey: " << fpr;
+                        }
+                        
                     }
                 }
                 catch (...) {
@@ -93,22 +106,25 @@ namespace pEp
         }
     }
 
-    std::string ExtraKeyManager::importExtraKey(const std::filesystem::path& p) const
+    std::wstring ExtraKeyManager::importExtraKey(const std::filesystem::path& p) const
     {
-        std::string ret;
+        std::wstring ret = L"";
         std::string k = loadTextFileContent(p);
         identity_list* l;
         stringlist_t* imported_keys = new_stringlist(NULL);
-        PEP_STATUS status = import_extrakey_with_fpr_return(session, k.c_str(), k.size(), &l, &imported_keys, NULL);
-        if (status != PEP_KEY_IMPORTED)
+        PEP_STATUS const status = import_extrakey_with_fpr_return(session, k.c_str(), k.size(), &l, &imported_keys, NULL);
+        if ((status == PEP_KEY_IMPORTED)||(status==PEP_STATUS_OK))
         {
-            provisioning_log_error << "Error configuring extra key " << p.c_str() << ": " << status;
-            return "";
+            std::string s = "";
+            ret = boost::locale::conv::utf_to_utf<wchar_t>(imported_keys->value);
+            provisioning_log_info << "Importing extra key from file " << p.c_str() << " successful, fpr: " << ret;
         }
         else
         {
-            ret = imported_keys->value;
+            provisioning_log_error << "Error configuring extra key from file " << p.c_str() << ", status: " << status;
+            goto finish_import_extrakey;
         }
+    finish_import_extrakey:
         free_stringlist(imported_keys);
         return ret;
     }
@@ -141,5 +157,65 @@ namespace pEp
             }
         }
         return false;
+    }
+
+    bool ExtraKeyManager::comparei(wstring stringA, wstring stringB)
+    {
+        std::locale loc = boost::locale::generator().generate("");  // use default system locale
+        std::locale::global(loc);
+
+        return 0 == std::use_facet<boost::locale::collator<wchar_t>>(loc).compare(boost::locale::collator_base::primary, stringA, stringB);
+    }
+    
+    std::string ExtraKeyManager::wstringToString(std::wstring ws) {
+        return boost::locale::conv::utf_to_utf<char>(ws);
+    }
+
+    std::wstring ExtraKeyManager::buildExtraKeysRegistryValueForOutlook(std::wstring fpr) {
+        std::wstring listOfExtrakeys = rkSettingOutlook.GetValue(OutlookExtrakeyRegKey, ExtrakeyKeyDefaultValue);
+        std::string ek = wstringToString(listOfExtrakeys);
+
+        if (ExtraKeyManager::comparei(listOfExtrakeys, ExtrakeyKeyDefaultValue)) {
+            listOfExtrakeys = fpr;
+        }
+        else {
+            std::wstringstream ss(listOfExtrakeys);
+            std::wstring item;
+            std::vector<std::wstring> extraKeys;
+
+            while (std::getline(ss, item, L',')) {
+                extraKeys.push_back(item);
+            }
+
+            // Trim whitespace and remove empty
+            for (auto it = extraKeys.begin(); it != extraKeys.end(); ) {
+                it->erase(it->begin(), std::find_if(it->begin(), it->end(), [](wchar_t ch) {
+                    return !std::iswspace(ch);
+                    }));
+                it->erase(std::find_if(it->rbegin(), it->rend(), [](wchar_t ch) {
+                    return !std::iswspace(ch);
+                    }).base(), it->end());
+
+                if (it->empty()) {
+                    it = extraKeys.erase(it);
+                }
+                else {
+                    ++it;
+                }
+            }
+
+            bool found = false;
+            for (auto it = extraKeys.begin(); it != extraKeys.end(); ) {
+                if (it->compare(fpr) == 0) {
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                listOfExtrakeys.append(L",").append(fpr);
+            }
+        }
+
+        return listOfExtrakeys;
     }
 }
