@@ -197,6 +197,7 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
         media_key_manager.ImportKeys();
     }
 
+    // 07.08.2023/IP - added handling of extrakeys
     // Import extra keys
     {
         pEp::ExtraKeyManager extra_key_manager(first_session);

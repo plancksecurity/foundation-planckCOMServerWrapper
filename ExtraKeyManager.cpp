@@ -1,3 +1,6 @@
+// Copyright planck security 2023
+// 07.08.2023/IP - added handling of extrakeys
+
 #include "stdafx.h"
 #include "ExtraKeyManager.h"
 #include <fstream>

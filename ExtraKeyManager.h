@@ -1,17 +1,20 @@
+// Copyright planck security 2023
+// 07.08.2023/IP - added handling of extrakeys
+
 #pragma once
 #include <pEp/pEpEngine.h>
 #include "unpack.hh"
 
 namespace pEp
 {
-#define OutlookRegKey		_T("Software\\planck\\Outlook")
-#define OutlookExtrakeyRegKey		_T("Extrakeys")
+#define OutlookRegKey					_T("Software\\planck\\Outlook")
+#define OutlookExtrakeyRegKey			_T("Extrakeys")
 #define ExtrakeyKeyDefaultValue			_T("")
 #define ExtraKeyRegKey					_T("Software\\planck\\Provisioning\\Extrakeys")
 #define ExtraKeyLocalFolderRegKey		_T("LocalFolder")
 #define ExtraKeyDir						_T("Extrakeys")
 
-#define ALWAYS_IMPORT true
+#define ALWAYS_IMPORT false
 
 	class ExtraKeyManager
 	{

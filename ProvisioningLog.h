@@ -1,3 +1,6 @@
+// Copyright planck security 2023
+// 07.08.2023/IP - extracted logfile handling for provisioning activities
+
 #pragma once
 
 namespace pEp
