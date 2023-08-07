@@ -209,6 +209,8 @@ namespace pEp
                 if (it->compare(fpr) == 0) {
                     found = true;
                 }
+
+                ++it;
             }
 
             if (!found) {
