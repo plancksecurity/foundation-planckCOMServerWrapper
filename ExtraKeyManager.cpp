@@ -181,44 +181,6 @@ namespace pEp
             if (str.find(substr) == std::string::npos) {
                 listOfExtrakeys.append(L",").append(fpr);
             }
-
-            /*std::wstringstream ss(listOfExtrakeys);
-            std::wstring item;
-            std::vector<std::wstring> extraKeys;
-
-            while (std::getline(ss, item, L',')) {
-                extraKeys.push_back(item);
-            }
-
-            // Trim whitespace and remove empty
-            for (auto it = extraKeys.begin(); it != extraKeys.end(); ) {
-                it->erase(it->begin(), std::find_if(it->begin(), it->end(), [](wchar_t ch) {
-                    return !std::iswspace(ch);
-                    }));
-                it->erase(std::find_if(it->rbegin(), it->rend(), [](wchar_t ch) {
-                    return !std::iswspace(ch);
-                    }).base(), it->end());
-
-                if (it->empty()) {
-                    it = extraKeys.erase(it);
-                }
-                else {
-                    ++it;
-                }
-            }
-
-            bool found = false;
-            for (auto it = extraKeys.begin(); it != extraKeys.end(); ) {
-                if (it->compare(fpr) == 0) {
-                    found = true;
-                }
-
-                ++it;
-            }
-
-            if (!found) {
-                listOfExtrakeys.append(L",").append(fpr);
-            }*/
         }
 
         return listOfExtrakeys;
