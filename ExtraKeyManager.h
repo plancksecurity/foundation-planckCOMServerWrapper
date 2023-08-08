@@ -2,11 +2,10 @@
 // 07.08.2023/IP - added handling of extrakeys
 
 #pragma once
+
 #include <pEp/pEpEngine.h>
 #include "unpack.hh"
 
-namespace pEp
-{
 #define OutlookRegKey					_T("Software\\planck\\Outlook")
 #define OutlookExtrakeyRegKey			_T("Extrakeys")
 #define ExtrakeyKeyDefaultValue			_T("")
@@ -16,8 +15,10 @@ namespace pEp
 
 #define ALWAYS_IMPORT false
 
+namespace pEp
+{
 	class ExtraKeyManager
-	{
+	{	
 		PEP_SESSION session;
 		pEp::utility::RegistryKey rkExtrakeyImporter;	// references the config for managing the extrakey importer
 		pEp::utility::RegistryKey rkSettingOutlook;		// references the registry node for Outlook configs
@@ -25,28 +26,29 @@ namespace pEp
 
 		/// <summary>
 		// Loads a key from a file in a particular directory
-		void loadKeyFromFile(const std::filesystem::path& p);
 		/// </summary>
 		/// <returns></returns>
+		void loadKeyFromFile(const std::filesystem::path& p);
+
 		
 		/// <summary>
-		// imports a PGP key
-		std::wstring importExtraKey(const std::filesystem::path& p) const;
+		// imports a PGP key		
 		/// </summary>
 		/// <returns></returns>
+		std::wstring importExtraKey(const std::filesystem::path& p) const;
 
 		/// <summary>
 		// loads a text file into a string
-		std::string loadTextFileContent(const std::filesystem::path& p) const;
 		/// </summary>
 		/// <returns></returns>
+		std::string loadTextFileContent(const std::filesystem::path& p) const;
 		
 		/// <summary>
 		// saves .stamp file for a particular key
-		void saveFprToStamp(const std::filesystem::path& p, const std::string& fpr) const;
 		/// </summary>
 		/// <returns></returns>
-
+		void saveFprToStamp(const std::filesystem::path& p, const std::string& fpr) const;
+		
 		/// <summary>
 		/// Get default provisioning directory
 		/// </summary>
@@ -65,7 +67,7 @@ namespace pEp
 		/// <returns></returns>
 		std::wstring ExtraKeyManager::buildExtraKeysRegistryValueForOutlook(std::wstring fpr);
 
-		bool comparei(wstring stringA, wstring stringB);
+		bool wstringsEqual(wstring stringA, wstring stringB);
 		std::string wstringToString(std::wstring ws);
 
 	public:

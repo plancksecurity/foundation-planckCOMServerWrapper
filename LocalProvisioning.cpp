@@ -26,8 +26,7 @@ namespace pEp
 			std::filesystem::path provisioning_key_path = provisioning_path / ProvisioningKeyFile;
 			std::filesystem::path target_path = provisioning_path / L"package";
 
-			if (!std::filesystem::exists(provisioning_path))
-				LocalProvisioning::createDirIfNotExists(provisioning_path);
+			LocalProvisioning::createDirIfNotExists(provisioning_path);				
 
 			if (!std::filesystem::exists(pkg_path)) {
 				// there is no package to provision

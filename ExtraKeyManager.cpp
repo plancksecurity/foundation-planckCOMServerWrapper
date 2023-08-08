@@ -42,9 +42,6 @@ namespace pEp
         // either take the value specified in the registry, or fall back to the default value
         localFolder = rkExtrakeyImporter.GetValue(ExtraKeyLocalFolderRegKey, ExtraKeyManager::defaultExtrakeyPath());
 
-        provisioning_log_debug << "Creating " << localFolder << " if it does not exist.";
-        LocalProvisioning::createDirIfNotExists(localFolder);
-
         for (const std::filesystem::directory_entry& dir_entry : std::filesystem::directory_iterator(localFolder))
         {
            ExtraKeyManager::loadKeyFromFile(dir_entry);
@@ -58,18 +55,18 @@ namespace pEp
         stamp_path += ".stamp";
         std::wstring fpr = L"";
 
-        if (!containsPGPPublicKey(p.c_str())) {
-            provisioning_log_debug << p.c_str() << " does not contain a public key";
-            return;
-        }
-
-        provisioning_log_debug << "Loading key from " << pubkey_path.c_str() << " and writing it to " << stamp_path.c_str();
+        provisioning_log_debug << "Loading key from " << pubkey_path.c_str() << " and writing stamp file to " << stamp_path.c_str();
 
         if (std::filesystem::exists(pubkey_path))
-        {
+        {            
+            if (!containsPGPPublicKey(p.c_str())) {
+                provisioning_log_debug << p.c_str() << " does not contain a public key";
+                return;
+            }
+
             // check stamp datetime against allkeys and pattern
             // and return if it stamp_path greater or equal than all of them
-            if (std::filesystem::exists(stamp_path) && std::filesystem::exists(pubkey_path))
+            if (std::filesystem::exists(stamp_path))
             {
                 const auto time_stamp = std::filesystem::last_write_time(stamp_path);
                 const auto time_allkeys = std::filesystem::last_write_time(pubkey_path);
@@ -82,29 +79,26 @@ namespace pEp
                 }
             }
 
-            if (std::filesystem::exists(pubkey_path))
-            {
-                // import keys and configure extra key registry keys
-                try {
-                    fpr = importExtraKey(pubkey_path);
-                    if (!fpr.empty())
-                    {
-                        saveFprToStamp(p, ExtraKeyManager::wstringToString(fpr));
+            // import keys and configure extra key registry keys
+            try {
+                fpr = importExtraKey(pubkey_path);
+                if (!fpr.empty())
+                {
+                    saveFprToStamp(p, ExtraKeyManager::wstringToString(fpr));
 
-                        std::wstring targetListOfExtrakeys = buildExtraKeysRegistryValueForOutlook(fpr);
+                    std::wstring targetListOfExtrakeys = buildExtraKeysRegistryValueForOutlook(fpr);
 
-                        if (rkSettingOutlook.SetValue(OutlookExtrakeyRegKey, targetListOfExtrakeys)) {
-                            provisioning_log_info << "Set registry value for extrakey: " << fpr;
-                        }
-                        else {
-                            provisioning_log_error << "Cannot set registry value for extrakey: " << fpr;
-                        }
-                        
+                    if (rkSettingOutlook.SetValue(OutlookExtrakeyRegKey, targetListOfExtrakeys)) {
+                        provisioning_log_info << "Set registry value for extrakey: " << fpr;
                     }
+                    else {
+                        provisioning_log_error << "Cannot set registry value for extrakey: " << fpr;
+                    }
+
                 }
-                catch (...) {
-                    provisioning_log_error << "Cannot import key.";
-                }
+            }
+            catch (...) {
+                provisioning_log_error << "Cannot import key.";
             }
         }
     }
@@ -118,16 +112,14 @@ namespace pEp
         PEP_STATUS const status = import_extrakey_with_fpr_return(session, k.c_str(), k.size(), &l, &imported_keys, NULL);
         if ((status == PEP_KEY_IMPORTED)||(status==PEP_STATUS_OK))
         {
-            std::string s = "";
             ret = boost::locale::conv::utf_to_utf<wchar_t>(imported_keys->value);
             provisioning_log_info << "Importing extra key from file " << p.c_str() << " successful, fpr: " << ret;
         }
         else
         {
             provisioning_log_error << "Error configuring extra key from file " << p.c_str() << ", status: " << status;
-            goto finish_import_extrakey;
         }
-    finish_import_extrakey:
+
         free_stringlist(imported_keys);
         return ret;
     }
@@ -162,7 +154,7 @@ namespace pEp
         return false;
     }
 
-    bool ExtraKeyManager::comparei(wstring stringA, wstring stringB)
+    bool ExtraKeyManager::wstringsEqual(wstring stringA, wstring stringB)
     {
         std::locale loc = boost::locale::generator().generate("");  // use default system locale
         std::locale::global(loc);
@@ -178,11 +170,19 @@ namespace pEp
         std::wstring listOfExtrakeys = rkSettingOutlook.GetValue(OutlookExtrakeyRegKey, ExtrakeyKeyDefaultValue);
         std::string ek = wstringToString(listOfExtrakeys);
 
-        if (ExtraKeyManager::comparei(listOfExtrakeys, ExtrakeyKeyDefaultValue)) {
+        if (ExtraKeyManager::wstringsEqual(listOfExtrakeys, ExtrakeyKeyDefaultValue)) {
             listOfExtrakeys = fpr;
         }
         else {
-            std::wstringstream ss(listOfExtrakeys);
+            std::string str = ExtraKeyManager::wstringToString(listOfExtrakeys);
+            std::string substr = ExtraKeyManager::wstringToString(fpr);
+            
+            
+            if (str.find(substr) == std::string::npos) {
+                listOfExtrakeys.append(L",").append(fpr);
+            }
+
+            /*std::wstringstream ss(listOfExtrakeys);
             std::wstring item;
             std::vector<std::wstring> extraKeys;
 
@@ -218,7 +218,7 @@ namespace pEp
 
             if (!found) {
                 listOfExtrakeys.append(L",").append(fpr);
-            }
+            }*/
         }
 
         return listOfExtrakeys;
