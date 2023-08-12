@@ -42,9 +42,14 @@ namespace pEp
         // either take the value specified in the registry, or fall back to the default value
         localFolder = rkExtrakeyImporter.GetValue(ExtraKeyLocalFolderRegKey, ExtraKeyManager::defaultExtrakeyPath());
 
-        for (const std::filesystem::directory_entry& dir_entry : std::filesystem::directory_iterator(localFolder))
-        {
-           ExtraKeyManager::loadKeyFromFile(dir_entry);
+        if (std::filesystem::exists(localFolder)) {
+            for (const std::filesystem::directory_entry& dir_entry : std::filesystem::directory_iterator(localFolder))
+            {
+                ExtraKeyManager::loadKeyFromFile(dir_entry);
+            }
+        }
+        else {
+            provisioning_log_info << "Extrakey directory does not exist.";
         }
     }
 
@@ -55,12 +60,12 @@ namespace pEp
         stamp_path += ".stamp";
         std::wstring fpr = L"";
 
-        provisioning_log_debug << "Loading key from " << pubkey_path.c_str() << " and writing stamp file to " << stamp_path.c_str();
+        provisioning_log_debug << "Trying to load key from " << pubkey_path.c_str();
 
         if (std::filesystem::exists(pubkey_path))
         {            
-            if (!containsPGPPublicKey(p.c_str())) {
-                provisioning_log_debug << p.c_str() << " does not contain a public key";
+            if (!containsPGPPublicKey(pubkey_path.c_str())) {
+                provisioning_log_debug << pubkey_path.c_str() << " does not contain a public key";
                 return;
             }
 
