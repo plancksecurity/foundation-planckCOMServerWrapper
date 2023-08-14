@@ -160,6 +160,7 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
     </ClCompile>
     <ClCompile Include="pEp_utility.cpp" />
     <ClCompile Include="LocalProvisioning.cpp" />
+    <ClCompile Include="ExtraKeyManager.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -179,6 +180,7 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
     <ClInclude Include="..\planckJSONServerWrapper\server\adapter-library.hh" />
     <ClInclude Include="CMainWindow.h" />
     <ClInclude Include="CpEpEngine.h" />
+    <ClInclude Include="ExtraKeyManager.h" />
     <ClInclude Include="GateKeeper.h" />
     <ClInclude Include="LocalJSONAdapter.h" />
     <ClInclude Include="LocalProvisioning.h" />
@@ -186,6 +188,7 @@ xcopy /y "..\Dependencies\zlib\zlib1.dll" "$(OutDir)"
     <ClInclude Include="planckCOMServerWrapper.h" />
     <ClInclude Include="planckCOMServerWrapper_i.h" />
     <ClInclude Include="pEp_utility.h" />
+    <ClInclude Include="ProvisioningLog.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />

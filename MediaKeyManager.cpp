@@ -2,6 +2,7 @@
 #include "MediaKeyManager.h"
 #include <fstream>
 #include "pEp_utility.h"
+#include "ProvisioningLog.h"
 
 namespace pEp
 {
@@ -101,9 +102,6 @@ std::string MediaKeyManager::import_media_key(const std::filesystem::path& p) co
     return ret;
 }
 
-
-
-
 void MediaKeyManager::load_keys_in_dir(const std::filesystem::path& p)
 {
     fs::path allkeys_path = p / allkeys_filename;
@@ -197,7 +195,7 @@ void MediaKeyManager::ImportKeys()
 	fs::path provisioning_path(LocalProvisioning::defaultProvisioningPath());
 	fs::path media_key_path = provisioning_path / MediaKeyDir;
     
-    LocalProvisioning::create_dir_if_not_exists(media_key_path);
+    LocalProvisioning::createDirIfNotExists(media_key_path);
    
     for (const fs::directory_entry& dir_entry : fs::directory_iterator(media_key_path))
     {

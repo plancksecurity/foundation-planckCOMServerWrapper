@@ -11,6 +11,7 @@
 #include "CMainWindow.h"
 #include "LocalProvisioning.h"
 #include "MediaKeyManager.h"
+#include "ExtraKeyManager.h"
 #include <iostream>
 #include <sddl.h>
 #include <Lmcons.h>
@@ -27,6 +28,7 @@ namespace po = boost::program_options;
 std::string logfile = "";
 #endif
 
+void init_provisioning_log();
 
 // Check that this is the only instance.
 // It uses a named mutex to see if one instance of this binary is being executed
@@ -174,6 +176,7 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
     _AtlModule.start_gatekeeper();
 
     // Provisioning
+    init_provisioning_log();
     pEp::LocalProvisioning provisioning;
     provisioning.Run();
 
@@ -194,6 +197,13 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
         media_key_manager.ImportKeys();
     }
 
+    // 07.08.2023/IP - added handling of extrakeys
+    // Import extra keys
+    {
+        pEp::ExtraKeyManager extra_key_manager(first_session);
+        extra_key_manager.ImportKeys();
+    }
+
     auto rv = _AtlModule.WinMain(nShowCmd);
 
     if (ljs) {
@@ -207,4 +217,40 @@ extern "C" int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/
     ::release(first_session);
     ExitProcess(rv);
     return rv;
+}
+
+
+
+void init_provisioning_log()
+{
+    static bool initialized = false;
+    if (initialized)
+        return;
+
+    static const std::string COMMON_FMT("[%TimeStamp%][%Function%]:  %Message%");
+    boost::log::register_simple_formatter_factory< boost::log::trivial::severity_level, char >("Severity");
+
+    // Output message to file, rotates when file reached 1mb or at midnight every day. Each log file
+    // is capped at 1mb and total is 20mb
+    boost::filesystem::path user_dir(SignedPackage::pEp_locations.at("PER_USER_DIRECTORY"));
+    boost::filesystem::path log_path = user_dir / "Logs" / "provisioning_log%3N.txt";
+    boost::log::add_file_log(
+        boost::log::keywords::file_name = log_path.c_str(),
+        boost::log::keywords::rotation_size = 1 * 1024 * 1024,
+        boost::log::keywords::max_size = 20 * 1024 * 1024,
+        boost::log::keywords::time_based_rotation = boost::log::sinks::file::rotation_at_time_point(0, 0, 0),
+        boost::log::keywords::format = COMMON_FMT,
+        boost::log::keywords::auto_flush = true
+    );
+
+    boost::log::add_common_attributes();
+
+    // Only output message with INFO or higher severity in Release
+#ifndef _DEBUG
+    boost::log::core::get()->set_filter(
+        boost::log::trivial::severity >= boost::log::trivial::info
+    );
+#endif
+
+    initialized = true;
 }

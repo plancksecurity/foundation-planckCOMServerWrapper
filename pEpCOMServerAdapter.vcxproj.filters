@@ -58,6 +58,9 @@
     <ClCompile Include="planckCOMServerWrapper_i.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ExtraKeyManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -106,6 +109,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="planckCOMServerWrapper_i.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ExtraKeyManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvisioningLog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
