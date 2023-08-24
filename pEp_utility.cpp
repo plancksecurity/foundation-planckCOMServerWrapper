@@ -1,3 +1,6 @@
+// Changelog
+// 24.08.2023/IP - added preservation of major/minor version attributes when copying/creating identites
+
 #include "stdafx.h"
 #include "pEp_utility.h"
 
@@ -107,6 +110,8 @@ namespace pEp {
                     ident_s->Lang = utf16_bstr(ident->lang);
                 ident_s->Me = ident->me;
                 ident_s->Flags = (pEpIdentityFlags)ident->flags;
+                ident_s->MajorVersion = ident->major_ver;
+                ident_s->MinorVersion = ident->minor_ver;
             }
         }
 
@@ -168,6 +173,9 @@ namespace pEp {
 
             _ident->me = ident->Me;
             _ident->flags = (identity_flags_t)ident->Flags;
+
+            _ident->major_ver = ident->MajorVersion;
+            _ident->minor_ver = ident->MinorVersion;
 
             return _ident;
         }

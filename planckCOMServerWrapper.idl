@@ -1,3 +1,6 @@
+// Changelog
+// 24.08.2023/IP - added preservation of major/minor version attributes when copying/creating identites
+// 
 // pEpCOMServerAdapter.idl : IDL source for pEpCOMServerAdapter
 //
 
@@ -255,6 +258,10 @@ interface IpEpEngine : IUnknown {
         BSTR Lang;
         VARIANT_BOOL Me;
         pEpIdentityFlags Flags;
+
+        // 24.08.2023/IP - added preservation of major/minor version attributes when copying/creating identites
+        USHORT MajorVersion;
+        USHORT MinorVersion;
     };
 
     [id(11)] HRESULT SetIdentityFlags([in] struct pEpIdentity *identity, [in] pEpIdentityFlags flags);

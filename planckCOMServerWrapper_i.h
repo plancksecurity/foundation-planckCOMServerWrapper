@@ -333,6 +333,8 @@ enum pEpIdentityFlags
     BSTR Lang;
     VARIANT_BOOL Me;
     pEpIdentityFlags Flags;
+    USHORT MajorVersion;
+    USHORT MinorVersion;
     } ;
 typedef /* [v1_enum] */ 
 enum pEpRating
