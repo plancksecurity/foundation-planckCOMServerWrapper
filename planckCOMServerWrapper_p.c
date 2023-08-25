@@ -48,7 +48,7 @@
 
 #include "planckCOMServerWrapper_i.h"
 
-#define TYPE_FORMAT_STRING_SIZE   1261                              
+#define TYPE_FORMAT_STRING_SIZE   1263                              
 #define PROC_FORMAT_STRING_SIZE   3319                              
 #define EXPR_FORMAT_STRING_SIZE   1                                 
 #define TRANSMIT_AS_TABLE_SIZE    0            
@@ -135,7 +135,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 24 */	NdrFcShort( 0x10b ),	/* Flags:  must size, must free, in, simple ref, */
 /* 26 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 28 */	NdrFcShort( 0x446 ),	/* Type Offset=1094 */
+/* 28 */	NdrFcShort( 0x448 ),	/* Type Offset=1096 */
 
 	/* Return value */
 
@@ -307,7 +307,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 222 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 224 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 226 */	NdrFcShort( 0x4a2 ),	/* Type Offset=1186 */
+/* 226 */	NdrFcShort( 0x4a4 ),	/* Type Offset=1188 */
 
 	/* Return value */
 
@@ -404,7 +404,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 330 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 332 */	NdrFcShort( 0x10 ),	/* x86 Stack size/offset = 16 */
-/* 334 */	NdrFcShort( 0x4a2 ),	/* Type Offset=1186 */
+/* 334 */	NdrFcShort( 0x4a4 ),	/* Type Offset=1188 */
 
 	/* Return value */
 
@@ -459,7 +459,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 390 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 392 */	NdrFcShort( 0x14 ),	/* x86 Stack size/offset = 20 */
-/* 394 */	NdrFcShort( 0x4a2 ),	/* Type Offset=1186 */
+/* 394 */	NdrFcShort( 0x4a4 ),	/* Type Offset=1188 */
 
 	/* Return value */
 
@@ -496,7 +496,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 432 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 434 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 436 */	NdrFcShort( 0x4a2 ),	/* Type Offset=1186 */
+/* 436 */	NdrFcShort( 0x4a4 ),	/* Type Offset=1188 */
 
 	/* Return value */
 
@@ -526,7 +526,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 468 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 470 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 472 */	NdrFcShort( 0x4a2 ),	/* Type Offset=1186 */
+/* 472 */	NdrFcShort( 0x4a4 ),	/* Type Offset=1188 */
 
 	/* Return value */
 
@@ -556,7 +556,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 504 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 506 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 508 */	NdrFcShort( 0x4a2 ),	/* Type Offset=1186 */
+/* 508 */	NdrFcShort( 0x4a4 ),	/* Type Offset=1188 */
 
 	/* Return value */
 
@@ -664,7 +664,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 	/* Parameter result */
 
-/* 630 */	NdrFcShort( 0x8113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=32 */
+/* 630 */	NdrFcShort( 0xa113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=40 */
 /* 632 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
 /* 634 */	NdrFcShort( 0x424 ),	/* Type Offset=1060 */
 
@@ -700,7 +700,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 	/* Parameter result */
 
-/* 672 */	NdrFcShort( 0x8113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=32 */
+/* 672 */	NdrFcShort( 0xa113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=40 */
 /* 674 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
 /* 676 */	NdrFcShort( 0x424 ),	/* Type Offset=1060 */
 
@@ -796,7 +796,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 	/* Parameter result */
 
-/* 786 */	NdrFcShort( 0x8113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=32 */
+/* 786 */	NdrFcShort( 0xa113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=40 */
 /* 788 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
 /* 790 */	NdrFcShort( 0x424 ),	/* Type Offset=1060 */
 
@@ -828,7 +828,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 822 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 824 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 826 */	NdrFcShort( 0x4bc ),	/* Type Offset=1212 */
+/* 826 */	NdrFcShort( 0x4be ),	/* Type Offset=1214 */
 
 	/* Return value */
 
@@ -901,7 +901,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 906 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 908 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 910 */	NdrFcShort( 0x4bc ),	/* Type Offset=1212 */
+/* 910 */	NdrFcShort( 0x4be ),	/* Type Offset=1214 */
 
 	/* Return value */
 
@@ -931,13 +931,13 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 942 */	NdrFcShort( 0x11b ),	/* Flags:  must size, must free, in, out, simple ref, */
 /* 944 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 946 */	NdrFcShort( 0x446 ),	/* Type Offset=1094 */
+/* 946 */	NdrFcShort( 0x448 ),	/* Type Offset=1096 */
 
 	/* Parameter dst */
 
 /* 948 */	NdrFcShort( 0x113 ),	/* Flags:  must size, must free, out, simple ref, */
 /* 950 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 952 */	NdrFcShort( 0x446 ),	/* Type Offset=1094 */
+/* 952 */	NdrFcShort( 0x448 ),	/* Type Offset=1096 */
 
 	/* Parameter extra */
 
@@ -987,19 +987,19 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 1002 */	NdrFcShort( 0x11b ),	/* Flags:  must size, must free, in, out, simple ref, */
 /* 1004 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 1006 */	NdrFcShort( 0x446 ),	/* Type Offset=1094 */
+/* 1006 */	NdrFcShort( 0x448 ),	/* Type Offset=1096 */
 
 	/* Parameter dst */
 
 /* 1008 */	NdrFcShort( 0x113 ),	/* Flags:  must size, must free, out, simple ref, */
 /* 1010 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 1012 */	NdrFcShort( 0x446 ),	/* Type Offset=1094 */
+/* 1012 */	NdrFcShort( 0x448 ),	/* Type Offset=1096 */
 
 	/* Parameter keylist */
 
 /* 1014 */	NdrFcShort( 0x11b ),	/* Flags:  must size, must free, in, out, simple ref, */
 /* 1016 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
-/* 1018 */	NdrFcShort( 0x4bc ),	/* Type Offset=1212 */
+/* 1018 */	NdrFcShort( 0x4be ),	/* Type Offset=1214 */
 
 	/* Parameter flags */
 
@@ -1043,7 +1043,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 1062 */	NdrFcShort( 0x10b ),	/* Flags:  must size, must free, in, simple ref, */
 /* 1064 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 1066 */	NdrFcShort( 0x446 ),	/* Type Offset=1094 */
+/* 1066 */	NdrFcShort( 0x448 ),	/* Type Offset=1096 */
 
 	/* Parameter pVal */
 
@@ -1155,7 +1155,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 1188 */	NdrFcShort( 0x10b ),	/* Flags:  must size, must free, in, simple ref, */
 /* 1190 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 1192 */	NdrFcShort( 0x446 ),	/* Type Offset=1094 */
+/* 1192 */	NdrFcShort( 0x448 ),	/* Type Offset=1096 */
 
 	/* Parameter receivedBy */
 
@@ -1186,7 +1186,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 1218 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 1220 */	NdrFcShort( 0x18 ),	/* x86 Stack size/offset = 24 */
-/* 1222 */	NdrFcShort( 0x4a2 ),	/* Type Offset=1186 */
+/* 1222 */	NdrFcShort( 0x4a4 ),	/* Type Offset=1188 */
 
 	/* Return value */
 
@@ -1222,7 +1222,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 1260 */	NdrFcShort( 0x10b ),	/* Flags:  must size, must free, in, simple ref, */
 /* 1262 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 1264 */	NdrFcShort( 0x446 ),	/* Type Offset=1094 */
+/* 1264 */	NdrFcShort( 0x448 ),	/* Type Offset=1096 */
 
 	/* Parameter extra */
 
@@ -1234,7 +1234,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 1272 */	NdrFcShort( 0x113 ),	/* Flags:  must size, must free, out, simple ref, */
 /* 1274 */	NdrFcShort( 0x10 ),	/* x86 Stack size/offset = 16 */
-/* 1276 */	NdrFcShort( 0x446 ),	/* Type Offset=1094 */
+/* 1276 */	NdrFcShort( 0x448 ),	/* Type Offset=1096 */
 
 	/* Parameter flags */
 
@@ -1271,7 +1271,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 1314 */	NdrFcShort( 0x11b ),	/* Flags:  must size, must free, in, out, simple ref, */
 /* 1316 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 1318 */	NdrFcShort( 0x446 ),	/* Type Offset=1094 */
+/* 1318 */	NdrFcShort( 0x448 ),	/* Type Offset=1096 */
 
 	/* Parameter x_KeyList */
 
@@ -1321,7 +1321,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 1368 */	NdrFcShort( 0xb ),	/* Flags:  must size, must free, in, */
 /* 1370 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 1372 */	NdrFcShort( 0x4d6 ),	/* Type Offset=1238 */
+/* 1372 */	NdrFcShort( 0x4d8 ),	/* Type Offset=1240 */
 
 	/* Return value */
 
@@ -1385,7 +1385,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 	/* Parameter result */
 
-/* 1446 */	NdrFcShort( 0x8113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=32 */
+/* 1446 */	NdrFcShort( 0xa113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=40 */
 /* 1448 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
 /* 1450 */	NdrFcShort( 0x424 ),	/* Type Offset=1060 */
 
@@ -1417,13 +1417,13 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 1482 */	NdrFcShort( 0x10b ),	/* Flags:  must size, must free, in, simple ref, */
 /* 1484 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 1486 */	NdrFcShort( 0x446 ),	/* Type Offset=1094 */
+/* 1486 */	NdrFcShort( 0x448 ),	/* Type Offset=1096 */
 
 	/* Parameter dst */
 
 /* 1488 */	NdrFcShort( 0x113 ),	/* Flags:  must size, must free, out, simple ref, */
 /* 1490 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 1492 */	NdrFcShort( 0x446 ),	/* Type Offset=1094 */
+/* 1492 */	NdrFcShort( 0x448 ),	/* Type Offset=1096 */
 
 	/* Parameter to_fpr */
 
@@ -1510,7 +1510,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 1584 */	NdrFcShort( 0x10b ),	/* Flags:  must size, must free, in, simple ref, */
 /* 1586 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 1588 */	NdrFcShort( 0x446 ),	/* Type Offset=1094 */
+/* 1588 */	NdrFcShort( 0x448 ),	/* Type Offset=1096 */
 
 	/* Parameter rating */
 
@@ -1629,7 +1629,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 			0x6c,		/* Old Flags:  object, Oi2 */
 /* 1718 */	NdrFcLong( 0x0 ),	/* 0 */
 /* 1722 */	NdrFcShort( 0x28 ),	/* 40 */
-/* 1724 */	NdrFcShort( 0x2c ),	/* x86 Stack size/offset = 44 */
+/* 1724 */	NdrFcShort( 0x30 ),	/* x86 Stack size/offset = 48 */
 /* 1726 */	NdrFcShort( 0x0 ),	/* 0 */
 /* 1728 */	NdrFcShort( 0x8 ),	/* 8 */
 /* 1730 */	0x46,		/* Oi2 Flags:  clt must size, has return, has ext, */
@@ -1649,13 +1649,13 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 	/* Parameter fpr */
 
 /* 1746 */	NdrFcShort( 0x8b ),	/* Flags:  must size, must free, in, by val, */
-/* 1748 */	NdrFcShort( 0x24 ),	/* x86 Stack size/offset = 36 */
+/* 1748 */	NdrFcShort( 0x28 ),	/* x86 Stack size/offset = 40 */
 /* 1750 */	NdrFcShort( 0x20 ),	/* Type Offset=32 */
 
 	/* Return value */
 
 /* 1752 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
-/* 1754 */	NdrFcShort( 0x28 ),	/* x86 Stack size/offset = 40 */
+/* 1754 */	NdrFcShort( 0x2c ),	/* x86 Stack size/offset = 44 */
 /* 1756 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
@@ -1783,7 +1783,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 1902 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 1904 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 1906 */	NdrFcShort( 0x4bc ),	/* Type Offset=1212 */
+/* 1906 */	NdrFcShort( 0x4be ),	/* Type Offset=1214 */
 
 	/* Return value */
 
@@ -1893,7 +1893,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 2028 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 2030 */	NdrFcShort( 0x14 ),	/* x86 Stack size/offset = 20 */
-/* 2032 */	NdrFcShort( 0x4a2 ),	/* Type Offset=1186 */
+/* 2032 */	NdrFcShort( 0x4a4 ),	/* Type Offset=1188 */
 
 	/* Return value */
 
@@ -1960,13 +1960,13 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 2106 */	NdrFcShort( 0x10b ),	/* Flags:  must size, must free, in, simple ref, */
 /* 2108 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 2110 */	NdrFcShort( 0x446 ),	/* Type Offset=1094 */
+/* 2110 */	NdrFcShort( 0x448 ),	/* Type Offset=1096 */
 
 	/* Parameter xer */
 
 /* 2112 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 2114 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 2116 */	NdrFcShort( 0x4a2 ),	/* Type Offset=1186 */
+/* 2116 */	NdrFcShort( 0x4a4 ),	/* Type Offset=1188 */
 
 	/* Return value */
 
@@ -2056,7 +2056,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 2220 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 2222 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 2224 */	NdrFcShort( 0x4a2 ),	/* Type Offset=1186 */
+/* 2224 */	NdrFcShort( 0x4a4 ),	/* Type Offset=1188 */
 
 	/* Return value */
 
@@ -2086,7 +2086,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 2256 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 2258 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 2260 */	NdrFcShort( 0x4a2 ),	/* Type Offset=1186 */
+/* 2260 */	NdrFcShort( 0x4a4 ),	/* Type Offset=1188 */
 
 	/* Return value */
 
@@ -2215,7 +2215,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 2406 */	NdrFcShort( 0x113 ),	/* Flags:  must size, must free, out, simple ref, */
 /* 2408 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 2410 */	NdrFcShort( 0x446 ),	/* Type Offset=1094 */
+/* 2410 */	NdrFcShort( 0x448 ),	/* Type Offset=1096 */
 
 	/* Return value */
 
@@ -2245,7 +2245,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 2442 */	NdrFcShort( 0x10b ),	/* Flags:  must size, must free, in, simple ref, */
 /* 2444 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 2446 */	NdrFcShort( 0x446 ),	/* Type Offset=1094 */
+/* 2446 */	NdrFcShort( 0x448 ),	/* Type Offset=1096 */
 
 	/* Parameter omitFields */
 
@@ -2258,7 +2258,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 2454 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 2456 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
-/* 2458 */	NdrFcShort( 0x4a2 ),	/* Type Offset=1186 */
+/* 2458 */	NdrFcShort( 0x4a4 ),	/* Type Offset=1188 */
 
 	/* Return value */
 
@@ -2397,7 +2397,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 2616 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 2618 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 2620 */	NdrFcShort( 0x4a2 ),	/* Type Offset=1186 */
+/* 2620 */	NdrFcShort( 0x4a4 ),	/* Type Offset=1188 */
 
 	/* Return value */
 
@@ -2655,7 +2655,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 2916 */	NdrFcShort( 0x2010 ),	/* Flags:  out, srv alloc size=8 */
 /* 2918 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
-/* 2920 */	NdrFcShort( 0x4e8 ),	/* Type Offset=1256 */
+/* 2920 */	NdrFcShort( 0x4ea ),	/* Type Offset=1258 */
 
 	/* Return value */
 
@@ -2685,7 +2685,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 2952 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 2954 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 2956 */	NdrFcShort( 0x4bc ),	/* Type Offset=1212 */
+/* 2956 */	NdrFcShort( 0x4be ),	/* Type Offset=1214 */
 
 	/* Return value */
 
@@ -2719,7 +2719,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 	/* Parameter manager */
 
-/* 2994 */	NdrFcShort( 0x8113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=32 */
+/* 2994 */	NdrFcShort( 0xa113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=40 */
 /* 2996 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
 /* 2998 */	NdrFcShort( 0x424 ),	/* Type Offset=1060 */
 
@@ -2757,7 +2757,7 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 3036 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 3038 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 3040 */	NdrFcShort( 0x4bc ),	/* Type Offset=1212 */
+/* 3040 */	NdrFcShort( 0x4be ),	/* Type Offset=1214 */
 
 	/* Return value */
 
@@ -2859,13 +2859,13 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 
 /* 3156 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 3158 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 3160 */	NdrFcShort( 0x4bc ),	/* Type Offset=1212 */
+/* 3160 */	NdrFcShort( 0x4be ),	/* Type Offset=1214 */
 
 	/* Parameter importedKeys */
 
 /* 3162 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
 /* 3164 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
-/* 3166 */	NdrFcShort( 0x4bc ),	/* Type Offset=1212 */
+/* 3166 */	NdrFcShort( 0x4be ),	/* Type Offset=1214 */
 
 	/* Return value */
 
@@ -3007,7 +3007,7 @@ static const planckCOMServerWrapper_MIDL_TYPE_FORMAT_STRING planckCOMServerWrapp
 			NdrFcShort( 0x0 ),	/* 0 */
 /*  2 */	
 			0x11, 0x0,	/* FC_RP */
-/*  4 */	NdrFcShort( 0x442 ),	/* Offset= 1090 (1094) */
+/*  4 */	NdrFcShort( 0x444 ),	/* Offset= 1092 (1096) */
 /*  6 */	
 			0x12, 0x0,	/* FC_UP */
 /*  8 */	NdrFcShort( 0xe ),	/* Offset= 14 (22) */
@@ -3722,7 +3722,7 @@ static const planckCOMServerWrapper_MIDL_TYPE_FORMAT_STRING planckCOMServerWrapp
 /* 1060 */	
 			0x1a,		/* FC_BOGUS_STRUCT */
 			0x3,		/* 3 */
-/* 1062 */	NdrFcShort( 0x20 ),	/* 32 */
+/* 1062 */	NdrFcShort( 0x24 ),	/* 36 */
 /* 1064 */	NdrFcShort( 0x0 ),	/* 0 */
 /* 1066 */	NdrFcShort( 0x0 ),	/* Offset= 0 (1066) */
 /* 1068 */	0x4c,		/* FC_EMBEDDED_COMPLEX */
@@ -3744,135 +3744,137 @@ static const planckCOMServerWrapper_MIDL_TYPE_FORMAT_STRING planckCOMServerWrapp
 			0x6,		/* FC_SHORT */
 /* 1090 */	0x3e,		/* FC_STRUCTPAD2 */
 			0xe,		/* FC_ENUM32 */
-/* 1092 */	0x5c,		/* FC_PAD */
+/* 1092 */	0x6,		/* FC_SHORT */
+			0x6,		/* FC_SHORT */
+/* 1094 */	0x5c,		/* FC_PAD */
 			0x5b,		/* FC_END */
-/* 1094 */	
+/* 1096 */	
 			0x1a,		/* FC_BOGUS_STRUCT */
 			0x7,		/* 7 */
-/* 1096 */	NdrFcShort( 0x98 ),	/* 152 */
-/* 1098 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 1100 */	NdrFcShort( 0x0 ),	/* Offset= 0 (1100) */
-/* 1102 */	0xe,		/* FC_ENUM32 */
+/* 1098 */	NdrFcShort( 0xa0 ),	/* 160 */
+/* 1100 */	NdrFcShort( 0x0 ),	/* 0 */
+/* 1102 */	NdrFcShort( 0x0 ),	/* Offset= 0 (1102) */
+/* 1104 */	0xe,		/* FC_ENUM32 */
 			0x4c,		/* FC_EMBEDDED_COMPLEX */
-/* 1104 */	0x0,		/* 0 */
-			NdrFcShort( 0xfbcf ),	/* Offset= -1073 (32) */
+/* 1106 */	0x0,		/* 0 */
+			NdrFcShort( 0xfbcd ),	/* Offset= -1075 (32) */
 			0x4c,		/* FC_EMBEDDED_COMPLEX */
-/* 1108 */	0x0,		/* 0 */
-			NdrFcShort( 0xfbcb ),	/* Offset= -1077 (32) */
+/* 1110 */	0x0,		/* 0 */
+			NdrFcShort( 0xfbc9 ),	/* Offset= -1079 (32) */
 			0x4c,		/* FC_EMBEDDED_COMPLEX */
-/* 1112 */	0x0,		/* 0 */
-			NdrFcShort( 0xfbc7 ),	/* Offset= -1081 (32) */
+/* 1114 */	0x0,		/* 0 */
+			NdrFcShort( 0xfbc5 ),	/* Offset= -1083 (32) */
 			0x4c,		/* FC_EMBEDDED_COMPLEX */
-/* 1116 */	0x0,		/* 0 */
-			NdrFcShort( 0xfbc3 ),	/* Offset= -1085 (32) */
+/* 1118 */	0x0,		/* 0 */
+			NdrFcShort( 0xfbc1 ),	/* Offset= -1087 (32) */
 			0x4c,		/* FC_EMBEDDED_COMPLEX */
-/* 1120 */	0x0,		/* 0 */
-			NdrFcShort( 0xffb9 ),	/* Offset= -71 (1050) */
+/* 1122 */	0x0,		/* 0 */
+			NdrFcShort( 0xffb7 ),	/* Offset= -73 (1050) */
 			0xb,		/* FC_HYPER */
-/* 1124 */	0xb,		/* FC_HYPER */
+/* 1126 */	0xb,		/* FC_HYPER */
 			0x4c,		/* FC_EMBEDDED_COMPLEX */
-/* 1126 */	0x0,		/* 0 */
-			NdrFcShort( 0xffbd ),	/* Offset= -67 (1060) */
+/* 1128 */	0x0,		/* 0 */
+			NdrFcShort( 0xffbb ),	/* Offset= -69 (1060) */
 			0x4c,		/* FC_EMBEDDED_COMPLEX */
-/* 1130 */	0x0,		/* 0 */
-			NdrFcShort( 0xffaf ),	/* Offset= -81 (1050) */
+/* 1132 */	0x0,		/* 0 */
+			NdrFcShort( 0xffad ),	/* Offset= -83 (1050) */
 			0x4c,		/* FC_EMBEDDED_COMPLEX */
-/* 1134 */	0x0,		/* 0 */
-			NdrFcShort( 0xffb5 ),	/* Offset= -75 (1060) */
+/* 1136 */	0x0,		/* 0 */
+			NdrFcShort( 0xffb3 ),	/* Offset= -77 (1060) */
 			0x4c,		/* FC_EMBEDDED_COMPLEX */
-/* 1138 */	0x0,		/* 0 */
-			NdrFcShort( 0xffa7 ),	/* Offset= -89 (1050) */
+/* 1140 */	0x0,		/* 0 */
+			NdrFcShort( 0xffa5 ),	/* Offset= -91 (1050) */
 			0x4c,		/* FC_EMBEDDED_COMPLEX */
-/* 1142 */	0x0,		/* 0 */
-			NdrFcShort( 0xffa3 ),	/* Offset= -93 (1050) */
+/* 1144 */	0x0,		/* 0 */
+			NdrFcShort( 0xffa1 ),	/* Offset= -95 (1050) */
 			0x4c,		/* FC_EMBEDDED_COMPLEX */
-/* 1146 */	0x0,		/* 0 */
-			NdrFcShort( 0xff9f ),	/* Offset= -97 (1050) */
+/* 1148 */	0x0,		/* 0 */
+			NdrFcShort( 0xff9d ),	/* Offset= -99 (1050) */
 			0x4c,		/* FC_EMBEDDED_COMPLEX */
-/* 1150 */	0x0,		/* 0 */
-			NdrFcShort( 0xff9b ),	/* Offset= -101 (1050) */
+/* 1152 */	0x0,		/* 0 */
+			NdrFcShort( 0xff99 ),	/* Offset= -103 (1050) */
 			0x4c,		/* FC_EMBEDDED_COMPLEX */
-/* 1154 */	0x0,		/* 0 */
-			NdrFcShort( 0xff97 ),	/* Offset= -105 (1050) */
+/* 1156 */	0x0,		/* 0 */
+			NdrFcShort( 0xff95 ),	/* Offset= -107 (1050) */
 			0x4c,		/* FC_EMBEDDED_COMPLEX */
-/* 1158 */	0x0,		/* 0 */
-			NdrFcShort( 0xfb99 ),	/* Offset= -1127 (32) */
+/* 1160 */	0x0,		/* 0 */
+			NdrFcShort( 0xfb97 ),	/* Offset= -1129 (32) */
 			0x4c,		/* FC_EMBEDDED_COMPLEX */
-/* 1162 */	0x0,		/* 0 */
-			NdrFcShort( 0xff8f ),	/* Offset= -113 (1050) */
+/* 1164 */	0x0,		/* 0 */
+			NdrFcShort( 0xff8d ),	/* Offset= -115 (1050) */
 			0xe,		/* FC_ENUM32 */
-/* 1166 */	0x4c,		/* FC_EMBEDDED_COMPLEX */
+/* 1168 */	0x4c,		/* FC_EMBEDDED_COMPLEX */
 			0x0,		/* 0 */
-/* 1168 */	NdrFcShort( 0xfb90 ),	/* Offset= -1136 (32) */
-/* 1170 */	0xe,		/* FC_ENUM32 */
+/* 1170 */	NdrFcShort( 0xfb8e ),	/* Offset= -1138 (32) */
+/* 1172 */	0xe,		/* FC_ENUM32 */
 			0x40,		/* FC_STRUCTPAD4 */
-/* 1172 */	0x5c,		/* FC_PAD */
+/* 1174 */	0x5c,		/* FC_PAD */
 			0x5b,		/* FC_END */
-/* 1174 */	
+/* 1176 */	
 			0x11, 0x0,	/* FC_RP */
-/* 1176 */	NdrFcShort( 0xff8c ),	/* Offset= -116 (1060) */
-/* 1178 */	
+/* 1178 */	NdrFcShort( 0xff8a ),	/* Offset= -118 (1060) */
+/* 1180 */	
 			0x11, 0x4,	/* FC_RP [alloced_on_stack] */
-/* 1180 */	NdrFcShort( 0x6 ),	/* Offset= 6 (1186) */
-/* 1182 */	
+/* 1182 */	NdrFcShort( 0x6 ),	/* Offset= 6 (1188) */
+/* 1184 */	
 			0x13, 0x0,	/* FC_OP */
-/* 1184 */	NdrFcShort( 0xfb76 ),	/* Offset= -1162 (22) */
-/* 1186 */	0xb4,		/* FC_USER_MARSHAL */
+/* 1186 */	NdrFcShort( 0xfb74 ),	/* Offset= -1164 (22) */
+/* 1188 */	0xb4,		/* FC_USER_MARSHAL */
 			0x83,		/* 131 */
-/* 1188 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 1190 */	NdrFcShort( 0x4 ),	/* 4 */
-/* 1192 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 1194 */	NdrFcShort( 0xfff4 ),	/* Offset= -12 (1182) */
-/* 1196 */	
+/* 1190 */	NdrFcShort( 0x0 ),	/* 0 */
+/* 1192 */	NdrFcShort( 0x4 ),	/* 4 */
+/* 1194 */	NdrFcShort( 0x0 ),	/* 0 */
+/* 1196 */	NdrFcShort( 0xfff4 ),	/* Offset= -12 (1184) */
+/* 1198 */	
 			0x11, 0x4,	/* FC_RP [alloced_on_stack] */
-/* 1198 */	NdrFcShort( 0xff76 ),	/* Offset= -138 (1060) */
-/* 1200 */	
+/* 1200 */	NdrFcShort( 0xff74 ),	/* Offset= -140 (1060) */
+/* 1202 */	
 			0x11, 0x4,	/* FC_RP [alloced_on_stack] */
-/* 1202 */	NdrFcShort( 0xa ),	/* Offset= 10 (1212) */
-/* 1204 */	
+/* 1204 */	NdrFcShort( 0xa ),	/* Offset= 10 (1214) */
+/* 1206 */	
 			0x13, 0x10,	/* FC_OP [pointer_deref] */
-/* 1206 */	NdrFcShort( 0x2 ),	/* Offset= 2 (1208) */
-/* 1208 */	
+/* 1208 */	NdrFcShort( 0x2 ),	/* Offset= 2 (1210) */
+/* 1210 */	
 			0x13, 0x0,	/* FC_OP */
-/* 1210 */	NdrFcShort( 0xff4e ),	/* Offset= -178 (1032) */
-/* 1212 */	0xb4,		/* FC_USER_MARSHAL */
+/* 1212 */	NdrFcShort( 0xff4c ),	/* Offset= -180 (1032) */
+/* 1214 */	0xb4,		/* FC_USER_MARSHAL */
 			0x83,		/* 131 */
-/* 1214 */	NdrFcShort( 0x1 ),	/* 1 */
-/* 1216 */	NdrFcShort( 0x4 ),	/* 4 */
-/* 1218 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 1220 */	NdrFcShort( 0xfff0 ),	/* Offset= -16 (1204) */
-/* 1222 */	
+/* 1216 */	NdrFcShort( 0x1 ),	/* 1 */
+/* 1218 */	NdrFcShort( 0x4 ),	/* 4 */
+/* 1220 */	NdrFcShort( 0x0 ),	/* 0 */
+/* 1222 */	NdrFcShort( 0xfff0 ),	/* Offset= -16 (1206) */
+/* 1224 */	
 			0x11, 0xc,	/* FC_RP [alloced_on_stack] [simple_pointer] */
-/* 1224 */	0x6,		/* FC_SHORT */
+/* 1226 */	0x6,		/* FC_SHORT */
 			0x5c,		/* FC_PAD */
-/* 1226 */	
+/* 1228 */	
 			0x11, 0x0,	/* FC_RP */
-/* 1228 */	NdrFcShort( 0xfff0 ),	/* Offset= -16 (1212) */
-/* 1230 */	
+/* 1230 */	NdrFcShort( 0xfff0 ),	/* Offset= -16 (1214) */
+/* 1232 */	
 			0x11, 0x8,	/* FC_RP [simple_pointer] */
-/* 1232 */	0xe,		/* FC_ENUM32 */
+/* 1234 */	0xe,		/* FC_ENUM32 */
 			0x5c,		/* FC_PAD */
-/* 1234 */	
+/* 1236 */	
 			0x11, 0xc,	/* FC_RP [alloced_on_stack] [simple_pointer] */
-/* 1236 */	0xe,		/* FC_ENUM32 */
+/* 1238 */	0xe,		/* FC_ENUM32 */
 			0x5c,		/* FC_PAD */
-/* 1238 */	
+/* 1240 */	
 			0x2f,		/* FC_IP */
 			0x5a,		/* FC_CONSTANT_IID */
-/* 1240 */	NdrFcLong( 0x4da92647 ),	/* 1302931015 */
-/* 1244 */	NdrFcShort( 0xa858 ),	/* -22440 */
-/* 1246 */	NdrFcShort( 0x448e ),	/* 17550 */
-/* 1248 */	0xb0,		/* 176 */
+/* 1242 */	NdrFcLong( 0x4da92647 ),	/* 1302931015 */
+/* 1246 */	NdrFcShort( 0xa858 ),	/* -22440 */
+/* 1248 */	NdrFcShort( 0x448e ),	/* 17550 */
+/* 1250 */	0xb0,		/* 176 */
 			0x1f,		/* 31 */
-/* 1250 */	0xbe,		/* 190 */
+/* 1252 */	0xbe,		/* 190 */
 			0x4d,		/* 77 */
-/* 1252 */	0xcb,		/* 203 */
+/* 1254 */	0xcb,		/* 203 */
 			0x8c,		/* 140 */
-/* 1254 */	0x86,		/* 134 */
+/* 1256 */	0x86,		/* 134 */
 			0xa1,		/* 161 */
-/* 1256 */	
+/* 1258 */	
 			0x11, 0xc,	/* FC_RP [alloced_on_stack] [simple_pointer] */
-/* 1258 */	0xd,		/* FC_ENUM16 */
+/* 1260 */	0xd,		/* FC_ENUM16 */
 			0x5c,		/* FC_PAD */
 
 			0x0
