@@ -2005,7 +2005,7 @@ STDMETHODIMP CpEpEngine::DisableAllSyncChannels()
 
 STDMETHODIMP CpEpEngine::SyncReinit()
 {
-    PEP_STATUS status = sync_reinit(session());
+    const PEP_STATUS status = passphrase_cache.api(::sync_reinit, session());
 
     if (status == PEP_STATUS_OK)
         return S_OK;
