@@ -2405,18 +2405,6 @@ STDMETHODIMP CpEpEngine::ImportKeyWithFprReturn(BSTR keyData, LPSAFEARRAY* priva
 }
 
 
-STDMETHODIMP CpEpEngine::EnableEchoProtocol(VARIANT_BOOL enable)
-{
-    config_enable_echo_protocol(session(), enable);
-    return S_OK;
-}
-
-STDMETHODIMP CpEpEngine::EnableEchoProtocolInOutgoingMessageRatingPreview(VARIANT_BOOL enable)
-{
-    config_enable_echo_in_outgoing_message_rating_preview(session(), enable);
-    return S_OK;
-}
-
 STDMETHODIMP CpEpEngine::ConfigMediaKey(BSTR pattern, BSTR fpr) noexcept
 {
     PEP_STATUS status = PEP_STATUS_OK;
