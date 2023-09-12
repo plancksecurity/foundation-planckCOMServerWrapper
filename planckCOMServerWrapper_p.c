@@ -49,7 +49,7 @@
 #include "planckCOMServerWrapper_i.h"
 
 #define TYPE_FORMAT_STRING_SIZE   1263                              
-#define PROC_FORMAT_STRING_SIZE   3349                              
+#define PROC_FORMAT_STRING_SIZE   3205                              
 #define EXPR_FORMAT_STRING_SIZE   1                                 
 #define TRANSMIT_AS_TABLE_SIZE    0            
 #define WIRE_MARSHAL_TABLE_SIZE   2            
@@ -2898,128 +2898,6 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 /* 3202 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
-	/* Procedure EnableEchoProtocol */
-
-/* 3204 */	0x33,		/* FC_AUTO_HANDLE */
-			0x6c,		/* Old Flags:  object, Oi2 */
-/* 3206 */	NdrFcLong( 0x0 ),	/* 0 */
-/* 3210 */	NdrFcShort( 0x4d ),	/* 77 */
-/* 3212 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
-/* 3214 */	NdrFcShort( 0x6 ),	/* 6 */
-/* 3216 */	NdrFcShort( 0x8 ),	/* 8 */
-/* 3218 */	0x44,		/* Oi2 Flags:  has return, has ext, */
-			0x2,		/* 2 */
-/* 3220 */	0x8,		/* 8 */
-			0x1,		/* Ext Flags:  new corr desc, */
-/* 3222 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 3224 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 3226 */	NdrFcShort( 0x0 ),	/* 0 */
-
-	/* Parameter enable */
-
-/* 3228 */	NdrFcShort( 0x48 ),	/* Flags:  in, base type, */
-/* 3230 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 3232 */	0x6,		/* FC_SHORT */
-			0x0,		/* 0 */
-
-	/* Return value */
-
-/* 3234 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
-/* 3236 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 3238 */	0x8,		/* FC_LONG */
-			0x0,		/* 0 */
-
-	/* Procedure EnableEchoProtocolInOutgoingMessageRatingPreview */
-
-/* 3240 */	0x33,		/* FC_AUTO_HANDLE */
-			0x6c,		/* Old Flags:  object, Oi2 */
-/* 3242 */	NdrFcLong( 0x0 ),	/* 0 */
-/* 3246 */	NdrFcShort( 0x4e ),	/* 78 */
-/* 3248 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
-/* 3250 */	NdrFcShort( 0x6 ),	/* 6 */
-/* 3252 */	NdrFcShort( 0x8 ),	/* 8 */
-/* 3254 */	0x44,		/* Oi2 Flags:  has return, has ext, */
-			0x2,		/* 2 */
-/* 3256 */	0x8,		/* 8 */
-			0x1,		/* Ext Flags:  new corr desc, */
-/* 3258 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 3260 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 3262 */	NdrFcShort( 0x0 ),	/* 0 */
-
-	/* Parameter enable */
-
-/* 3264 */	NdrFcShort( 0x48 ),	/* Flags:  in, base type, */
-/* 3266 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 3268 */	0x6,		/* FC_SHORT */
-			0x0,		/* 0 */
-
-	/* Return value */
-
-/* 3270 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
-/* 3272 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 3274 */	0x8,		/* FC_LONG */
-			0x0,		/* 0 */
-
-	/* Procedure ConfigMediaKey */
-
-/* 3276 */	0x33,		/* FC_AUTO_HANDLE */
-			0x6c,		/* Old Flags:  object, Oi2 */
-/* 3278 */	NdrFcLong( 0x0 ),	/* 0 */
-/* 3282 */	NdrFcShort( 0x4f ),	/* 79 */
-/* 3284 */	NdrFcShort( 0x10 ),	/* x86 Stack size/offset = 16 */
-/* 3286 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 3288 */	NdrFcShort( 0x8 ),	/* 8 */
-/* 3290 */	0x46,		/* Oi2 Flags:  clt must size, has return, has ext, */
-			0x3,		/* 3 */
-/* 3292 */	0x8,		/* 8 */
-			0x5,		/* Ext Flags:  new corr desc, srv corr check, */
-/* 3294 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 3296 */	NdrFcShort( 0x1 ),	/* 1 */
-/* 3298 */	NdrFcShort( 0x0 ),	/* 0 */
-
-	/* Parameter pattern */
-
-/* 3300 */	NdrFcShort( 0x8b ),	/* Flags:  must size, must free, in, by val, */
-/* 3302 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 3304 */	NdrFcShort( 0x20 ),	/* Type Offset=32 */
-
-	/* Parameter fpr */
-
-/* 3306 */	NdrFcShort( 0x8b ),	/* Flags:  must size, must free, in, by val, */
-/* 3308 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 3310 */	NdrFcShort( 0x20 ),	/* Type Offset=32 */
-
-	/* Return value */
-
-/* 3312 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
-/* 3314 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
-/* 3316 */	0x8,		/* FC_LONG */
-			0x0,		/* 0 */
-
-	/* Procedure ConfigMediaKeyMap */
-
-/* 3318 */	0x33,		/* FC_AUTO_HANDLE */
-			0x6c,		/* Old Flags:  object, Oi2 */
-/* 3320 */	NdrFcLong( 0x0 ),	/* 0 */
-/* 3324 */	NdrFcShort( 0x50 ),	/* 80 */
-/* 3326 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 3328 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 3330 */	NdrFcShort( 0x8 ),	/* 8 */
-/* 3332 */	0x44,		/* Oi2 Flags:  has return, has ext, */
-			0x1,		/* 1 */
-/* 3334 */	0x8,		/* 8 */
-			0x1,		/* Ext Flags:  new corr desc, */
-/* 3336 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 3338 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 3340 */	NdrFcShort( 0x0 ),	/* 0 */
-
-	/* Return value */
-
-/* 3342 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
-/* 3344 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 3346 */	0x8,		/* FC_LONG */
-			0x0,		/* 0 */
-
 			0x0
         }
     };
@@ -4060,11 +3938,7 @@ static const unsigned short IpEpEngine_FormatStringOffsetTable[] =
     3036,
     3078,
     3114,
-    3156,
-    3204,
-    3240,
-    3276,
-    3318
+    3156
     };
 
 static const MIDL_STUBLESS_PROXY_INFO IpEpEngine_ProxyInfo =
@@ -4088,7 +3962,7 @@ static const MIDL_SERVER_INFO IpEpEngine_ServerInfo =
     0,
     0,
     0};
-CINTERFACE_PROXY_VTABLE(81) _IpEpEngineProxyVtbl = 
+CINTERFACE_PROXY_VTABLE(77) _IpEpEngineProxyVtbl = 
 {
     &IpEpEngine_ProxyInfo,
     &IID_IpEpEngine,
@@ -4168,18 +4042,14 @@ CINTERFACE_PROXY_VTABLE(81) _IpEpEngineProxyVtbl =
     (void *) (INT_PTR) -1 /* IpEpEngine::GroupQueryMembers */ ,
     (void *) (INT_PTR) -1 /* IpEpEngine::SetIdentity */ ,
     (void *) (INT_PTR) -1 /* IpEpEngine::SetCommPartnerKey */ ,
-    (void *) (INT_PTR) -1 /* IpEpEngine::ImportKeyWithFprReturn */ ,
-    (void *) (INT_PTR) -1 /* IpEpEngine::EnableEchoProtocol */ ,
-    (void *) (INT_PTR) -1 /* IpEpEngine::EnableEchoProtocolInOutgoingMessageRatingPreview */ ,
-    (void *) (INT_PTR) -1 /* IpEpEngine::ConfigMediaKey */ ,
-    (void *) (INT_PTR) -1 /* IpEpEngine::ConfigMediaKeyMap */
+    (void *) (INT_PTR) -1 /* IpEpEngine::ImportKeyWithFprReturn */
 };
 
 const CInterfaceStubVtbl _IpEpEngineStubVtbl =
 {
     &IID_IpEpEngine,
     &IpEpEngine_ServerInfo,
-    81,
+    77,
     0, /* pure interpreted */
     CStdStubBuffer_METHODS
 };

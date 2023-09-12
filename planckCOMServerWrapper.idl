@@ -562,8 +562,7 @@ interface IpEpEngine : IUnknown {
     [id(68)] HRESULT DisableAllSyncChannels();
 
     // Restarts sync
-    [id(85)] HRESULT SyncReinit();
-
+    [id(81)] HRESULT SyncReinit();
 
     // group API
 
@@ -586,7 +585,6 @@ interface IpEpEngine : IUnknown {
     // Gets the members of a group
     [id(77)] HRESULT GroupQueryMembers([in] struct pEpIdentity* groupIdentity, [out, retval] SAFEARRAY(struct pEpIdentity)* members);
 
-
     // Sets the identity
     [id(78)] HRESULT SetIdentity([in] struct pEpIdentity* identity);
 
@@ -595,14 +593,6 @@ interface IpEpEngine : IUnknown {
 
     // Imports keys from data, return optional list of fprs imported
     [id(80)] HRESULT ImportKeyWithFprReturn([in] BSTR keyData, [out] SAFEARRAY(struct pEpIdentity)* privateKeys, [out] SAFEARRAY(BSTR)* importedKeys);
-
-    // Enable Echo protocol
-    [id(81)] HRESULT EnableEchoProtocol([in] VARIANT_BOOL enable);
-    [id(82)] HRESULT EnableEchoProtocolInOutgoingMessageRatingPreview([in] VARIANT_BOOL enable);
-    [id(83)] HRESULT ConfigMediaKey([in] BSTR pattern, [in] BSTR fpr);
-    [id(84)] HRESULT ConfigMediaKeyMap();
-    
-
 };
 
 [

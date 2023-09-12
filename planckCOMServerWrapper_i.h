@@ -767,18 +767,6 @@ EXTERN_C const IID IID_IpEpEngine;
             /* [out] */ SAFEARRAY * *privateKeys,
             /* [out] */ SAFEARRAY * *importedKeys) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE EnableEchoProtocol( 
-            /* [in] */ VARIANT_BOOL enable) = 0;
-        
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE EnableEchoProtocolInOutgoingMessageRatingPreview( 
-            /* [in] */ VARIANT_BOOL enable) = 0;
-        
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE ConfigMediaKey( 
-            /* [in] */ BSTR pattern,
-            /* [in] */ BSTR fpr) = 0;
-        
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE ConfigMediaKeyMap( void) = 0;
-        
     };
     
     
@@ -1172,22 +1160,6 @@ EXTERN_C const IID IID_IpEpEngine;
             /* [out] */ SAFEARRAY * *privateKeys,
             /* [out] */ SAFEARRAY * *importedKeys);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *EnableEchoProtocol )( 
-            IpEpEngine * This,
-            /* [in] */ VARIANT_BOOL enable);
-        
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *EnableEchoProtocolInOutgoingMessageRatingPreview )( 
-            IpEpEngine * This,
-            /* [in] */ VARIANT_BOOL enable);
-        
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *ConfigMediaKey )( 
-            IpEpEngine * This,
-            /* [in] */ BSTR pattern,
-            /* [in] */ BSTR fpr);
-        
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *ConfigMediaKeyMap )( 
-            IpEpEngine * This);
-        
         END_INTERFACE
     } IpEpEngineVtbl;
 
@@ -1432,18 +1404,6 @@ EXTERN_C const IID IID_IpEpEngine;
 
 #define IpEpEngine_ImportKeyWithFprReturn(This,keyData,privateKeys,importedKeys)	\
     ( (This)->lpVtbl -> ImportKeyWithFprReturn(This,keyData,privateKeys,importedKeys) ) 
-
-#define IpEpEngine_EnableEchoProtocol(This,enable)	\
-    ( (This)->lpVtbl -> EnableEchoProtocol(This,enable) ) 
-
-#define IpEpEngine_EnableEchoProtocolInOutgoingMessageRatingPreview(This,enable)	\
-    ( (This)->lpVtbl -> EnableEchoProtocolInOutgoingMessageRatingPreview(This,enable) ) 
-
-#define IpEpEngine_ConfigMediaKey(This,pattern,fpr)	\
-    ( (This)->lpVtbl -> ConfigMediaKey(This,pattern,fpr) ) 
-
-#define IpEpEngine_ConfigMediaKeyMap(This)	\
-    ( (This)->lpVtbl -> ConfigMediaKeyMap(This) ) 
 
 #endif /* COBJMACROS */
 
