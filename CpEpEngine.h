@@ -285,6 +285,7 @@ public:
     STDMETHOD(GetIsSyncRunning)(VARIANT_BOOL *running);
     STDMETHOD(ShutDownSync)();
     STDMETHOD(DisableAllSyncChannels)();
+    STDMETHOD(SyncReinit)();
 
     STDMETHOD(PERToXERSyncMessage)(TextMessage *msg, BSTR *xer);
     STDMETHOD(MIMEDecodeMessage)(BSTR mimeText, TextMessage *msg);

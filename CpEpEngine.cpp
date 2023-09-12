@@ -2003,6 +2003,18 @@ STDMETHODIMP CpEpEngine::DisableAllSyncChannels()
         return FAIL(L"DisableAllSyncChannels", status);
 }
 
+STDMETHODIMP CpEpEngine::SyncReinit()
+{
+    PEP_STATUS status = sync_reinit(session());
+
+    if (status == PEP_STATUS_OK)
+        return S_OK;
+    else if (status == PEP_OUT_OF_MEMORY)
+        return E_OUTOFMEMORY;
+    else
+        return FAIL(L"SyncReinit", status);
+}
+
 // Group Management methods
 
 STDMETHODIMP CpEpEngine::GroupCreate(pEpIdentity* groupIdentity, pEpIdentity* manager, SAFEARRAY* memberlist)

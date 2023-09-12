@@ -323,7 +323,7 @@ interface IpEpEngine : IUnknown {
         // by normal pEp clients!
         pEpEncryptFlagForceNoAttachedKey = 0x4,
 
-        // This is mainly used by pEp clients to send private keys to 
+        //ï¿½This is mainly used by pEp clients to send private keys to 
         // their own PGP-only device
         pEpEncryptFlagForceVersion1 = 0x16
     } pEpEncryptFlags;
@@ -560,6 +560,9 @@ interface IpEpEngine : IUnknown {
 
     // Disables sync for all identities
     [id(68)] HRESULT DisableAllSyncChannels();
+
+    // Restarts sync
+    [id(85)] HRESULT SyncReinit();
 
 
     // group API

@@ -715,6 +715,8 @@ EXTERN_C const IID IID_IpEpEngine;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE DisableAllSyncChannels( void) = 0;
         
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE SyncReinit( void) = 0;
+        
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE GroupCreate( 
             /* [in] */ struct pEpIdentity *groupIdentity,
             /* [in] */ struct pEpIdentity *manager,
@@ -1105,6 +1107,9 @@ EXTERN_C const IID IID_IpEpEngine;
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *DisableAllSyncChannels )( 
             IpEpEngine * This);
         
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *SyncReinit )( 
+            IpEpEngine * This);
+        
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *GroupCreate )( 
             IpEpEngine * This,
             /* [in] */ struct pEpIdentity *groupIdentity,
@@ -1388,6 +1393,9 @@ EXTERN_C const IID IID_IpEpEngine;
 
 #define IpEpEngine_DisableAllSyncChannels(This)	\
     ( (This)->lpVtbl -> DisableAllSyncChannels(This) ) 
+
+#define IpEpEngine_SyncReinit(This)	\
+    ( (This)->lpVtbl -> SyncReinit(This) ) 
 
 #define IpEpEngine_GroupCreate(This,groupIdentity,manager,memberlist)	\
     ( (This)->lpVtbl -> GroupCreate(This,groupIdentity,manager,memberlist) ) 
