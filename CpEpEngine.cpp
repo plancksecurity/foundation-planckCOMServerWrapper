@@ -2208,7 +2208,10 @@ STDMETHODIMP CpEpEngine::GroupQueryGroups(LPSAFEARRAY* groupList)
         return E_INVALIDARG;
 
     ::identity_list* il = nullptr;
-    PEP_STATUS status = ::adapter_group_query_groups(session(), &il);
+
+    // TODO: The manager parameter here really should not be NULL.
+    PEP_STATUS status = ::adapter_group_query_groups(session(), NULL, &il);
+
     if (status == PEP_OUT_OF_MEMORY) {
         return E_OUTOFMEMORY;
     }
