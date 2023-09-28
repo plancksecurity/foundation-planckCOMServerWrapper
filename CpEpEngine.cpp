@@ -2210,27 +2210,13 @@ STDMETHODIMP CpEpEngine::GroupQueryGroups(pEpIdentity* manager, LPSAFEARRAY* gro
 {
     assert(manager);
 
-    ::pEp_identity* _ident = nullptr;
-
     if (!groupList || !manager)
         return E_INVALIDARG;
 
     ::identity_list* il = nullptr;
+    IdentityPtr _ident(new_identity(manager), free_identity);  
 
-    try {
-        _ident = new_identity(manager);
-        assert(_ident);
-        if (_ident == NULL)
-            return E_OUTOFMEMORY;
-    }
-    catch (bad_alloc&) {
-        return E_OUTOFMEMORY;
-    }
-    catch (exception& ex) {
-        return FAIL(ex.what());;
-    }
-
-    PEP_STATUS status = ::adapter_group_query_groups(session(), _ident, &il);
+    PEP_STATUS status = ::adapter_group_query_groups(session(), _ident.get(), &il);
 
     if (status == PEP_OUT_OF_MEMORY) {
         return E_OUTOFMEMORY;
