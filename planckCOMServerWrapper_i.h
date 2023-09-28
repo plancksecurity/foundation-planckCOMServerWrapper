@@ -771,6 +771,11 @@ EXTERN_C const IID IID_IpEpEngine;
             /* [in] */ BSTR text,
             /* [retval][out] */ BSTR *signature) = 0;
         
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE SignatureVerifies( 
+            /* [in] */ BSTR text,
+            /* [in] */ BSTR textSignature,
+            /* [retval][out] */ VARIANT_BOOL *matches) = 0;
+        
     };
     
     
@@ -1169,6 +1174,12 @@ EXTERN_C const IID IID_IpEpEngine;
             /* [in] */ BSTR text,
             /* [retval][out] */ BSTR *signature);
         
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *SignatureVerifies )( 
+            IpEpEngine * This,
+            /* [in] */ BSTR text,
+            /* [in] */ BSTR textSignature,
+            /* [retval][out] */ VARIANT_BOOL *matches);
+        
         END_INTERFACE
     } IpEpEngineVtbl;
 
@@ -1416,6 +1427,9 @@ EXTERN_C const IID IID_IpEpEngine;
 
 #define IpEpEngine_SignatureForText(This,text,signature)	\
     ( (This)->lpVtbl -> SignatureForText(This,text,signature) ) 
+
+#define IpEpEngine_SignatureVerifies(This,text,textSignature,matches)	\
+    ( (This)->lpVtbl -> SignatureVerifies(This,text,textSignature,matches) ) 
 
 #endif /* COBJMACROS */
 

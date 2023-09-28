@@ -310,7 +310,8 @@ public:
     STDMETHOD(GroupQueryMembers)(pEpIdentity* groupIdentity, LPSAFEARRAY* members);
 
     // Stand-alone signing
-    STDMETHOD(SignatureForText)(BSTR text, BSTR * signature);
+    STDMETHOD(SignatureForText)(BSTR text, BSTR *signature);
+    STDMETHOD(SignatureVerifies)(BSTR text, BSTR signature, VARIANT_BOOL*pMatches);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)
