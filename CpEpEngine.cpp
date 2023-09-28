@@ -1,3 +1,6 @@
+// Chaneglog
+// 28.09.2023/IP - added manager parameter to GroupQueryGroups
+// 
 // CpEpEngine.cpp : Implementation of CpEpEngine
 
 #include "stdafx.h"
@@ -2202,15 +2205,32 @@ STDMETHODIMP CpEpEngine::GroupRating(pEpIdentity* groupIdentity, pEpIdentity* ma
     return ERROR_SUCCESS;
 }
 
-STDMETHODIMP CpEpEngine::GroupQueryGroups(LPSAFEARRAY* groupList)
+// 28.09.2023/IP - added manager parameter to GroupQueryGroups
+STDMETHODIMP CpEpEngine::GroupQueryGroups(pEpIdentity* manager, LPSAFEARRAY* groupList)
 {
-    if (!groupList)
+    assert(manager);
+
+    ::pEp_identity* _ident = nullptr;
+
+    if (!groupList || !manager)
         return E_INVALIDARG;
 
     ::identity_list* il = nullptr;
 
-    // TODO: The manager parameter here really should not be NULL.
-    PEP_STATUS status = ::adapter_group_query_groups(session(), NULL, &il);
+    try {
+        _ident = new_identity(manager);
+        assert(_ident);
+        if (_ident == NULL)
+            return E_OUTOFMEMORY;
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());;
+    }
+
+    PEP_STATUS status = ::adapter_group_query_groups(session(), _ident, &il);
 
     if (status == PEP_OUT_OF_MEMORY) {
         return E_OUTOFMEMORY;
