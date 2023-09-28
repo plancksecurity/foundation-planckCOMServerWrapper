@@ -1,5 +1,8 @@
 // CpEpEngine.cpp : Implementation of CpEpEngine
 
+// Changelog
+// 28.09.2023/DZ - add stand-alone signing
+
 #include "stdafx.h"
 #include "CpEpEngine.h"
 #include "GateKeeper.h"
@@ -7,9 +10,6 @@
 #include "../libPlanckWrapper/src/group_manager_api.h"
 #include "MediaKeyManager.h"
 #include "signature.h"
-
-
-
 
 using namespace std;
 using namespace pEp::utility;

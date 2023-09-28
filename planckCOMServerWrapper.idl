@@ -1,5 +1,6 @@
 // Changelog
 // 24.08.2023/IP - added preservation of major/minor version attributes when copying/creating identites
+// 28.09.2023/DZ - add stand-alone signing
 // 
 // pEpCOMServerAdapter.idl : IDL source for pEpCOMServerAdapter
 //

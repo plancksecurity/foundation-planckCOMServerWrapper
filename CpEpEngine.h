@@ -1,5 +1,8 @@
 // CpEpEngine.h : Declaration of the CpEpEngine
 
+// Changelog
+// 28.09.2023/DZ - add stand-alone signing
+
 #pragma once
 #include "resource.h"       // main symbols
 #include "stdafx.h"
