@@ -2438,3 +2438,7 @@ STDMETHODIMP CpEpEngine::ConfigMediaKeyMap() noexcept
     return PEP_STATUS_OK;
 }
 
+STDMETHODIMP CpEpEngine::SignatureForText(BSTR text, BSTR *signature)
+{
+    return PEP_STATUS_OK;
+}

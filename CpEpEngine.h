@@ -308,6 +308,9 @@ public:
     STDMETHOD(GroupQueryGroups)(LPSAFEARRAY* groupList);
     STDMETHOD(GroupQueryManager)(pEpIdentity* groupIdentity, pEpIdentity* manager);
     STDMETHOD(GroupQueryMembers)(pEpIdentity* groupIdentity, LPSAFEARRAY* members);
+
+    // Stand-alone signing
+    STDMETHOD(SignatureForText)(BSTR text, BSTR *signature);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)
