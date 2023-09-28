@@ -6,7 +6,7 @@
 #include "LocalJSONAdapter.h"
 #include "../libPlanckWrapper/src/group_manager_api.h"
 #include "MediaKeyManager.h"
-
+#include "signature.h"
 
 
 
@@ -2438,7 +2438,25 @@ STDMETHODIMP CpEpEngine::ConfigMediaKeyMap() noexcept
     return PEP_STATUS_OK;
 }
 
-STDMETHODIMP CpEpEngine::SignatureForText(BSTR text, BSTR *signature)
+STDMETHODIMP CpEpEngine::SignatureForText(BSTR text, BSTR *signature) noexcept
 {
-    return PEP_STATUS_OK;
+    if (!signature) {
+        return E_INVALIDARG;
+    }
+
+    *signature = nullptr;
+    
+    string _text = utf8_string(text);
+
+    PEP_STATUS status = PEP_STATUS_OK;
+    char* stext;
+    size_t ssize;
+    status = signature_for_text(session(), _text.c_str(), _text.size(), &stext, &ssize);
+
+    if (status == PEP_STATUS_OK) {
+        string strSignature{ stext, ssize };
+        *signature = utf16_bstr(strSignature);
+    }
+    
+    return status;
 }
