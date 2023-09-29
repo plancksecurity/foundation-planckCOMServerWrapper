@@ -2471,7 +2471,7 @@ STDMETHODIMP CpEpEngine::SignatureVerifies(BSTR text, BSTR signature, VARIANT_BO
     string _text = utf8_string(text);
     string _signature = utf8_string(signature);
 
-    PEP_STATUS status = verify_signature(session(), _text.c_str(), _text.size(), _signature.c_str(), _signature.size());
+    const PEP_STATUS status = verify_signature(session(), _text.c_str(), _text.size(), _signature.c_str(), _signature.size());
 
     if (status == PEP_VERIFIED) {
         *pMatches = true;
