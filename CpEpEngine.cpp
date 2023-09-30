@@ -2461,7 +2461,7 @@ STDMETHODIMP CpEpEngine::SignatureForText(BSTR text, BSTR *signature) noexcept
     return status;
 }
 
-STDMETHODIMP CpEpEngine::SignatureVerifies(BSTR text, BSTR signature, VARIANT_BOOL*pMatches) noexcept
+STDMETHODIMP CpEpEngine::SignatureVerifies(BSTR text, BSTR signature, VARIANT_BOOL *pMatches) noexcept
 {
     if (!pMatches) {
         return E_INVALIDARG;
