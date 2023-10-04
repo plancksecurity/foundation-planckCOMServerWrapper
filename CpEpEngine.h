@@ -1,3 +1,7 @@
+// Changelog
+// 28.09.2023/IP - added manager parameter to GroupQueryGroups
+// 
+// 
 // CpEpEngine.h : Declaration of the CpEpEngine
 
 // Changelog
@@ -308,7 +312,8 @@ public:
     STDMETHOD(GroupInviteMember)(pEpIdentity* groupIdentity, pEpIdentity* groupMember);
     STDMETHOD(GroupRemoveMember)(pEpIdentity* groupIdentity, pEpIdentity* groupMember);
     STDMETHOD(GroupRating)(pEpIdentity* groupIdentity, pEpIdentity* manager, pEpRating* ratings);
-    STDMETHOD(GroupQueryGroups)(LPSAFEARRAY* groupList);
+    // 28.09.2023/IP - added manager parameter to GroupQueryGroups
+    STDMETHOD(GroupQueryGroups)(pEpIdentity* manager, LPSAFEARRAY* groupList);
     STDMETHOD(GroupQueryManager)(pEpIdentity* groupIdentity, pEpIdentity* manager);
     STDMETHOD(GroupQueryMembers)(pEpIdentity* groupIdentity, LPSAFEARRAY* members);
 

@@ -745,6 +745,7 @@ EXTERN_C const IID IID_IpEpEngine;
             /* [retval][out] */ enum pEpRating *rating) = 0;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE GroupQueryGroups( 
+            /* [in] */ struct pEpIdentity *manager,
             /* [retval][out] */ SAFEARRAY * *groupList) = 0;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE GroupQueryManager( 
@@ -1142,6 +1143,7 @@ EXTERN_C const IID IID_IpEpEngine;
         
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *GroupQueryGroups )( 
             IpEpEngine * This,
+            /* [in] */ struct pEpIdentity *manager,
             /* [retval][out] */ SAFEARRAY * *groupList);
         
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *GroupQueryManager )( 
@@ -1407,8 +1409,8 @@ EXTERN_C const IID IID_IpEpEngine;
 #define IpEpEngine_GroupRating(This,groupIdentity,manager,rating)	\
     ( (This)->lpVtbl -> GroupRating(This,groupIdentity,manager,rating) ) 
 
-#define IpEpEngine_GroupQueryGroups(This,groupList)	\
-    ( (This)->lpVtbl -> GroupQueryGroups(This,groupList) ) 
+#define IpEpEngine_GroupQueryGroups(This,manager,groupList)	\
+    ( (This)->lpVtbl -> GroupQueryGroups(This,manager,groupList) ) 
 
 #define IpEpEngine_GroupQueryManager(This,groupIdentity,manager)	\
     ( (This)->lpVtbl -> GroupQueryManager(This,groupIdentity,manager) ) 
