@@ -49,7 +49,7 @@
 #include "planckCOMServerWrapper_i.h"
 
 #define TYPE_FORMAT_STRING_SIZE   1263                              
-#define PROC_FORMAT_STRING_SIZE   3211                              
+#define PROC_FORMAT_STRING_SIZE   3301                              
 #define EXPR_FORMAT_STRING_SIZE   1                                 
 #define TRANSMIT_AS_TABLE_SIZE    0            
 #define WIRE_MARSHAL_TABLE_SIZE   2            
@@ -2904,6 +2904,85 @@ static const planckCOMServerWrapper_MIDL_PROC_FORMAT_STRING planckCOMServerWrapp
 /* 3208 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
+	/* Procedure SignatureForText */
+
+/* 3210 */	0x33,		/* FC_AUTO_HANDLE */
+			0x6c,		/* Old Flags:  object, Oi2 */
+/* 3212 */	NdrFcLong( 0x0 ),	/* 0 */
+/* 3216 */	NdrFcShort( 0x4d ),	/* 77 */
+/* 3218 */	NdrFcShort( 0x10 ),	/* x86 Stack size/offset = 16 */
+/* 3220 */	NdrFcShort( 0x0 ),	/* 0 */
+/* 3222 */	NdrFcShort( 0x8 ),	/* 8 */
+/* 3224 */	0x47,		/* Oi2 Flags:  srv must size, clt must size, has return, has ext, */
+			0x3,		/* 3 */
+/* 3226 */	0x8,		/* 8 */
+			0x7,		/* Ext Flags:  new corr desc, clt corr check, srv corr check, */
+/* 3228 */	NdrFcShort( 0x1 ),	/* 1 */
+/* 3230 */	NdrFcShort( 0x1 ),	/* 1 */
+/* 3232 */	NdrFcShort( 0x0 ),	/* 0 */
+
+	/* Parameter text */
+
+/* 3234 */	NdrFcShort( 0x8b ),	/* Flags:  must size, must free, in, by val, */
+/* 3236 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
+/* 3238 */	NdrFcShort( 0x20 ),	/* Type Offset=32 */
+
+	/* Parameter signature */
+
+/* 3240 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
+/* 3242 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
+/* 3244 */	NdrFcShort( 0x4a4 ),	/* Type Offset=1188 */
+
+	/* Return value */
+
+/* 3246 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
+/* 3248 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
+/* 3250 */	0x8,		/* FC_LONG */
+			0x0,		/* 0 */
+
+	/* Procedure SignatureVerifies */
+
+/* 3252 */	0x33,		/* FC_AUTO_HANDLE */
+			0x6c,		/* Old Flags:  object, Oi2 */
+/* 3254 */	NdrFcLong( 0x0 ),	/* 0 */
+/* 3258 */	NdrFcShort( 0x4e ),	/* 78 */
+/* 3260 */	NdrFcShort( 0x14 ),	/* x86 Stack size/offset = 20 */
+/* 3262 */	NdrFcShort( 0x0 ),	/* 0 */
+/* 3264 */	NdrFcShort( 0x22 ),	/* 34 */
+/* 3266 */	0x46,		/* Oi2 Flags:  clt must size, has return, has ext, */
+			0x4,		/* 4 */
+/* 3268 */	0x8,		/* 8 */
+			0x5,		/* Ext Flags:  new corr desc, srv corr check, */
+/* 3270 */	NdrFcShort( 0x0 ),	/* 0 */
+/* 3272 */	NdrFcShort( 0x1 ),	/* 1 */
+/* 3274 */	NdrFcShort( 0x0 ),	/* 0 */
+
+	/* Parameter text */
+
+/* 3276 */	NdrFcShort( 0x8b ),	/* Flags:  must size, must free, in, by val, */
+/* 3278 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
+/* 3280 */	NdrFcShort( 0x20 ),	/* Type Offset=32 */
+
+	/* Parameter textSignature */
+
+/* 3282 */	NdrFcShort( 0x8b ),	/* Flags:  must size, must free, in, by val, */
+/* 3284 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
+/* 3286 */	NdrFcShort( 0x20 ),	/* Type Offset=32 */
+
+	/* Parameter matches */
+
+/* 3288 */	NdrFcShort( 0x2150 ),	/* Flags:  out, base type, simple ref, srv alloc size=8 */
+/* 3290 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
+/* 3292 */	0x6,		/* FC_SHORT */
+			0x0,		/* 0 */
+
+	/* Return value */
+
+/* 3294 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
+/* 3296 */	NdrFcShort( 0x10 ),	/* x86 Stack size/offset = 16 */
+/* 3298 */	0x8,		/* FC_LONG */
+			0x0,		/* 0 */
+
 			0x0
         }
     };
@@ -3944,7 +4023,9 @@ static const unsigned short IpEpEngine_FormatStringOffsetTable[] =
     3042,
     3084,
     3120,
-    3162
+    3162,
+    3210,
+    3252
     };
 
 static const MIDL_STUBLESS_PROXY_INFO IpEpEngine_ProxyInfo =
@@ -3968,7 +4049,7 @@ static const MIDL_SERVER_INFO IpEpEngine_ServerInfo =
     0,
     0,
     0};
-CINTERFACE_PROXY_VTABLE(77) _IpEpEngineProxyVtbl = 
+CINTERFACE_PROXY_VTABLE(79) _IpEpEngineProxyVtbl = 
 {
     &IpEpEngine_ProxyInfo,
     &IID_IpEpEngine,
@@ -4048,14 +4129,16 @@ CINTERFACE_PROXY_VTABLE(77) _IpEpEngineProxyVtbl =
     (void *) (INT_PTR) -1 /* IpEpEngine::GroupQueryMembers */ ,
     (void *) (INT_PTR) -1 /* IpEpEngine::SetIdentity */ ,
     (void *) (INT_PTR) -1 /* IpEpEngine::SetCommPartnerKey */ ,
-    (void *) (INT_PTR) -1 /* IpEpEngine::ImportKeyWithFprReturn */
+    (void *) (INT_PTR) -1 /* IpEpEngine::ImportKeyWithFprReturn */ ,
+    (void *) (INT_PTR) -1 /* IpEpEngine::SignatureForText */ ,
+    (void *) (INT_PTR) -1 /* IpEpEngine::SignatureVerifies */
 };
 
 const CInterfaceStubVtbl _IpEpEngineStubVtbl =
 {
     &IID_IpEpEngine,
     &IpEpEngine_ServerInfo,
-    77,
+    79,
     0, /* pure interpreted */
     CStdStubBuffer_METHODS
 };

@@ -1,6 +1,7 @@
 // Changelog
 // 28.09.2023/IP - added manager parameter to GroupQueryGroups
 // 24.08.2023/IP - added preservation of major/minor version attributes when copying/creating identites
+// 28.09.2023/DZ - add stand-alone signing
 // 
 // pEpCOMServerAdapter.idl : IDL source for pEpCOMServerAdapter
 //
@@ -595,6 +596,12 @@ interface IpEpEngine : IUnknown {
 
     // Imports keys from data, return optional list of fprs imported
     [id(80)] HRESULT ImportKeyWithFprReturn([in] BSTR keyData, [out] SAFEARRAY(struct pEpIdentity)* privateKeys, [out] SAFEARRAY(BSTR)* importedKeys);
+
+    // Gets the signature for a given text
+    [id(82)] HRESULT SignatureForText([in] BSTR text, [out, retval] BSTR *signature);
+
+    // Checks if the given text matches the given signature
+    [id(83)] HRESULT SignatureVerifies([in] BSTR text, [in] BSTR textSignature, [out, retval] VARIANT_BOOL*matches);
 };
 
 [

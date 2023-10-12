@@ -4,6 +4,9 @@
 // 
 // CpEpEngine.h : Declaration of the CpEpEngine
 
+// Changelog
+// 28.09.2023/DZ - add stand-alone signing
+
 #pragma once
 #include "resource.h"       // main symbols
 #include "stdafx.h"
@@ -313,6 +316,10 @@ public:
     STDMETHOD(GroupQueryGroups)(pEpIdentity* manager, LPSAFEARRAY* groupList);
     STDMETHOD(GroupQueryManager)(pEpIdentity* groupIdentity, pEpIdentity* manager);
     STDMETHOD(GroupQueryMembers)(pEpIdentity* groupIdentity, LPSAFEARRAY* members);
+
+    // Stand-alone signing
+    STDMETHOD(SignatureForText)(BSTR text, BSTR *signature);
+    STDMETHOD(SignatureVerifies)(BSTR text, BSTR signature, VARIANT_BOOL*pMatches);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)

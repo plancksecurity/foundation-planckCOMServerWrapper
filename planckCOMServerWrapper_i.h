@@ -768,6 +768,15 @@ EXTERN_C const IID IID_IpEpEngine;
             /* [out] */ SAFEARRAY * *privateKeys,
             /* [out] */ SAFEARRAY * *importedKeys) = 0;
         
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE SignatureForText( 
+            /* [in] */ BSTR text,
+            /* [retval][out] */ BSTR *signature) = 0;
+        
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE SignatureVerifies( 
+            /* [in] */ BSTR text,
+            /* [in] */ BSTR textSignature,
+            /* [retval][out] */ VARIANT_BOOL *matches) = 0;
+        
     };
     
     
@@ -1162,6 +1171,17 @@ EXTERN_C const IID IID_IpEpEngine;
             /* [out] */ SAFEARRAY * *privateKeys,
             /* [out] */ SAFEARRAY * *importedKeys);
         
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *SignatureForText )( 
+            IpEpEngine * This,
+            /* [in] */ BSTR text,
+            /* [retval][out] */ BSTR *signature);
+        
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *SignatureVerifies )( 
+            IpEpEngine * This,
+            /* [in] */ BSTR text,
+            /* [in] */ BSTR textSignature,
+            /* [retval][out] */ VARIANT_BOOL *matches);
+        
         END_INTERFACE
     } IpEpEngineVtbl;
 
@@ -1406,6 +1426,12 @@ EXTERN_C const IID IID_IpEpEngine;
 
 #define IpEpEngine_ImportKeyWithFprReturn(This,keyData,privateKeys,importedKeys)	\
     ( (This)->lpVtbl -> ImportKeyWithFprReturn(This,keyData,privateKeys,importedKeys) ) 
+
+#define IpEpEngine_SignatureForText(This,text,signature)	\
+    ( (This)->lpVtbl -> SignatureForText(This,text,signature) ) 
+
+#define IpEpEngine_SignatureVerifies(This,text,textSignature,matches)	\
+    ( (This)->lpVtbl -> SignatureVerifies(This,text,textSignature,matches) ) 
 
 #endif /* COBJMACROS */
 

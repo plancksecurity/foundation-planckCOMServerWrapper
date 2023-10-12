@@ -3,16 +3,16 @@
 // 
 // CpEpEngine.cpp : Implementation of CpEpEngine
 
+// Changelog
+// 28.09.2023/DZ - add stand-alone signing
+
 #include "stdafx.h"
 #include "CpEpEngine.h"
 #include "GateKeeper.h"
 #include "LocalJSONAdapter.h"
 #include "../libPlanckWrapper/src/group_manager_api.h"
 #include "MediaKeyManager.h"
-
-
-
-
+#include "signature.h"
 
 using namespace std;
 using namespace pEp::utility;
@@ -2447,3 +2447,44 @@ STDMETHODIMP CpEpEngine::ConfigMediaKeyMap() noexcept
     return PEP_STATUS_OK;
 }
 
+STDMETHODIMP CpEpEngine::SignatureForText(BSTR text, BSTR *signature) noexcept
+{
+    if (!signature) {
+        return E_INVALIDARG;
+    }
+
+    *signature = nullptr;
+    
+    string _text = utf8_string(text);
+
+    PEP_STATUS status = PEP_STATUS_OK;
+    char *stext;
+    size_t ssize;
+    status = signature_for_text(session(), _text.c_str(), _text.size(), &stext, &ssize);
+
+    if (status == PEP_STATUS_OK) {
+        string strSignature{ stext, ssize };
+        *signature = utf16_bstr(strSignature);
+    }
+    
+    return status;
+}
+
+STDMETHODIMP CpEpEngine::SignatureVerifies(BSTR text, BSTR signature, VARIANT_BOOL *pMatches) noexcept
+{
+    if (!pMatches) {
+        return E_INVALIDARG;
+    }
+    *pMatches = false;
+
+    string _text = utf8_string(text);
+    string _signature = utf8_string(signature);
+
+    const PEP_STATUS status = verify_signature(session(), _text.c_str(), _text.size(), _signature.c_str(), _signature.size());
+
+    if (status == PEP_VERIFIED) {
+        *pMatches = true;
+    }
+    
+    return status;
+}
