@@ -1282,6 +1282,9 @@ STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SA
 
     *rating = (pEpRating)_rating;
 
+    if ((status != PEP_STATUS_OK) && (status < PEP_UNENCRYPTED || status >= PEP_TRUSTWORD_NOT_FOUND))
+      return FAIL("Failure to decrypt message", status);
+
     return S_OK;
 }
 
