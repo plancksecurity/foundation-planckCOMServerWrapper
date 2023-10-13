@@ -1,8 +1,8 @@
 Debug/
 Release/
-pEpCOMServerAdapter_i.c
-pEpCOMServerAdapter_i.h
-pEpCOMServerAdapter_p.c
+planckCOMServerWrapper_i.c
+planckCOMServerWrapper_i.h
+planckCOMServerWrapper_p.c
 pEpCOMServerAdapter.aps
 *.orig
 *.user
