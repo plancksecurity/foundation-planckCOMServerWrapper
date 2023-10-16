@@ -1,7 +1,7 @@
 #pragma once
 
 // Changelog
-// 16.10.2023/DZ - Handle version information and encryption format across all identity types
+// 16.10.2023/DZ - Handle version information, encryption format, flags uniformly across all identity types
 
 #include "stdafx.h"
 #include "planckCOMServerWrapper_i.h"
@@ -20,10 +20,10 @@ namespace pEp {
             pEpComType comm_type;
             string lang;
 			bool me;
-            int flags;
             unsigned int major_ver;
             unsigned int minor_ver;
             planckEncFormat enc_format;
+            int flags;
 
             pEp_identity_cpp(
                 string _address = string(),
@@ -31,12 +31,13 @@ namespace pEp {
                 string _user_id = string(),
                 string _username = string(),
                 pEpComType _comm_type = pEpCtUnknown,
-				bool _me = false,
                 string _lang = string(),
+                bool _me = false,
                 unsigned int _major_ver = 0,
                 unsigned int _minor_ver = 0,
-                planckEncFormat _enc_format = planckEncFormatNone
-            ) : address(_address), fpr(_fpr), user_id(_user_id), username(_username), comm_type(_comm_type), me(_me), lang(_lang), major_ver(_major_ver), minor_ver(_minor_ver), enc_format(_enc_format)
+                planckEncFormat _enc_format = planckEncFormatNone,
+                int _flags = pEpIdfNone
+            ) : address(_address), fpr(_fpr), user_id(_user_id), username(_username), comm_type(_comm_type), me(_me), lang(_lang), major_ver(_major_ver), minor_ver(_minor_ver), enc_format(_enc_format), flags(_flags)
             { }
 
             pEp_identity_cpp(const ::pEp_identity *_ident);

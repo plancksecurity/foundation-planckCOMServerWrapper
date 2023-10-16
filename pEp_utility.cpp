@@ -1,6 +1,6 @@
 // Changelog
 // 24.08.2023/IP - added preservation of major/minor version attributes when copying/creating identites
-// 16.10.2023/DZ - Handle version information and encryption format across all identity types
+// 16.10.2023/DZ - Handle version information, encryption format, flags uniformly across all identity types
 
 #include "stdafx.h"
 #include "pEp_utility.h"
@@ -25,10 +25,10 @@ namespace pEp {
             comm_type = (pEpComType)_ident->comm_type;
             lang = _ident->lang;
             me = _ident->me;
-            flags = (int)_ident->flags;
             major_ver = _ident->major_ver;
             minor_ver = _ident->minor_ver;
             enc_format = static_cast<planckEncFormat>(_ident->enc_format);
+            flags = (int)_ident->flags;
         }
 
         pEp_identity_cpp::pEp_identity_cpp(const pEpIdentity *_ident)
@@ -48,10 +48,10 @@ namespace pEp {
             if (_ident->Lang)
                 lang = utf8_string(_ident->Lang);
             me = _ident->UserName;
-            flags = (int)_ident->Flags;
             major_ver = _ident->MajorVersion;
             minor_ver = _ident->MinorVersion;
             enc_format = _ident->EncFormat;
+            flags = (int)_ident->Flags;
         }
 
         pEp_identity * pEp_identity_cpp::to_pEp_identity()
@@ -71,10 +71,10 @@ namespace pEp {
             }
 
             _ident->me = this->me;
-            _ident->flags = (identity_flags) this->flags;
             _ident->major_ver = this->major_ver;
             _ident->minor_ver = this->minor_ver;
             _ident->enc_format = static_cast<PEP_enc_format>(this->enc_format);
+            _ident->flags = static_cast<identity_flags>(this->flags);
 
             return _ident;
         }
@@ -93,10 +93,10 @@ namespace pEp {
             _ident->UserName = utf16_bstr(this->username);
             _ident->UserId = utf16_bstr(this->user_id);
             _ident->Me = this->me;
-            _ident->Flags = (pEpIdentityFlags) this->flags;
             _ident->MajorVersion = this->major_ver;
             _ident->MinorVersion = this->minor_ver;
             _ident->EncFormat = this->enc_format;
+            _ident->Flags = static_cast<pEpIdentityFlags>(this->flags);
 
             return _ident;
         }
@@ -121,10 +121,10 @@ namespace pEp {
                 if (ident->lang)
                     ident_s->Lang = utf16_bstr(ident->lang);
                 ident_s->Me = ident->me;
-                ident_s->Flags = (pEpIdentityFlags)ident->flags;
                 ident_s->MajorVersion = ident->major_ver;
                 ident_s->MinorVersion = ident->minor_ver;
                 ident_s->EncFormat = static_cast<planckEncFormat>(ident->enc_format);
+                ident_s->Flags = static_cast<pEpIdentityFlags>(ident->flags);
             }
         }
 
@@ -185,11 +185,11 @@ namespace pEp {
             }
 
             _ident->me = ident->Me;
-            _ident->flags = (identity_flags_t)ident->Flags;
 
             _ident->major_ver = ident->MajorVersion;
             _ident->minor_ver = ident->MinorVersion;
             _ident->enc_format = static_cast<PEP_enc_format>(ident->EncFormat);
+            _ident->flags = static_cast<identity_flags_t>(ident->Flags);
 
             return _ident;
         }
