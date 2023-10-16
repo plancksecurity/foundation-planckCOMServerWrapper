@@ -33,8 +33,10 @@ namespace pEp {
                 pEpComType _comm_type = pEpCtUnknown,
 				bool _me = false,
                 string _lang = string(),
+                unsigned int _major_ver = 0,
+                unsigned int _minor_ver = 0,
                 planckEncFormat _enc_format = planckEncFormatNone
-            ) : address(_address), fpr(_fpr), user_id(_user_id), username(_username), comm_type(_comm_type), me(_me), lang(_lang), enc_format(_enc_format)
+            ) : address(_address), fpr(_fpr), user_id(_user_id), username(_username), comm_type(_comm_type), me(_me), lang(_lang), major_ver(_major_ver), minor_ver(_minor_ver), enc_format(_enc_format)
             { }
 
             pEp_identity_cpp(const ::pEp_identity *_ident);
