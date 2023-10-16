@@ -26,6 +26,7 @@ namespace pEp {
             lang = _ident->lang;
             me = _ident->me;
             flags = (int)_ident->flags;
+            enc_format = static_cast<planckEncFormat>(_ident->enc_format);
         }
 
         pEp_identity_cpp::pEp_identity_cpp(const pEpIdentity *_ident)
@@ -46,6 +47,7 @@ namespace pEp {
                 lang = utf8_string(_ident->Lang);
             me = _ident->UserName;
             flags = (int)_ident->Flags;
+            enc_format = _ident->EncFormat;
         }
 
         pEp_identity * pEp_identity_cpp::to_pEp_identity()
@@ -66,6 +68,7 @@ namespace pEp {
 
             _ident->me = this->me;
             _ident->flags = (identity_flags) this->flags;
+            _ident->enc_format = static_cast<PEP_enc_format>(this->enc_format);
 
             return _ident;
         }
@@ -85,6 +88,7 @@ namespace pEp {
             _ident->UserId = utf16_bstr(this->user_id);
             _ident->Me = this->me;
             _ident->Flags = (pEpIdentityFlags) this->flags;
+            _ident->EncFormat = this->enc_format;
 
             return _ident;
         }
@@ -112,7 +116,7 @@ namespace pEp {
                 ident_s->Flags = (pEpIdentityFlags)ident->flags;
                 ident_s->MajorVersion = ident->major_ver;
                 ident_s->MinorVersion = ident->minor_ver;
-                ident_s->EncFormat = (planckEncFormat) ident->enc_format;
+                ident_s->EncFormat = static_cast<planckEncFormat>(ident->enc_format);
             }
         }
 
@@ -177,7 +181,7 @@ namespace pEp {
 
             _ident->major_ver = ident->MajorVersion;
             _ident->minor_ver = ident->MinorVersion;
-            _ident->enc_format = (PEP_enc_format)ident->EncFormat;
+            _ident->enc_format = static_cast<PEP_enc_format>(ident->EncFormat);
 
             return _ident;
         }
