@@ -112,6 +112,7 @@ namespace pEp {
                 ident_s->Flags = (pEpIdentityFlags)ident->flags;
                 ident_s->MajorVersion = ident->major_ver;
                 ident_s->MinorVersion = ident->minor_ver;
+                ident_s->EncFormat = (planckEncFormat) ident->enc_format;
             }
         }
 
@@ -176,6 +177,7 @@ namespace pEp {
 
             _ident->major_ver = ident->MajorVersion;
             _ident->minor_ver = ident->MinorVersion;
+            _ident->enc_format = (PEP_enc_format)ident->EncFormat;
 
             return _ident;
         }

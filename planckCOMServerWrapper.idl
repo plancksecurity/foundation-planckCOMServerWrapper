@@ -275,6 +275,7 @@ interface IpEpEngine : IUnknown {
         BSTR Lang;
         VARIANT_BOOL Me;
         pEpIdentityFlags Flags;
+        planckEncFormat EncFormat;
 
         // 24.08.2023/IP - added preservation of major/minor version attributes when copying/creating identites
         USHORT MajorVersion;
