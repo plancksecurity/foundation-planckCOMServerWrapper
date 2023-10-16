@@ -1234,6 +1234,45 @@ STDMETHODIMP CpEpEngine::EncryptMessageForSelf(pEpIdentity * targetId, TextMessa
     return result;
 }
 
+STDMETHODIMP CpEpEngine::GetFingerprints(TextMessage* msg, SAFEARRAY** keylist) {
+    assert(msg);
+    assert(keylist);
+
+    if(!(msg && keylist))
+        return E_INVALIDARG;
+    
+    ::message* _msg = NULL;
+    try {
+        _msg = text_message_to_C(msg);
+    }
+    catch (bad_alloc&) {
+        return E_OUTOFMEMORY;
+    }
+    catch (exception& ex) {
+        return FAIL(ex.what());
+    }
+    ::stringlist_t* _keylist = new_stringlist(*keylist);
+
+    PEP_STATUS const status = passphrase_cache.api(::get_fprs, session(), _msg, &_keylist);
+   
+    ::free_message(_msg);
+
+    if (_keylist) {
+        *keylist = string_array(_keylist);
+        free_stringlist(_keylist);
+    }
+
+    // a non-encrypted message should not throw a failure
+    if (status == PEP_UNENCRYPTED) {
+        return S_OK;
+    }
+
+    if (status != PEP_STATUS_OK)
+        return FAIL("Failure to get fingerprints from message", status);
+
+    return S_OK;
+}
+
 STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SAFEARRAY ** keylist, pEpDecryptFlags *flags, pEpRating *rating)
 {
     assert(src);

@@ -247,6 +247,7 @@ public:
         /* [defaultvalue][in] */ pEpEncryptFlags flags = pEpEncryptFlagDefault,
         /* [defaultvalue][in] */ pEpEncFormat encFormat = pEpEncPep);
 
+    STDMETHOD(GetFingerprints)(TextMessage * msg, SAFEARRAY ** keylist);
     STDMETHOD(DecryptMessage)(TextMessage * src, TextMessage * dst, SAFEARRAY ** keylist, pEpDecryptFlags* flags, pEpRating *rating);
     STDMETHOD(ReEvaluateMessageRating)(TextMessage * msg, SAFEARRAY * x_KeyList, pEpRating x_EncStatus, pEpRating *rating);
     STDMETHOD(OutgoingMessageRating)(TextMessage *msg, pEpRating * pVal);
