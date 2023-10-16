@@ -265,7 +265,7 @@ interface IpEpEngine : IUnknown {
         planckEncFormatInline_EA,
         planckEncFormatAuto = 255
     } planckEncFormat;
-    
+
     [uuid(C3A3814E-567F-4D1C-9F44-9B1DA3957A89)] struct pEpIdentity {
         BSTR Address;
         BSTR Fpr;

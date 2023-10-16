@@ -1,9 +1,9 @@
 // Changelog
 // 24.08.2023/IP - added preservation of major/minor version attributes when copying/creating identites
+// 16.10.2023/DZ - Handle version information and encryption format across all identity types
 
 #include "stdafx.h"
 #include "pEp_utility.h"
-
 
 using namespace ATL;
 

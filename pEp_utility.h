@@ -1,9 +1,11 @@
 #pragma once
 
+// Changelog
+// 16.10.2023/DZ - Handle version information and encryption format across all identity types
+
 #include "stdafx.h"
 #include "planckCOMServerWrapper_i.h"
 #include "utf8_helper.h"
-
 
 using namespace std;
 
@@ -19,6 +21,8 @@ namespace pEp {
             string lang;
 			bool me;
             int flags;
+            unsigned int major_ver;
+            unsigned int minor_ver;
             planckEncFormat enc_format;
 
             pEp_identity_cpp(
