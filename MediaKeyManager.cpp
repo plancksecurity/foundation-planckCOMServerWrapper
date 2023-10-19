@@ -89,7 +89,7 @@ std::string MediaKeyManager::import_media_key(const std::filesystem::path& p) co
     std::string k = load_text_file_contents(p);
     identity_list *l;
     stringlist_t* imported_keys = new_stringlist(NULL);
-    PEP_STATUS status = import_key_with_fpr_return(session, k.c_str(), k.size(), &l, &imported_keys, NULL);
+    PEP_STATUS status = import_key_with_fpr_return(session, k.c_str(), k.size(), &l, NULL, &imported_keys, NULL);
     if (status != PEP_KEY_IMPORTED)
     {
         provisioning_log_error << "Error configuring media key " << p.c_str() << ": " << status;

@@ -595,7 +595,7 @@ interface IpEpEngine : IUnknown {
     [id(79)] HRESULT SetCommPartnerKey([in] struct pEpIdentity* identity, [in] BSTR fpr);
 
     // Imports keys from data, return optional list of fprs imported
-    [id(80)] HRESULT ImportKeyWithFprReturn([in] BSTR keyData, [out] SAFEARRAY(struct pEpIdentity)* privateKeys, [out] SAFEARRAY(BSTR)* importedKeys);
+    [id(80)] HRESULT ImportKeyWithFprReturn([in] BSTR keyData, [out] SAFEARRAY(struct pEpIdentity)* importedIdentities, [out] SAFEARRAY(struct pEpIdentity)* privateKeys, [out] SAFEARRAY(BSTR)* importedKeys);
 
     // Gets the signature for a given text
     [id(82)] HRESULT SignatureForText([in] BSTR text, [out, retval] BSTR *signature);
