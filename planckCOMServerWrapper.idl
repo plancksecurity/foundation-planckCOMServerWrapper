@@ -492,7 +492,7 @@ interface IpEpEngine : IUnknown {
     [id(48)] HRESULT DeliverHandshakeResult([in] enum SyncHandshakeResult result, [in] SAFEARRAY(struct pEpIdentity) identities_sharing);
 
     // Imports keys from data
-    [id(49)] HRESULT ImportKey([in] BSTR keyData, [out] SAFEARRAY(struct pEpIdentity)* privateKeys);
+    [id(49)] HRESULT ImportKey([in] BSTR keyData, [out] SAFEARRAY(struct pEpIdentity)* importedIdentities, [out] SAFEARRAY(struct pEpIdentity)* privateKeys);
 
     typedef [v1_enum] enum pEpCipherSuite {
         pEpCipherSuiteDefault = 0,
