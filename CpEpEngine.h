@@ -208,8 +208,8 @@ public:
     STDMETHOD(GetLanguageList)(BSTR * languages);
     STDMETHOD(SetIdentityFlags)(struct pEpIdentity* identity, pEpIdentityFlags flags);
     STDMETHOD(UnsetIdentityFlags)(struct pEpIdentity *identity, pEpIdentityFlags flags);
-    STDMETHOD(ImportKey)(BSTR keyData, LPSAFEARRAY *privateKeys);
-    STDMETHOD(ImportKeyWithFprReturn)(BSTR keyData, LPSAFEARRAY* privateKeys, LPSAFEARRAY* importedKeys);
+    STDMETHOD(ImportKey)(BSTR keyData, LPSAFEARRAY* importedIdentities, LPSAFEARRAY *privateKeys);
+    STDMETHOD(ImportKeyWithFprReturn)(BSTR keyData, LPSAFEARRAY* importedIdentities, LPSAFEARRAY* privateKeys, LPSAFEARRAY* importedKeys);
     STDMETHOD(SetIdentity)(struct pEpIdentity *identity);
 
     // keymanagement API

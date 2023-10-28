@@ -76,9 +76,9 @@ STDMETHODIMP CpEpEngine::ConfigCipherSuite(pEpCipherSuite cipherSuite)
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::ImportKey(BSTR keyData, LPSAFEARRAY * privateKeys)
+STDMETHODIMP CpEpEngine::ImportKey(BSTR keyData, LPSAFEARRAY* importedIdentities, LPSAFEARRAY * privateKeys)
 {
-    return ImportKeyWithFprReturn(keyData, privateKeys, NULL);
+    return ImportKeyWithFprReturn(keyData, importedIdentities, privateKeys, NULL);
 }
 
 
@@ -2415,7 +2415,7 @@ STDMETHODIMP CpEpEngine::SetCommPartnerKey(pEpIdentity* identity, BSTR fpr) {
     return S_OK;
 }
 
-STDMETHODIMP CpEpEngine::ImportKeyWithFprReturn(BSTR keyData, LPSAFEARRAY* privateKeys, LPSAFEARRAY* importedKeys)
+STDMETHODIMP CpEpEngine::ImportKeyWithFprReturn(BSTR keyData, LPSAFEARRAY* importedIdentities, LPSAFEARRAY* privateKeys, LPSAFEARRAY* importedKeys)
 {
     assert(keyData);
 
@@ -2425,12 +2425,13 @@ STDMETHODIMP CpEpEngine::ImportKeyWithFprReturn(BSTR keyData, LPSAFEARRAY* priva
     string key_data = utf8_string(keyData);
     size_t size = SysStringLen(keyData);
     ::identity_list* private_keys = nullptr;
+    ::identity_list* imported_identities = nullptr;
     ::stringlist_t* imported_keys = nullptr;
     if (importedKeys) {
         imported_keys = new_stringlist(*importedKeys);
     }
 
-    PEP_STATUS status = passphrase_cache.api(::import_key_with_fpr_return, session(), key_data.c_str(), size, &private_keys, &imported_keys, (uint64_t*)nullptr);
+    PEP_STATUS status = passphrase_cache.api(::import_key_with_fpr_return, session(), key_data.c_str(), size, &imported_identities, &private_keys, &imported_keys, (uint64_t*)nullptr);
     assert(status != ::PEP_OUT_OF_MEMORY);
     if (status == ::PEP_OUT_OF_MEMORY)
         return E_OUTOFMEMORY;
@@ -2463,6 +2464,25 @@ STDMETHODIMP CpEpEngine::ImportKeyWithFprReturn(BSTR keyData, LPSAFEARRAY* priva
         }
         free_stringlist(imported_keys);
     }
+
+    SAFEARRAY* _importedIdentities = nullptr;
+    try {
+        _importedIdentities = array_from_C<pEpIdentity, identity_list>(imported_identities);
+    }
+    catch (exception& ex)
+    {
+        ::free_identity_list(imported_identities);
+        try {
+            dynamic_cast<bad_alloc&>(ex);
+        }
+        catch (bad_cast&)
+        {
+            return FAIL(ex.what());
+        }
+        return E_OUTOFMEMORY;
+    }
+    free_identity_list(imported_identities);
+    *importedIdentities = _importedIdentities;
 
     return status;
 }
