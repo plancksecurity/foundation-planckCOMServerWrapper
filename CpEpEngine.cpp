@@ -1155,7 +1155,7 @@ STDMETHODIMP CpEpEngine::EncryptMessageAndAddPrivKey(TextMessage * src, TextMess
     if ((status != PEP_STATUS_OK) && (status < PEP_UNENCRYPTED || status >= PEP_TRUSTWORD_NOT_FOUND))
         return FAIL("Failure to encrypt message", status);
 
-    // Statii like PEP_UNENCRYPTED due to no private key
+    // Status like PEP_UNENCRYPTED due to no private key
     // should not be a catastrophic failure here. Using S_FALSE
     // still allows clients to differentiate with S_OK,
     // although this does not work out of the box with
@@ -1251,26 +1251,57 @@ STDMETHODIMP CpEpEngine::GetFingerprints(TextMessage* msg, SAFEARRAY** keylist) 
     catch (exception& ex) {
         return FAIL(ex.what());
     }
-    ::stringlist_t* _keylist = new_stringlist(*keylist);
-
-    PEP_STATUS const status = passphrase_cache.api(::get_fprs, session(), _msg, &_keylist);
-   
+    ::stringlist_t* _keylist = new_stringlist(*keylist);    
+    ::stringlist_t* _keylistResult = new_stringlist(*keylist);
+    // extract the key ids from the message and store them in _keylist
+    PEP_STATUS status = passphrase_cache.api(::get_key_ids, session(), _msg, &_keylist);   
     ::free_message(_msg);
+    // a non-encrypted message should not throw a failure, but we can directly get back and do not process any further 
+    if (status == PEP_UNENCRYPTED) {
+        goto exit_ok;
+    }
 
+    if (status != PEP_STATUS_OK) {
+        goto exit_not_ok;
+    }
+        
+    _keylistResult = _keylist;
     if (_keylist) {
         *keylist = string_array(_keylist);
-        free_stringlist(_keylist);
+        // now get the fingerprints from our database, if we have any
+        while (_keylist) {
+            ::stringlist_t* _fprlist = new_stringlist((string_array(_keylist)));
+            std::string fprCombined = "";
+            std::string keyid = _keylist->value;
+            std::string fpr = "none";
+            std::string colon = ":";
+
+            status = find_keys(session(), _keylist->value, &_fprlist);
+            if (status != PEP_STATUS_OK) {
+                goto exit_not_ok;
+            }
+
+            if (_fprlist != NULL) {
+                fpr = _fprlist->value;                
+            }
+
+            fprCombined = keyid + colon + fpr;
+            char* cString = new char[fprCombined.length() + 1];
+            strcpy_s(cString, fprCombined.length() + 1, fprCombined.c_str());
+            free(_keylist->value);
+            _keylist->value = cString;
+            _keylist = _keylist->next;
+        }
     }
 
-    // a non-encrypted message should not throw a failure
-    if (status == PEP_UNENCRYPTED) {
-        return S_OK;
-    }
-
-    if (status != PEP_STATUS_OK)
-        return FAIL("Failure to get fingerprints from message", status);
-
+exit_ok:
+    *keylist = string_array(_keylistResult);
+    free_stringlist(_keylistResult);
     return S_OK;
+
+exit_not_ok:
+    free_stringlist(_keylist);
+    return FAIL("Failure to get key ids from message", status);
 }
 
 STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SAFEARRAY ** keylist, pEpDecryptFlags *flags, pEpRating *rating)
