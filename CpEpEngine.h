@@ -1,11 +1,10 @@
 // Changelog
 // 28.09.2023/IP - added manager parameter to GroupQueryGroups
+// 28.09.2023/DZ - add stand-alone signing
+// 31.10.2023/IP - added get_fingerprints
 // 
 // 
 // CpEpEngine.h : Declaration of the CpEpEngine
-
-// Changelog
-// 28.09.2023/DZ - add stand-alone signing
 
 #pragma once
 #include "resource.h"       // main symbols

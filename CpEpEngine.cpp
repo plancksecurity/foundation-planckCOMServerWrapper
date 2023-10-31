@@ -1,10 +1,9 @@
 // Chaneglog
 // 28.09.2023/IP - added manager parameter to GroupQueryGroups
+// 28.09.2023/DZ - add stand-alone signing
+// 31.10.2023/IP - added get_fingerprints
 // 
 // CpEpEngine.cpp : Implementation of CpEpEngine
-
-// Changelog
-// 28.09.2023/DZ - add stand-alone signing
 
 #include "stdafx.h"
 #include "CpEpEngine.h"
@@ -1251,8 +1250,8 @@ STDMETHODIMP CpEpEngine::GetFingerprints(TextMessage* msg, SAFEARRAY** keylist) 
     catch (exception& ex) {
         return FAIL(ex.what());
     }
-    ::stringlist_t* _keylist = new_stringlist(*keylist);    
-    ::stringlist_t* _keylistResult = new_stringlist(*keylist);
+    ::stringlist_t* _keylist = NULL;    
+    ::stringlist_t* _keylistResult = NULL;
     // extract the key ids from the message and store them in _keylist
     PEP_STATUS status = passphrase_cache.api(::get_key_ids, session(), _msg, &_keylist);   
     ::free_message(_msg);
@@ -1267,10 +1266,9 @@ STDMETHODIMP CpEpEngine::GetFingerprints(TextMessage* msg, SAFEARRAY** keylist) 
         
     _keylistResult = _keylist;
     if (_keylist) {
-        *keylist = string_array(_keylist);
         // now get the fingerprints from our database, if we have any
         while (_keylist) {
-            ::stringlist_t* _fprlist = new_stringlist((string_array(_keylist)));
+            ::stringlist_t* _fprlist = NULL;
             std::string fprCombined = "";
             std::string keyid = _keylist->value;
             std::string fpr = "none";
@@ -1286,10 +1284,8 @@ STDMETHODIMP CpEpEngine::GetFingerprints(TextMessage* msg, SAFEARRAY** keylist) 
             }
 
             fprCombined = keyid + colon + fpr;
-            char* cString = new char[fprCombined.length() + 1];
-            strcpy_s(cString, fprCombined.length() + 1, fprCombined.c_str());
             free(_keylist->value);
-            _keylist->value = cString;
+            _keylist->value = strdup(fprCombined.c_str());
             _keylist = _keylist->next;
         }
     }

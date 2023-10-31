@@ -2,6 +2,7 @@
 // 28.09.2023/IP - added manager parameter to GroupQueryGroups
 // 24.08.2023/IP - added preservation of major/minor version attributes when copying/creating identites
 // 28.09.2023/DZ - add stand-alone signing
+// 31.10.2023/IP - added get_fingerprints
 // 
 // pEpCOMServerAdapter.idl : IDL source for pEpCOMServerAdapter
 //
@@ -604,7 +605,7 @@ interface IpEpEngine : IUnknown {
     [id(83)] HRESULT SignatureVerifies([in] BSTR text, [in] BSTR textSignature, [out, retval] VARIANT_BOOL*matches);
 
     [id(84)] HRESULT GetFingerprints(
-        [in, out] struct TextMessage* msg,
+        [in] struct TextMessage* msg,
         [in, out] SAFEARRAY(BSTR)* keylist);
 };
 
