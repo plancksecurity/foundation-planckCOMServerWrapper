@@ -2,6 +2,7 @@
 // 28.09.2023/IP - added manager parameter to GroupQueryGroups
 // 24.08.2023/IP - added preservation of major/minor version attributes when copying/creating identites
 // 28.09.2023/DZ - add stand-alone signing
+// 16.10.2023/DZ - Handle version information, encryption format, flags uniformly across all identity types
 // 
 // pEpCOMServerAdapter.idl : IDL source for pEpCOMServerAdapter
 //
@@ -251,6 +252,20 @@ interface IpEpEngine : IUnknown {
 
     } pEpIdentityFlags;
 
+    typedef [v1_enum] enum planckEncFormat {
+        planckEncFormatNone = 0,
+        planckEncFormatPieces = 1,
+        planckEncFormatInline = 1,
+        planckEncFormatSMIME = 2,
+        planckEncFormatPGPMIME = 3,
+        planckEncFormatPlanckMessageV1 = 3,
+        planckEncFormatPlanck = 4,
+        planckEncFormatPlanckMessageV2 = 4,
+        planckEncFormatPGPMIMEOutlook1,
+        planckEncFormatInline_EA,
+        planckEncFormatAuto = 255
+    } planckEncFormat;
+
     [uuid(C3A3814E-567F-4D1C-9F44-9B1DA3957A89)] struct pEpIdentity {
         BSTR Address;
         BSTR Fpr;
@@ -259,11 +274,13 @@ interface IpEpEngine : IUnknown {
         pEpComType CommType;
         BSTR Lang;
         VARIANT_BOOL Me;
-        pEpIdentityFlags Flags;
 
         // 24.08.2023/IP - added preservation of major/minor version attributes when copying/creating identites
         USHORT MajorVersion;
         USHORT MinorVersion;
+
+        planckEncFormat EncFormat;
+        pEpIdentityFlags Flags;
     };
 
     [id(11)] HRESULT SetIdentityFlags([in] struct pEpIdentity *identity, [in] pEpIdentityFlags flags);
