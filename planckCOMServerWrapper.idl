@@ -3,6 +3,7 @@
 // 24.08.2023/IP - added preservation of major/minor version attributes when copying/creating identites
 // 28.09.2023/DZ - add stand-alone signing
 // 16.10.2023/DZ - Handle version information, encryption format, flags uniformly across all identity types
+// 31.10.2023/IP - added get_fingerprints
 // 
 // pEpCOMServerAdapter.idl : IDL source for pEpCOMServerAdapter
 //
@@ -619,6 +620,10 @@ interface IpEpEngine : IUnknown {
 
     // Checks if the given text matches the given signature
     [id(83)] HRESULT SignatureVerifies([in] BSTR text, [in] BSTR textSignature, [out, retval] VARIANT_BOOL*matches);
+
+    [id(84)] HRESULT GetFingerprints(
+        [in] struct TextMessage* msg,
+        [in, out] SAFEARRAY(BSTR)* keylist);
 };
 
 [

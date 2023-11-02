@@ -1,11 +1,10 @@
 // Changelog
 // 28.09.2023/IP - added manager parameter to GroupQueryGroups
+// 28.09.2023/DZ - add stand-alone signing
+// 31.10.2023/IP - added get_fingerprints
 // 
 // 
 // CpEpEngine.h : Declaration of the CpEpEngine
-
-// Changelog
-// 28.09.2023/DZ - add stand-alone signing
 
 #pragma once
 #include "resource.h"       // main symbols
@@ -247,6 +246,7 @@ public:
         /* [defaultvalue][in] */ pEpEncryptFlags flags = pEpEncryptFlagDefault,
         /* [defaultvalue][in] */ pEpEncFormat encFormat = pEpEncPep);
 
+    STDMETHOD(GetFingerprints)(TextMessage * msg, SAFEARRAY ** keylist);
     STDMETHOD(DecryptMessage)(TextMessage * src, TextMessage * dst, SAFEARRAY ** keylist, pEpDecryptFlags* flags, pEpRating *rating);
     STDMETHOD(ReEvaluateMessageRating)(TextMessage * msg, SAFEARRAY * x_KeyList, pEpRating x_EncStatus, pEpRating *rating);
     STDMETHOD(OutgoingMessageRating)(TextMessage *msg, pEpRating * pVal);
