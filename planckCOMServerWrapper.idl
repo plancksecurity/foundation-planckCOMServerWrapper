@@ -318,6 +318,7 @@ interface IpEpEngine : IUnknown {
         pEpRatingTrusted,
         pEpRatingTrustedAndAnonymized,
         pEpRatingFullyAnonymous,
+        pEpRatingSMIME,
 
         pEpRatingMistrust = -1,
         pEpRatingB0rken = -2,
