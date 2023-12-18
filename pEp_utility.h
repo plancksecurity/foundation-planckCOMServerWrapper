@@ -98,6 +98,7 @@ namespace pEp {
 
 		identity_list *identities(SAFEARRAY * sa);
         ::message * text_message_to_C(TextMessage *msg);
+        ::message* message_shallow_copy(const ::message* src);
         void text_message_from_C(TextMessage *msg2, const ::message *msg);
 
 		/// <summary>

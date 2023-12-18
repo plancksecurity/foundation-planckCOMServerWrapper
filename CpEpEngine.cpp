@@ -1332,6 +1332,9 @@ STDMETHODIMP CpEpEngine::DecryptMessage(TextMessage * src, TextMessage * dst, SA
 
     *flags = (pEpDecryptFlags)engineflags;
 
+    ::message* shallow_src = message_shallow_copy(_src);
+    ::message* shallow_dst = message_shallow_copy(_src);
+
     if (_src)
         text_message_from_C(src, _src);
 
