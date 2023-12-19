@@ -358,35 +358,6 @@ namespace pEp {
             memset(msg, 0, sizeof(TextMessage));
         }
 
-        ::message* message_shallow_copy(const ::message* msg)
-        {
-            ::message* msg2 = new_message(msg->dir);
-            
-            msg2->dir = msg->dir;
-            msg2->id = msg->id;
-            msg2->shortmsg = msg->shortmsg;
-            msg2->longmsg = msg->longmsg;
-            msg2->longmsg_formatted = msg->longmsg_formatted;
-            msg2->attachments = msg->attachments;
-            msg2->sent = msg->sent;
-            msg2->recv = msg->recv;
-            msg2->from = msg->from;
-            msg2->to = msg->to;
-            msg2->recv_by = msg->recv_by;
-            msg2->cc = msg->cc;
-            msg2->bcc = msg->bcc;
-            msg2->reply_to = msg->reply_to;
-            msg2->references = msg->references;
-            msg2->keywords = msg->keywords;
-            msg2->comments = msg->comments;
-            msg2->opt_fields = msg->opt_fields;
-            msg2->enc_format = msg->enc_format;
-            msg2->_sender_fpr = msg->_sender_fpr;
-            msg2->rating = msg->rating;
-
-            return nullptr;
-        }
-
         void text_message_from_C(TextMessage *msg2, const ::message *msg)
         {
             assert(msg2);
