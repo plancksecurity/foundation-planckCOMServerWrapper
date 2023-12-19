@@ -495,11 +495,11 @@ namespace pEp {
                         throw bad_alloc();
 
                 }
-                const char *pstrMimeType = str(b.MimeType);
-                const char* pstrFilename = str(b.Filename);
-                _bl = bloblist_add(_bl, buffer, size, pstrMimeType, pstrFilename);
-                free((void *) pstrMimeType);
-                free((void *) pstrFilename);
+
+                string strMimeType = utf8_string(b.MimeType);
+                string strFilename = utf8_string(b.Filename);
+                _bl = bloblist_add(_bl, buffer, size, strMimeType.c_str(), strFilename.c_str());
+
                 if (_bl == NULL) {
                     free(buffer);
                     clear_blob(b);
