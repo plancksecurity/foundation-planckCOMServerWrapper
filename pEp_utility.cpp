@@ -466,7 +466,11 @@ namespace pEp {
                         throw bad_alloc();
 
                 }
-                _bl = bloblist_add(_bl, buffer, size, str(b.MimeType), str(b.Filename));
+
+                string strMimeType = utf8_string(b.MimeType);
+                string strFilename = utf8_string(b.Filename);
+                _bl = bloblist_add(_bl, buffer, size, strMimeType.c_str(), strFilename.c_str());
+
                 if (_bl == NULL) {
                     free(buffer);
                     clear_blob(b);
