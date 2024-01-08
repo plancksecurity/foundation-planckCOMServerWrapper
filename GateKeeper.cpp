@@ -185,10 +185,8 @@ namespace pEp {
 
             if (now > next) {
                 next = now + GateKeeper::cycle;
-                if (update_enabled() && Is_update_available())
-                {
-                    mainWindow.ShowNotificationInfo(r(IDS_NEWUPDATE_TITLE), r(IDS_NEWUPDATE_TEXT));
-                }
+                if (update_enabled())
+                    update_now();
             }
 
             Sleep(waiting);
@@ -620,49 +618,6 @@ namespace pEp {
             InternetCloseHandle(hUrl);
         BCryptDestroyKey(dk);
 
-        return result;
-    }
-
-    bool GateKeeper::is_product_url_exists(product p, DWORD context) {
-        {
-            HANDLE file = CreateFile(get_lockFile().c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
-            if (file == INVALID_HANDLE_VALUE) {
-                return false;
-            }
-            else {
-                CloseHandle(file);
-                DeleteFile(get_lockFile().c_str());
-            }
-        }
-
-        BCRYPT_KEY_HANDLE dk = delivery_key();
-#ifdef UNICODE
-        tstring delivery = utility::utf16_string(wrapped_delivery_key(dk));
-#else
-        tstring delivery = wrapped_delivery_key(delivery_key());
-#endif
-        tstring url = p.second;
-        url += _T("&challenge=");
-        url += delivery;
-        tstring headers;
-        HINTERNET hUrl = InternetOpenUrl(internet, url.c_str(), headers.c_str(), headers.length(),
-            INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_UI | INTERNET_FLAG_SECURE, context);
-        if (hUrl == NULL)
-            return false;
-        return true;
-    }
-    bool GateKeeper::Is_update_available() {
-        bool result = true;
-        product_list products = registered_products();
-        DWORD context = 0;
-        for (auto i = products.begin(); i != products.end(); i++) {
-            try {
-                result = result && is_product_url_exists(*i, context++);
-            }
-            catch (exception&) {
-                result = false;
-            }
-        }
         return result;
     }
 
