@@ -38,8 +38,7 @@ namespace pEp {
         void keep();
 		product_list registered_products();
 		bool update_product(product p, DWORD context = 0);
-        bool is_product_url_exists(product p, DWORD context);
-        bool Is_update_available();
+
         bool update_enabled();
         void enable_update();
         void disable_update();
