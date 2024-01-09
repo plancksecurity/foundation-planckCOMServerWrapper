@@ -40,6 +40,8 @@ namespace pEp {
 		bool update_product(product p, DWORD context = 0);
 
         bool update_enabled();
+        bool is_update_available();
+        bool is_product_url_exists(product p, DWORD context);
         void enable_update();
         void disable_update();
         void update_now();
