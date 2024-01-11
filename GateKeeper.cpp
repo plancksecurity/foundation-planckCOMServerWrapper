@@ -185,8 +185,10 @@ namespace pEp {
 
             if (now > next) {
                 next = now + GateKeeper::cycle;
-                if (update_enabled())
-                    update_now();
+                if (update_enabled() && is_update_available())
+                {                    
+                    mainWindow.ShowNotificationInfo(r(IDS_NEWUPDATE_TITLE), r(IDS_NEWUPDATE_TEXT));
+                }
             }
 
             Sleep(waiting);
@@ -381,6 +383,108 @@ namespace pEp {
         }
 
         return enabled;
+    }
+
+    bool GateKeeper::is_update_available() {
+        bool result = true;
+        NTSTATUS status = BCryptOpenAlgorithmProvider(&hAES, BCRYPT_AES_ALGORITHM, MS_PRIMITIVE_PROVIDER, 0);
+        assert(status == 0);
+        if (status) {
+            result = false;
+            goto closing;
+        }
+        status = BCryptSetProperty(hAES, BCRYPT_CHAINING_MODE, (PUCHAR)BCRYPT_CHAIN_MODE_GCM, sizeof(BCRYPT_CHAIN_MODE_GCM), 0);
+        if (status) {
+            result = false;
+            goto closing;
+        }
+
+        status = BCryptOpenAlgorithmProvider(&hRSA, BCRYPT_RSA_ALGORITHM, MS_PRIMITIVE_PROVIDER, 0);
+        assert(status == 0);
+        if (status) {
+            result = false;
+            goto closing;
+        }
+
+        internet = InternetOpen(_T("pEp"), INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+        if (!internet)
+        {
+            result = false;
+            goto closing;
+        }
+
+        {
+        product_list products = registered_products();
+        DWORD context = 0;
+
+        result = products.size() > 0;
+        for (auto i = products.begin(); i != products.end(); i++) {
+            try {
+                result = result && is_product_url_exists(*i, context++);
+            }
+            catch (exception&) {
+
+            }
+            }
+        }
+
+    closing:
+        if (internet)
+            InternetCloseHandle(internet);
+        if (hAES)
+            BCryptCloseAlgorithmProvider(hAES, 0);
+        if (hRSA)
+            BCryptCloseAlgorithmProvider(hRSA, 0);
+        internet = NULL;
+        hAES = NULL;
+        hRSA = NULL;
+
+        return result;
+    }
+
+    bool GateKeeper::is_product_url_exists(product p, DWORD context) {
+        {
+            HANDLE file = CreateFile(get_lockFile().c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+            if (file == INVALID_HANDLE_VALUE) {
+                return false;
+            }
+            else {
+                CloseHandle(file);
+                DeleteFile(get_lockFile().c_str());
+            }
+        }
+        bool result = false;
+        BCRYPT_KEY_HANDLE dk = delivery_key();
+#ifdef UNICODE
+        tstring delivery = utility::utf16_string(wrapped_delivery_key(dk));
+#else
+        tstring delivery = wrapped_delivery_key(delivery_key());
+#endif
+        tstring url = p.second;
+        url += _T("&challenge=");
+        url += delivery;
+        tstring headers;
+        HINTERNET hUrl = InternetOpenUrl(internet, url.c_str(), headers.c_str(), headers.length(),
+            INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_UI | INTERNET_FLAG_SECURE, context);
+        if (hUrl != NULL)
+        {
+            try {
+                UCHAR iv[12];
+                DWORD reading;
+                InternetReadFile(hUrl, iv, sizeof(iv), &reading);
+                result = reading > 0;
+            }
+            catch (exception&) {
+                result = false;
+                goto closing;
+            }
+        }
+        closing:
+            if (hUrl)
+                InternetCloseHandle(hUrl);
+            BCryptDestroyKey(dk);
+
+        return result;
     }
 
     GateKeeper::product_list GateKeeper::registered_products()
