@@ -458,7 +458,29 @@ namespace pEp {
         tstring headers;
         HINTERNET hUrl = InternetOpenUrl(internet, url.c_str(), headers.c_str(), headers.length(),
             INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_UI | INTERNET_FLAG_SECURE, context);
-        result = (hUrl != NULL);
+        if (hUrl == NULL)
+            result = false;
+        else {
+            try {
+                UCHAR iv[12];
+                DWORD reading;
+                InternetReadFile(hUrl, iv, sizeof(iv), &reading);
+
+                if (reading)
+                {
+                    result = true;
+                }
+            }
+            catch (exception&) {
+                result = false;
+                goto closing;
+            }
+        }
+    closing:
+        if (hUrl)
+            InternetCloseHandle(hUrl);
+        BCryptDestroyKey(dk);
+
         return result;
     }
 
