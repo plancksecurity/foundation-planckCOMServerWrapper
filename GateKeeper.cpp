@@ -445,7 +445,7 @@ namespace pEp {
                 DeleteFile(get_lockFile().c_str());
             }
         }
-
+        bool result = false;
         BCRYPT_KEY_HANDLE dk = delivery_key();
 #ifdef UNICODE
         tstring delivery = utility::utf16_string(wrapped_delivery_key(dk));
@@ -458,9 +458,8 @@ namespace pEp {
         tstring headers;
         HINTERNET hUrl = InternetOpenUrl(internet, url.c_str(), headers.c_str(), headers.length(),
             INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_UI | INTERNET_FLAG_SECURE, context);
-        if (hUrl == NULL)
-            return false;
-        return true;
+        result = (hUrl != NULL);
+        return result;
     }
 
     GateKeeper::product_list GateKeeper::registered_products()
