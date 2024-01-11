@@ -18,7 +18,7 @@ struct PUBLIC_KEY_VALUES {
 };
 
 static void ReverseMemCopy(
-    _Out_ BYTE       *pbDest,            
+    _Out_ BYTE       *pbDest,
     _In_  BYTE const *pbSource,
     _In_  DWORD       cb
 )
@@ -389,35 +389,42 @@ namespace pEp {
         bool result = true;
         NTSTATUS status = BCryptOpenAlgorithmProvider(&hAES, BCRYPT_AES_ALGORITHM, MS_PRIMITIVE_PROVIDER, 0);
         assert(status == 0);
-        result = status == 0;
-        if (status)
+        if (status) {
+            result = false;
             goto closing;
+        }
         status = BCryptSetProperty(hAES, BCRYPT_CHAINING_MODE, (PUCHAR)BCRYPT_CHAIN_MODE_GCM, sizeof(BCRYPT_CHAIN_MODE_GCM), 0);
-        if (status)
+        if (status) {
+            result = false;
             goto closing;
+        }
 
         status = BCryptOpenAlgorithmProvider(&hRSA, BCRYPT_RSA_ALGORITHM, MS_PRIMITIVE_PROVIDER, 0);
         assert(status == 0);
-        result = status == 0;
-        if (status)
+        if (status) {
+            result = false;
             goto closing;
+        }
 
         internet = InternetOpen(_T("pEp"), INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
         if (!internet)
+        {
+            result = false;
             goto closing;
+        }
 
         {
-            product_list products = registered_products();
-            DWORD context = 0;
-           
-            result = products.size() > 0;
-            for (auto i = products.begin(); i != products.end(); i++) {
-                try {
-                    result = result && is_product_url_exists(*i, context++);
-                }
-                catch (exception&) {
+        product_list products = registered_products();
+        DWORD context = 0;
 
-                }
+        result = products.size() > 0;
+        for (auto i = products.begin(); i != products.end(); i++) {
+            try {
+                result = result && is_product_url_exists(*i, context++);
+            }
+            catch (exception&) {
+
+            }
             }
         }
 
@@ -431,6 +438,7 @@ namespace pEp {
         internet = NULL;
         hAES = NULL;
         hRSA = NULL;
+
         return result;
     }
 
@@ -458,28 +466,23 @@ namespace pEp {
         tstring headers;
         HINTERNET hUrl = InternetOpenUrl(internet, url.c_str(), headers.c_str(), headers.length(),
             INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_UI | INTERNET_FLAG_SECURE, context);
-        if (hUrl == NULL)
-            result = false;
-        else {
+        if (hUrl != NULL)
+        {
             try {
                 UCHAR iv[12];
                 DWORD reading;
                 InternetReadFile(hUrl, iv, sizeof(iv), &reading);
-
-                if (reading)
-                {
-                    result = true;
-                }
+                result = reading > 0;
             }
             catch (exception&) {
                 result = false;
                 goto closing;
             }
         }
-    closing:
-        if (hUrl)
-            InternetCloseHandle(hUrl);
-        BCryptDestroyKey(dk);
+        closing:
+            if (hUrl)
+                InternetCloseHandle(hUrl);
+            BCryptDestroyKey(dk);
 
         return result;
     }
