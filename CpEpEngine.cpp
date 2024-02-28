@@ -1285,7 +1285,7 @@ STDMETHODIMP CpEpEngine::GetFingerprints(TextMessage* msg, SAFEARRAY** keylist) 
 
             fprCombined = keyid + colon + fpr;
             free(_keylist->value);
-            _keylist->value = strdup(fprCombined.c_str());
+            _keylist->value = _strdup(fprCombined.c_str());
             _keylist = _keylist->next;
         }
     }
