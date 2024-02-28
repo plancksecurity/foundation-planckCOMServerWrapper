@@ -2544,12 +2544,13 @@ STDMETHODIMP CpEpEngine::SignatureForText(BSTR text, BSTR *signature) noexcept
     string _text = utf8_string(text);
 
     PEP_STATUS status = PEP_STATUS_OK;
-    char *stext;
-    size_t ssize;
+    char *stext = nullptr;
+    size_t ssize = 0;
     status = signature_for_text(session(), _text.c_str(), _text.size(), &stext, &ssize);
 
     if (status == PEP_STATUS_OK) {
         string strSignature{ stext, ssize };
+        free(stext);
         *signature = utf16_bstr(strSignature);
     }
     
