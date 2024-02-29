@@ -60,10 +60,12 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Platform)'=='x64'">
     <PostBuildEvent>
-      <Command>echo "Registering server $(TargetPath)"</Command>
-      <Command>$(TargetPath) /Regserver</Command>
-      <Command>echo "Generating interop assembly $(TargetDir)planckCOMServerWrapper.Interop.dll"</Command>
-      <Command>TlbImp.exe "$(TargetPath)" /out:"$(TargetDir)\planckCOMServerWrapper.Interop.dll" /namespace:planckCOMServerWrapperLib /primary /keyfile:"$(ProjectDir)pEp_test.snk" /machine:Agnostic"</Command>
+        <Command>
+echo "Registering server $(TargetPath)"
+$(TargetPath) /Regserver
+echo "Generating interop assembly $(TargetDir)planckCOMServerWrapper.Interop.dll"
+TlbImp.exe "$(TargetPath)" /out:"$(TargetDir)\planckCOMServerWrapper.Interop.dll" /namespace:planckCOMServerWrapperLib /primary /keyfile:"$(ProjectDir)pEp_test.snk" /machine:X64"
+        </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
