@@ -13,6 +13,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cwctype>
+#include <boost/locale/collator.hpp>
 #include <boost/locale.hpp>
 
 namespace pEp
@@ -164,7 +165,7 @@ namespace pEp
         std::locale loc = boost::locale::generator().generate("");  // use default system locale
         std::locale::global(loc);
 
-        return 0 == std::use_facet<boost::locale::collator<wchar_t>>(loc).compare(boost::locale::collator_base::primary, stringA, stringB);
+        return 0 == std::use_facet<boost::locale::collator<wchar_t>>(loc).compare(boost::locale::collate_level::primary, stringA, stringB);
     }
     
     std::string ExtraKeyManager::wstringToString(std::wstring ws) {

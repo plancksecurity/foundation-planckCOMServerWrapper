@@ -3,6 +3,8 @@
 // Changelog
 // 16.10.2023/DZ - Handle version information, encryption format, flags uniformly across all identity types
 
+#include <pEp/platform_windows.h>
+
 #include "stdafx.h"
 #include "planckCOMServerWrapper_i.h"
 #include "utf8_helper.h"

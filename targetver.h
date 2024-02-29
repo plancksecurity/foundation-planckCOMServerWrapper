@@ -7,5 +7,8 @@
 
 #include <WinSDKVer.h>
 
-#define WINVER 0x0601
-#define _WIN32_WINNT 0x0601 // build for Windows 7
+#ifndef _WIN32_WINNT 
+#define _WIN32_WINNT 0x0A00 // build for Windows 10 
+#endif
+
+#define WINVER _WIN32_WINNT 
