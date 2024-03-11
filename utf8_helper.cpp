@@ -51,9 +51,9 @@ namespace pEp {
             if (bstr == NULL)
                 return "";
 
-            _bstr_t _bstr(bstr);
+            _bstr_t _bstr{ bstr, false }; // Explicitly DON'T copy
             wstring wstr = (wchar_t *)_bstr;
-            _bstr.Detach();
+            _bstr.Detach(); // Can safely detach, because we didn't copy
 
             return utf8_string(wstr, norm);
         }
