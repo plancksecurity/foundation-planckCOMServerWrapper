@@ -343,34 +343,7 @@ namespace pEp {
             SysFreeString(msg->ShortMsg);
             SysFreeString(msg->LongMsg);
             SysFreeString(msg->LongMsgFormatted);
-            
-            if (msg->Attachments) {
-                const UINT dim = 1;
-                LONG lowerBounds = 0, upperBounds = 0;
-                HRESULT result = SafeArrayGetLBound(msg->Attachments, dim, &lowerBounds);
-                if (SUCCEEDED(result)) {
-                    result = SafeArrayGetUBound(msg->Attachments, dim, &upperBounds);
-                    if (SUCCEEDED(result)) {
-                        result = SafeArrayLock(msg->Attachments);
-                        if (SUCCEEDED(result)) {
-                            for (LONG i = lowerBounds; i < upperBounds; i++) {
-                                Blob *blob = static_cast<Blob*>(msg->Attachments->pvData) + i;
-                                result = SafeArrayDestroy(blob->value);
-                                if (!SUCCEEDED(result)) {
-                                    std::cerr << "could not destroy array\n";
-                                }
-                                SysFreeString(blob->Filename);
-                                SysFreeString(blob->MimeType);
-                            }
-                        }
-                    }
-                }
-                result = SafeArrayDestroy(msg->Attachments);
-                if (!SUCCEEDED(result)) {
-                    std::cerr << "could not destroy attachments\n";
-                }
-            }
-
+            SafeArrayDestroy(msg->Attachments);
             clear_identity_s(msg->From);
             SafeArrayDestroy(msg->To);
             clear_identity_s(msg->RecvBy);
