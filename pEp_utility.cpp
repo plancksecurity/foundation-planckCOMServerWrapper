@@ -436,16 +436,15 @@ namespace pEp {
             if (bl == NULL)
                 throw bad_alloc();
 
-            Blob* pBlobs;
-            SafeArrayAccessData(sa, reinterpret_cast<void **>(&pBlobs));
-
             bloblist_t *_bl = bl;
             for (LONG i = lbound; i <= ubound; i++) {
-                Blob* pBlob = pBlobs + i;
+                Blob b;
+                memset(&b, 0, sizeof(Blob));
+                SafeArrayGetElement(sa, &i, &b);
 
                 LONG _lbound, _ubound;
-                SafeArrayGetLBound(pBlob->value, 1, &_lbound);
-                SafeArrayGetUBound(pBlob->value, 1, &_ubound);
+                SafeArrayGetLBound(b.value, 1, &_lbound);
+                SafeArrayGetUBound(b.value, 1, &_ubound);
                 size_t size = _ubound - _lbound + 1;
 
                 char *buffer;
@@ -456,7 +455,7 @@ namespace pEp {
 
                     char *data;
 
-                    SafeArrayAccessData(pBlob->value, (void **)&data);
+                    SafeArrayAccessData(b.value, (void **)&data);
                     memcpy(buffer, data, size);
                     buffer[size] = 0; // safeguard
                     SafeArrayUnaccessData(sa);
@@ -468,18 +467,18 @@ namespace pEp {
 
                 }
 
-                string strMimeType = utf8_string(pBlob->MimeType);
-                string strFilename = utf8_string(pBlob->Filename);
+                string strMimeType = utf8_string(b.MimeType);
+                string strFilename = utf8_string(b.Filename);
                 _bl = bloblist_add(_bl, buffer, size, strMimeType.c_str(), strFilename.c_str());
 
                 if (_bl == NULL) {
                     free(buffer);
-                    clear_blob(*pBlob);
+                    clear_blob(b);
                     free_bloblist(bl);
                     throw bad_alloc();
                 }
 
-                clear_blob(*pBlob);
+                clear_blob(b);
             }
 
             return bl;
