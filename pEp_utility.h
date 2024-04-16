@@ -2,6 +2,7 @@
 
 // Changelog
 // 16.10.2023/DZ - Handle version information, encryption format, flags uniformly across all identity types
+// 16.04.2024/DZ - Fix Memory leaks
 
 #include "stdafx.h"
 #include "planckCOMServerWrapper_i.h"

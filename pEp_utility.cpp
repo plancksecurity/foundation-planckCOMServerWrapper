@@ -1,6 +1,7 @@
 // Changelog
 // 24.08.2023/IP - added preservation of major/minor version attributes when copying/creating identites
 // 16.10.2023/DZ - Handle version information, encryption format, flags uniformly across all identity types
+// 16.04.2024/DZ - Fix Memory leaks
 
 #include "stdafx.h"
 #include "pEp_utility.h"
