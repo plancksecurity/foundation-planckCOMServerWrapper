@@ -458,7 +458,7 @@ namespace pEp {
                     SafeArrayAccessData(b.value, (void **)&data);
                     memcpy(buffer, data, size);
                     buffer[size] = 0; // safeguard
-                    SafeArrayUnaccessData(sa);
+                    SafeArrayUnaccessData(b.value);
                 }
                 else {
                     buffer = _strdup("");
