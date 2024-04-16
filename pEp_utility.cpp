@@ -246,8 +246,9 @@ namespace pEp {
 
             T *_tl = tl;
             for (LONG i = lbound; i <= ubound; _tl = _tl->next, i++) {
-                Destructor<T2 *> e{ from_C<T2*, T>(_tl) };
-                HRESULT result = SafeArrayPutElement(sa, &i, e());
+                T2* element = from_C<T2*, T>(_tl);
+                AutoDestructor<T2 *> e{ element };
+                HRESULT result = SafeArrayPutElement(sa, &i, element);
                 if (!SUCCEEDED(result))
                     throw bad_alloc();
             }
@@ -459,7 +460,7 @@ namespace pEp {
             for (LONG i = lbound; i <= ubound; i++) {
                 Blob b;
                 memset(&b, 0, sizeof(Blob));
-                Destructor<Blob> blob{b};
+                AutoDestructor<Blob> blob{b};
                 SafeArrayGetElement(sa, &i, &b);
 
                 LONG _lbound, _ubound;
@@ -658,6 +659,23 @@ namespace pEp {
             }
         }
 
+        template<>
+        void auto_destruct(StringPair* strings) {
+            if (strings) {
+                SysFreeString(strings->Name);
+                SysFreeString(strings->Value);
+                delete strings;
+            }
+        }
+
+        template<>
+        void auto_destruct(pEpIdentity* identity) {
+            if (identity) {
+                clear_identity_s(identity);
+                delete identity;
+            }
+        }
+
         /** RegistryKey class **/
 
         LONG RegistryKey::create_key(HKEY hk, const std::wstring& key, HKEY& hkKey) noexcept
@@ -731,41 +749,6 @@ namespace pEp {
         bool RegistryKey::SetValue(const std::wstring& key, const std::wstring& value) noexcept
         {
             return RegSetValueEx(hkKeyPath, key.c_str(), 0, REG_SZ, (BYTE*)value.c_str(), value.size() * 2) == ERROR_SUCCESS;
-        }
-
-        /// <summary>
-        /// Destructor function for COM and heap-allocated objects.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="a"></param>
-        template<class T>
-        void destruct(T a) {
-            static_assert(false, "specialize destruct() for every type you use it with");
-        }
-
-        template<>
-        void destruct(Blob* blob) {
-            if (blob) {
-                clear_blob(blob);
-                delete blob;
-            }
-        }
-
-        template<>
-        void destruct(StringPair* strings) {
-            if (strings) {
-                SysFreeString(strings->Name);
-                SysFreeString(strings->Value);
-                delete strings;
-            }
-        }
-
-        template<>
-        void destruct(pEpIdentity* identity) {
-            if (identity) {
-                clear_identity_s(identity);
-                delete identity;
-            }
         }
     }
 }

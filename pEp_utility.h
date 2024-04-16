@@ -49,9 +49,13 @@ namespace pEp {
         };
 
         void copy_identity(pEpIdentity * ident_s, const pEp_identity * ident);
+
         void clear_identity_s(pEpIdentity& ident);
+        void clear_identity_s(pEpIdentity* ident);
         void clear_text_message(TextMessage *msg);
         void clear_blob(Blob& blob);
+        void clear_blob(Blob* b);
+
         ::pEp_identity *new_identity(const pEpIdentity * ident);
 
         void opt_field_array_from_C(stringpair_list_t* spair_list, LPSAFEARRAY* pair_list_out);
@@ -60,44 +64,46 @@ namespace pEp {
 
         static LPTYPELIB pTypelib = NULL;
 
-        /// <summary>
-        /// Destructor function for COM and/or heap-allocated objects.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="a"></param>
         template<class T>
-        void destruct(T a);
+        void auto_destruct(T t) {
+            static_assert(false, "specialize auto_destruct for your type");
+        }
 
         template<>
-        void destruct(Blob* blob);
-
-        template<>
-        inline void destruct(Blob blob) {
+        inline void auto_destruct(Blob blob) {
             clear_blob(blob);
         }
 
         template<>
-        void destruct(StringPair* strings);
+        inline void auto_destruct(Blob *blob) {
+            clear_blob(blob);
+        }
 
         template<>
-        void destruct(pEpIdentity* identity);
+        inline void auto_destruct(Blob& blob) {
+            clear_blob(blob);
+        }
+
+        template<>
+        void auto_destruct(StringPair* strings);
+
+        template<>
+        void auto_destruct(pEpIdentity* identity);
 
         /// <summary>
         /// Auto destructor for COM and/or heap-allocated objects.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         template<class T>
-        struct Destructor {
-            Destructor(T e) : _element{ e } {}
+        struct AutoDestructor {
+            AutoDestructor(T& e) : _element{ e } {}
 
-            ~Destructor() {
-                destruct(_element);
+            ~AutoDestructor() {
+                auto_destruct(_element);
             }
 
-            T& operator()() { return _element; }
-
         private:
-            T _element;
+            T& _element;
         };
 
         template< class UDType > static IRecordInfo *getRecordInfo()
