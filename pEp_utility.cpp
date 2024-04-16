@@ -245,7 +245,8 @@ namespace pEp {
 
             T *_tl = tl;
             for (LONG i = lbound; i <= ubound; _tl = _tl->next, i++) {
-                HRESULT result = SafeArrayPutElement(sa, &i, from_C<T2 *, T>(_tl));
+                T2 *element = from_C<T2*, T>(_tl);
+                HRESULT result = SafeArrayPutElement(sa, &i, element);
                 if (!SUCCEEDED(result))
                     throw bad_alloc();
             }
