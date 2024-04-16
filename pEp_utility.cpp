@@ -437,6 +437,7 @@ namespace pEp {
             SysFreeString(b->MimeType);
             SafeArrayDestroy(b->value);
             memset(b, 0, sizeof(Blob));
+            delete b;
         }
 
         bloblist_t *bloblist(SAFEARRAY *sa)
