@@ -245,8 +245,8 @@ namespace pEp {
 
             T *_tl = tl;
             for (LONG i = lbound; i <= ubound; _tl = _tl->next, i++) {
-                T2 *element = from_C<T2*, T>(_tl);
-                HRESULT result = SafeArrayPutElement(sa, &i, element);
+                Destructor<T2 *> e{ from_C<T2*, T>(_tl) };
+                HRESULT result = SafeArrayPutElement(sa, &i, e());
                 if (!SUCCEEDED(result))
                     throw bad_alloc();
             }
@@ -715,5 +715,20 @@ namespace pEp {
             return RegSetValueEx(hkKeyPath, key.c_str(), 0, REG_SZ, (BYTE*)value.c_str(), value.size() * 2) == ERROR_SUCCESS;
         }
 
+        /// <summary>
+        /// Destructor function for COM and heap-allocated objects.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="a"></param>
+        template<class T>
+        void destruct(T a) {}
+
+        template<>
+        void destruct(Blob* blob) {
+            if (blob) {
+                clear_blob(*blob);
+                delete blob;
+            }
+        }
     }
 }

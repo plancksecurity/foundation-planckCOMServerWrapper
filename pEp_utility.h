@@ -58,6 +58,35 @@ namespace pEp {
 
         static LPTYPELIB pTypelib = NULL;
 
+        /// <summary>
+        /// Destructor function for COM and/or heap-allocated objects.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="a"></param>
+        template<class T>
+        void destruct(T a);
+
+        template<>
+        void destruct(Blob* blob);
+
+        /// <summary>
+        /// Auto destructor for COM and/or heap-allocated objects.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        template<class T>
+        struct Destructor {
+            Destructor(T e) : _element{ e } {}
+
+            ~Destructor() {
+                destruct(_element);
+            }
+
+            T& operator()() { return _element; }
+
+        private:
+            T _element;
+        };
+
         template< class UDType > static IRecordInfo *getRecordInfo()
         {
             LPTYPEINFO pTypeInfo = NULL;
