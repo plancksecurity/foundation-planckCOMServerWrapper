@@ -430,6 +430,14 @@ namespace pEp {
             memset(&b, 0, sizeof(Blob));
         }
 
+        void clear_blob(Blob *b)
+        {
+            SysFreeString(b->Filename);
+            SysFreeString(b->MimeType);
+            SafeArrayDestroy(b->value);
+            memset(b, 0, sizeof(Blob));
+        }
+
         bloblist_t *bloblist(SAFEARRAY *sa)
         {
             if (sa == NULL)
@@ -740,9 +748,14 @@ namespace pEp {
         template<>
         void destruct(Blob* blob) {
             if (blob) {
-                clear_blob(*blob);
+                clear_blob(blob);
                 delete blob;
             }
+        }
+
+        template<>
+        void destruct(Blob& blob) {
+            clear_blob(blob);
         }
 
         template<>

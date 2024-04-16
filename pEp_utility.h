@@ -70,6 +70,18 @@ namespace pEp {
         template<>
         void destruct(Blob* blob);
 
+        template<>
+        void destruct(Blob* blob);
+
+        template<>
+        void destruct(Blob& blob);
+
+        template<>
+        void destruct(StringPair* strings);
+
+        template<>
+        void destruct(pEpIdentity* identity);
+
         /// <summary>
         /// Auto destructor for COM and/or heap-allocated objects.
         /// </summary>
