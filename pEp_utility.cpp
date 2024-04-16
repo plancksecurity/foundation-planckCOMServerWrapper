@@ -265,6 +265,17 @@ namespace pEp {
             memset(&ident, 0, sizeof(pEpIdentity));
         }
 
+        void clear_identity_s(pEpIdentity* ident)
+        {
+            SysFreeString(ident->Address);
+            SysFreeString(ident->Fpr);
+            SysFreeString(ident->Lang);
+            SysFreeString(ident->UserName);
+            SysFreeString(ident->UserId);
+
+            memset(ident, 0, sizeof(pEpIdentity));
+        }
+
         template<> pEpIdentity from_C< pEpIdentity, pEp_identity >(pEp_identity *tl)
         {
             pEpIdentity _ident;
@@ -721,13 +732,32 @@ namespace pEp {
         /// <typeparam name="T"></typeparam>
         /// <param name="a"></param>
         template<class T>
-        void destruct(T a) {}
+        void destruct(T a) {
+            static_assert(false, "specialize destruct() for every type you use it with");
+        }
 
         template<>
         void destruct(Blob* blob) {
             if (blob) {
                 clear_blob(*blob);
                 delete blob;
+            }
+        }
+
+        template<>
+        void destruct(StringPair* strings) {
+            if (strings) {
+                SysFreeString(strings->Name);
+                SysFreeString(strings->Value);
+                delete strings;
+            }
+        }
+
+        template<>
+        void destruct(pEpIdentity* identity) {
+            if (identity) {
+                clear_identity_s(identity);
+                delete identity;
             }
         }
     }
