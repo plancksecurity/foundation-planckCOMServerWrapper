@@ -51,6 +51,7 @@ namespace pEp {
         void copy_identity(pEpIdentity * ident_s, const pEp_identity * ident);
         void clear_identity_s(pEpIdentity& ident);
         void clear_text_message(TextMessage *msg);
+        void clear_blob(Blob& blob);
         ::pEp_identity *new_identity(const pEpIdentity * ident);
 
         void opt_field_array_from_C(stringpair_list_t* spair_list, LPSAFEARRAY* pair_list_out);
@@ -71,10 +72,9 @@ namespace pEp {
         void destruct(Blob* blob);
 
         template<>
-        void destruct(Blob* blob);
-
-        template<>
-        void destruct(Blob& blob);
+        inline void destruct(Blob blob) {
+            clear_blob(blob);
+        }
 
         template<>
         void destruct(StringPair* strings);

@@ -459,6 +459,7 @@ namespace pEp {
             for (LONG i = lbound; i <= ubound; i++) {
                 Blob b;
                 memset(&b, 0, sizeof(Blob));
+                Destructor<Blob> blob{b};
                 SafeArrayGetElement(sa, &i, &b);
 
                 LONG _lbound, _ubound;
@@ -492,12 +493,9 @@ namespace pEp {
 
                 if (_bl == NULL) {
                     free(buffer);
-                    clear_blob(b);
                     free_bloblist(bl);
                     throw bad_alloc();
                 }
-
-                clear_blob(b);
             }
 
             return bl;
@@ -751,11 +749,6 @@ namespace pEp {
                 clear_blob(blob);
                 delete blob;
             }
-        }
-
-        template<>
-        void destruct(Blob& blob) {
-            clear_blob(blob);
         }
 
         template<>
