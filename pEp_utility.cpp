@@ -209,14 +209,12 @@ namespace pEp {
             assert(tl);
 
             CComSafeArray<BYTE> sa;
-            if (tl) {
+            if (tl && tl->size) {
                 sa.Create(tl->size);
-                if (tl->size) {
-                    char *data;
-                    SafeArrayAccessData(sa, (void **)&data);
-                    memcpy(data, tl->value, tl->size);
-                    SafeArrayUnaccessData(sa);
-                }
+                char *data;
+                SafeArrayAccessData(sa, (void **)&data);
+                memcpy(data, tl->value, tl->size);
+                SafeArrayUnaccessData(sa);
             }
             else {
                 sa.Create((ULONG)0);
