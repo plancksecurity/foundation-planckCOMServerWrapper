@@ -1413,6 +1413,7 @@ STDMETHODIMP CpEpEngine::OutgoingMessageRating(TextMessage *msg, pEpRating * pVa
 
     PEP_rating _rating;
     PEP_STATUS status = passphrase_cache.api(::outgoing_message_rating, session(), _msg, &_rating);
+    ::free_message(_msg);
     if (status != PEP_STATUS_OK)
         return FAIL(L"cannot get message rating", status);
 
