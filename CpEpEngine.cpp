@@ -1,4 +1,4 @@
-// Chaneglog
+// Changelog
 //
 // 28.09.2023/IP - added manager parameter to GroupQueryGroups
 // 28.09.2023/DZ - add stand-alone signing
