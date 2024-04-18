@@ -3,6 +3,7 @@
 // 28.09.2023/IP - added manager parameter to GroupQueryGroups
 // 28.09.2023/DZ - add stand-alone signing
 // 31.10.2023/IP - added get_fingerprints
+// 17.04.2024/DZ - fix memory leak
  
 // CpEpEngine.cpp : Implementation of CpEpEngine
 
