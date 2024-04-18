@@ -553,7 +553,11 @@ namespace pEp {
                 pair = ::new_stringpair(NULL, NULL);
             }
             else {
-                pair = ::new_stringpair(str(fld->Name), str(fld->Value));
+                const char* name = str(fld->Name);
+                const char* value = str(fld->Value);
+                pair = ::new_stringpair(name, value);
+                free((void*)name);
+                free((void*)value);
             }
             if (pair == NULL)
                 throw bad_alloc();
