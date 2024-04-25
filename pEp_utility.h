@@ -2,6 +2,7 @@
 
 // Changelog
 // 16.10.2023/DZ - Handle version information, encryption format, flags uniformly across all identity types
+// 16.04.2024/DZ - Fix Memory leaks
 
 #include "stdafx.h"
 #include "planckCOMServerWrapper_i.h"
@@ -48,8 +49,13 @@ namespace pEp {
         };
 
         void copy_identity(pEpIdentity * ident_s, const pEp_identity * ident);
+
         void clear_identity_s(pEpIdentity& ident);
+        void clear_identity_s(pEpIdentity* ident);
         void clear_text_message(TextMessage *msg);
+        void clear_blob(Blob& blob);
+        void clear_blob(Blob* b);
+
         ::pEp_identity *new_identity(const pEpIdentity * ident);
 
         void opt_field_array_from_C(stringpair_list_t* spair_list, LPSAFEARRAY* pair_list_out);
@@ -57,6 +63,48 @@ namespace pEp {
         template< class T2, class T > SAFEARRAY * array_from_C(T *tl);
 
         static LPTYPELIB pTypelib = NULL;
+
+        template<class T>
+        void auto_destruct(T t) {
+            static_assert(false, "specialize auto_destruct for your type");
+        }
+
+        template<>
+        inline void auto_destruct(Blob blob) {
+            clear_blob(blob);
+        }
+
+        template<>
+        inline void auto_destruct(Blob *blob) {
+            clear_blob(blob);
+        }
+
+        template<>
+        inline void auto_destruct(Blob& blob) {
+            clear_blob(blob);
+        }
+
+        template<>
+        void auto_destruct(StringPair* strings);
+
+        template<>
+        void auto_destruct(pEpIdentity* identity);
+
+        /// <summary>
+        /// Auto destructor for COM and/or heap-allocated objects.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        template<class T>
+        struct AutoDestructor {
+            AutoDestructor(T& e) : _element{ e } {}
+
+            ~AutoDestructor() {
+                auto_destruct(_element);
+            }
+
+        private:
+            T& _element;
+        };
 
         template< class UDType > static IRecordInfo *getRecordInfo()
         {
