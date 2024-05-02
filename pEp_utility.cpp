@@ -1,6 +1,7 @@
 // Changelog
 // 24.08.2023/IP - added preservation of major/minor version attributes when copying/creating identites
 // 16.10.2023/DZ - Handle version information, encryption format, flags uniformly across all identity types
+// 16.04.2024/DZ - Fix Memory leaks
 
 #include "stdafx.h"
 #include "pEp_utility.h"
@@ -209,14 +210,12 @@ namespace pEp {
             assert(tl);
 
             CComSafeArray<BYTE> sa;
-            if (tl) {
+            if (tl && tl->size) {
                 sa.Create(tl->size);
-                if (tl->size) {
-                    char *data;
-                    SafeArrayAccessData(sa, (void **)&data);
-                    memcpy(data, tl->value, tl->size);
-                    SafeArrayUnaccessData(sa);
-                }
+                char *data;
+                SafeArrayAccessData(sa, (void **)&data);
+                memcpy(data, tl->value, tl->size);
+                SafeArrayUnaccessData(sa);
             }
             else {
                 sa.Create((ULONG)0);
@@ -247,7 +246,9 @@ namespace pEp {
 
             T *_tl = tl;
             for (LONG i = lbound; i <= ubound; _tl = _tl->next, i++) {
-                HRESULT result = SafeArrayPutElement(sa, &i, from_C<T2 *, T>(_tl));
+                T2* element = from_C<T2*, T>(_tl);
+                AutoDestructor<T2 *> e{ element };
+                HRESULT result = SafeArrayPutElement(sa, &i, element);
                 if (!SUCCEEDED(result))
                     throw bad_alloc();
             }
@@ -264,6 +265,17 @@ namespace pEp {
             SysFreeString(ident.UserId);
 
             memset(&ident, 0, sizeof(pEpIdentity));
+        }
+
+        void clear_identity_s(pEpIdentity* ident)
+        {
+            SysFreeString(ident->Address);
+            SysFreeString(ident->Fpr);
+            SysFreeString(ident->Lang);
+            SysFreeString(ident->UserName);
+            SysFreeString(ident->UserId);
+
+            memset(ident, 0, sizeof(pEpIdentity));
         }
 
         template<> pEpIdentity from_C< pEpIdentity, pEp_identity >(pEp_identity *tl)
@@ -419,6 +431,15 @@ namespace pEp {
             memset(&b, 0, sizeof(Blob));
         }
 
+        void clear_blob(Blob *b)
+        {
+            SysFreeString(b->Filename);
+            SysFreeString(b->MimeType);
+            SafeArrayDestroy(b->value);
+            memset(b, 0, sizeof(Blob));
+            delete b;
+        }
+
         bloblist_t *bloblist(SAFEARRAY *sa)
         {
             if (sa == NULL)
@@ -440,6 +461,7 @@ namespace pEp {
             for (LONG i = lbound; i <= ubound; i++) {
                 Blob b;
                 memset(&b, 0, sizeof(Blob));
+                AutoDestructor<Blob> blob{b};
                 SafeArrayGetElement(sa, &i, &b);
 
                 LONG _lbound, _ubound;
@@ -458,7 +480,7 @@ namespace pEp {
                     SafeArrayAccessData(b.value, (void **)&data);
                     memcpy(buffer, data, size);
                     buffer[size] = 0; // safeguard
-                    SafeArrayUnaccessData(sa);
+                    SafeArrayUnaccessData(b.value);
                 }
                 else {
                     buffer = _strdup("");
@@ -473,12 +495,9 @@ namespace pEp {
 
                 if (_bl == NULL) {
                     free(buffer);
-                    clear_blob(b);
                     free_bloblist(bl);
                     throw bad_alloc();
                 }
-
-                clear_blob(b);
             }
 
             return bl;
@@ -534,7 +553,11 @@ namespace pEp {
                 pair = ::new_stringpair(NULL, NULL);
             }
             else {
-                pair = ::new_stringpair(str(fld->Name), str(fld->Value));
+                const char* name = str(fld->Name);
+                const char* value = str(fld->Value);
+                pair = ::new_stringpair(name, value);
+                free((void*)name);
+                free((void*)value);
             }
             if (pair == NULL)
                 throw bad_alloc();
@@ -641,6 +664,23 @@ namespace pEp {
             }
         }
 
+        template<>
+        void auto_destruct(StringPair* strings) {
+            if (strings) {
+                SysFreeString(strings->Name);
+                SysFreeString(strings->Value);
+                delete strings;
+            }
+        }
+
+        template<>
+        void auto_destruct(pEpIdentity* identity) {
+            if (identity) {
+                clear_identity_s(identity);
+                delete identity;
+            }
+        }
+
         /** RegistryKey class **/
 
         LONG RegistryKey::create_key(HKEY hk, const std::wstring& key, HKEY& hkKey) noexcept
@@ -715,6 +755,5 @@ namespace pEp {
         {
             return RegSetValueEx(hkKeyPath, key.c_str(), 0, REG_SZ, (BYTE*)value.c_str(), value.size() * 2) == ERROR_SUCCESS;
         }
-
     }
 }
