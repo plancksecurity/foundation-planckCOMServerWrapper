@@ -69,6 +69,7 @@ LRESULT CMainWindow::OnNotification(UINT nMsg, WPARAM wParam, LPARAM lParam, BOO
 
     MENUINFO info;
     BOOL enabled;
+    BOOL updateAvailable;
 
     switch (event) {
     case WM_CONTEXTMENU:
@@ -81,8 +82,13 @@ LRESULT CMainWindow::OnNotification(UINT nMsg, WPARAM wParam, LPARAM lParam, BOO
         SetMenuInfo(menuContext, &info);
         _menuContext = GetSubMenu(menuContext, 0);
 
+        // Check if updates are enabled and update the menu state by checking/unchecking it accordingly
         enabled = pEp::GateKeeper::gatekeeper()->update_enabled();
         CheckMenuItem(_menuContext, ID_POPUP_SCHEDULEUPDATES, enabled ? MF_CHECKED : MF_UNCHECKED);
+
+        // Check if an update is available and update the menu state by greying it out or not accordingly
+        updateAvailable = pEp::GateKeeper::gatekeeper()->is_update_available();
+        EnableMenuItem(_menuContext, ID_POPUP_UPDATENOW, MF_BYCOMMAND | (updateAvailable ? MF_ENABLED : MF_GRAYED));
 
         SetForegroundWindow(m_hWnd); // this is utter nonsense, but required by TrackPopupMenuEx
         POINT point;
