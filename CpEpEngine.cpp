@@ -4,7 +4,8 @@
 // 28.09.2023/DZ - add stand-alone signing
 // 31.10.2023/IP - added get_fingerprints
 // 17.04.2024/DZ - fix memory leak
- 
+// 27.05.2024/DZ - add stubs for RFC-16 Passphrase Handling
+
 // CpEpEngine.cpp : Implementation of CpEpEngine
 
 #include "stdafx.h"
@@ -2577,4 +2578,16 @@ STDMETHODIMP CpEpEngine::SignatureVerifies(BSTR text, BSTR signature, VARIANT_BO
     }
     
     return status;
+}
+
+STDMETHODIMP CpEpEngine::ManagePassphrase(LPSAFEARRAY accounts_with_old_passphrases, BSTR new_passphrase, LPSAFEARRAY* error_accounts) {
+    return PEP_ILLEGAL_VALUE;
+}
+
+STDMETHODIMP CpEpEngine::HasPassphrase(BSTR account, VARIANT_BOOL* result) {
+    return PEP_ILLEGAL_VALUE;
+}
+
+STDMETHODIMP CpEpEngine::UnlockKeysWithPassphrase(LPSAFEARRAY accounts, LPSAFEARRAY *error_accounts) {
+    return PEP_ILLEGAL_VALUE;
 }
