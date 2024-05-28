@@ -2585,9 +2585,12 @@ STDMETHODIMP CpEpEngine::ManagePassphrase(LPSAFEARRAY accounts_with_old_passphra
 }
 
 STDMETHODIMP CpEpEngine::HasPassphrase(BSTR account, VARIANT_BOOL* result) {
-    return PEP_ILLEGAL_VALUE;
+    string _account = utf8_string(account);
+    bool has_passphrase_set = false;
+    const PEP_STATUS status = has_passphrase(session(), _account.c_str(), &has_passphrase_set);
+    return status;
 }
 
-STDMETHODIMP CpEpEngine::UnlockKeysWithPassphrase(LPSAFEARRAY accounts, LPSAFEARRAY *error_accounts) {
+STDMETHODIMP CpEpEngine::UnlockKeysWithPassphrase(LPSAFEARRAY account_passphrases, LPSAFEARRAY *error_accounts) {
     return PEP_ILLEGAL_VALUE;
 }
