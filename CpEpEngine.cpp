@@ -2592,5 +2592,15 @@ STDMETHODIMP CpEpEngine::HasPassphrase(BSTR account, VARIANT_BOOL* result) {
 }
 
 STDMETHODIMP CpEpEngine::UnlockKeysWithPassphrase(LPSAFEARRAY account_passphrases, LPSAFEARRAY *error_accounts) {
-    return PEP_ILLEGAL_VALUE;
+    stringpair_list_t* _account_passphrases = stringpair_list(account_passphrases);
+    stringlist_t* _errors_accounts = NULL;
+
+    const PEP_STATUS status = unlock_keys_with_passphrase(session(), _account_passphrases, &_errors_accounts);
+
+    *error_accounts = string_array(_errors_accounts);
+
+    free_stringlist(_errors_accounts);
+    free_stringpair_list(_account_passphrases);
+
+    return status;
 }
