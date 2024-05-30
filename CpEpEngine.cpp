@@ -2600,13 +2600,13 @@ STDMETHODIMP CpEpEngine::ManagePassphrase(LPSAFEARRAY accounts_with_old_passphra
 STDMETHODIMP CpEpEngine::HasPassphrase(BSTR account, VARIANT_BOOL* result) {
     string _account = utf8_string(account);
     bool has_passphrase_set = false;
-    
+
     const PEP_STATUS status = has_passphrase(session(), _account.c_str(), &has_passphrase_set);
-    
+
     if (status == PEP_STATUS_OK) {
         *result = has_passphrase_set;
     }
-    
+
     return status;
 }
 
