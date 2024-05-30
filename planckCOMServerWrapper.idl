@@ -627,7 +627,7 @@ interface IpEpEngine : IUnknown {
         [in] struct TextMessage* msg,
         [in, out] SAFEARRAY(BSTR)* keylist);
 
-    [id(85)] HRESULT ManagePassphrase([in] SAFEARRAY(BSTR) accounts_with_old_passphrases, [in] BSTR new_passphrase, [out] SAFEARRAY(BSTR)* error_accounts);
+    [id(85)] HRESULT ManagePassphrase([in] SAFEARRAY(struct StringPair) accounts_with_old_passphrases, [in] BSTR new_passphrase, [out] SAFEARRAY(BSTR)* error_accounts);
     [id(86)] HRESULT HasPassphrase([in] BSTR account, [out, retval] VARIANT_BOOL* result);
     [id(87)] HRESULT UnlockKeysWithPassphrase([in] SAFEARRAY(struct StringPair) account_passphrases, [out] SAFEARRAY(BSTR)* error_accounts);
 };
