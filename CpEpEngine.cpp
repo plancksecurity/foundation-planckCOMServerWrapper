@@ -2583,14 +2583,16 @@ STDMETHODIMP CpEpEngine::SignatureVerifies(BSTR text, BSTR signature, VARIANT_BO
 STDMETHODIMP CpEpEngine::ManagePassphrase(LPSAFEARRAY accounts_with_old_passphrases, BSTR new_passphrase, LPSAFEARRAY* error_accounts) {
     string passphrase = utf8_string(new_passphrase);
     stringpair_list_t* account_passphrases = stringpair_list(accounts_with_old_passphrases);
-    stringlist_t* errors_accounts = NULL;
+    stringlist_t* _error_accounts = NULL;
 
-    const PEP_STATUS status = manage_passphrase(session(), account_passphrases, passphrase.c_str(), &errors_accounts);
+    const PEP_STATUS status = manage_passphrase(session(), account_passphrases, passphrase.c_str(), &_error_accounts);
 
-    *error_accounts = string_array(errors_accounts);
-
-    free_stringlist(errors_accounts);
     free_stringpair_list(account_passphrases);
+
+    if (status == PEP_STATUS_OK) {
+        *error_accounts = string_array(_error_accounts);
+        free_stringlist(_error_accounts);
+    }
 
     return status;
 }
@@ -2604,14 +2606,16 @@ STDMETHODIMP CpEpEngine::HasPassphrase(BSTR account, VARIANT_BOOL* result) {
 
 STDMETHODIMP CpEpEngine::UnlockKeysWithPassphrase(LPSAFEARRAY account_passphrases, LPSAFEARRAY *error_accounts) {
     stringpair_list_t* _account_passphrases = stringpair_list(account_passphrases);
-    stringlist_t* errors_accounts = NULL;
+    stringlist_t* _error_accounts = NULL;
 
-    const PEP_STATUS status = unlock_keys_with_passphrase(session(), _account_passphrases, &errors_accounts);
+    const PEP_STATUS status = unlock_keys_with_passphrase(session(), _account_passphrases, &_error_accounts);
 
-    *error_accounts = string_array(errors_accounts);
-
-    free_stringlist(errors_accounts);
     free_stringpair_list(_account_passphrases);
+
+    if (status == PEP_STATUS_OK) {
+        *error_accounts = string_array(_error_accounts);
+        free_stringlist(_error_accounts);
+    }
 
     return status;
 }
