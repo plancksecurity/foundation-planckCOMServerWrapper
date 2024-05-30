@@ -1,9 +1,10 @@
 // Changelog
+//
 // 28.09.2023/IP - added manager parameter to GroupQueryGroups
 // 28.09.2023/DZ - add stand-alone signing
 // 31.10.2023/IP - added get_fingerprints
-// 
-// 
+// 27.05.2024/DZ - add stubs for RFC-16 Passphrase Handling
+
 // CpEpEngine.h : Declaration of the CpEpEngine
 
 #pragma once
@@ -319,7 +320,11 @@ public:
 
     // Stand-alone signing
     STDMETHOD(SignatureForText)(BSTR text, BSTR *signature);
-    STDMETHOD(SignatureVerifies)(BSTR text, BSTR signature, VARIANT_BOOL*pMatches);
+    STDMETHOD(SignatureVerifies)(BSTR text, BSTR signature, VARIANT_BOOL* pMatches);
+
+    STDMETHOD(ManagePassphrase)(LPSAFEARRAY accounts_with_old_passphrases, BSTR new_passphrase, LPSAFEARRAY* error_accounts);
+    STDMETHOD(HasPassphrase)(BSTR account, VARIANT_BOOL* result);
+    STDMETHOD(UnlockKeysWithPassphrase)(LPSAFEARRAY accounts, LPSAFEARRAY* error_accounts);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)
