@@ -9,6 +9,10 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x86">
+      <Configuration>Debug</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
@@ -20,6 +24,10 @@
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x86">
+      <Configuration>Release</Configuration>
+      <Platform>x86</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
@@ -37,6 +45,7 @@
     <ProjectGuid>{A27BD6BF-63BC-473D-B8BD-84ACB085F39C}</ProjectGuid>
     <Keyword>AtlProj</Keyword>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <VcpkgTriplet Condition="'$(Platform)'=='x86'">x86-windows</VcpkgTriplet>
     <VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows</VcpkgTriplet>
     <ProjectName>planckCOMServerWrapper</ProjectName>
   </PropertyGroup>
@@ -63,12 +72,17 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Platform)'=='Win32'">
+    <OutDir>$(SolutionDir)\x86\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)'!='Win32'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)vcpkg\installed\x64-windows\debug\lib;</LibraryPath>
   </PropertyGroup>
@@ -78,25 +92,38 @@
     <IncludePath>$(IncludePath)</IncludePath>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)vcpkg\installed\x64-windows\lib;</LibraryPath>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)vcpkg\installed\x86-windows\debug\lib;</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)vcpkg\installed\x86-windows\debug\lib;</LibraryPath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)x86\$(Configuration);$(SolutionDir)vcpkg\installed\x86-windows\debug\lib;</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)vcpkg\installed\x86-windows\lib;</LibraryPath>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)vcpkg\installed\x86-windows\lib;</LibraryPath>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)x86\$(Configuration);$(SolutionDir)vcpkg\installed\x86-windows\lib;</LibraryPath>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
@@ -109,7 +136,7 @@ TlbImp.exe "$(TargetPath)" /out:"$(TargetDir)\planckCOMServerWrapper.Interop.dll
         </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
@@ -142,8 +169,12 @@ TlbImp.exe "$(TargetPath)" /out:"$(TargetDir)\planckCOMServerWrapper.Interop.dll
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>comsuppwd.lib;Wininet.lib;bcrypt.lib;Crypt32.lib;archive.lib;boost_atomic-vc140-mt-gd.lib;boost_chrono-vc140-mt-gd.lib;boost_cobalt-vc140-mt-gd.lib;boost_container-vc140-mt-gd.lib;boost_context-vc140-mt-gd.lib;boost_contract-vc140-mt-gd.lib;boost_coroutine-vc140-mt-gd.lib;boost_date_time-vc140-mt-gd.lib;boost_exception-vc140-mt-gd.lib;boost_fiber-vc140-mt-gd.lib;boost_filesystem-vc140-mt-gd.lib;boost_graph-vc140-mt-gd.lib;boost_iostreams-vc140-mt-gd.lib;boost_json-vc140-mt-gd.lib;boost_locale-vc140-mt-gd.lib;boost_log-vc140-mt-gd.lib;boost_log_setup-vc140-mt-gd.lib;boost_math_c99-vc140-mt-gd.lib;boost_math_c99f-vc140-mt-gd.lib;boost_math_c99l-vc140-mt-gd.lib;boost_math_tr1-vc140-mt-gd.lib;boost_math_tr1f-vc140-mt-gd.lib;boost_math_tr1l-vc140-mt-gd.lib;boost_nowide-vc140-mt-gd.lib;boost_program_options-vc140-mt-gd.lib;boost_random-vc140-mt-gd.lib;boost_regex-vc140-mt-gd.lib;boost_serialization-vc140-mt-gd.lib;boost_stacktrace_noop-vc140-mt-gd.lib;boost_stacktrace_windbg-vc140-mt-gd.lib;boost_stacktrace_windbg_cached-vc140-mt-gd.lib;boost_system-vc140-mt-gd.lib;boost_thread-vc140-mt-gd.lib;boost_timer-vc140-mt-gd.lib;boost_type_erasure-vc140-mt-gd.lib;boost_unit_test_framework-vc140-mt-gd.lib;boost_url-vc140-mt-gd.lib;boost_wave-vc140-mt-gd.lib;boost_wserialization-vc140-mt-gd.lib;bz2d.lib;charset.lib;cryptopp.lib;iconv.lib;libcrypto.lib;libexpatd.lib;libssl.lib;libxml2.lib;lz4d.lib;lzma.lib;zlibd.lib;zstd.lib;libpEpAdapter.lib;libpEpCxx11.lib;pEpEngine.lib;</AdditionalDependencies>
-      <LibraryPath>$(SolutionDir)\vcpkg\installed\x64-windows\lib;$(SolutionDir)$(Platform)\$(ConfigurationName);$(LibraryPath);</LibraryPath>
+      <AdditionalDependencies>
+	      comsuppwd.lib;Wininet.lib;bcrypt.lib;Crypt32.lib;archive.lib;bz2d.lib;charset.lib;cryptopp.lib;iconv.lib;
+	      libcrypto.lib;libexpatd.lib;libssl.lib;libxml2.lib;lz4d.lib;lzma.lib;zlibd.lib;zstd.lib;libpEpAdapter.lib;libpEpCxx11.lib;pEpEngine.lib;
+      </AdditionalDependencies>
+      <LibraryPath Condition="'$(Platform)'=='Win32'">$(SolutionDir)\vcpkg\installed\x86-windows\lib;$(SolutionDir)x86\$(ConfigurationName);$(LibraryPath);</LibraryPath>
+      <LibraryPath Condition="'$(Platform)'!='Win32'">$(SolutionDir)\vcpkg\installed\x64-windows\lib;$(SolutionDir)$(Platform)\$(ConfigurationName);$(LibraryPath);</LibraryPath>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <PreventDllBinding>true</PreventDllBinding>
@@ -152,50 +183,7 @@ TlbImp.exe "$(TargetPath)" /out:"$(TargetDir)\planckCOMServerWrapper.Interop.dll
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
     </ProjectReference>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>JSON_ADAPTER_LIBRARY;DEBUG_ENABLED;WIN32;_WINDOWS;_DEBUG;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <EnablePREfast>false</EnablePREfast>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)planckJSONServerWrapper\server;$(SolutionDir);$(SolutionDir)\include;$(SolutionDir)\include\pEp;$(SolutionDir)PlanckCoreV3\asn.1;$(SolutionDir)\libPlanckWrapper\src;$(SolutionDir)\vcpkg\installed\x86-windows\include;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <Midl>
-      <MkTypLibCompatible>false</MkTypLibCompatible>
-      <TargetEnvironment>Win32</TargetEnvironment>
-      <PreprocessorDefinitions>DEBUG_ENABLED;_WINDOWS;_DEBUG;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <HeaderFileName>planckCOMServerWrapper_i.h</HeaderFileName>
-      <InterfaceIdentifierFileName>planckCOMServerWrapper_i.c</InterfaceIdentifierFileName>
-      <ProxyFileName>planckCOMServerWrapper_p.c</ProxyFileName>
-      <GenerateStublessProxies>true</GenerateStublessProxies>
-      <TypeLibraryName>$(IntDir)planckCOMServerWrapper.tlb</TypeLibraryName>
-      <DllDataFileName />
-      <ValidateAllParameters>true</ValidateAllParameters>
-    </Midl>
-    <ResourceCompile>
-      <Culture>0x0409</Culture>
-      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>DEBUG_ENABLED;_WINDOWS;_DEBUG;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>
-      </AdditionalOptions>
-    </ResourceCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>comsuppwd.lib;Wininet.lib;bcrypt.lib;Crypt32.lib;archive.lib;bz2d.lib;charset.lib;cryptopp.lib;iconv.lib;libcrypto.lib;libexpatd.lib;libssl.lib;libxml2.lib;lz4d.lib;lzma.lib;zlibd.lib;zstd.lib;libpEpAdapter.lib;libpEpCxx11.lib;pEpEngine.lib;boost_atomic-vc143-mt-gd-x32-1_85.lib;boost_charconv-vc143-mt-gd-x32-1_85.lib;boost_chrono-vc143-mt-gd-x32-1_85.lib;boost_cobalt-vc143-mt-gd-x32-1_85.lib;boost_container-vc143-mt-gd-x32-1_85.lib;boost_context-vc143-mt-gd-x32-1_85.lib;boost_contract-vc143-mt-gd-x32-1_85.lib;boost_coroutine-vc143-mt-gd-x32-1_85.lib;boost_date_time-vc143-mt-gd-x32-1_85.lib;boost_exception-vc143-mt-gd-x32-1_85.lib;boost_fiber-vc143-mt-gd-x32-1_85.lib;boost_fiber_numa-vc143-mt-gd-x32-1_85.lib;boost_filesystem-vc143-mt-gd-x32-1_85.lib;boost_graph-vc143-mt-gd-x32-1_85.lib;boost_iostreams-vc143-mt-gd-x32-1_85.lib;boost_json-vc143-mt-gd-x32-1_85.lib;boost_locale-vc143-mt-gd-x32-1_85.lib;boost_log-vc143-mt-gd-x32-1_85.lib;boost_log_setup-vc143-mt-gd-x32-1_85.lib;boost_math_c99-vc143-mt-gd-x32-1_85.lib;boost_math_c99f-vc143-mt-gd-x32-1_85.lib;boost_math_c99l-vc143-mt-gd-x32-1_85.lib;boost_math_tr1-vc143-mt-gd-x32-1_85.lib;boost_math_tr1f-vc143-mt-gd-x32-1_85.lib;boost_math_tr1l-vc143-mt-gd-x32-1_85.lib;boost_nowide-vc143-mt-gd-x32-1_85.lib;boost_program_options-vc143-mt-gd-x32-1_85.lib;boost_python311-vc143-mt-gd-x32-1_85.lib;boost_random-vc143-mt-gd-x32-1_85.lib;boost_regex-vc143-mt-gd-x32-1_85.lib;boost_serialization-vc143-mt-gd-x32-1_85.lib;boost_stacktrace_basic-vc143-mt-gd-x32-1_85.lib;boost_stacktrace_noop-vc143-mt-gd-x32-1_85.lib;boost_stacktrace_windbg-vc143-mt-gd-x32-1_85.lib;boost_stacktrace_windbg_cached-vc143-mt-gd-x32-1_85.lib;boost_system-vc143-mt-gd-x32-1_85.lib;boost_thread-vc143-mt-gd-x32-1_85.lib;boost_timer-vc143-mt-gd-x32-1_85.lib;boost_type_erasure-vc143-mt-gd-x32-1_85.lib;boost_unit_test_framework-vc143-mt-gd-x32-1_85.lib;boost_url-vc143-mt-gd-x32-1_85.lib;boost_wave-vc143-mt-gd-x32-1_85.lib;boost_wserialization-vc143-mt-gd-x32-1_85.lib;</AdditionalDependencies>
-      <LibraryPath>$(SolutionDir)\vcpkg\installed\x86-windows\debug\lib;$(SolutionDir)$(Platform)\$(ConfigurationName);$(LibraryPath);</LibraryPath>
-      <IgnoreSpecificDefaultLibraries>
-      </IgnoreSpecificDefaultLibraries>
-      <PreventDllBinding>true</PreventDllBinding>
-    </Link>
-    <ProjectReference>
-      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
-    </ProjectReference>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
@@ -228,49 +216,12 @@ TlbImp.exe "$(TargetPath)" /out:"$(TargetDir)\planckCOMServerWrapper.Interop.dll
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>comsuppwd.lib;Wininet.lib;bcrypt.lib;Crypt32.lib;archive.lib;bz2.lib;charset.lib;cryptopp.lib;ffi.lib;iconv.lib;libcrypto.lib;libexpat.lib;libssl.lib;libxml2.lib;lz4.lib;lzma.lib;pkgconf.lib;zlib.lib;zstd.lib;libpEpAdapter.lib;libpEpCxx11.lib;pEpEngine.lib;boost_atomic-vc140-mt.lib;boost_chrono-vc140-mt.lib;boost_cobalt-vc140-mt.lib;boost_container-vc140-mt.lib;boost_context-vc140-mt.lib;boost_contract-vc140-mt.lib;boost_coroutine-vc140-mt.lib;boost_date_time-vc140-mt.lib;boost_exception-vc140-mt.lib;boost_fiber-vc140-mt.lib;boost_filesystem-vc140-mt.lib;boost_graph-vc140-mt.lib;boost_iostreams-vc140-mt.lib;boost_json-vc140-mt.lib;boost_locale-vc140-mt.lib;boost_log-vc140-mt.lib;boost_log_setup-vc140-mt.lib;boost_math_c99-vc140-mt.lib;boost_math_c99f-vc140-mt.lib;boost_math_c99l-vc140-mt.lib;boost_math_tr1-vc140-mt.lib;boost_math_tr1f-vc140-mt.lib;boost_math_tr1l-vc140-mt.lib;boost_nowide-vc140-mt.lib;boost_program_options-vc140-mt.lib;boost_python311-vc140-mt.lib;boost_random-vc140-mt.lib;boost_regex-vc140-mt.lib;boost_serialization-vc140-mt.lib;boost_stacktrace_noop-vc140-mt.lib;boost_stacktrace_windbg-vc140-mt.lib;boost_stacktrace_windbg_cached-vc140-mt.lib;boost_system-vc140-mt.lib;boost_thread-vc140-mt.lib;boost_timer-vc140-mt.lib;boost_type_erasure-vc140-mt.lib;boost_unit_test_framework-vc140-mt.lib;boost_url-vc140-mt.lib;boost_wave-vc140-mt.lib;boost_wserialization-vc140-mt.lib;</AdditionalDependencies>
-      <LibraryPath>$(SolutionDir)\vcpkg\installed\x64-windows\lib;$(SolutionDir)$(Platform)\$(ConfigurationName);$(LibraryPath);</LibraryPath>
-      <PreventDllBinding>true</PreventDllBinding>
-    </Link>
-    <ProjectReference>
-      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
-    </ProjectReference>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>JSON_ADAPTER_LIBRARY;DEBUG_ENABLED;WIN32;_WINDOWS;NDEBUG;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <EnablePREfast>false</EnablePREfast>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)planckJSONServerWrapper\server;$(SolutionDir);$(SolutionDir)\include;$(SolutionDir)\include\pEp;$(SolutionDir)PlanckCoreV3\asn.1;$(SolutionDir)\libPlanckWrapper\src;$(SolutionDir)\vcpkg\installed\x86-windows\include</AdditionalIncludeDirectories>
-      <SupportJustMyCode>true</SupportJustMyCode>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-    </ClCompile>
-    <Midl>
-      <MkTypLibCompatible>false</MkTypLibCompatible>
-      <TargetEnvironment>Win32</TargetEnvironment>
-      <PreprocessorDefinitions>_WINDOWS;NDEBUG;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <HeaderFileName>planckCOMServerWrapper_i.h</HeaderFileName>
-      <InterfaceIdentifierFileName>planckCOMServerWrapper_i.c</InterfaceIdentifierFileName>
-      <ProxyFileName>planckCOMServerWrapper_p.c</ProxyFileName>
-      <GenerateStublessProxies>true</GenerateStublessProxies>
-      <TypeLibraryName>$(IntDir)planckCOMServerWrapper.tlb</TypeLibraryName>
-      <DllDataFileName />
-      <ValidateAllParameters>true</ValidateAllParameters>
-    </Midl>
-    <ResourceCompile>
-      <Culture>0x0409</Culture>
-      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDOWS;NDEBUG;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ResourceCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>comsuppwd.lib;Wininet.lib;bcrypt.lib;Crypt32.lib;archive.lib;bz2.lib;charset.lib;cryptopp.lib;ffi.lib;iconv.lib;libcrypto.lib;libexpat.lib;libssl.lib;libxml2.lib;lz4.lib;lzma.lib;pkgconf.lib;zlib.lib;zstd.lib;libpEpAdapter.lib;libpEpCxx11.lib;pEpEngine.lib;boost_atomic-vc143-mt-x32-1_85.lib;boost_charconv-vc143-mt-x32-1_85.lib;boost_chrono-vc143-mt-x32-1_85.lib;boost_cobalt-vc143-mt-x32-1_85.lib;boost_container-vc143-mt-x32-1_85.lib;boost_context-vc143-mt-x32-1_85.lib;boost_contract-vc143-mt-x32-1_85.lib;boost_coroutine-vc143-mt-x32-1_85.lib;boost_date_time-vc143-mt-x32-1_85.lib;boost_exception-vc143-mt-x32-1_85.lib;boost_fiber-vc143-mt-x32-1_85.lib;boost_fiber_numa-vc143-mt-x32-1_85.lib;boost_filesystem-vc143-mt-x32-1_85.lib;boost_graph-vc143-mt-x32-1_85.lib;boost_iostreams-vc143-mt-x32-1_85.lib;boost_json-vc143-mt-x32-1_85.lib;boost_locale-vc143-mt-x32-1_85.lib;boost_log-vc143-mt-x32-1_85.lib;boost_log_setup-vc143-mt-x32-1_85.lib;boost_math_c99-vc143-mt-x32-1_85.lib;boost_math_c99f-vc143-mt-x32-1_85.lib;boost_math_c99l-vc143-mt-x32-1_85.lib;boost_math_tr1-vc143-mt-x32-1_85.lib;boost_math_tr1f-vc143-mt-x32-1_85.lib;boost_math_tr1l-vc143-mt-x32-1_85.lib;boost_nowide-vc143-mt-x32-1_85.lib;boost_program_options-vc143-mt-x32-1_85.lib;boost_python311-vc143-mt-x32-1_85.lib;boost_random-vc143-mt-x32-1_85.lib;boost_regex-vc143-mt-x32-1_85.lib;boost_serialization-vc143-mt-x32-1_85.lib;boost_stacktrace_basic-vc143-mt-x32-1_85.lib;boost_stacktrace_noop-vc143-mt-x32-1_85.lib;boost_stacktrace_windbg-vc143-mt-x32-1_85.lib;boost_stacktrace_windbg_cached-vc143-mt-x32-1_85.lib;boost_system-vc143-mt-x32-1_85.lib;boost_thread-vc143-mt-x32-1_85.lib;boost_timer-vc143-mt-x32-1_85.lib;boost_type_erasure-vc143-mt-x32-1_85.lib;boost_unit_test_framework-vc143-mt-x32-1_85.lib;boost_url-vc143-mt-x32-1_85.lib;boost_wave-vc143-mt-x32-1_85.lib;boost_wserialization-vc143-mt-x32-1_85.lib;</AdditionalDependencies>
-      <LibraryPath>$(SolutionDir)\vcpkg\installed\x86-windows\lib;$(SolutionDir)$(Platform)\$(ConfigurationName);$(LibraryPath);</LibraryPath>
+      <AdditionalDependencies>
+	      comsuppwd.lib;Wininet.lib;bcrypt.lib;Crypt32.lib;archive.lib;bz2.lib;charset.lib;cryptopp.lib;ffi.lib;iconv.lib;libcrypto.lib;libexpat.lib;libssl.lib;libxml2.lib;lz4.lib;lzma.lib;zlib.lib;
+	      zstd.lib;libpEpAdapter.lib; libpEpCxx11.lib; pEpEngine.lib;
+      </AdditionalDependencies>
+      <LibraryPath Condition="'$(Platform)'=='Win32'">$(SolutionDir)\vcpkg\installed\x86-windows\lib;$(SolutionDir)x86\$(ConfigurationName);$(LibraryPath);</LibraryPath>
+      <LibraryPath Condition="'$(Platform)'!='Win32'">$(SolutionDir)\vcpkg\installed\x64-windows\lib;$(SolutionDir)$(Platform)\$(ConfigurationName);$(LibraryPath);</LibraryPath>
       <PreventDllBinding>true</PreventDllBinding>
     </Link>
     <ProjectReference>
