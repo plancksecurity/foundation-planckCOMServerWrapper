@@ -2635,6 +2635,25 @@ STDMETHODIMP CpEpEngine::UnlockKeysWithPassphrase(LPSAFEARRAY account_passphrase
             if (current->value && current->value->value) {
                 string passphrase{ current->value->value };
                 cache_passphrase(passphrase);
+
+                if (current->value->key) {
+                    string email = string{ current->value->key };
+                    identity_list* identities = NULL;
+                    const PEP_STATUS own_status = own_identities_retrieve(session(), &identities);
+                    if (own_status == PEP_STATUS_OK) {
+                        for (identity_list* current_id = identities; current_id; current_id = current_id->next) {
+                            if (current_id->ident && current_id->ident->address) {
+                                string email2 = string{ current_id->ident->address };
+                                if (email == email2) {
+                                    const PEP_STATUS ensure_status = passphrase_cache.ensure_passphrase(session(), current_id->ident->fpr);
+                                    if (ensure_status != PEP_STATUS_OK) {
+                                        cerr << "this is bad\n";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
