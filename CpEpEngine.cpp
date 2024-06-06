@@ -2580,6 +2580,11 @@ STDMETHODIMP CpEpEngine::SignatureVerifies(BSTR text, BSTR signature, VARIANT_BO
     return status;
 }
 
+static void cache_passphrase(const string& passphrase)
+{
+    passphrase_cache.add(passphrase);
+}
+
 STDMETHODIMP CpEpEngine::ManagePassphrase(LPSAFEARRAY accounts_with_old_passphrases, BSTR new_passphrase, LPSAFEARRAY* error_accounts) {
     string passphrase = utf8_string(new_passphrase);
     stringpair_list_t* account_passphrases = stringpair_list(accounts_with_old_passphrases);
@@ -2591,6 +2596,10 @@ STDMETHODIMP CpEpEngine::ManagePassphrase(LPSAFEARRAY accounts_with_old_passphra
 
     if (status != PEP_STATUS_OK && _error_accounts) {
         *error_accounts = string_array(_error_accounts);
+    }
+    else if (status == PEP_STATUS_OK) {
+        // cache the new passphrase
+        cache_passphrase(passphrase);
     }
 
     free_stringlist(_error_accounts);
@@ -2617,12 +2626,20 @@ STDMETHODIMP CpEpEngine::UnlockKeysWithPassphrase(LPSAFEARRAY account_passphrase
 
     const PEP_STATUS status = unlock_keys_with_passphrase(session(), _account_passphrases, &_error_accounts);
 
-    free_stringpair_list(_account_passphrases);
-
     if (status != PEP_STATUS_OK && _error_accounts) {
         *error_accounts = string_array(_error_accounts);
     }
+    else if (status == PEP_STATUS_OK) {
+        // cache the new passphrases
+        for (stringpair_list_t* current = _account_passphrases; current; current = current->next) {
+            if (current->value && current->value->value) {
+                string passphrase{ current->value->value };
+                cache_passphrase(passphrase);
+            }
+        }
+    }
 
+    free_stringpair_list(_account_passphrases);
     free_stringlist(_error_accounts);
 
     return status;
