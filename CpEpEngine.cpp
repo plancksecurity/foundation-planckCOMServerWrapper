@@ -2589,10 +2589,11 @@ STDMETHODIMP CpEpEngine::ManagePassphrase(LPSAFEARRAY accounts_with_old_passphra
 
     free_stringpair_list(account_passphrases);
 
-    if (status == PEP_STATUS_OK) {
+    if (status != PEP_STATUS_OK && _error_accounts) {
         *error_accounts = string_array(_error_accounts);
-        free_stringlist(_error_accounts);
     }
+
+    free_stringlist(_error_accounts);
 
     return status;
 }
@@ -2618,10 +2619,11 @@ STDMETHODIMP CpEpEngine::UnlockKeysWithPassphrase(LPSAFEARRAY account_passphrase
 
     free_stringpair_list(_account_passphrases);
 
-    if (status == PEP_STATUS_OK) {
+    if (status != PEP_STATUS_OK && _error_accounts) {
         *error_accounts = string_array(_error_accounts);
-        free_stringlist(_error_accounts);
     }
+
+    free_stringlist(_error_accounts);
 
     return status;
 }
