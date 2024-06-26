@@ -275,6 +275,7 @@ public:
     STDMETHOD(TrustOwnKey)(pEpIdentity * ident);
     STDMETHOD(ConfigPassphrase)(BSTR passphrase);
     STDMETHOD(ConfigPassphraseForNewKeys)(VARIANT_BOOL enable, BSTR passphrase);
+    STDMETHOD(ConfigPassphraseForNewKeysByEmail)(VARIANT_BOOL enable, BSTR accountEmail, BSTR passphrase);
     STDMETHOD(SetCommPartnerKey)(pEpIdentity* identity, BSTR fpr);
 
     // Trigger an immediate update

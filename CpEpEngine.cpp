@@ -2061,6 +2061,21 @@ STDMETHODIMP CpEpEngine::ConfigPassphraseForNewKeys(VARIANT_BOOL enable, BSTR pa
         return FAIL(L"ConfigPassphraseForNewKeys", status);
 }
 
+STDMETHODIMP CpEpEngine::ConfigPassphraseForNewKeysByEmail(VARIANT_BOOL enable, BSTR accountEmail, BSTR passphrase)
+{
+    string _accountEmail = utf8_string(accountEmail);
+    string _passphrase = utf8_string(passphrase);
+
+    PEP_STATUS status = ::config_passphrase_for_new_keys_by_email(session(), enable, _accountEmail.c_str(), _passphrase.c_str());
+
+    if (status == PEP_STATUS_OK) {
+        return S_OK;
+    }
+    else {
+        return FAIL(L"ConfigPassphraseForNewKeysByEmail", status);
+    }
+}
+
 STDMETHODIMP CpEpEngine::ShowNotification(BSTR title, BSTR message) 
 {
     pEp::GateKeeper::gatekeeper()->show_notification(title, message);
