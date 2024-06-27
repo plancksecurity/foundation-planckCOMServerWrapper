@@ -2066,14 +2066,15 @@ STDMETHODIMP CpEpEngine::ConfigPassphraseForNewKeysByEmail(VARIANT_BOOL enable, 
     string _accountEmail = utf8_string(accountEmail);
     string _passphrase = utf8_string(passphrase);
 
-    PEP_STATUS status = ::config_passphrase_for_new_keys_by_email(session(), enable, _accountEmail.c_str(), _passphrase.c_str());
-
-    if (status == PEP_STATUS_OK) {
-        return S_OK;
+    if (enable) {
+        passphrase_cache.add(_accountEmail, _passphrase);
     }
     else {
-        return FAIL(L"ConfigPassphraseForNewKeysByEmail", status);
+        // TODO
+        //passphrase_cache.remove(_accountEmail, _passphrase);
     }
+
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::ShowNotification(BSTR title, BSTR message) 
