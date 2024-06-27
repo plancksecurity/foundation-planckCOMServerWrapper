@@ -2595,9 +2595,10 @@ STDMETHODIMP CpEpEngine::SignatureVerifies(BSTR text, BSTR signature, VARIANT_BO
     return status;
 }
 
-static void cache_passphrase(const string& passphrase)
+// Put an account email/passphrase combination into the cache.
+static void cache_passphrase(const string& account_email, const string& passphrase)
 {
-    passphrase_cache.add(passphrase);
+    passphrase_cache.add(account_email, passphrase);
 }
 
 STDMETHODIMP CpEpEngine::ManagePassphrase(LPSAFEARRAY accounts_with_old_passphrases, BSTR new_passphrase, LPSAFEARRAY* error_accounts) {
@@ -2607,16 +2608,20 @@ STDMETHODIMP CpEpEngine::ManagePassphrase(LPSAFEARRAY accounts_with_old_passphra
 
     const PEP_STATUS status = manage_passphrase(session(), account_passphrases, passphrase.c_str(), &_error_accounts);
 
-    free_stringpair_list(account_passphrases);
-
     if (status != PEP_STATUS_OK && _error_accounts) {
         *error_accounts = string_array(_error_accounts);
     }
     else if (status == PEP_STATUS_OK) {
-        // cache the new passphrase
-        cache_passphrase(passphrase);
+        // cache the new account/passphrase combinations
+        for (stringpair_list_t* current = account_passphrases; current && current->value; current = current->next) {
+            if (current->value && current->value->key) {
+                string account_email{ current->value->key };
+                cache_passphrase(account_email, passphrase);
+            }
+        }
     }
 
+    free_stringpair_list(account_passphrases);
     free_stringlist(_error_accounts);
 
     return status;
@@ -2645,11 +2650,12 @@ STDMETHODIMP CpEpEngine::UnlockKeysWithPassphrase(LPSAFEARRAY account_passphrase
         *error_accounts = string_array(_error_accounts);
     }
     else if (status == PEP_STATUS_OK) {
-        // cache the new passphrases
+        // cache the new account/passphrase combinations
         for (stringpair_list_t* current = _account_passphrases; current; current = current->next) {
-            if (current->value && current->value->value) {
+            if (current->value && current->value->key && current->value->value) {
+                string account_email{ current->value->key };
                 string passphrase{ current->value->value };
-                cache_passphrase(passphrase);
+                cache_passphrase(account_email, passphrase);
             }
         }
     }
