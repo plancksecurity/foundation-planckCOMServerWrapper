@@ -2595,12 +2595,6 @@ STDMETHODIMP CpEpEngine::SignatureVerifies(BSTR text, BSTR signature, VARIANT_BO
     return status;
 }
 
-// Put an account email/passphrase combination into the cache.
-static void cache_passphrase(const string& account_email, const string& passphrase)
-{
-    passphrase_cache.add(account_email, passphrase);
-}
-
 STDMETHODIMP CpEpEngine::ManagePassphrase(LPSAFEARRAY accounts_with_old_passphrases, BSTR new_passphrase, LPSAFEARRAY* error_accounts) {
     string passphrase = utf8_string(new_passphrase);
     stringpair_list_t* account_passphrases = stringpair_list(accounts_with_old_passphrases);
@@ -2616,7 +2610,7 @@ STDMETHODIMP CpEpEngine::ManagePassphrase(LPSAFEARRAY accounts_with_old_passphra
         for (stringpair_list_t* current = account_passphrases; current && current->value; current = current->next) {
             if (current->value && current->value->key) {
                 string account_email{ current->value->key };
-                cache_passphrase(account_email, passphrase);
+                passphrase_cache.add(account_email, passphrase);
             }
         }
     }
@@ -2655,7 +2649,7 @@ STDMETHODIMP CpEpEngine::UnlockKeysWithPassphrase(LPSAFEARRAY account_passphrase
             if (current->value && current->value->key && current->value->value) {
                 string account_email{ current->value->key };
                 string passphrase{ current->value->value };
-                cache_passphrase(account_email, passphrase);
+                passphrase_cache.add(account_email, passphrase);
             }
         }
     }
