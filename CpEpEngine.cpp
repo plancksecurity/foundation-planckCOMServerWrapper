@@ -2070,8 +2070,7 @@ STDMETHODIMP CpEpEngine::ConfigPassphraseForNewKeysByEmail(VARIANT_BOOL enable, 
         passphrase_cache.add(_accountEmail, _passphrase);
     }
     else {
-        // TODO
-        //passphrase_cache.remove(_accountEmail, _passphrase);
+        passphrase_cache.remove(_accountEmail, _passphrase);
     }
 
     return S_OK;
