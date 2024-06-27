@@ -667,12 +667,7 @@ STDMETHODIMP CpEpEngine::Myself(struct pEpIdentity *ident, struct pEpIdentity *r
         return FAIL(ex.what());;
     }
 
-    PEP_STATUS status;
-    if (passphrase_for_new_keys != "")
-        status = ::config_passphrase_for_new_keys(session(), true, passphrase_for_new_keys.c_str());
-    else
-        status = ::config_passphrase_for_new_keys(session(), false, passphrase_for_new_keys.c_str());
-    status = passphrase_cache.api(::myself, session(), _ident);
+    PEP_STATUS status = passphrase_cache.api(::myself, session(), _ident);
 
     if (status == PEP_STATUS_OK) {
         assert(_ident->fpr);
