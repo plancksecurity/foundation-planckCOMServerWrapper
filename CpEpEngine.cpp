@@ -2061,11 +2061,12 @@ STDMETHODIMP CpEpEngine::ConfigPassphraseForNewKeysByEmail(VARIANT_BOOL enable, 
     string _accountEmail = utf8_string(accountEmail);
     string _passphrase = utf8_string(passphrase);
 
-    if (enable) {
-        passphrase_cache.add(_accountEmail, _passphrase);
-    }
-    else {
-        passphrase_cache.remove(_accountEmail, _passphrase);
+    if (!_accountEmail.empty()) {
+        if (enable) {
+            passphrase_cache.add(_accountEmail, _passphrase);
+        } else {
+            passphrase_cache.remove(_accountEmail);
+        }
     }
 
     return S_OK;
