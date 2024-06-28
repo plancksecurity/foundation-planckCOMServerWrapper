@@ -631,6 +631,9 @@ interface IpEpEngine : IUnknown {
     [id(86)] HRESULT HasPassphrase([in] BSTR account, [out, retval] VARIANT_BOOL* result);
     [id(87)] HRESULT UnlockKeysWithPassphrase([in] SAFEARRAY(struct StringPair) account_passphrases, [out] SAFEARRAY(BSTR)* error_accounts);
 
+    // Adds or remove (accountEmail, passphrase) tuples.
+    // If `enable` is true, and `accountEmail` is not empty, adds the tuple.
+    // If `enable` is false, and `accountEmail` is not empty, removes the tuple.
     [id(88)] HRESULT ConfigPassphraseForNewKeysByEmail([in] VARIANT_BOOL enable, [in] BSTR accountEmail, [in] BSTR passphrase);
 
 };

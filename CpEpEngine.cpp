@@ -667,12 +667,7 @@ STDMETHODIMP CpEpEngine::Myself(struct pEpIdentity *ident, struct pEpIdentity *r
         return FAIL(ex.what());;
     }
 
-    PEP_STATUS status;
-    if (passphrase_for_new_keys != "")
-        status = ::config_passphrase_for_new_keys(session(), true, passphrase_for_new_keys.c_str());
-    else
-        status = ::config_passphrase_for_new_keys(session(), false, passphrase_for_new_keys.c_str());
-    status = passphrase_cache.api(::myself, session(), _ident);
+    PEP_STATUS status = passphrase_cache.api(::myself, session(), _ident);
 
     if (status == PEP_STATUS_OK) {
         assert(_ident->fpr);
@@ -2066,14 +2061,15 @@ STDMETHODIMP CpEpEngine::ConfigPassphraseForNewKeysByEmail(VARIANT_BOOL enable, 
     string _accountEmail = utf8_string(accountEmail);
     string _passphrase = utf8_string(passphrase);
 
-    PEP_STATUS status = ::config_passphrase_for_new_keys_by_email(session(), enable, _accountEmail.c_str(), _passphrase.c_str());
+    if (!_accountEmail.empty()) {
+        if (enable) {
+            passphrase_cache.add(_accountEmail, _passphrase);
+        } else {
+            passphrase_cache.remove(_accountEmail);
+        }
+    }
 
-    if (status == PEP_STATUS_OK) {
-        return S_OK;
-    }
-    else {
-        return FAIL(L"ConfigPassphraseForNewKeysByEmail", status);
-    }
+    return S_OK;
 }
 
 STDMETHODIMP CpEpEngine::ShowNotification(BSTR title, BSTR message) 
@@ -2595,11 +2591,6 @@ STDMETHODIMP CpEpEngine::SignatureVerifies(BSTR text, BSTR signature, VARIANT_BO
     return status;
 }
 
-static void cache_passphrase(const string& passphrase)
-{
-    passphrase_cache.add(passphrase);
-}
-
 STDMETHODIMP CpEpEngine::ManagePassphrase(LPSAFEARRAY accounts_with_old_passphrases, BSTR new_passphrase, LPSAFEARRAY* error_accounts) {
     string passphrase = utf8_string(new_passphrase);
     stringpair_list_t* account_passphrases = stringpair_list(accounts_with_old_passphrases);
@@ -2607,16 +2598,20 @@ STDMETHODIMP CpEpEngine::ManagePassphrase(LPSAFEARRAY accounts_with_old_passphra
 
     const PEP_STATUS status = manage_passphrase(session(), account_passphrases, passphrase.c_str(), &_error_accounts);
 
-    free_stringpair_list(account_passphrases);
-
     if (status != PEP_STATUS_OK && _error_accounts) {
         *error_accounts = string_array(_error_accounts);
     }
     else if (status == PEP_STATUS_OK) {
-        // cache the new passphrase
-        cache_passphrase(passphrase);
+        // cache the new account/passphrase combinations
+        for (stringpair_list_t* current = account_passphrases; current && current->value; current = current->next) {
+            if (current->value && current->value->key) {
+                string account_email{ current->value->key };
+                passphrase_cache.add(account_email, passphrase);
+            }
+        }
     }
 
+    free_stringpair_list(account_passphrases);
     free_stringlist(_error_accounts);
 
     return status;
@@ -2645,11 +2640,12 @@ STDMETHODIMP CpEpEngine::UnlockKeysWithPassphrase(LPSAFEARRAY account_passphrase
         *error_accounts = string_array(_error_accounts);
     }
     else if (status == PEP_STATUS_OK) {
-        // cache the new passphrases
+        // cache the new account/passphrase combinations
         for (stringpair_list_t* current = _account_passphrases; current; current = current->next) {
-            if (current->value && current->value->value) {
+            if (current->value && current->value->key && current->value->value) {
+                string account_email{ current->value->key };
                 string passphrase{ current->value->value };
-                cache_passphrase(passphrase);
+                passphrase_cache.add(account_email, passphrase);
             }
         }
     }
