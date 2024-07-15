@@ -275,6 +275,7 @@ public:
     STDMETHOD(TrustOwnKey)(pEpIdentity * ident);
     STDMETHOD(ConfigPassphrase)(BSTR passphrase);
     STDMETHOD(ConfigPassphraseForNewKeys)(VARIANT_BOOL enable, BSTR passphrase);
+    STDMETHOD(ConfigPassphraseForNewKeysByEmail)(VARIANT_BOOL enable, BSTR accountEmail, BSTR passphrase);
     STDMETHOD(SetCommPartnerKey)(pEpIdentity* identity, BSTR fpr);
 
     // Trigger an immediate update
@@ -324,7 +325,7 @@ public:
 
     STDMETHOD(ManagePassphrase)(LPSAFEARRAY accounts_with_old_passphrases, BSTR new_passphrase, LPSAFEARRAY* error_accounts);
     STDMETHOD(HasPassphrase)(BSTR account, VARIANT_BOOL* result);
-    STDMETHOD(UnlockKeysWithPassphrase)(LPSAFEARRAY accounts, LPSAFEARRAY* error_accounts);
+    STDMETHOD(UnlockKeysWithPassphrase)(LPSAFEARRAY accounts_passphrases, LPSAFEARRAY* error_accounts);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(pEpEngine), CpEpEngine)
