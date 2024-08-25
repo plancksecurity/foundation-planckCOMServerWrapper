@@ -5,6 +5,10 @@
       <Configuration>Debug</Configuration>
       <Platform>ARM</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
@@ -21,6 +25,10 @@
       <Configuration>Release</Configuration>
       <Platform>ARM</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -36,14 +44,12 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A27BD6BF-63BC-473D-B8BD-84ACB085F39C}</ProjectGuid>
-    <Keyword>AtlProj</Keyword>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <VcpkgTriplet Condition="'$(Platform)'=='x64'">x64-windows</VcpkgTriplet>
     <ProjectName>planckCOMServerWrapper</ProjectName>
   </PropertyGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A27BD6BF-63BC-473D-B8BD-84ACB085F39C}</ProjectGuid>
-    <Keyword>AtlProj</Keyword>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <VcpkgTriplet Condition="'$(Platform)'=='x86'">x86-windows</VcpkgTriplet>
     <VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows</VcpkgTriplet>
@@ -62,6 +68,18 @@
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <PreferredToolArchitecture />
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <PreferredToolArchitecture />
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -73,10 +91,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Platform)'=='Win32'">
-    <OutDir>$(SolutionDir)\x86\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)x86\$(Configuration)\</OutDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Platform)'!='Win32'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+  <PropertyGroup Condition="'$(Platform)'=='x86'">
+    <OutDir>$(SolutionDir)x86\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)'=='x64'">
+    <OutDir>$(SolutionDir)x64\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)'=='ARM64'">
+    <OutDir>$(SolutionDir)arm64\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
@@ -84,15 +108,7 @@
     <IncludePath>$(IncludePath)</IncludePath>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)vcpkg\installed\x64-windows\debug\lib;</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IgnoreImportLibrary>false</IgnoreImportLibrary>
-    <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(IncludePath)</IncludePath>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)vcpkg\installed\x64-windows\lib;</LibraryPath>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(SolutionDir)x64\$(Configuration);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
@@ -100,7 +116,7 @@
     <IncludePath>$(IncludePath)</IncludePath>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)vcpkg\installed\x86-windows\debug\lib;</LibraryPath>
+    <LibraryPath>$(VC_LibraryPath);$(WindowsSdkDir)\Lib;$(SolutionDir)x86\$(Configuration);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
@@ -108,14 +124,30 @@
     <IncludePath>$(IncludePath)</IncludePath>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)x86\$(Configuration);$(SolutionDir)vcpkg\installed\x86-windows\debug\lib;</LibraryPath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)x86\$(Configuration);</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LibraryPath>$(VC_LibraryPath_ARM64);$(WindowsSDK_LibraryPath_ARM64);$(SolutionDir)arm64\$(Configuration);</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(SolutionDir)x64\$(Configuration);</LibraryPath>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)vcpkg\installed\x86-windows\lib;</LibraryPath>
+    <LibraryPath>$(VC_LibraryPath);$(WindowsSdkDir)\Lib;$(SolutionDir)x86\$(Configuration);</LibraryPath>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -123,14 +155,30 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)x86\$(Configuration);$(SolutionDir)vcpkg\installed\x86-windows\lib;</LibraryPath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)x86\$(Configuration);</LibraryPath>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <LibraryPath>$(VC_LibraryPath_ARM64);$(WindowsSDK_LibraryPath_ARM64);$(SolutionDir)arm64\$(Configuration);</LibraryPath>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <VcpkgHostTriplet>
+    </VcpkgHostTriplet>
+    <VcpkgTriplet>arm64-windows</VcpkgTriplet>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <VcpkgHostTriplet>
+    </VcpkgHostTriplet>
+    <VcpkgTriplet>arm64-windows</VcpkgTriplet>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <PostBuildEvent>
       <Command>
-echo "Registering server $(TargetPath)"
-$(TargetPath) /regserver
 echo "Generating interop assembly $(TargetDir)\planckCOMServerWrapper.Interop.dll"
 TlbImp.exe "$(TargetPath)" /out:"$(TargetDir)\planckCOMServerWrapper.Interop.dll" /namespace:planckCOMServerWrapperLib /primary /keyfile:"$(ProjectDir)pEp_test.snk" /machine:Agnostic"
         </Command>
@@ -173,8 +221,10 @@ TlbImp.exe "$(TargetPath)" /out:"$(TargetDir)\planckCOMServerWrapper.Interop.dll
 	      comsuppwd.lib;Wininet.lib;bcrypt.lib;Crypt32.lib;archive.lib;bz2d.lib;charset.lib;cryptopp.lib;iconv.lib;
 	      libcrypto.lib;libexpatd.lib;libssl.lib;libxml2.lib;lz4d.lib;lzma.lib;zlibd.lib;zstd.lib;libpEpAdapter.lib;libpEpCxx11.lib;pEpEngine.lib;
       </AdditionalDependencies>
-      <LibraryPath Condition="'$(Platform)'=='Win32'">$(SolutionDir)\vcpkg\installed\x86-windows\lib;$(SolutionDir)x86\$(ConfigurationName);$(LibraryPath);</LibraryPath>
-      <LibraryPath Condition="'$(Platform)'!='Win32'">$(SolutionDir)\vcpkg\installed\x64-windows\lib;$(SolutionDir)$(Platform)\$(ConfigurationName);$(LibraryPath);</LibraryPath>
+      <LibraryPath Condition="'$(Platform)'=='Win32'">$(SolutionDir)x86\$(ConfigurationName);$(LibraryPath);</LibraryPath>
+      <LibraryPath Condition="'$(Platform)'=='x86'">$(SolutionDir)x86\$(ConfigurationName);$(LibraryPath);</LibraryPath>
+      <LibraryPath Condition="'$(Platform)'=='x64'">$(SolutionDir)x64\$(ConfigurationName);$(LibraryPath);</LibraryPath>
+      <LibraryPath Condition="'$(Platform)'=='ARM64'">$(SolutionDir)arm64\$(ConfigurationName);$(LibraryPath);</LibraryPath>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <PreventDllBinding>true</PreventDllBinding>
@@ -220,8 +270,10 @@ TlbImp.exe "$(TargetPath)" /out:"$(TargetDir)\planckCOMServerWrapper.Interop.dll
 	      comsuppwd.lib;Wininet.lib;bcrypt.lib;Crypt32.lib;archive.lib;bz2.lib;charset.lib;cryptopp.lib;ffi.lib;iconv.lib;libcrypto.lib;libexpat.lib;libssl.lib;libxml2.lib;lz4.lib;lzma.lib;zlib.lib;
 	      zstd.lib;libpEpAdapter.lib; libpEpCxx11.lib; pEpEngine.lib;
       </AdditionalDependencies>
-      <LibraryPath Condition="'$(Platform)'=='Win32'">$(SolutionDir)\vcpkg\installed\x86-windows\lib;$(SolutionDir)x86\$(ConfigurationName);$(LibraryPath);</LibraryPath>
-      <LibraryPath Condition="'$(Platform)'!='Win32'">$(SolutionDir)\vcpkg\installed\x64-windows\lib;$(SolutionDir)$(Platform)\$(ConfigurationName);$(LibraryPath);</LibraryPath>
+      <LibraryPath Condition="'$(Platform)'=='Win32'">$(SolutionDir)x86\$(ConfigurationName);$(LibraryPath);</LibraryPath>
+      <LibraryPath Condition="'$(Platform)'=='x86'">$(SolutionDir)x86\$(ConfigurationName);$(LibraryPath);</LibraryPath>
+      <LibraryPath Condition="'$(Platform)'=='x64'">$(SolutionDir)x64\$(ConfigurationName);$(LibraryPath);</LibraryPath>
+      <LibraryPath Condition="'$(Platform)'=='ARM64'">$(SolutionDir)arm64\$(ConfigurationName);$(LibraryPath);</LibraryPath>
       <PreventDllBinding>true</PreventDllBinding>
     </Link>
     <ProjectReference>
