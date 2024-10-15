@@ -138,7 +138,6 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="pep_test.snk" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="planckCOMServerWrapper.idl">
